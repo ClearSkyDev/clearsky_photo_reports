@@ -2,6 +2,42 @@ import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, TextInput, Image, FlatList, Button } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 
+// Mock AI label suggestions per inspection section
+const mockAISuggestions = {
+  'Front Elevation': [
+    'Front Elevation – Downspout – Possible Hail Damage',
+    'Front Elevation – Gutter – Sagging',
+  ],
+  'Right Elevation': [
+    'Right Elevation – Fascia – Peeling Paint',
+    'Right Elevation – Siding – Impact Marks',
+  ],
+  'Back Elevation': [
+    'Back Elevation – Window Trim – Wood Rot',
+    'Back Elevation – Hose Bib – Rust Stains',
+  ],
+  'Left Elevation': [
+    'Left Elevation – AC Unit – Obstruction',
+    'Left Elevation – Foundation Crack',
+  ],
+  'Roof Edge': ['Roof Edge – Drip Edge – Bent', 'Roof Edge – Soffit – Animal Damage'],
+  'Front Slope': ['Front Slope – Shingle Crease – Wind Lift', 'Front Slope – Granule Loss – Aging'],
+  'Right Slope': ['Right Slope – Soft Spot – Possible Deck Rot', 'Right Slope – Nail Pops – Shingle Lift'],
+  'Back Slope': ['Back Slope – Pipe Jack – Cracked Boot', 'Back Slope – Ridge Cap – Exposed Nail'],
+  'Left Slope': ['Left Slope – Flashing – Loose', 'Left Slope – Vent Cap – Rust'],
+  'Accessories & Conditions': ['Skylight – Flashing Improper', 'Satellite Dish – Improper Mount'],
+  'Rear Yard': ['Rear Yard – Fence Damage', 'Rear Yard – Tree Limbs Over Roof'],
+  'Address + Front Shot': ['Address Confirmed – 123 Main St', 'Front View – House Orientation Verified'],
+};
+
+// Return a random AI suggestion for a given section or a fallback text
+const generateAISuggestion = (sectionPrefix) => {
+  const suggestions = mockAISuggestions[sectionPrefix] || [
+    'General Observation – No Issues Detected',
+  ];
+  return suggestions[Math.floor(Math.random() * suggestions.length)];
+};
+
 const inspectionSections = [
   'Address + Front Shot',
   'Front Elevation',
@@ -32,7 +68,7 @@ export default function ClearSkyPhotoIntakeScreen() {
         imageUri: result.assets[0].uri,
         sectionPrefix: section,
         userLabel: section,
-        aiSuggestedLabel: '',
+        aiSuggestedLabel: generateAISuggestion(section),
         approved: false,
       };
       setPhotosBySection((prev) => ({
@@ -49,6 +85,10 @@ export default function ClearSkyPhotoIntakeScreen() {
     }));
   };
 
+  const regenerateAISuggestion = (section, id) => {
+    updatePhoto(section, id, { aiSuggestedLabel: generateAISuggestion(section) });
+  };
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       {inspectionSections.map((section) => (
@@ -61,13 +101,14 @@ export default function ClearSkyPhotoIntakeScreen() {
           onApprove={(id) => updatePhoto(section, id, { approved: true })}
           onEdit={(id) => updatePhoto(section, id, { approved: false })}
           onSkip={(id) => updatePhoto(section, id, { approved: false })}
+          onRegenerate={(id) => regenerateAISuggestion(section, id)}
         />
       ))}
     </ScrollView>
   );
 }
 
-function SectionAccordion({ section, photos, onAddPhoto, onUpdateLabel, onApprove, onEdit, onSkip }) {
+function SectionAccordion({ section, photos, onAddPhoto, onUpdateLabel, onApprove, onEdit, onSkip, onRegenerate }) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -104,6 +145,9 @@ function SectionAccordion({ section, photos, onAddPhoto, onUpdateLabel, onApprov
                   </TouchableOpacity>
                   <TouchableOpacity onPress={() => onSkip(item.id)} style={styles.actionButton}>
                     <Text>⏭️</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => onRegenerate(item.id)} style={styles.actionButton}>
+                    <Text>🔄</Text>
                   </TouchableOpacity>
                 </View>
               </View>
