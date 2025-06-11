@@ -14,3 +14,7 @@ node scripts/demo_generate_questionnaire.js
 ```
 
 Running the script outputs a pre-filled questionnaire based on sample photos.
+
+## Report Preview Screen
+
+`react_native/ReportPreviewScreen.js` implements a basic report preview. It takes a set of approved photo objects and a questionnaire object and allows inspectors to edit a summary then export the result as HTML or PDF using Expo's `Print.printToFileAsync`.
