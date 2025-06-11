@@ -31,7 +31,7 @@ export default function ClearSkyPhotoIntakeScreen() {
         id: Date.now().toString(),
         imageUri: result.assets[0].uri,
         sectionPrefix: section,
-        userLabel: '',
+        userLabel: section,
         aiSuggestedLabel: '',
         approved: false,
       };
@@ -42,10 +42,10 @@ export default function ClearSkyPhotoIntakeScreen() {
     }
   };
 
-  const updateLabel = (section, id, text) => {
+  const updatePhoto = (section, id, changes) => {
     setPhotosBySection((prev) => ({
       ...prev,
-      [section]: prev[section].map((p) => (p.id === id ? { ...p, userLabel: text } : p)),
+      [section]: prev[section].map((p) => (p.id === id ? { ...p, ...changes } : p)),
     }));
   };
 
@@ -57,14 +57,17 @@ export default function ClearSkyPhotoIntakeScreen() {
           section={section}
           photos={photosBySection[section] || []}
           onAddPhoto={() => handleAddPhoto(section)}
-          onUpdateLabel={(id, text) => updateLabel(section, id, text)}
+          onUpdateLabel={(id, text) => updatePhoto(section, id, { userLabel: text })}
+          onApprove={(id) => updatePhoto(section, id, { approved: true })}
+          onEdit={(id) => updatePhoto(section, id, { approved: false })}
+          onSkip={(id) => updatePhoto(section, id, { approved: false })}
         />
       ))}
     </ScrollView>
   );
 }
 
-function SectionAccordion({ section, photos, onAddPhoto, onUpdateLabel }) {
+function SectionAccordion({ section, photos, onAddPhoto, onUpdateLabel, onApprove, onEdit, onSkip }) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -86,8 +89,23 @@ function SectionAccordion({ section, photos, onAddPhoto, onUpdateLabel }) {
                   style={styles.labelInput}
                   value={item.userLabel}
                   placeholder={`${section} label`}
+                  editable={!item.approved}
                   onChangeText={(text) => onUpdateLabel(item.id, text)}
                 />
+                {item.aiSuggestedLabel ? (
+                  <Text style={styles.suggestText}>{item.aiSuggestedLabel}</Text>
+                ) : null}
+                <View style={styles.actionRow}>
+                  <TouchableOpacity onPress={() => onApprove(item.id)} style={styles.actionButton}>
+                    <Text>✅</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => onEdit(item.id)} style={styles.actionButton}>
+                    <Text>✏️</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => onSkip(item.id)} style={styles.actionButton}>
+                    <Text>⏭️</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             )}
           />
@@ -132,6 +150,19 @@ const styles = StyleSheet.create({
     borderColor: '#aaa',
     paddingVertical: 4,
     marginTop: 4,
+  },
+  suggestText: {
+    fontSize: 12,
+    color: '#666',
+    marginTop: 2,
+  },
+  actionRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 4,
+  },
+  actionButton: {
+    paddingHorizontal: 4,
   },
 });
 
