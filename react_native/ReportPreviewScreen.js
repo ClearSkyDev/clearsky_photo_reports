@@ -1,21 +1,19 @@
 import React, { useState } from 'react';
 import { ScrollView, View, Text, Image, TextInput, Button } from 'react-native';
-import * as Print from 'expo-print';
 import generateReportHTML from './generateReportHTML';
+import { exportReportAsPDF, exportReportAsHTML } from './exportReport';
 
 export default function ReportPreviewScreen({ uploadedPhotos, roofQuestionnaire }) {
   const [summaryText, setSummaryText] = useState('');
 
   const handleExportPDF = async () => {
     const html = generateReportHTML(uploadedPhotos, roofQuestionnaire, summaryText);
-    const { uri } = await Print.printToFileAsync({ html });
-    console.log('PDF saved to', uri);
+    await exportReportAsPDF(html);
   };
 
   const handleExportHTML = async () => {
     const html = generateReportHTML(uploadedPhotos, roofQuestionnaire, summaryText);
-    const { uri } = await Print.printToFileAsync({ html, base64: false });
-    console.log('HTML saved to', uri);
+    await exportReportAsHTML(html);
   };
 
   return (
