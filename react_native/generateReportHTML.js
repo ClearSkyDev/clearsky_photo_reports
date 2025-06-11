@@ -3,6 +3,10 @@ export default function generateReportHTML(
   roofQuestionnaire,
   summaryText = "",
   clientName = "",
+  clientAddress = "",
+  insuranceCarrier = "",
+  claimNumber = "",
+  perilType = "",
   inspectionDate = new Date().toLocaleDateString()
 ) {
   const groupPhotosBySection = () => {
@@ -39,7 +43,11 @@ export default function generateReportHTML(
     <body>
       <h1>Roof Inspection Report</h1>
       <p><strong>Date:</strong> ${inspectionDate}</p>
-      <p><strong>Client:</strong> ${clientName || "________________"}</p>
+      <p><strong>Client:</strong> ${clientName}</p>
+      <p><strong>Address:</strong> ${clientAddress}</p>
+      <p><strong>Insurance Carrier:</strong> ${insuranceCarrier}</p>
+      <p><strong>Claim #:</strong> ${claimNumber}</p>
+      <p><strong>Peril Type:</strong> ${perilType}</p>
 
       <h2>Photos</h2>
       ${Object.entries(groupedPhotos)

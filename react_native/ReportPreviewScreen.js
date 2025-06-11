@@ -5,14 +5,45 @@ import { exportReportAsPDF, exportReportAsHTML } from './exportReport';
 
 export default function ReportPreviewScreen({ uploadedPhotos, roofQuestionnaire }) {
   const [summaryText, setSummaryText] = useState('');
+  const [clientName, setClientName] = useState('');
+  const [clientAddress, setClientAddress] = useState('');
+  const [insuranceCarrier, setInsuranceCarrier] = useState('');
+  const [claimNumber, setClaimNumber] = useState('');
+  const [perilType, setPerilType] = useState('');
+
+  const inputStyle = {
+    borderColor: 'gray',
+    borderWidth: 1,
+    padding: 8,
+    marginVertical: 6,
+    borderRadius: 6,
+  };
 
   const handleExportPDF = async () => {
-    const html = generateReportHTML(uploadedPhotos, roofQuestionnaire, summaryText);
+    const html = generateReportHTML(
+      uploadedPhotos,
+      roofQuestionnaire,
+      summaryText,
+      clientName,
+      clientAddress,
+      insuranceCarrier,
+      claimNumber,
+      perilType
+    );
     await exportReportAsPDF(html);
   };
 
   const handleExportHTML = async () => {
-    const html = generateReportHTML(uploadedPhotos, roofQuestionnaire, summaryText);
+    const html = generateReportHTML(
+      uploadedPhotos,
+      roofQuestionnaire,
+      summaryText,
+      clientName,
+      clientAddress,
+      insuranceCarrier,
+      claimNumber,
+      perilType
+    );
     await exportReportAsHTML(html);
   };
 
@@ -20,6 +51,39 @@ export default function ReportPreviewScreen({ uploadedPhotos, roofQuestionnaire 
     <ScrollView style={{ padding: 16 }}>
       <Text style={{ fontSize: 20, fontWeight: 'bold' }}>Inspection Report</Text>
       <Text>Date: {new Date().toLocaleDateString()}</Text>
+      <View style={{ marginBottom: 20 }}>
+        <Text style={{ fontWeight: 'bold' }}>Client Information</Text>
+        <TextInput
+          placeholder="Client Name"
+          value={clientName}
+          onChangeText={setClientName}
+          style={inputStyle}
+        />
+        <TextInput
+          placeholder="Address"
+          value={clientAddress}
+          onChangeText={setClientAddress}
+          style={inputStyle}
+        />
+        <TextInput
+          placeholder="Insurance Carrier"
+          value={insuranceCarrier}
+          onChangeText={setInsuranceCarrier}
+          style={inputStyle}
+        />
+        <TextInput
+          placeholder="Claim Number"
+          value={claimNumber}
+          onChangeText={setClaimNumber}
+          style={inputStyle}
+        />
+        <TextInput
+          placeholder="Peril Type (e.g. Hail, Wind, Fire)"
+          value={perilType}
+          onChangeText={setPerilType}
+          style={inputStyle}
+        />
+      </View>
       <View style={{ marginTop: 16 }}>
         {['Address','Front','Right','Back','Left','Roof Edge','Slopes','Accessories','Rear Yard'].map((section) => (
           <View key={section} style={{ marginBottom: 8 }}>
