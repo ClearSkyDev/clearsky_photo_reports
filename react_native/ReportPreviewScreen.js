@@ -1,69 +1,7 @@
 import React, { useState } from 'react';
 import { ScrollView, View, Text, Image, TextInput, Button } from 'react-native';
 import * as Print from 'expo-print';
-
-// Utility to generate HTML from uploaded photos and questionnaire
-function generateReportHTML(photos, questionnaire, notes) {
-  const photoSections = [
-    'Address',
-    'Front',
-    'Right',
-    'Back',
-    'Left',
-    'Roof Edge',
-    'Slopes',
-    'Accessories',
-    'Rear Yard',
-  ];
-
-  const photosHtml = photoSections
-    .map((section) => {
-      const sectionPhotos = photos.filter((p) =>
-        p.sectionPrefix.toLowerCase().includes(section.toLowerCase())
-      );
-      if (sectionPhotos.length === 0) return '';
-      const imgs = sectionPhotos
-        .map(
-          (photo) => `
-          <div style="margin-bottom:12px">
-            <img src="${photo.imageUri}" style="width:100%;height:auto" />
-            <div>Label: ${photo.userLabel}</div>
-          </div>`
-        )
-        .join('');
-      return `<h3>${section}</h3>${imgs}`;
-    })
-    .join('');
-
-  const questionnaireHtml = Object.entries(questionnaire)
-    .map(([section, data]) => {
-      if (typeof data === 'object' && !Array.isArray(data)) {
-        const inner = Object.entries(data)
-          .map(([key, values]) => `<div>${key}: ${values.join(', ')}</div>`) 
-          .join('');
-        return `<h4>${section.toUpperCase()}</h4>${inner}`;
-      }
-      if (Array.isArray(data)) {
-        return `<h4>${section.toUpperCase()}</h4><div>${data.join(', ')}</div>`;
-      }
-      return '';
-    })
-    .join('');
-
-  return `
-    <html>
-      <body style="font-family: Arial, sans-serif; padding:16px">
-        <h2>Inspection Report</h2>
-        <div>Date: ${new Date().toLocaleDateString()}</div>
-        ${photosHtml}
-        <h3>Roof Questionnaire Summary</h3>
-        ${questionnaireHtml}
-        <h3>Inspector Summary</h3>
-        <div>${notes}</div>
-      </body>
-    </html>
-  `;
-}
+import generateReportHTML from './generateReportHTML';
 
 export default function ReportPreviewScreen({ uploadedPhotos, roofQuestionnaire }) {
   const [summaryText, setSummaryText] = useState('');
