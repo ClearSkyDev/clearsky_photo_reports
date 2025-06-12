@@ -7,6 +7,7 @@ export default function generateReportHTML(
   insuranceCarrier = "",
   claimNumber = "",
   perilType = "",
+  inspectorSignature = null,
   inspectionDate = new Date().toLocaleDateString()
 ) {
   const groupPhotosBySection = () => {
@@ -99,6 +100,7 @@ export default function generateReportHTML(
       <div class="summary">
         <h2>Inspector Summary</h2>
         <p>${summaryText || "[Add your final comments here before exporting.]"}</p>
+        ${inspectorSignature ? `<img src="${inspectorSignature}" alt="Inspector Signature" style="width: 300px;" />` : ''}
       </div>
     </body>
   </html>

@@ -18,3 +18,5 @@ Running the script outputs a pre-filled questionnaire based on sample photos.
 ## Report Preview Screen
 
 `react_native/ReportPreviewScreen.js` implements a basic report preview. It takes a set of approved photo objects and a questionnaire object and allows inspectors to edit a summary then export the result as HTML or PDF. The exported file is saved to the device and the native share sheet is opened so the report can be shared or saved using any available app.
+
+The preview screen now also includes a signature canvas so inspectors can sign the report before exporting.
