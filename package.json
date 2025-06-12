@@ -1,0 +1,20 @@
+{
+  "name": "clearsky_photo_reports",
+  "version": "1.0.0",
+  "description": "AI powered roof inspection reporting app",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "react-native-signature-canvas": "^4.7.4"
+  }
+}
