@@ -108,7 +108,11 @@ export default function ReportPreviewScreen({ uploadedPhotos, roofQuestionnaire 
               .filter((p) => p.sectionPrefix.toLowerCase().includes(section.toLowerCase()))
               .map((photo) => (
                 <View key={photo.id} style={{ marginBottom: 12 }}>
-                  <Image source={{ uri: photo.imageUri }} style={{ width: '100%', height: 200 }} resizeMode="cover" />
+                  <Image
+                    source={{ uri: photo.imageUri }}
+                    style={{ width: '100%', aspectRatio: 1, borderRadius: 6 }}
+                    resizeMode="cover"
+                  />
                   <Text>Label: {photo.userLabel}</Text>
                 </View>
               ))}
