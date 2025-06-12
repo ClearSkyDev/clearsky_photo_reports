@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ScrollView, View, Text, Image, TextInput, Button } from 'react-native';
+import Signature from 'react-native-signature-canvas';
 import generateReportHTML from './generateReportHTML';
 import { exportReportAsPDF, exportReportAsHTML } from './exportReport';
 
@@ -10,6 +11,15 @@ export default function ReportPreviewScreen({ uploadedPhotos, roofQuestionnaire 
   const [insuranceCarrier, setInsuranceCarrier] = useState('');
   const [claimNumber, setClaimNumber] = useState('');
   const [perilType, setPerilType] = useState('');
+  const [signatureData, setSignatureData] = useState(null);
+
+  const handleSignature = (signature) => {
+    setSignatureData(signature);
+  };
+
+  const handleEmpty = () => {
+    alert('Please sign before submitting.');
+  };
 
   const inputStyle = {
     borderColor: 'gray',
@@ -28,7 +38,8 @@ export default function ReportPreviewScreen({ uploadedPhotos, roofQuestionnaire 
       clientAddress,
       insuranceCarrier,
       claimNumber,
-      perilType
+      perilType,
+      signatureData
     );
     await exportReportAsPDF(html);
   };
@@ -42,7 +53,8 @@ export default function ReportPreviewScreen({ uploadedPhotos, roofQuestionnaire 
       clientAddress,
       insuranceCarrier,
       claimNumber,
-      perilType
+      perilType,
+      signatureData
     );
     await exportReportAsHTML(html);
   };
@@ -128,6 +140,18 @@ export default function ReportPreviewScreen({ uploadedPhotos, roofQuestionnaire 
           marginBottom: 16,
         }}
       />
+
+      <View style={{ height: 300, marginVertical: 20 }}>
+        <Text style={{ fontWeight: 'bold' }}>Inspector Signature:</Text>
+        <Signature
+          onOK={handleSignature}
+          onEmpty={handleEmpty}
+          descriptionText="Sign below"
+          clearText="Clear"
+          confirmText="Save"
+          webStyle={`.m-signature-pad--footer { display: none; }`}
+        />
+      </View>
 
       <Button title="Export as PDF" onPress={handleExportPDF} />
       <Button title="Export as HTML" onPress={handleExportHTML} />
