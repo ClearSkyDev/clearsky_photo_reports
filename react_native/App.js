@@ -26,9 +26,9 @@ const mockAISuggestions = {
   'Right Slope': ['Right Slope – Soft Spot – Possible Deck Rot', 'Right Slope – Nail Pops – Shingle Lift'],
   'Back Slope': ['Back Slope – Pipe Jack – Cracked Boot', 'Back Slope – Ridge Cap – Exposed Nail'],
   'Left Slope': ['Left Slope – Flashing – Loose', 'Left Slope – Vent Cap – Rust'],
-  'Accessories & Conditions': ['Skylight – Flashing Improper', 'Satellite Dish – Improper Mount'],
-  'Rear Yard': ['Rear Yard – Fence Damage', 'Rear Yard – Tree Limbs Over Roof'],
-  'Address + Front Shot': ['Address Confirmed – 123 Main St', 'Front View – House Orientation Verified'],
+  'Roof Accessories': ['Skylight – Flashing Improper', 'Satellite Dish – Improper Mount'],
+  'Roof Conditions': ['Granule Loss – Aging', 'Shingle Curling – Wind Damage'],
+  Address: ['Address Confirmed – 123 Main St', 'Front View – House Orientation Verified'],
 };
 
 // Return a random AI suggestion for a given section or a fallback text
@@ -40,18 +40,18 @@ const generateAISuggestion = (sectionPrefix) => {
 };
 
 const inspectionSections = [
-  'Address + Front Shot',
+  'Address',
   'Front Elevation',
   'Right Elevation',
   'Back Elevation',
   'Left Elevation',
-  'Rear Yard',
   'Roof Edge',
   'Front Slope',
   'Right Slope',
   'Back Slope',
   'Left Slope',
-  'Accessories & Conditions'
+  'Roof Accessories',
+  'Roof Conditions',
 ];
 
 
