@@ -56,6 +56,8 @@ const inspectionSections = [
 
 
 export default function ClearSkyPhotoIntakeScreen() {
+  // Store photos keyed by section name
+  const [photoData, setPhotoData] = useState({});
   const [photosBySection, setPhotosBySection] = useState({});
 
   const handleAddPhoto = async (section) => {
