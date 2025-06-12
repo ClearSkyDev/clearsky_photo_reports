@@ -61,7 +61,7 @@ export default function generateReportHTML(
               .map(
                 (p) => `
               <div class="photo-item">
-                <img src="${p.imageUri}" alt="Photo" />
+                <img src="${p.imageUri}" alt="Photo" style="width: 100%; aspect-ratio: 1 / 1; object-fit: cover; border-radius: 6px;" />
                 <div class="caption">${p.userLabel}</div>
               </div>
             `
