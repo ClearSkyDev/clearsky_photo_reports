@@ -11,8 +11,10 @@ export default function ReportPreviewScreen({ uploadedPhotos, roofQuestionnaire 
   const [insuranceCarrier, setInsuranceCarrier] = useState('');
   const [claimNumber, setClaimNumber] = useState('');
   const [perilType, setPerilType] = useState('');
+  // Holds the inspector signature as a base64 encoded PNG
   const [signatureData, setSignatureData] = useState(null);
 
+  // Save the drawn signature when the user taps "Save" on the canvas
   const handleSignature = (signature) => {
     setSignatureData(signature);
   };
@@ -30,6 +32,7 @@ export default function ReportPreviewScreen({ uploadedPhotos, roofQuestionnaire 
   };
 
   const handleExportPDF = async () => {
+    // Include the saved signature when generating the report markup
     const html = generateReportHTML(
       uploadedPhotos,
       roofQuestionnaire,
@@ -45,6 +48,7 @@ export default function ReportPreviewScreen({ uploadedPhotos, roofQuestionnaire 
   };
 
   const handleExportHTML = async () => {
+    // The same signature data is also passed when exporting HTML
     const html = generateReportHTML(
       uploadedPhotos,
       roofQuestionnaire,
