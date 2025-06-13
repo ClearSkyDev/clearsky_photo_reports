@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, TextInput, Image, FlatList, Button } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, TextInput, Image, Button } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { compressAndSquarePhoto } from './photoUploadUtils';
 
@@ -58,9 +58,8 @@ const inspectionSections = [
 export default function ClearSkyPhotoIntakeScreen() {
   // Store photos keyed by section name
   const [photoData, setPhotoData] = useState({});
-  const [photosBySection, setPhotosBySection] = useState({});
 
-  const handleAddPhoto = async (section) => {
+  const handlePhotoUpload = async (section) => {
     const result = await ImagePicker.launchCameraAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       quality: 0.5,
@@ -68,99 +67,64 @@ export default function ClearSkyPhotoIntakeScreen() {
 
     if (!result.canceled) {
       const processedUri = await compressAndSquarePhoto(result.assets[0].uri);
-      const photoObj = {
-        id: Date.now().toString(),
-        imageUri: processedUri,
-        sectionPrefix: section,
-        userLabel: section,
-        aiSuggestedLabel: generateAISuggestion(section),
-        approved: false,
-      };
-      setPhotosBySection((prev) => ({
+      setPhotoData((prev) => ({
         ...prev,
-        [section]: prev[section] ? [...prev[section], photoObj] : [photoObj],
+        [section]: prev[section]
+          ? [...prev[section], { uri: processedUri, label: '' }]
+          : [{ uri: processedUri, label: '' }],
       }));
     }
   };
 
-  const updatePhoto = (section, id, changes) => {
-    setPhotosBySection((prev) => ({
-      ...prev,
-      [section]: prev[section].map((p) => (p.id === id ? { ...p, ...changes } : p)),
-    }));
-  };
-
-  const regenerateAISuggestion = (section, id) => {
-    updatePhoto(section, id, { aiSuggestedLabel: generateAISuggestion(section) });
+  const handleLabelChange = (section, index, text) => {
+    setPhotoData((prev) => {
+      const updatedSection = prev[section] ? [...prev[section]] : [];
+      if (updatedSection[index]) {
+        updatedSection[index] = { ...updatedSection[index], label: text };
+      }
+      return { ...prev, [section]: updatedSection };
+    });
   };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
       {inspectionSections.map((section) => (
-        <SectionAccordion
+        <View
           key={section}
-          section={section}
-          photos={photosBySection[section] || []}
-          onAddPhoto={() => handleAddPhoto(section)}
-          onUpdateLabel={(id, text) => updatePhoto(section, id, { userLabel: text })}
-          onApprove={(id) => updatePhoto(section, id, { approved: true })}
-          onEdit={(id) => updatePhoto(section, id, { approved: false })}
-          onSkip={(id) => updatePhoto(section, id, { approved: false })}
-          onRegenerate={(id) => regenerateAISuggestion(section, id)}
-        />
+          style={{ marginVertical: 10, padding: 10, borderBottomWidth: 1 }}
+        >
+          <Text style={{ fontWeight: 'bold', fontSize: 16 }}>{section}</Text>
+
+          <Button
+            title={`Upload Photo for ${section}`}
+            onPress={() => handlePhotoUpload(section)}
+          />
+
+          {photoData[section]?.map((item, index) => (
+            <View key={index} style={{ marginTop: 10 }}>
+              <Image
+                source={{ uri: item.uri }}
+                style={{ width: 200, height: 200, borderRadius: 6 }}
+                resizeMode="cover"
+              />
+
+              <TextInput
+                value={item.label}
+                onChangeText={(text) => handleLabelChange(section, index, text)}
+                placeholder="Enter photo label"
+                style={{
+                  borderWidth: 1,
+                  borderColor: '#ccc',
+                  padding: 8,
+                  marginTop: 5,
+                  borderRadius: 4,
+                }}
+              />
+            </View>
+          ))}
+        </View>
       ))}
     </ScrollView>
-  );
-}
-
-function SectionAccordion({ section, photos, onAddPhoto, onUpdateLabel, onApprove, onEdit, onSkip, onRegenerate }) {
-  const [open, setOpen] = useState(false);
-
-  return (
-    <View style={styles.sectionContainer}>
-      <TouchableOpacity onPress={() => setOpen(!open)} style={styles.sectionHeader}>
-        <Text style={styles.sectionTitle}>{section}</Text>
-      </TouchableOpacity>
-      {open && (
-        <View style={styles.sectionContent}>
-          <Button title="Add Photo" onPress={onAddPhoto} />
-          <FlatList
-            data={photos}
-            numColumns={3}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <View style={styles.photoItem}>
-                <Image source={{ uri: item.imageUri }} style={styles.thumbnail} />
-                <TextInput
-                  style={styles.labelInput}
-                  value={item.userLabel}
-                  placeholder={`${section} label`}
-                  editable={!item.approved}
-                  onChangeText={(text) => onUpdateLabel(item.id, text)}
-                />
-                {item.aiSuggestedLabel ? (
-                  <Text style={styles.suggestText}>{item.aiSuggestedLabel}</Text>
-                ) : null}
-                <View style={styles.actionRow}>
-                  <TouchableOpacity onPress={() => onApprove(item.id)} style={styles.actionButton}>
-                    <Text>✅</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity onPress={() => onEdit(item.id)} style={styles.actionButton}>
-                    <Text>✏️</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity onPress={() => onSkip(item.id)} style={styles.actionButton}>
-                    <Text>⏭️</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity onPress={() => onRegenerate(item.id)} style={styles.actionButton}>
-                    <Text>🔄</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            )}
-          />
-        </View>
-      )}
-    </View>
   );
 }
 
