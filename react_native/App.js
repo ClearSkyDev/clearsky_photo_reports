@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, ScrollView, StyleSheet, TextInput, Image, Button } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
-import { compressAndSquarePhoto } from './photoUploadUtils';
 
 // Mock AI label suggestions per inspection section
 const mockAISuggestions = {
@@ -60,29 +59,32 @@ export default function ClearSkyPhotoIntakeScreen() {
   const [photoData, setPhotoData] = useState({});
 
   const handlePhotoUpload = async (section) => {
-    const result = await ImagePicker.launchCameraAsync({
+    let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      quality: 0.5,
+      allowsEditing: false,
+      quality: 1,
     });
 
     if (!result.canceled) {
-      const processedUri = await compressAndSquarePhoto(result.assets[0].uri);
-      setPhotoData((prev) => ({
-        ...prev,
-        [section]: prev[section]
-          ? [...prev[section], { uri: processedUri, label: '' }]
-          : [{ uri: processedUri, label: '' }],
-      }));
+      const newPhoto = {
+        uri: result.assets[0].uri,
+        label: `${section.toLowerCase()} photo`, // Default label suggestion
+      };
+
+      setPhotoData((prevData) => {
+        const updatedSection = prevData[section]
+          ? [...prevData[section], newPhoto]
+          : [newPhoto];
+        return { ...prevData, [section]: updatedSection };
+      });
     }
   };
 
-  const handleLabelChange = (section, index, text) => {
-    setPhotoData((prev) => {
-      const updatedSection = prev[section] ? [...prev[section]] : [];
-      if (updatedSection[index]) {
-        updatedSection[index] = { ...updatedSection[index], label: text };
-      }
-      return { ...prev, [section]: updatedSection };
+  const handleLabelChange = (section, index, newLabel) => {
+    setPhotoData((prevData) => {
+      const updatedSection = [...prevData[section]];
+      updatedSection[index].label = newLabel;
+      return { ...prevData, [section]: updatedSection };
     });
   };
 
