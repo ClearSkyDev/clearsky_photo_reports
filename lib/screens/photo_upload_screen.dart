@@ -45,8 +45,7 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
             label: Text("Pick Photos"),
           ),
           SizedBox(height: 10),
-          Expanded(
-            child: GridView.builder(
+          Expanded(child: GridView.builder(
               padding: EdgeInsets.all(8),
               itemCount: _photos.length,
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -93,8 +92,8 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
   );
 }
             ),
-            if (_photos.isNotEmpty)
-  Padding(
+            if (_photos.isNotEmpty) {
+return  Padding(
     padding: const EdgeInsets.symmetric(vertical: 12),
     child: ElevatedButton(
       onPressed: () {
