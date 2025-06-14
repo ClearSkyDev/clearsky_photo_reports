@@ -8,6 +8,8 @@ void main() {
 }
 
 class ClearSkyApp extends StatelessWidget {
+  const ClearSkyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

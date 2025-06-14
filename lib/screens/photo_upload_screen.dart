@@ -5,16 +5,18 @@ import 'package:image_picker/image_picker.dart';
 import '../models/photo_entry.dart';
 
 class PhotoUploadScreen extends StatefulWidget {
+  const PhotoUploadScreen({super.key});
+
   @override
   _PhotoUploadScreenState createState() => _PhotoUploadScreenState();
 }
 
 class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
   final ImagePicker _picker = ImagePicker();
-  List<PhotoEntry> _photos = [];
+  final List<PhotoEntry> _photos = [];
 
   Future<void> _pickImages() async {
-    final List<XFile>? selected = await _picker.pickMultiImage();
+    final List<XFile> selected = await _picker.pickMultiImage();
     if (selected != null && selected.isNotEmpty) {
       setState(() {
         _photos.addAll(
