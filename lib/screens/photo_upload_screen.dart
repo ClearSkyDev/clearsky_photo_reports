@@ -14,8 +14,15 @@ class PhotoUploadScreen extends StatefulWidget {
 }
 
 class PhotoUploadScreenState extends State<PhotoUploadScreen> {
+  late final InspectionMetadata _metadata;
   final ImagePicker _picker = ImagePicker();
   final List<PhotoEntry> _photos = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _metadata = widget.metadata;
+  }
 
   Future<void> _pickImages() async {
     final List<XFile> selected = await _picker.pickMultiImage();
@@ -132,7 +139,8 @@ class PhotoUploadScreenState extends State<PhotoUploadScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => ReportPreviewScreen(photos: _photos),
+                      builder: (context) =>
+                          ReportPreviewScreen(photos: _photos, metadata: _metadata),
                     ),
                   );
                 },

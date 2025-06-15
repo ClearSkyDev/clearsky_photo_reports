@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show NetworkAssetBundle, rootBundle;
 import 'dart:convert';
 import '../models/photo_entry.dart';
+import '../models/inspection_metadata.dart';
 import 'dart:html' as html; // for HTML download (web only)
 import 'package:pdf/widgets.dart' as pw;
 import 'package:pdf/pdf.dart';
@@ -9,8 +10,13 @@ import 'package:printing/printing.dart';
 
 class ReportPreviewScreen extends StatefulWidget {
   final List<PhotoEntry> photos;
+  final InspectionMetadata metadata;
 
-  const ReportPreviewScreen({super.key, required this.photos});
+  const ReportPreviewScreen({
+    super.key,
+    required this.photos,
+    required this.metadata,
+  });
 
   @override
   State<ReportPreviewScreen> createState() => _ReportPreviewScreenState();
@@ -19,6 +25,13 @@ class ReportPreviewScreen extends StatefulWidget {
 class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
   static const String _contactInfo =
       'ClearSky Roof Inspectors | www.clearskyroof.com | (555) 123-4567';
+  late final InspectionMetadata _metadata;
+
+  @override
+  void initState() {
+    super.initState();
+    _metadata = widget.metadata;
+  }
   String _timestampedFileName(String ext) {
     final now = DateTime.now();
     final y = now.year.toString().padLeft(4, '0');
@@ -39,6 +52,20 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
     final buffer = StringBuffer();
     buffer.writeln('<html><head><title>Photo Report</title></head><body>');
     buffer.writeln('<h1>ClearSky Photo Report</h1>');
+    buffer.writeln('<h2>Inspection Details</h2>');
+    buffer.writeln('<p>');
+    buffer.writeln('Client: ${_metadata.clientName}<br>');
+    buffer.writeln('Property: ${_metadata.propertyAddress}<br>');
+    buffer.writeln(
+        'Inspection Date: ${_metadata.inspectionDate.toLocal().toString().split(" ")[0]}<br>');
+    if (_metadata.insuranceCarrier != null) {
+      buffer.writeln('Carrier: ${_metadata.insuranceCarrier}<br>');
+    }
+    buffer.writeln('Peril Type: ${_metadata.perilType.name}<br>');
+    if (_metadata.inspectorName != null) {
+      buffer.writeln('Inspector: ${_metadata.inspectorName}<br>');
+    }
+    buffer.writeln('</p>');
 
     for (var photo in widget.photos) {
       buffer.writeln('<div style="margin-bottom: 20px;">');
@@ -134,6 +161,15 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
               pw.Text(_contactInfo, textAlign: pw.TextAlign.center),
           build: (pw.Context context) => [
             pw.Header(level: 0, text: 'ClearSky Photo Report'),
+            pw.Text('Client: ${_metadata.clientName}'),
+            pw.Text('Property: ${_metadata.propertyAddress}'),
+            pw.Text("Inspection Date: ${_metadata.inspectionDate.toLocal().toString().split(' ')[0]}"),
+            if (_metadata.insuranceCarrier != null)
+              pw.Text('Carrier: ${_metadata.insuranceCarrier}'),
+            pw.Text('Peril Type: ${_metadata.perilType.name}'),
+            if (_metadata.inspectorName != null)
+              pw.Text('Inspector: ${_metadata.inspectorName}'),
+            pw.SizedBox(height: 20),
             ...widgets,
           ],
         ),
@@ -151,6 +187,22 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
       appBar: AppBar(title: const Text('Review Report')),
       body: Column(
         children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Client: ${_metadata.clientName}'),
+                Text('Property: ${_metadata.propertyAddress}'),
+                Text('Inspection Date: ${_metadata.inspectionDate.toLocal().toString().split(" ")[0]}'),
+                if (_metadata.insuranceCarrier != null)
+                  Text('Carrier: ${_metadata.insuranceCarrier}'),
+                Text('Peril Type: ${_metadata.perilType.name}'),
+                if (_metadata.inspectorName != null)
+                  Text('Inspector: ${_metadata.inspectorName}'),
+              ],
+            ),
+          ),
           Expanded(
             child: ListView.builder(
               itemCount: widget.photos.length,
