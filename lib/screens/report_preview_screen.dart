@@ -118,16 +118,46 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
     }
     buffer.writeln('</p>');
 
-    for (var group in _gatherGroups()) {
-      buffer.writeln('<h3>${group.key}</h3>');
-      for (var photo in group.value) {
-        buffer.writeln(
-            '<div style="display:inline-block;margin:5px;text-align:center;">');
-        buffer.writeln(
-            '<img src="${photo.url}" width="300" height="300" style="object-fit:cover;"><br>');
-        final label = photo.label.isNotEmpty ? photo.label : 'Unlabeled';
-        buffer.writeln('<span>$label</span>');
+    if (widget.sections != null) {
+      for (var section in kInspectionSections) {
+        final photos = widget.sections![section] ?? [];
+        if (photos.isEmpty) continue;
+        buffer.writeln('<h2>$section</h2>');
+        buffer.writeln('<div style="display:flex;flex-wrap:wrap;">');
+        for (var photo in photos) {
+          final label = photo.label.isNotEmpty ? photo.label : 'Unlabeled';
+          buffer.writeln(
+              '<div style="width:300px;margin:5px;text-align:center;">');
+          buffer.writeln(
+              '<img src="${photo.url}" width="300" height="300" style="object-fit:cover;"><br>');
+          buffer.writeln('<span>$label</span>');
+          buffer.writeln('</div>');
+        }
         buffer.writeln('</div>');
+      }
+    }
+
+    if (widget.additionalStructures != null && widget.additionalNames != null) {
+      for (int i = 0; i < widget.additionalStructures!.length; i++) {
+        final name = widget.additionalNames![i];
+        final sections = widget.additionalStructures![i];
+        buffer.writeln('<h2>$name</h2>');
+        for (var section in kInspectionSections) {
+          final photos = sections[section] ?? [];
+          if (photos.isEmpty) continue;
+          buffer.writeln('<h3>$section</h3>');
+          buffer.writeln('<div style="display:flex;flex-wrap:wrap;">');
+          for (var photo in photos) {
+            final label = photo.label.isNotEmpty ? photo.label : 'Unlabeled';
+            buffer.writeln(
+                '<div style="width:300px;margin:5px;text-align:center;">');
+            buffer.writeln(
+                '<img src="${photo.url}" width="300" height="300" style="object-fit:cover;"><br>');
+            buffer.writeln('<span>$label</span>');
+            buffer.writeln('</div>');
+          }
+          buffer.writeln('</div>');
+        }
       }
     }
 
@@ -151,29 +181,67 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
 
   // Helper to load all images before PDF generation
   Future<List<pw.Widget>> _buildPdfWidgets() async {
-    List<pw.Widget> widgets = [];
+    final List<pw.Widget> widgets = [];
 
-    for (var group in _gatherGroups()) {
-      widgets.add(pw.Header(level: 1, text: group.key));
-      for (var photo in group.value) {
+    Future<pw.Widget> buildWrap(List<PhotoEntry> photos) async {
+      final items = <pw.Widget>[];
+      for (var photo in photos) {
         final imageData =
             await NetworkAssetBundle(Uri.parse(photo.url)).load("");
         final bytes = imageData.buffer.asUint8List();
-
         final label = photo.label.isNotEmpty ? photo.label : 'Unlabeled';
 
-        widgets.add(
-          pw.Column(
-            crossAxisAlignment: pw.CrossAxisAlignment.start,
-            children: [
-              pw.Text(label, style: const pw.TextStyle(fontSize: 16)),
-              pw.SizedBox(height: 5),
-              pw.Image(pw.MemoryImage(bytes), width: 300, height: 300,
-                  fit: pw.BoxFit.cover),
-              pw.SizedBox(height: 20),
-            ],
+        items.add(
+          pw.Container(
+            width: 150,
+            child: pw.Column(
+              children: [
+                pw.Image(pw.MemoryImage(bytes),
+                    width: 150, height: 150, fit: pw.BoxFit.cover),
+                pw.SizedBox(height: 4),
+                pw.Text(label,
+                    textAlign: pw.TextAlign.center,
+                    style: const pw.TextStyle(fontSize: 12)),
+              ],
+            ),
           ),
         );
+      }
+
+      return pw.Wrap(spacing: 10, runSpacing: 10, children: items);
+    }
+
+    if (widget.sections != null) {
+      for (var section in kInspectionSections) {
+        final photos = widget.sections![section] ?? [];
+        if (photos.isEmpty) continue;
+        widgets.add(pw.Text(section,
+            style: pw.TextStyle(
+                fontSize: 18, fontWeight: pw.FontWeight.bold)));
+        widgets.add(pw.SizedBox(height: 8));
+        widgets.add(await buildWrap(photos));
+        widgets.add(pw.SizedBox(height: 20));
+      }
+    }
+
+    if (widget.additionalStructures != null && widget.additionalNames != null) {
+      for (int i = 0; i < widget.additionalStructures!.length; i++) {
+        final name = widget.additionalNames![i];
+        final sections = widget.additionalStructures![i];
+        widgets.add(pw.Text(name,
+            style: pw.TextStyle(
+                fontSize: 20, fontWeight: pw.FontWeight.bold)));
+        widgets.add(pw.SizedBox(height: 10));
+        for (var section in kInspectionSections) {
+          final photos = sections[section] ?? [];
+          if (photos.isEmpty) continue;
+          widgets.add(pw.Text(section,
+              style: pw.TextStyle(
+                  fontSize: 18, fontWeight: pw.FontWeight.bold)));
+          widgets.add(pw.SizedBox(height: 8));
+          widgets.add(await buildWrap(photos));
+          widgets.add(pw.SizedBox(height: 20));
+        }
       }
     }
 
