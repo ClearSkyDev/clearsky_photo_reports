@@ -1,9 +1,20 @@
 import 'package:flutter/material.dart';
 import '../models/inspection_metadata.dart';
+import '../models/photo_entry.dart';
 
 class SendReportScreen extends StatefulWidget {
   final InspectionMetadata metadata;
-  const SendReportScreen({super.key, required this.metadata});
+  final Map<String, List<PhotoEntry>>? sections;
+  final List<Map<String, List<PhotoEntry>>>? additionalStructures;
+  final List<String>? additionalNames;
+
+  const SendReportScreen({
+    super.key,
+    required this.metadata,
+    this.sections,
+    this.additionalStructures,
+    this.additionalNames,
+  });
 
   @override
   State<SendReportScreen> createState() => _SendReportScreenState();

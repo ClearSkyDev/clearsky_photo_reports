@@ -8,6 +8,7 @@ import 'dart:html' as html; // for HTML download (web only)
 import 'package:pdf/widgets.dart' as pw;
 import 'package:pdf/pdf.dart';
 import 'package:printing/printing.dart';
+import 'send_report_screen.dart';
 
 class ReportPreviewScreen extends StatefulWidget {
   final List<PhotoEntry>? photos;
@@ -427,6 +428,25 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
                   child: const Text("Download PDF"),
                 ),
               ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 32),
+            child: ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => SendReportScreen(
+                      metadata: _metadata,
+                      sections: widget.sections,
+                      additionalStructures: widget.additionalStructures,
+                      additionalNames: widget.additionalNames,
+                    ),
+                  ),
+                );
+              },
+              child: const Text('Finalize & Send'),
             ),
           ),
         ],
