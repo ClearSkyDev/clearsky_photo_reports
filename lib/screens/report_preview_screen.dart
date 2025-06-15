@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show NetworkAssetBundle, rootBundle;
 import 'dart:convert';
+import 'dart:io';
+import 'dart:typed_data';
 import '../models/photo_entry.dart';
 import '../models/inspection_metadata.dart';
 import '../models/inspection_sections.dart';
@@ -342,8 +344,8 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
     return widgets;
   }
 
-  // PDF export
-  Future<void> _downloadPdf() async {
+  // Generate PDF bytes for the current report
+  Future<Uint8List> _downloadPdf() async {
     final pdf = pw.Document();
     final widgets = await _buildPdfWidgets();
 
@@ -444,11 +446,65 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
         ),
       );
 
+    return pdf.save();
+  }
+
+  Future<void> _exportPdf() async {
+    final bytes = await _downloadPdf();
     final fileName = _metadataFileName('pdf');
     await Printing.layoutPdf(
-      onLayout: (PdfPageFormat format) async => pdf.save(),
+      onLayout: (PdfPageFormat format) async => bytes,
       name: fileName,
     );
+  }
+
+  /// Collect report parts into memory for export.
+  Future<Map<String, Uint8List>> _collectReportParts() async {
+    final files = <String, Uint8List>{};
+    final htmlContent = generateHtmlPreview();
+    files['report.html'] = Uint8List.fromList(utf8.encode(htmlContent));
+    files['report.pdf'] = await _downloadPdf();
+
+    Future<void> addPhotos(String section, List<PhotoEntry> photos) async {
+      final sectionClean = section.replaceAll(RegExp(r'\s+'), '');
+      for (final photo in photos) {
+        try {
+          Uint8List bytes;
+          if (photo.url.startsWith('http')) {
+            final data =
+                await NetworkAssetBundle(Uri.parse(photo.url)).load('');
+            bytes = data.buffer.asUint8List();
+          } else {
+            final file = File(photo.url);
+            if (!await file.exists()) continue;
+            bytes = await file.readAsBytes();
+          }
+          final label = photo.label.isNotEmpty ? photo.label : 'Unlabeled';
+          final cleanLabel =
+              label.replaceAll(RegExp(r'[^A-Za-z0-9_-]'), '_');
+          final name = '${sectionClean}_${cleanLabel}.jpg';
+          files[name] = bytes;
+        } catch (_) {}
+      }
+    }
+
+    if (widget.sections != null) {
+      for (final entry in widget.sections!.entries) {
+        await addPhotos(entry.key, entry.value);
+      }
+    }
+
+    if (widget.additionalStructures != null && widget.additionalNames != null) {
+      for (int i = 0; i < widget.additionalStructures!.length; i++) {
+        final name = widget.additionalNames![i];
+        final sections = widget.additionalStructures![i];
+        for (final entry in sections.entries) {
+          await addPhotos('$name - ${entry.key}', entry.value);
+        }
+      }
+    }
+
+    return files;
   }
 
   void _previewFullReport() {
@@ -458,7 +514,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
       MaterialPageRoute(
         builder: (_) => ReportPreviewWebView(
           html: htmlContent,
-          onExportPdf: _downloadPdf,
+          onExportPdf: _exportPdf,
         ),
       ),
     );
@@ -596,7 +652,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
-                  onPressed: _downloadPdf,
+                  onPressed: _exportPdf,
                   child: const Text("Download PDF"),
                 ),
               ],
