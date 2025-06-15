@@ -11,6 +11,7 @@ class ReportSettings {
   final int primaryColor;
   final bool includeDisclaimer;
   final String footerText;
+  final String template;
 
   ReportSettings({
     required this.companyName,
@@ -19,6 +20,7 @@ class ReportSettings {
     required this.primaryColor,
     required this.includeDisclaimer,
     required this.footerText,
+    required this.template,
   });
 
   Map<String, dynamic> toMap() {
@@ -29,6 +31,7 @@ class ReportSettings {
       'primaryColor': primaryColor,
       'includeDisclaimer': includeDisclaimer,
       'footerText': footerText,
+      'template': template,
     };
   }
 
@@ -42,6 +45,7 @@ class ReportSettings {
           : int.tryParse(map['primaryColor']?.toString() ?? '') ?? 0xff2196f3,
       includeDisclaimer: map['includeDisclaimer'] as bool? ?? true,
       footerText: map['footerText'] ?? '',
+      template: map['template'] ?? 'legacy',
     );
   }
 }
@@ -69,6 +73,12 @@ class _ReportSettingsScreenState extends State<ReportSettingsScreen> {
     'Purple': Colors.purple,
   };
   String _selectedColor = 'Blue';
+  static const Map<String, String> _templates = {
+    'Legacy Style': 'legacy',
+    'Clean & Simple': 'clean',
+    'Modern + Colored Section Headers': 'modern',
+  };
+  String _selectedTemplate = 'legacy';
 
   @override
   void initState() {
@@ -102,6 +112,11 @@ class _ReportSettingsScreenState extends State<ReportSettingsScreen> {
                     orElse: () => const MapEntry('Blue', Colors.blue))
                 .key;
         _includeDisclaimer = settings.includeDisclaimer;
+        _selectedTemplate = _templates.entries
+                .firstWhere(
+                    (e) => e.value == settings.template,
+                    orElse: () => const MapEntry('Legacy Style', 'legacy'))
+                .key;
       });
     }
   }
@@ -114,6 +129,7 @@ class _ReportSettingsScreenState extends State<ReportSettingsScreen> {
       primaryColor: _colors[_selectedColor]!.value,
       includeDisclaimer: _includeDisclaimer,
       footerText: _footerController.text.trim(),
+      template: _templates[_selectedTemplate]!,
     );
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('report_settings', jsonEncode(settings.toMap()));
@@ -172,6 +188,24 @@ class _ReportSettingsScreenState extends State<ReportSettingsScreen> {
                 if (val != null) {
                   setState(() {
                     _selectedColor = val;
+                  });
+                }
+              },
+            ),
+            const SizedBox(height: 12),
+            DropdownButtonFormField<String>(
+              value: _selectedTemplate,
+              decoration: const InputDecoration(labelText: 'Report Template'),
+              items: _templates.keys
+                  .map((name) => DropdownMenuItem(
+                        value: name,
+                        child: Text(name),
+                      ))
+                  .toList(),
+              onChanged: (val) {
+                if (val != null) {
+                  setState(() {
+                    _selectedTemplate = val;
                   });
                 }
               },
