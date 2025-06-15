@@ -110,11 +110,24 @@ export default function ReportPreviewScreen({ uploadedPhotos, roofQuestionnaire 
         />
       </View>
       <View style={{ marginTop: 16 }}>
-        {['Address','Front','Right','Back','Left','Roof Edge','Slopes','Accessories','Rear Yard'].map((section) => (
+        {[
+          'Address',
+          'Front Elevation',
+          'Right Elevation',
+          'Back Elevation',
+          'Left Elevation',
+          'Roof Edge',
+          'Front Slope',
+          'Right Slope',
+          'Back Slope',
+          'Left Slope',
+          'Roof Accessories',
+          'Roof Conditions',
+        ].map((section) => (
           <View key={section} style={{ marginBottom: 8 }}>
             <Text style={{ fontSize: 16, marginVertical: 8 }}>{section}</Text>
             {uploadedPhotos
-              .filter((p) => p.sectionPrefix.toLowerCase().includes(section.toLowerCase()))
+              .filter((p) => p.sectionPrefix === section)
               .map((photo) => (
                 <View key={photo.id} style={{ marginBottom: 12 }}>
                   <Image
@@ -122,7 +135,7 @@ export default function ReportPreviewScreen({ uploadedPhotos, roofQuestionnaire 
                     style={{ width: '100%', aspectRatio: 1, borderRadius: 6 }}
                     resizeMode="cover"
                   />
-                  <Text>Label: {photo.userLabel}</Text>
+                  <Text>{photo.userLabel}</Text>
                 </View>
               ))}
           </View>
