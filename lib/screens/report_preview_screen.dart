@@ -6,6 +6,7 @@ import 'dart:typed_data';
 import '../models/photo_entry.dart';
 import '../models/inspection_metadata.dart';
 import '../models/inspection_sections.dart';
+import '../models/saved_report.dart';
 import 'dart:html' as html; // for HTML download (web only)
 import 'package:pdf/widgets.dart' as pw;
 import 'package:pdf/pdf.dart';
@@ -14,6 +15,7 @@ import 'send_report_screen.dart';
 import 'report_preview_webview.dart';
 import 'report_settings_screen.dart' show ReportSettings;
 import 'package:shared_preferences/shared_preferences.dart';
+import '../utils/export_utils.dart';
 
 class ReportPreviewScreen extends StatefulWidget {
   final List<PhotoEntry>? photos;
@@ -23,6 +25,7 @@ class ReportPreviewScreen extends StatefulWidget {
   final List<String>? additionalNames;
   final bool readOnly;
   final String? summary;
+  final SavedReport? savedReport;
 
   const ReportPreviewScreen({
     super.key,
@@ -33,6 +36,7 @@ class ReportPreviewScreen extends StatefulWidget {
     required this.metadata,
     this.readOnly = false,
     this.summary,
+    this.savedReport,
   });
 
   @override
@@ -49,6 +53,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
   late final InspectionMetadata _metadata;
   late final TextEditingController _summaryController;
   String _template = 'legacy';
+  bool _exporting = false;
 
   @override
   void initState() {
@@ -458,6 +463,34 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
     );
   }
 
+  Future<void> _exportZip() async {
+    if (widget.savedReport == null || _exporting) return;
+    setState(() => _exporting = true);
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const AlertDialog(
+        content: SizedBox(
+          height: 60,
+          child: Center(child: CircularProgressIndicator()),
+        ),
+      ),
+    );
+    try {
+      await exportAsZip(widget.savedReport!);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('ZIP exported')),
+        );
+      }
+    } finally {
+      if (mounted && Navigator.of(context).canPop()) {
+        Navigator.of(context).pop();
+      }
+      if (mounted) setState(() => _exporting = false);
+    }
+  }
+
   /// Collect report parts into memory for export.
   Future<Map<String, Uint8List>> _collectReportParts() async {
     final files = <String, Uint8List>{};
@@ -655,6 +688,26 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
                   onPressed: _exportPdf,
                   child: const Text("Download PDF"),
                 ),
+                if (widget.savedReport != null)
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blueAccent,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    onPressed: _exporting ? null : _exportZip,
+                    child: _exporting
+                        ? const SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Text('Export ZIP'),
+                  ),
               ],
             ),
           ),

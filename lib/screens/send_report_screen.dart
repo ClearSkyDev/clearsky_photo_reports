@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'dart:io';
 import '../utils/local_report_store.dart';
+import '../utils/export_utils.dart';
 
 /// If Firebase is not desired:
 /// - Use `path_provider` and `shared_preferences` or `hive` to save report JSON locally
@@ -36,6 +37,8 @@ class _SendReportScreenState extends State<SendReportScreen> {
   final TextEditingController _emailController = TextEditingController();
   bool _saving = false;
   String? _docId;
+  SavedReport? _savedReport;
+  bool _exporting = false;
 
   @override
   void initState() {
@@ -127,6 +130,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
     setState(() {
       _saving = false;
       _docId = reportId;
+      _savedReport = saved;
     });
 
     if (mounted) {
@@ -142,6 +146,36 @@ class _SendReportScreenState extends State<SendReportScreen> {
 
   void _downloadHtml() {
     // TODO: reuse _saveHtmlFile logic
+  }
+
+  Future<void> _exportZip() async {
+    if (_savedReport == null || _exporting) return;
+    setState(() => _exporting = true);
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const AlertDialog(
+        content: SizedBox(
+          height: 60,
+          child: Center(
+            child: CircularProgressIndicator(),
+          ),
+        ),
+      ),
+    );
+    try {
+      await exportAsZip(_savedReport!);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('ZIP exported')),
+        );
+      }
+    } finally {
+      if (mounted && Navigator.of(context).canPop()) {
+        Navigator.of(context).pop();
+      }
+      if (mounted) setState(() => _exporting = false);
+    }
   }
 
   Future<void> _sendEmail() async {
@@ -186,8 +220,21 @@ class _SendReportScreenState extends State<SendReportScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                ElevatedButton(onPressed: _downloadPdf, child: const Text('Download PDF')),
-                ElevatedButton(onPressed: _downloadHtml, child: const Text('Download HTML')),
+                ElevatedButton(
+                    onPressed: _downloadPdf,
+                    child: const Text('Download PDF')),
+                ElevatedButton(
+                    onPressed: _downloadHtml,
+                    child: const Text('Download HTML')),
+                ElevatedButton(
+                    onPressed: _exporting ? null : _exportZip,
+                    child: _exporting
+                        ? const SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Text('Export ZIP')),
               ],
             ),
             const SizedBox(height: 12),
