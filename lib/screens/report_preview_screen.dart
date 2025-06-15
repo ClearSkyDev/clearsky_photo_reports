@@ -40,26 +40,17 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
     _metadata = widget.metadata;
   }
   String _metadataFileName(String ext) {
-    final sanitizedAddress =
-        _metadata.propertyAddress.replaceAll(RegExp(r'[^A-Za-z0-9]'), '');
-    final monthNames = [
-      '',
-      'January',
-      'February',
-      'March',
-      'April',
-      'May',
-      'June',
-      'July',
-      'August',
-      'September',
-      'October',
-      'November',
-      'December'
-    ];
-    final month = monthNames[_metadata.inspectionDate.month];
-    final day = _metadata.inspectionDate.day.toString().padLeft(2, '0');
-    return '${sanitizedAddress}_${month}$day.$ext';
+    String sanitize(String input) {
+      return input
+          .trim()
+          .replaceAll(RegExp(r'[^A-Za-z0-9]+'), '_')
+          .replaceAll(RegExp(r'_+'), '_');
+    }
+
+    final address = sanitize(_metadata.propertyAddress);
+    final date = sanitize(
+        _metadata.inspectionDate.toLocal().toIso8601String().split('T')[0]);
+    return '${address}_${date}_clearsky_report.$ext';
   }
   void _updateLabel(int index, String value) {
     if (widget.photos == null) return;
@@ -186,8 +177,9 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
     final bytes = utf8.encode(htmlContent);
     final blob = html.Blob([bytes]);
     final url = html.Url.createObjectUrlFromBlob(blob);
+    final fileName = _metadataFileName('html');
     final anchor = html.AnchorElement(href: url)
-      ..setAttribute("download", _metadataFileName('html'))
+      ..setAttribute("download", fileName)
       ..click();
     html.Url.revokeObjectUrl(url);
   }
@@ -320,9 +312,10 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
         ),
       );
 
+    final fileName = _metadataFileName('pdf');
     await Printing.layoutPdf(
       onLayout: (PdfPageFormat format) async => pdf.save(),
-      name: _metadataFileName('pdf'),
+      name: fileName,
     );
   }
 
