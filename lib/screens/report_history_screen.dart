@@ -119,6 +119,7 @@ class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
               sections: sections,
               readOnly: true,
               summary: report.summary,
+              savedReport: report,
             ),
           ),
         );
