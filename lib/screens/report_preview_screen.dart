@@ -18,6 +18,7 @@ class ReportPreviewScreen extends StatefulWidget {
   final List<Map<String, List<PhotoEntry>>>? additionalStructures;
   final List<String>? additionalNames;
   final bool readOnly;
+  final String? summary;
 
   const ReportPreviewScreen({
     super.key,
@@ -27,6 +28,7 @@ class ReportPreviewScreen extends StatefulWidget {
     this.additionalNames,
     required this.metadata,
     this.readOnly = false,
+    this.summary,
   });
 
   @override
@@ -41,11 +43,19 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
   static const String _coverDisclaimer =
       'This report is a professional opinion based on visual inspection only.';
   late final InspectionMetadata _metadata;
+  late final TextEditingController _summaryController;
 
   @override
   void initState() {
     super.initState();
     _metadata = widget.metadata;
+    _summaryController = TextEditingController(text: widget.summary ?? '');
+  }
+
+  @override
+  void dispose() {
+    _summaryController.dispose();
+    super.dispose();
   }
   String _metadataFileName(String ext) {
     String sanitize(String input) {
@@ -146,6 +156,13 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
       buffer.writeln('<tr><td><strong>Weather Notes:</strong></td><td>${_metadata.weatherNotes}</td></tr>');
     }
     buffer.writeln('</table>');
+
+    if (_summaryController.text.isNotEmpty) {
+      buffer.writeln('<div style="border:1px solid #ccc;padding:8px;margin-top:20px;">');
+      buffer.writeln('<strong>Inspector Notes / Summary</strong><br>');
+      buffer.writeln('<p>${_summaryController.text}</p>');
+      buffer.writeln('</div>');
+    }
 
     buffer.writeln('<p class="signature">Inspector Signature: ________________________________</p>');
     buffer.writeln('<p style="font-size:12px;">$_coverDisclaimer</p>');
@@ -333,6 +350,24 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
                 if (_metadata.inspectorName != null)
                   pw.Text('Inspector Name: ${_metadata.inspectorName}'),
                 pw.SizedBox(height: 20),
+                if (_summaryController.text.isNotEmpty)
+                  pw.Container(
+                    width: double.infinity,
+                    padding: const pw.EdgeInsets.all(8),
+                    decoration: pw.BoxDecoration(
+                        border: pw.Border.all(color: PdfColors.grey)),
+                    child: pw.Column(
+                      crossAxisAlignment: pw.CrossAxisAlignment.start,
+                      children: [
+                        pw.Text('Inspector Notes / Summary',
+                            style: pw.TextStyle(
+                                fontWeight: pw.FontWeight.bold)),
+                        pw.SizedBox(height: 4),
+                        pw.Text(_summaryController.text),
+                      ],
+                    ),
+                  ),
+                pw.SizedBox(height: 20),
                 pw.Text(
                   _coverDisclaimer,
                   style: const pw.TextStyle(fontSize: 12),
@@ -415,6 +450,36 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
                   Text('Inspector Name: ${_metadata.inspectorName}'),
               ],
             ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: widget.readOnly
+                ? Container(
+                    width: double.infinity,
+                    margin: const EdgeInsets.only(bottom: 16),
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey)),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Inspector Notes / Summary',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(_summaryController.text),
+                      ],
+                    ),
+                  )
+                : TextField(
+                    controller: _summaryController,
+                    decoration: const InputDecoration(
+                      labelText: 'Inspector Notes / Summary',
+                      border: OutlineInputBorder(),
+                    ),
+                    maxLines: 3,
+                  ),
           ),
           Expanded(
             child: Builder(
@@ -522,6 +587,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
                         sections: widget.sections,
                         additionalStructures: widget.additionalStructures,
                         additionalNames: widget.additionalNames,
+                        summary: _summaryController.text,
                       ),
                     ),
                   );

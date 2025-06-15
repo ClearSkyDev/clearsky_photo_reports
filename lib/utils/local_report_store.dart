@@ -67,6 +67,7 @@ class LocalReportStore {
       userId: report.userId,
       inspectionMetadata: report.inspectionMetadata,
       sectionPhotos: updatedPhotos,
+      summary: report.summary,
       createdAt: report.createdAt,
     );
 
