@@ -8,8 +8,12 @@ export default function generateReportHTML(
   claimNumber = "",
   perilType = "",
   inspectorName = "",
+  reportId = "",
+  weatherNotes = "",
   signatureData = "",
-  inspectionDate = new Date().toLocaleDateString()
+  inspectionDate = new Date().toLocaleDateString(),
+  disclaimerText =
+    "This report is for informational purposes only and is not a warranty."
 ) {
   const sectionOrder = [
     'Address',
@@ -63,6 +67,7 @@ export default function generateReportHTML(
       </style>
     </head>
     <body>
+      <img src="assets/images/clearsky_logo.png" alt="ClearSky Logo" style="max-width:200px;margin-bottom:20px;" />
       <h1>Roof Inspection Report</h1>
       <p><strong>Date:</strong> ${inspectionDate}</p>
       <p><strong>Client:</strong> ${clientName}</p>
@@ -71,6 +76,8 @@ export default function generateReportHTML(
       <p><strong>Claim #:</strong> ${claimNumber}</p>
       <p><strong>Peril Type:</strong> ${perilType}</p>
       ${inspectorName ? `<p><strong>Inspector:</strong> ${inspectorName}</p>` : ''}
+      ${reportId ? `<p><strong>Report ID:</strong> ${reportId}</p>` : ''}
+      ${weatherNotes ? `<p><strong>Weather Notes:</strong> ${weatherNotes}</p>` : ''}
 
       <h2>Photos</h2>
       ${Object.entries(groupedPhotos)
@@ -130,6 +137,7 @@ export default function generateReportHTML(
           <img src="${signatureData}" alt="Signature" style="width: 300px; border: 1px solid #ccc;" />
         </div>
       ` : ''}
+      <footer style="text-align:center;margin-top:40px;font-size:12px;color:#666;">${disclaimerText}</footer>
     </body>
   </html>
   `;

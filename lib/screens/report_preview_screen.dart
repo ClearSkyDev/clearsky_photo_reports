@@ -34,6 +34,8 @@ class ReportPreviewScreen extends StatefulWidget {
 class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
   static const String _contactInfo =
       'ClearSky Roof Inspectors | www.clearskyroof.com | (555) 123-4567';
+  static const String _disclaimerText =
+      'This report is for informational purposes only and is not a warranty.';
   late final InspectionMetadata _metadata;
 
   @override
@@ -108,6 +110,8 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
   String generateHtmlPreview() {
     final buffer = StringBuffer();
     buffer.writeln('<html><head><title>Photo Report</title></head><body>');
+    buffer.writeln(
+        '<img src="assets/images/clearsky_logo.png" alt="ClearSky Logo" style="width:200px;">');
     buffer.writeln('<h1>ClearSky Photo Report</h1>');
     buffer.writeln('<h2>Inspection Details</h2>');
     buffer.writeln('<p>');
@@ -121,6 +125,12 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
     buffer.writeln('Peril Type: ${_metadata.perilType.name}<br>');
     if (_metadata.inspectorName != null) {
       buffer.writeln('Inspector Name: ${_metadata.inspectorName}<br>');
+    }
+    if (_metadata.reportId != null) {
+      buffer.writeln('Report ID: ${_metadata.reportId}<br>');
+    }
+    if (_metadata.weatherNotes != null) {
+      buffer.writeln('Weather Notes: ${_metadata.weatherNotes}<br>');
     }
     buffer.writeln('</p>');
 
@@ -169,6 +179,8 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
 
     buffer.writeln(
         '<p style="text-align: center; margin-top: 40px;">$_contactInfo</p>');
+    buffer.writeln(
+        '<footer style="text-align:center;margin-top:20px;font-size:12px;color:#666;">$_disclaimerText</footer>');
     buffer.writeln('</body></html>');
 
     return buffer.toString();
