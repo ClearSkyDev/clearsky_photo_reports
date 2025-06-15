@@ -11,18 +11,38 @@ export default function generateReportHTML(
   signatureData = "",
   inspectionDate = new Date().toLocaleDateString()
 ) {
-  const groupPhotosBySection = () => {
-    const grouped = {};
-    uploadedPhotos.forEach((photo) => {
-      if (!grouped[photo.sectionPrefix]) {
-        grouped[photo.sectionPrefix] = [];
-      }
-      grouped[photo.sectionPrefix].push(photo);
-    });
-    return grouped;
-  };
+  const sectionOrder = [
+    'Address',
+    'Front Elevation',
+    'Right Elevation',
+    'Back Elevation',
+    'Left Elevation',
+    'Roof Edge',
+    'Front Slope',
+    'Right Slope',
+    'Back Slope',
+    'Left Slope',
+    'Roof Accessories',
+    'Roof Conditions',
+  ];
 
-  const groupedPhotos = groupPhotosBySection();
+  const groupedPhotos = {};
+  // Preserve the original intake order for known sections
+  sectionOrder.forEach((section) => {
+    const photos = uploadedPhotos.filter((p) => p.sectionPrefix === section);
+    if (photos.length) {
+      groupedPhotos[section] = photos;
+    }
+  });
+  // Append any sections not in the predefined order
+  uploadedPhotos.forEach((p) => {
+    if (!groupedPhotos[p.sectionPrefix]) {
+      groupedPhotos[p.sectionPrefix] = [];
+    }
+    if (!groupedPhotos[p.sectionPrefix].includes(p)) {
+      groupedPhotos[p.sectionPrefix].push(p);
+    }
+  });
 
   return `
   <!DOCTYPE html>
