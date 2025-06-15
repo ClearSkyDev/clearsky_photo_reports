@@ -1,0 +1,99 @@
+import 'dart:convert';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:webview_flutter/webview_flutter.dart';
+
+// Only imported on web for HtmlElementView
+// ignore: avoid_web_libraries_in_flutter
+import 'dart:html' as html;
+import 'dart:ui' as ui;
+
+class ReportPreviewWebView extends StatefulWidget {
+  final String html;
+  final VoidCallback onExportPdf;
+  final VoidCallback? onEditLabels;
+
+  const ReportPreviewWebView({
+    super.key,
+    required this.html,
+    required this.onExportPdf,
+    this.onEditLabels,
+  });
+
+  @override
+  State<ReportPreviewWebView> createState() => _ReportPreviewWebViewState();
+}
+
+class _ReportPreviewWebViewState extends State<ReportPreviewWebView> {
+  String? _viewId;
+  String? _blobUrl;
+
+  @override
+  void initState() {
+    super.initState();
+    if (kIsWeb) {
+      _viewId = 'report-preview-${DateTime.now().millisecondsSinceEpoch}';
+      final blob = html.Blob([widget.html], 'text/html');
+      _blobUrl = html.Url.createObjectUrlFromBlob(blob);
+      ui.platformViewRegistry.registerViewFactory(
+        _viewId!,
+        (int viewId) {
+          final iframe = html.IFrameElement()
+            ..src = _blobUrl!
+            ..style.border = 'none'
+            ..style.width = '100%'
+            ..style.height = '100%';
+          return iframe;
+        },
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    if (_blobUrl != null) {
+      html.Url.revokeObjectUrl(_blobUrl!);
+    }
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final preview = kIsWeb
+        ? HtmlElementView(viewType: _viewId!)
+        : WebView(
+            initialUrl: Uri.dataFromString(
+              widget.html,
+              mimeType: 'text/html',
+              encoding: utf8,
+            ).toString(),
+            javascriptMode: JavascriptMode.unrestricted,
+          );
+
+    return Scaffold(
+      appBar: AppBar(title: const Text('Preview Report')),
+      body: Column(
+        children: [
+          Expanded(child: preview),
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                if (widget.onEditLabels != null)
+                  ElevatedButton(
+                    onPressed: widget.onEditLabels,
+                    child: const Text('Edit Labels'),
+                  ),
+                ElevatedButton(
+                  onPressed: widget.onExportPdf,
+                  child: const Text('Export PDF'),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
