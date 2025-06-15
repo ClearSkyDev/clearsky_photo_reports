@@ -1,12 +1,14 @@
 // Model for persisting completed reports in Firestore
 class SavedReport {
   final String id;
+  final String? userId;
   final Map<String, dynamic> inspectionMetadata;
   final Map<String, List<ReportPhotoEntry>> sectionPhotos;
   final DateTime createdAt;
 
   SavedReport({
     this.id = '',
+    this.userId,
     required this.inspectionMetadata,
     required this.sectionPhotos,
     DateTime? createdAt,
@@ -20,6 +22,7 @@ class SavedReport {
           entry.key: entry.value.map((p) => p.toMap()).toList(),
       },
       'createdAt': createdAt.millisecondsSinceEpoch,
+      if (userId != null) 'userId': userId,
     };
   }
 
@@ -35,6 +38,7 @@ class SavedReport {
 
     return SavedReport(
       id: id,
+      userId: map['userId'] as String?,
       inspectionMetadata:
           Map<String, dynamic>.from(map['inspectionMetadata'] ?? {}),
       sectionPhotos: sections,
