@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'screens/home_screen.dart';
 import 'screens/report_screen.dart';
 import 'screens/metadata_screen.dart';
+import 'screens/sectioned_photo_upload_screen.dart';
 
 void main() {
   runApp(const ClearSkyApp());
@@ -23,6 +24,7 @@ class ClearSkyApp extends StatelessWidget {
         '/': (context) => const HomeScreen(),
         '/report': (context) => const ReportScreen(),
         '/metadata': (context) => const MetadataScreen(),
+        '/sectionedUpload': (context) => const SectionedPhotoUploadScreen(),
       },
     );
   }
