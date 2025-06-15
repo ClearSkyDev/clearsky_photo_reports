@@ -6,6 +6,7 @@ import 'screens/report_screen.dart';
 import 'screens/metadata_screen.dart';
 import 'screens/sectioned_photo_upload_screen.dart';
 import 'screens/report_history_screen.dart';
+import 'screens/report_settings_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -33,6 +34,7 @@ class ClearSkyApp extends StatelessWidget {
         '/metadata': (context) => const MetadataScreen(),
         '/sectionedUpload': (context) => const SectionedPhotoUploadScreen(),
         '/history': (context) => const ReportHistoryScreen(),
+        '/settings': (context) => const ReportSettingsScreen(),
       },
     );
   }
