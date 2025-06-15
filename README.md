@@ -20,3 +20,10 @@ Running the script outputs a pre-filled questionnaire based on sample photos.
 `react_native/ReportPreviewScreen.js` implements a basic report preview. It takes a set of approved photo objects and a questionnaire object and allows inspectors to edit a summary then export the result as HTML or PDF. The exported file is saved to the device and the native share sheet is opened so the report can be shared or saved using any available app.
 
 The preview screen now also includes a signature canvas so inspectors can sign the report before exporting.
+
+## Flutter Report Preview
+
+The Flutter implementation renders the inspection report HTML differently depending on the platform:
+
+- **Web**: an `IFrameElement` from `dart:html` is registered with `ui.platformViewRegistry` and inserted using `HtmlElementView`.
+- **Mobile**: the [`webview_flutter`](https://pub.dev/packages/webview_flutter) plugin displays the report. The HTML is converted to a base64 data URI and loaded as local content.
