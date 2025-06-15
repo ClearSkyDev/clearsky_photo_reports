@@ -4,6 +4,7 @@ import 'package:image_picker/image_picker.dart';
 import '../models/inspection_sections.dart';
 import '../models/photo_entry.dart';
 import '../models/inspection_metadata.dart';
+import '../utils/label_suggestion.dart';
 import 'report_preview_screen.dart';
 
 class PhotoUploadScreen extends StatefulWidget {
@@ -33,10 +34,6 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
     _metadata = widget.metadata;
   }
 
-  Future<String> getSuggestedLabel(String path) async {
-    await Future.delayed(const Duration(milliseconds: 300));
-    return 'Suggested Label';
-  }
 
   Future<void> _pickImages(String section, {int? structure}) async {
     final List<XFile> selected = await _picker.pickMultiImage();
@@ -45,15 +42,15 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
         final target = structure == null
             ? sectionPhotos[section]!
             : additionalStructures[structure][section]!;
-        for (var xfile in selected) {
-          final entry = PhotoEntry(url: xfile.path);
-          target.add(entry);
-          getSuggestedLabel(xfile.path).then((label) {
-            setState(() {
-              entry.label = label;
+          for (var xfile in selected) {
+            final entry = PhotoEntry(url: xfile.path);
+            target.add(entry);
+            getSuggestedLabel(entry, section).then((label) {
+              setState(() {
+                entry.label = label;
+              });
             });
-          });
-        }
+          }
       });
     }
   }
