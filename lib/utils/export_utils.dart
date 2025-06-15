@@ -12,6 +12,7 @@ import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
+import 'package:share_plus/share_plus.dart';
 
 import '../models/inspection_metadata.dart';
 import '../models/inspection_sections.dart';
@@ -24,9 +25,19 @@ const String _disclaimerText =
 const String _coverDisclaimer =
     'This report is a professional opinion based on visual inspection only.';
 
+String _slugify(String input) {
+  return input
+      .toLowerCase()
+      .replaceAll(RegExp(r'[^a-z0-9]+'), '_')
+      .replaceAll(RegExp(r'^_+|_+$'), '');
+}
+
 /// Exports [report] as a ZIP archive containing an HTML file, PDF file
 /// and a folder of labeled photos.
 Future<void> exportAsZip(SavedReport report) async {
+  final meta = InspectionMetadata.fromMap(report.inspectionMetadata);
+  final addressSlug = _slugify(meta.propertyAddress);
+  final fileName = '${addressSlug}_clearsky_report.zip';
   final htmlStr = _generateHtml(report);
   final pdfBytes = await _generatePdf(report);
 
@@ -60,7 +71,7 @@ Future<void> exportAsZip(SavedReport report) async {
     final blob = html.Blob([zipData], 'application/zip');
     final url = html.Url.createObjectUrlFromBlob(blob);
     final anchor = html.AnchorElement(href: url)
-      ..setAttribute('download', 'report.zip')
+      ..setAttribute('download', fileName)
       ..click();
     html.Url.revokeObjectUrl(url);
     return;
@@ -74,10 +85,13 @@ Future<void> exportAsZip(SavedReport report) async {
   }
   dir ??= await getApplicationDocumentsDirectory();
 
-  final filePath =
-      p.join(dir.path, 'report_${DateTime.now().millisecondsSinceEpoch}.zip');
+  final filePath = p.join(dir.path, fileName);
   final file = File(filePath);
   await file.writeAsBytes(zipData, flush: true);
+
+  try {
+    await Share.shareXFiles([XFile(filePath)]);
+  } catch (_) {}
 }
 
 String _generateHtml(SavedReport report) {
