@@ -11,6 +11,7 @@ export default function ReportPreviewScreen({ uploadedPhotos, roofQuestionnaire 
   const [insuranceCarrier, setInsuranceCarrier] = useState('');
   const [claimNumber, setClaimNumber] = useState('');
   const [perilType, setPerilType] = useState('');
+  const [inspectorName, setInspectorName] = useState('');
   // Holds the inspector signature as a base64 encoded PNG
   const [signatureData, setSignatureData] = useState(null);
 
@@ -32,7 +33,7 @@ export default function ReportPreviewScreen({ uploadedPhotos, roofQuestionnaire 
   };
 
   const handleExportPDF = async () => {
-    // Include the saved signature when generating the report markup
+    // Include metadata and the saved signature when generating the report markup
     const html = generateReportHTML(
       uploadedPhotos,
       roofQuestionnaire,
@@ -42,13 +43,14 @@ export default function ReportPreviewScreen({ uploadedPhotos, roofQuestionnaire 
       insuranceCarrier,
       claimNumber,
       perilType,
+      inspectorName,
       signatureData
     );
     await exportReportAsPDF(html);
   };
 
   const handleExportHTML = async () => {
-    // The same signature data is also passed when exporting HTML
+    // Metadata and signature are also included when exporting HTML
     const html = generateReportHTML(
       uploadedPhotos,
       roofQuestionnaire,
@@ -58,6 +60,7 @@ export default function ReportPreviewScreen({ uploadedPhotos, roofQuestionnaire 
       insuranceCarrier,
       claimNumber,
       perilType,
+      inspectorName,
       signatureData
     );
     await exportReportAsHTML(html);
@@ -97,6 +100,12 @@ export default function ReportPreviewScreen({ uploadedPhotos, roofQuestionnaire 
           placeholder="Peril Type (e.g. Hail, Wind, Fire)"
           value={perilType}
           onChangeText={setPerilType}
+          style={inputStyle}
+        />
+        <TextInput
+          placeholder="Inspector Name"
+          value={inspectorName}
+          onChangeText={setInspectorName}
           style={inputStyle}
         />
       </View>

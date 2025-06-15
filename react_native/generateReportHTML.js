@@ -7,6 +7,7 @@ export default function generateReportHTML(
   insuranceCarrier = "",
   claimNumber = "",
   perilType = "",
+  inspectorName = "",
   signatureData = "",
   inspectionDate = new Date().toLocaleDateString()
 ) {
@@ -46,9 +47,10 @@ export default function generateReportHTML(
       <p><strong>Date:</strong> ${inspectionDate}</p>
       <p><strong>Client:</strong> ${clientName}</p>
       <p><strong>Address:</strong> ${clientAddress}</p>
-      <p><strong>Insurance Carrier:</strong> ${insuranceCarrier}</p>
+      ${insuranceCarrier ? `<p><strong>Insurance Carrier:</strong> ${insuranceCarrier}</p>` : ''}
       <p><strong>Claim #:</strong> ${claimNumber}</p>
       <p><strong>Peril Type:</strong> ${perilType}</p>
+      ${inspectorName ? `<p><strong>Inspector:</strong> ${inspectorName}</p>` : ''}
 
       <h2>Photos</h2>
       ${Object.entries(groupedPhotos)
