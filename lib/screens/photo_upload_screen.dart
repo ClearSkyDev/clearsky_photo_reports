@@ -52,6 +52,14 @@ class PhotoUploadScreenState extends State<PhotoUploadScreen> {
         children: [
           const SizedBox(height: 10),
           ElevatedButton.icon(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blueAccent,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
             onPressed: _pickImages,
             icon: const Icon(Icons.add_a_photo),
             label: const Text('Pick Photos'),
@@ -110,6 +118,14 @@ class PhotoUploadScreenState extends State<PhotoUploadScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 12),
               child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blueAccent,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
                 onPressed: () {
                   Navigator.push(
                     context,
