@@ -17,6 +17,7 @@ class ReportPreviewScreen extends StatefulWidget {
   final Map<String, List<PhotoEntry>>? sections;
   final List<Map<String, List<PhotoEntry>>>? additionalStructures;
   final List<String>? additionalNames;
+  final bool readOnly;
 
   const ReportPreviewScreen({
     super.key,
@@ -25,6 +26,7 @@ class ReportPreviewScreen extends StatefulWidget {
     this.additionalStructures,
     this.additionalNames,
     required this.metadata,
+    this.readOnly = false,
   });
 
   @override
@@ -428,16 +430,15 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
             ),
           ),
           Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              ElevatedButton(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blueAccent,
                     foregroundColor: Colors.white,
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
@@ -457,35 +458,37 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
                   onPressed: _downloadPdf,
                   child: const Text("Download PDF"),
                 ),
-            ],
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.only(bottom: 16),
-          child: ElevatedButton(
-            onPressed: _previewFullReport,
-            child: const Text('Preview Full Report'),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.only(bottom: 32),
-          child: ElevatedButton(
-            onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => SendReportScreen(
-                      metadata: _metadata,
-                      sections: widget.sections,
-                      additionalStructures: widget.additionalStructures,
-                      additionalNames: widget.additionalNames,
-                    ),
-                  ),
-                );
-              },
-              child: const Text('Finalize & Send'),
+              ],
             ),
           ),
+          if (!widget.readOnly) ...[
+            Padding(
+              padding: const EdgeInsets.only(bottom: 16),
+              child: ElevatedButton(
+                onPressed: _previewFullReport,
+                child: const Text('Preview Full Report'),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 32),
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => SendReportScreen(
+                        metadata: _metadata,
+                        sections: widget.sections,
+                        additionalStructures: widget.additionalStructures,
+                        additionalNames: widget.additionalNames,
+                      ),
+                    ),
+                  );
+                },
+                child: const Text('Finalize & Send'),
+              ),
+            ),
+          ]
         ],
       ),
     );
