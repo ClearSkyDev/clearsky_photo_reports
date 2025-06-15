@@ -50,7 +50,7 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
           final entry =
               PhotoEntry(url: xfile.path, label: '', labelLoading: true);
           target.add(entry);
-          getSuggestedLabel(entry, section).then((label) {
+          getSuggestedLabel(entry, section, _metadata).then((label) {
             setState(() {
               entry
                 ..label = label
@@ -173,7 +173,7 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
     for (var item in unlabeled) {
       final photo = item.value;
       setState(() => photo.labelLoading = true);
-      final label = await getSuggestedLabel(photo, item.key);
+      final label = await getSuggestedLabel(photo, item.key, _metadata);
       setState(() {
         photo
           ..label = label
