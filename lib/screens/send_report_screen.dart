@@ -17,6 +17,7 @@ class SendReportScreen extends StatefulWidget {
   final Map<String, List<PhotoEntry>>? sections;
   final List<Map<String, List<PhotoEntry>>>? additionalStructures;
   final List<String>? additionalNames;
+  final String summary;
 
   const SendReportScreen({
     super.key,
@@ -24,6 +25,7 @@ class SendReportScreen extends StatefulWidget {
     this.sections,
     this.additionalStructures,
     this.additionalNames,
+    this.summary = '',
   });
 
   @override
@@ -117,6 +119,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
       userId: null,
       inspectionMetadata: metadataMap,
       sectionPhotos: sectionPhotos,
+      summary: widget.summary,
     );
 
     await doc.set(saved.toMap());

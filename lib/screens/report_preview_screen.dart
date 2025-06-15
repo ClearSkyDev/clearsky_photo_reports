@@ -17,6 +17,7 @@ class ReportPreviewScreen extends StatefulWidget {
   final Map<String, List<PhotoEntry>>? sections;
   final List<Map<String, List<PhotoEntry>>>? additionalStructures;
   final List<String>? additionalNames;
+  final String? summary;
   final bool readOnly;
 
   const ReportPreviewScreen({
@@ -26,6 +27,7 @@ class ReportPreviewScreen extends StatefulWidget {
     this.additionalStructures,
     this.additionalNames,
     required this.metadata,
+    this.summary,
     this.readOnly = false,
   });
 
@@ -41,11 +43,21 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
   static const String _coverDisclaimer =
       'This report is a professional opinion based on visual inspection only.';
   late final InspectionMetadata _metadata;
+  late String _summary;
+  final TextEditingController _summaryController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     _metadata = widget.metadata;
+    _summary = widget.summary ?? '';
+    _summaryController.text = _summary;
+  }
+
+  @override
+  void dispose() {
+    _summaryController.dispose();
+    super.dispose();
   }
   String _metadataFileName(String ext) {
     String sanitize(String input) {
@@ -146,6 +158,11 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
       buffer.writeln('<tr><td><strong>Weather Notes:</strong></td><td>${_metadata.weatherNotes}</td></tr>');
     }
     buffer.writeln('</table>');
+
+    if (_summary.isNotEmpty) {
+      buffer.writeln('<h3>Report Summary</h3>');
+      buffer.writeln('<p>${_summary.replaceAll('\n', '<br>')}</p>');
+    }
 
     buffer.writeln('<p class="signature">Inspector Signature: ________________________________</p>');
     buffer.writeln('<p style="font-size:12px;">$_coverDisclaimer</p>');
@@ -332,6 +349,11 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
                 pw.Text('Peril Type: ${_metadata.perilType.name}'),
                 if (_metadata.inspectorName != null)
                   pw.Text('Inspector Name: ${_metadata.inspectorName}'),
+                if (_summary.isNotEmpty) ...[
+                  pw.SizedBox(height: 10),
+                  pw.Text('Report Summary', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                  pw.Text(_summary, textAlign: pw.TextAlign.center),
+                ],
                 pw.SizedBox(height: 20),
                 pw.Text(
                   _coverDisclaimer,
@@ -405,17 +427,30 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Client Name: ${_metadata.clientName}'),
-                Text('Property Address: ${_metadata.propertyAddress}'),
-                Text('Inspection Date: ${_metadata.inspectionDate.toLocal().toString().split(" ")[0]}'),
-                if (_metadata.insuranceCarrier != null)
-                  Text('Insurance Carrier: ${_metadata.insuranceCarrier}'),
-                Text('Peril Type: ${_metadata.perilType.name}'),
-                if (_metadata.inspectorName != null)
-                  Text('Inspector Name: ${_metadata.inspectorName}'),
-              ],
-            ),
+              Text('Client Name: ${_metadata.clientName}'),
+              Text('Property Address: ${_metadata.propertyAddress}'),
+              Text('Inspection Date: ${_metadata.inspectionDate.toLocal().toString().split(" ")[0]}'),
+              if (_metadata.insuranceCarrier != null)
+                Text('Insurance Carrier: ${_metadata.insuranceCarrier}'),
+              Text('Peril Type: ${_metadata.perilType.name}'),
+              if (_metadata.inspectorName != null)
+                Text('Inspector Name: ${_metadata.inspectorName}'),
+              const SizedBox(height: 8),
+              if (widget.readOnly)
+                if (_summary.isNotEmpty)
+                  Text('Summary: $_summary')
+                else
+                  const SizedBox()
+              else
+                TextField(
+                  controller: _summaryController,
+                  maxLines: 3,
+                  decoration: const InputDecoration(labelText: 'Report Summary'),
+                  onChanged: (val) => _summary = val,
+                ),
+            ],
           ),
+        ),
           Expanded(
             child: Builder(
               builder: (context) {
@@ -522,6 +557,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
                         sections: widget.sections,
                         additionalStructures: widget.additionalStructures,
                         additionalNames: widget.additionalNames,
+                        summary: _summary,
                       ),
                     ),
                   );

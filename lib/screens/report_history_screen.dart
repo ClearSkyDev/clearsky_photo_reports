@@ -118,6 +118,7 @@ class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
               metadata: meta,
               sections: sections,
               readOnly: true,
+              summary: report.summary,
             ),
           ),
         );
