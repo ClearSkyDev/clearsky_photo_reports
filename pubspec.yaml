@@ -18,6 +18,7 @@ dependencies:
   path_provider: ^2.1.2
   shared_preferences: ^2.2.2
   path: ^1.8.3
+  archive: ^3.3.3
   webview_flutter: ^4.13.0
   firebase_core: ^2.0.0
   cloud_firestore: ^4.0.0
