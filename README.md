@@ -27,3 +27,11 @@ The Flutter implementation renders the inspection report HTML differently depend
 
 - **Web**: an `IFrameElement` from `dart:html` is registered with `ui.platformViewRegistry` and inserted using `HtmlElementView`.
 - **Mobile**: the [`webview_flutter`](https://pub.dev/packages/webview_flutter) plugin displays the report. The HTML is converted to a base64 data URI and loaded as local content.
+
+## Firebase Setup
+
+This project uses Firebase for data storage and optional photo uploads. Install the `firebase_core`, `cloud_firestore` and `firebase_storage` packages and generate platform configuration files.
+
+1. Create a Firebase project in the [Firebase console](https://console.firebase.google.com).
+2. Download **google-services.json** for Android and **GoogleService-Info.plist** for iOS and place them in the respective platform directories.
+3. Run `flutterfire configure` to generate `lib/firebase_options.dart` which provides the `DefaultFirebaseOptions` used during `Firebase.initializeApp`.
