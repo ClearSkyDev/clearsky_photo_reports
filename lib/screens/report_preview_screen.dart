@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
-import '../models/photo_entry.dart';
+import 'package:flutter/services.dart' show NetworkAssetBundle;
 import 'dart:convert';
-import 'dart:html' as html;
+import '../models/photo_entry.dart';
+import 'dart:html' as html; // for HTML download (web only)
 import 'package:pdf/widgets.dart' as pw;
 import 'package:pdf/pdf.dart';
 import 'package:printing/printing.dart';
-import 'package:flutter/services.dart' show NetworkAssetBundle;
-
-
-
 
 class ReportPreviewScreen extends StatefulWidget {
   final List<PhotoEntry> photos;
@@ -26,66 +23,77 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
     });
   }
 
- void _downloadHtml() {
-  final buffer = StringBuffer();
-  buffer.writeln('<html><head><title>Photo Report</title></head><body>');
-  buffer.writeln('<h1>ClearSky Photo Report</h1>');
+  // HTML download
+  void _downloadHtml() {
+    final buffer = StringBuffer();
+    buffer.writeln('<html><head><title>Photo Report</title></head><body>');
+    buffer.writeln('<h1>ClearSky Photo Report</h1>');
 
-  for (var photo in widget.photos) {
-    buffer.writeln('<div style="margin-bottom: 20px;">');
-    buffer.writeln('<img src="${photo.url}" width="300" /><br>');
-    buffer.writeln('<strong>${photo.label}</strong>');
-    buffer.writeln('</div>');
+    for (var photo in widget.photos) {
+      buffer.writeln('<div style="margin-bottom: 20px;">');
+      buffer.writeln('<img src="${photo.url}" width="300"><br>');
+      buffer.writeln('<strong>${photo.label}</strong>');
+      buffer.writeln('</div>');
+    }
+
+    buffer.writeln('</body></html>');
+
+    final htmlContent = buffer.toString();
+    _saveHtmlFile(htmlContent);
   }
 
-  buffer.writeln('</body></html>');
+  void _saveHtmlFile(String htmlContent) {
+    final bytes = utf8.encode(htmlContent);
+    final blob = html.Blob([bytes]);
+    final url = html.Url.createObjectUrlFromBlob(blob);
+    final anchor = html.AnchorElement(href: url)
+      ..setAttribute("download", "photo_report.html")
+      ..click();
+    html.Url.revokeObjectUrl(url);
+  }
 
-  final htmlContent = buffer.toString();
-  _saveHtmlFile(htmlContent); // We'll make this next
-}void _saveHtmlFile(String htmlContent) {
-  final bytes = utf8.encode(htmlContent);
-  final blob = html.Blob([bytes]);
-  final url = html.Url.createObjectUrlFromBlob(blob);
-  final anchor = html.AnchorElement(href: url)
-    ..setAttribute("download", "photo_report.html")
-    ..click();
-  html.Url.revokeObjectUrl(url);
-}
+  // Helper to load all images before PDF generation
+  Future<List<pw.Widget>> _buildPdfWidgets() async {
+    List<pw.Widget> widgets = [];
 
-  void _downloadPdf() async {
-  final pdf = pw.Document();
+    for (var photo in widget.photos) {
+      final imageData = await NetworkAssetBundle(Uri.parse(photo.url)).load("");
+      final bytes = imageData.buffer.asUint8List();
 
-  pdf.addPage(
-    pw.MultiPage(
-      build: (pw.Context context) => [
-        pw.Header(level: 0, text: 'ClearSky Photo Report'),
-        ...widget.photos.map(
-          (photo) => pw.Column(
-            crossAxisAlignment: pw.CrossAxisAlignment.start,
-            children: [
-              pw.Text(photo.label, style: pw.TextStyle(fontSize: 16)),
-              pw.SizedBox(height: 5),
-              pw.Image(
-                pw.MemoryImage(
-                  (await NetworkAssetBundle(Uri.parse(photo.url)).load(""))
-                      .buffer
-                      .asUint8List(),
-                ),
-                width: 300,
-              ),
-              pw.SizedBox(height: 20),
-            ],
-          ),
+      widgets.add(
+        pw.Column(
+          crossAxisAlignment: pw.CrossAxisAlignment.start,
+          children: [
+            pw.Text(photo.label, style: pw.TextStyle(fontSize: 16)),
+            pw.SizedBox(height: 5),
+            pw.Image(pw.MemoryImage(bytes), width: 300),
+            pw.SizedBox(height: 20),
+          ],
         ),
-      ],
-    ),
-  );
+      );
+    }
 
-  await Printing.layoutPdf(
-    onLayout: (PdfPageFormat format) async => pdf.save(),
-  );
-}
+    return widgets;
+  }
 
+  // PDF export
+  Future<void> _downloadPdf() async {
+    final pdf = pw.Document();
+    final widgets = await _buildPdfWidgets();
+
+    pdf.addPage(
+      pw.MultiPage(
+        build: (pw.Context context) => [
+          pw.Header(level: 0, text: 'ClearSky Photo Report'),
+          ...widgets,
+        ],
+      ),
+    );
+
+    await Printing.layoutPdf(
+      onLayout: (PdfPageFormat format) async => pdf.save(),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -98,6 +106,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
               itemCount: widget.photos.length,
               itemBuilder: (context, index) {
                 final photo = widget.photos[index];
+                final controller = TextEditingController(text: photo.label);
                 return Card(
                   margin: const EdgeInsets.all(10),
                   child: Column(
@@ -107,7 +116,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
                         padding: const EdgeInsets.all(8.0),
                         child: TextField(
                           decoration: const InputDecoration(labelText: 'Label'),
-                          controller: TextEditingController(text: photo.label),
+                          controller: controller,
                           onChanged: (value) => _updateLabel(index, value),
                         ),
                       ),
@@ -132,7 +141,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
                 ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );
