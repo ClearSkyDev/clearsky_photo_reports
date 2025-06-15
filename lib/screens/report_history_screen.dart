@@ -7,7 +7,8 @@ import '../models/photo_entry.dart';
 import 'report_preview_screen.dart';
 
 class ReportHistoryScreen extends StatefulWidget {
-  const ReportHistoryScreen({super.key});
+  final String? inspectorName;
+  const ReportHistoryScreen({super.key, this.inspectorName});
 
   @override
   State<ReportHistoryScreen> createState() => _ReportHistoryScreenState();
@@ -24,10 +25,14 @@ class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
 
   Future<List<SavedReport>> _loadReports() async {
     final firestore = FirebaseFirestore.instance;
-    final snapshot = await firestore
+    Query query = firestore
         .collection('reports')
-        .orderBy('createdAt', descending: true)
-        .get();
+        .orderBy('createdAt', descending: true);
+    if (widget.inspectorName != null && widget.inspectorName!.isNotEmpty) {
+      query = query.where('inspectionMetadata.inspectorName',
+          isEqualTo: widget.inspectorName);
+    }
+    final snapshot = await query.get();
     return snapshot.docs
         .map((doc) => SavedReport.fromMap(doc.data(), doc.id))
         .toList();
@@ -62,6 +67,7 @@ class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
             builder: (_) => ReportPreviewScreen(
               metadata: meta,
               sections: sections,
+              readOnly: true,
             ),
           ),
         );
