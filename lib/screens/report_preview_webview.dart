@@ -1,4 +1,12 @@
 import 'dart:convert';
+
+/// Displays the generated report HTML across Flutter platforms.
+///
+/// * Web: uses `dart:html` to create an `IFrameElement` which is
+///   registered with `ui.platformViewRegistry` so it can be embedded
+///   in the widget tree via `HtmlElementView`.
+/// * Mobile: uses the `webview_flutter` plugin. The HTML string is
+///   converted to a base64 data URI and loaded as local content.
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -66,6 +74,7 @@ class _ReportPreviewWebViewState extends State<ReportPreviewWebView> {
               widget.html,
               mimeType: 'text/html',
               encoding: utf8,
+              base64: true,
             ).toString(),
             javascriptMode: JavascriptMode.unrestricted,
           );
