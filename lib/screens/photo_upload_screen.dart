@@ -3,9 +3,11 @@ import 'package:image_picker/image_picker.dart';
 
 import 'report_preview_screen.dart';
 import '../models/photo_entry.dart';
+import '../models/inspection_metadata.dart';
 
 class PhotoUploadScreen extends StatefulWidget {
-  const PhotoUploadScreen({super.key});
+  final InspectionMetadata metadata;
+  const PhotoUploadScreen({super.key, required this.metadata});
 
   @override
   PhotoUploadScreenState createState() => PhotoUploadScreenState();
