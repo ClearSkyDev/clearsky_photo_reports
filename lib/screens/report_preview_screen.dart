@@ -17,6 +17,15 @@ class ReportPreviewScreen extends StatefulWidget {
 }
 
 class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
+  String _timestampedFileName(String ext) {
+    final now = DateTime.now();
+    final y = now.year.toString().padLeft(4, '0');
+    final m = now.month.toString().padLeft(2, '0');
+    final d = now.day.toString().padLeft(2, '0');
+    final h = now.hour.toString().padLeft(2, '0');
+    final min = now.minute.toString().padLeft(2, '0');
+    return 'clearsky_report_${y}${m}${d}_${h}${min}.$ext';
+  }
   void _updateLabel(int index, String value) {
     setState(() {
       widget.photos[index].label = value;
@@ -47,7 +56,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
     final blob = html.Blob([bytes]);
     final url = html.Url.createObjectUrlFromBlob(blob);
     final anchor = html.AnchorElement(href: url)
-      ..setAttribute("download", "photo_report.html")
+      ..setAttribute("download", _timestampedFileName('html'))
       ..click();
     html.Url.revokeObjectUrl(url);
   }
@@ -92,6 +101,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
 
     await Printing.layoutPdf(
       onLayout: (PdfPageFormat format) async => pdf.save(),
+      name: _timestampedFileName('pdf'),
     );
   }
 
