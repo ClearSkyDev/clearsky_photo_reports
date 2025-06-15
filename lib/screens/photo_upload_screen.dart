@@ -35,7 +35,19 @@ class PhotoUploadScreenState extends State<PhotoUploadScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Photo Upload')),
+      appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Row(
+          children: [
+            Image.asset('assets/images/clearsky_logo.png', height: 28),
+            const SizedBox(width: 8),
+            const Text('Photo Upload'),
+          ],
+        ),
+      ),
       body: Column(
         children: [
           const SizedBox(height: 10),
