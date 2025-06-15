@@ -92,7 +92,7 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
   );
 }
             ),
-            if (_photos.isNotEmpty) {
+            if (_photos.is7NotEmpty) {
 return  Padding(
     padding: const EdgeInsets.symmetric(vertical: 12),
     child: ElevatedButton(
