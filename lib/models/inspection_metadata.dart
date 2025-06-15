@@ -5,6 +5,8 @@ class InspectionMetadata {
   final String? insuranceCarrier;
   final PerilType perilType;
   final String? inspectorName;
+  final String? reportId;
+  final String? weatherNotes;
 
   InspectionMetadata({
     required this.clientName,
@@ -13,6 +15,8 @@ class InspectionMetadata {
     this.insuranceCarrier,
     required this.perilType,
     this.inspectorName,
+    this.reportId,
+    this.weatherNotes,
   });
 }
 

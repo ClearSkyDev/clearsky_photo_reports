@@ -12,6 +12,8 @@ export default function ReportPreviewScreen({ uploadedPhotos, roofQuestionnaire 
   const [claimNumber, setClaimNumber] = useState('');
   const [perilType, setPerilType] = useState('');
   const [inspectorName, setInspectorName] = useState('');
+  const [reportId, setReportId] = useState('');
+  const [weatherNotes, setWeatherNotes] = useState('');
   // Holds the inspector signature as a base64 encoded PNG
   const [signatureData, setSignatureData] = useState(null);
 
@@ -44,6 +46,8 @@ export default function ReportPreviewScreen({ uploadedPhotos, roofQuestionnaire 
       claimNumber,
       perilType,
       inspectorName,
+      reportId,
+      weatherNotes,
       signatureData
     );
     await exportReportAsPDF(html);
@@ -61,6 +65,8 @@ export default function ReportPreviewScreen({ uploadedPhotos, roofQuestionnaire 
       claimNumber,
       perilType,
       inspectorName,
+      reportId,
+      weatherNotes,
       signatureData
     );
     await exportReportAsHTML(html);
@@ -106,6 +112,18 @@ export default function ReportPreviewScreen({ uploadedPhotos, roofQuestionnaire 
           placeholder="Inspector Name"
           value={inspectorName}
           onChangeText={setInspectorName}
+          style={inputStyle}
+        />
+        <TextInput
+          placeholder="Report ID"
+          value={reportId}
+          onChangeText={setReportId}
+          style={inputStyle}
+        />
+        <TextInput
+          placeholder="Weather Notes"
+          value={weatherNotes}
+          onChangeText={setWeatherNotes}
           style={inputStyle}
         />
       </View>

@@ -16,6 +16,8 @@ class _MetadataScreenState extends State<MetadataScreen> {
   final TextEditingController _propertyAddressController = TextEditingController();
   final TextEditingController _insuranceCarrierController = TextEditingController();
   final TextEditingController _inspectorNameController = TextEditingController();
+  final TextEditingController _reportIdController = TextEditingController();
+  final TextEditingController _weatherNotesController = TextEditingController();
   DateTime _inspectionDate = DateTime.now();
   PerilType _selectedPeril = PerilType.wind;
 
@@ -45,6 +47,12 @@ class _MetadataScreenState extends State<MetadataScreen> {
         perilType: _selectedPeril,
         inspectorName: _inspectorNameController.text.isNotEmpty
             ? _inspectorNameController.text
+            : null,
+        reportId: _reportIdController.text.isNotEmpty
+            ? _reportIdController.text
+            : null,
+        weatherNotes: _weatherNotesController.text.isNotEmpty
+            ? _weatherNotesController.text
             : null,
       );
       Navigator.push(
@@ -117,6 +125,14 @@ class _MetadataScreenState extends State<MetadataScreen> {
               TextFormField(
                 controller: _inspectorNameController,
                 decoration: const InputDecoration(labelText: 'Inspector Name'),
+              ),
+              TextFormField(
+                controller: _reportIdController,
+                decoration: const InputDecoration(labelText: 'Report ID'),
+              ),
+              TextFormField(
+                controller: _weatherNotesController,
+                decoration: const InputDecoration(labelText: 'Weather Notes'),
               ),
               const SizedBox(height: 20),
               ElevatedButton(
