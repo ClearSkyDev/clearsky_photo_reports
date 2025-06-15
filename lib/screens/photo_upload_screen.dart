@@ -19,6 +19,10 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
   late final InspectionMetadata _metadata;
   final ImagePicker _picker = ImagePicker();
 
+  bool _autoLabeling = false;
+  int _autoLabelRemaining = 0;
+  int _autoLabelTotal = 0;
+
   // Photos for the main structure
   late final Map<String, List<PhotoEntry>> sectionPhotos = {
     for (var s in kInspectionSections) s: [],
@@ -137,6 +141,50 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
         ],
       ),
     );
+  }
+
+  Future<void> _autoLabelAll() async {
+    final List<MapEntry<String, PhotoEntry>> unlabeled = [];
+    sectionPhotos.forEach((section, photos) {
+      for (var p in photos) {
+        if (p.label.isEmpty || p.label == 'Unlabeled') {
+          unlabeled.add(MapEntry(section, p));
+        }
+      }
+    });
+    for (var struct in additionalStructures) {
+      struct.forEach((section, photos) {
+        for (var p in photos) {
+          if (p.label.isEmpty || p.label == 'Unlabeled') {
+            unlabeled.add(MapEntry(section, p));
+          }
+        }
+      });
+    }
+
+    if (unlabeled.isEmpty) return;
+
+    setState(() {
+      _autoLabeling = true;
+      _autoLabelTotal = unlabeled.length;
+      _autoLabelRemaining = unlabeled.length;
+    });
+
+    for (var item in unlabeled) {
+      final photo = item.value;
+      setState(() => photo.labelLoading = true);
+      final label = await getSuggestedLabel(photo, item.key);
+      setState(() {
+        photo
+          ..label = label
+          ..labelLoading = false;
+        _autoLabelRemaining--;
+      });
+    }
+
+    setState(() {
+      _autoLabeling = false;
+    });
   }
 
   Widget _buildSection(
@@ -284,6 +332,40 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
   @override
   Widget build(BuildContext context) {
     final List<Widget> items = [];
+
+    items.add(
+      Padding(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        child: ElevatedButton.icon(
+          onPressed: _autoLabeling ? null : _autoLabelAll,
+          icon: const Icon(Icons.label_outline),
+          label: Text(
+            _autoLabeling ? 'Auto Labeling...' : 'Auto-Label All',
+          ),
+        ),
+      ),
+    );
+
+    if (_autoLabeling) {
+      items.add(
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4),
+          child: Column(
+            children: [
+              LinearProgressIndicator(
+                value: _autoLabelTotal == 0
+                    ? null
+                    : (_autoLabelTotal - _autoLabelRemaining) /
+                        _autoLabelTotal,
+              ),
+              const SizedBox(height: 4),
+              Text('Remaining: $_autoLabelRemaining'),
+            ],
+          ),
+        ),
+      );
+    }
+
 
     for (var section in kInspectionSections) {
       items.add(
