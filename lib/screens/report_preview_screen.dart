@@ -64,7 +64,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
         pw.Column(
           crossAxisAlignment: pw.CrossAxisAlignment.start,
           children: [
-            pw.Text(photo.label, style: pw.TextStyle(fontSize: 16)),
+            pw.Text(photo.label, style: const pw.TextStyle(fontSize: 16)),
             pw.SizedBox(height: 5),
             pw.Image(pw.MemoryImage(bytes), width: 300),
             pw.SizedBox(height: 20),

@@ -6,8 +6,8 @@ class ReportScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Generate Report')),
-      body: Center(child: Text('PDF generation logic goes here')),
+      appBar: AppBar(title: const Text('Generate Report')),
+      body: const Center(child: Text('PDF generation logic goes here')),
     );
   }
 }

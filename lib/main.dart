@@ -4,7 +4,7 @@ import 'screens/report_screen.dart';
 import 'screens/photo_upload_screen.dart';
 
 void main() {
-  runApp(ClearSkyApp());
+  runApp(const ClearSkyApp());
 }
 
 class ClearSkyApp extends StatelessWidget {
@@ -20,9 +20,9 @@ class ClearSkyApp extends StatelessWidget {
       ),
       initialRoute: '/',
       routes: {
-        '/': (context) => HomeScreen(),
-        '/report': (context) => ReportScreen(),
-        '/upload': (context) => PhotoUploadScreen(),
+        '/': (context) => const HomeScreen(),
+        '/report': (context) => const ReportScreen(),
+        '/upload': (context) => const PhotoUploadScreen(),
       },
     );
   }

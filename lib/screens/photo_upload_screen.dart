@@ -17,7 +17,7 @@ class PhotoUploadScreenState extends State<PhotoUploadScreen> {
 
   Future<void> _pickImages() async {
     final List<XFile> selected = await _picker.pickMultiImage();
-    if (selected != null && selected.isNotEmpty) {
+    if (selected.isNotEmpty) {
       setState(() {
         _photos.addAll(
           selected.map((xfile) => PhotoEntry(url: xfile.path)).toList(),
