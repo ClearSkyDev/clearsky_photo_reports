@@ -9,12 +9,16 @@ import 'package:pdf/pdf.dart';
 import 'package:printing/printing.dart';
 
 class ReportPreviewScreen extends StatefulWidget {
-  final List<PhotoEntry> photos;
+  final List<PhotoEntry>? photos;
   final InspectionMetadata metadata;
+  final Map<String, List<PhotoEntry>>? sections;
+  final Map<String, Map<String, List<PhotoEntry>>>? additionalStructures;
 
   const ReportPreviewScreen({
     super.key,
-    required this.photos,
+    this.photos,
+    this.sections,
+    this.additionalStructures,
     required this.metadata,
   });
 
@@ -42,9 +46,37 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
     return 'clearsky_report_${y}${m}${d}_${h}${min}.$ext';
   }
   void _updateLabel(int index, String value) {
+    if (widget.photos == null) return;
     setState(() {
-      widget.photos[index].label = value;
+      widget.photos![index].label = value;
     });
+  }
+
+  List<PhotoEntry> _gatherAllPhotos() {
+    final List<PhotoEntry> all = [];
+    if (widget.photos != null) {
+      all.addAll(widget.photos!);
+    }
+    if (widget.sections != null) {
+      widget.sections!.forEach((section, photos) {
+        for (var p in photos) {
+          final suffix = p.label != 'Unlabeled' ? ' - ${p.label}' : '';
+          all.add(PhotoEntry(url: p.url, label: '$section$suffix'));
+        }
+      });
+    }
+    if (widget.additionalStructures != null) {
+      widget.additionalStructures!.forEach((structure, sections) {
+        sections.forEach((section, photos) {
+          for (var p in photos) {
+            final suffix = p.label != 'Unlabeled' ? ' - ${p.label}' : '';
+            all.add(
+                PhotoEntry(url: p.url, label: '$structure - $section$suffix'));
+          }
+        });
+      });
+    }
+    return all;
   }
 
   // HTML download
@@ -67,7 +99,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
     }
     buffer.writeln('</p>');
 
-    for (var photo in widget.photos) {
+    for (var photo in _gatherAllPhotos()) {
       buffer.writeln('<div style="margin-bottom: 20px;">');
       buffer.writeln('<img src="${photo.url}" width="300"><br>');
       buffer.writeln('<strong>${photo.label}</strong>');
@@ -96,7 +128,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
   Future<List<pw.Widget>> _buildPdfWidgets() async {
     List<pw.Widget> widgets = [];
 
-    for (var photo in widget.photos) {
+    for (var photo in _gatherAllPhotos()) {
       final imageData = await NetworkAssetBundle(Uri.parse(photo.url)).load("");
       final bytes = imageData.buffer.asUint8List();
 
@@ -204,26 +236,35 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
             ),
           ),
           Expanded(
-            child: ListView.builder(
-              itemCount: widget.photos.length,
-              itemBuilder: (context, index) {
-                final photo = widget.photos[index];
-                final controller = TextEditingController(text: photo.label);
-                return Card(
-                  margin: const EdgeInsets.all(10),
-                  child: Column(
-                    children: [
-                      Image.network(photo.url),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: TextField(
-                          decoration: const InputDecoration(labelText: 'Label'),
-                          controller: controller,
-                          onChanged: (value) => _updateLabel(index, value),
-                        ),
+            child: Builder(
+              builder: (context) {
+                final photos = _gatherAllPhotos();
+                return ListView.builder(
+                  itemCount: photos.length,
+                  itemBuilder: (context, index) {
+                    final photo = photos[index];
+                    final controller = TextEditingController(text: photo.label);
+                    final editable = widget.photos != null && index < (widget.photos!.length);
+                    return Card(
+                      margin: const EdgeInsets.all(10),
+                      child: Column(
+                        children: [
+                          Image.network(photo.url),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: editable
+                                ? TextField(
+                                    decoration:
+                                        const InputDecoration(labelText: 'Label'),
+                                    controller: controller,
+                                    onChanged: (value) => _updateLabel(index, value),
+                                  )
+                                : Text(photo.label),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
+                    );
+                  },
                 );
               },
             ),
