@@ -42,15 +42,18 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
         final target = structure == null
             ? sectionPhotos[section]!
             : additionalStructures[structure][section]!;
-          for (var xfile in selected) {
-            final entry = PhotoEntry(url: xfile.path);
-            target.add(entry);
-            getSuggestedLabel(entry, section).then((label) {
-              setState(() {
-                entry.label = label;
-              });
+        for (var xfile in selected) {
+          final entry =
+              PhotoEntry(url: xfile.path, label: '', labelLoading: true);
+          target.add(entry);
+          getSuggestedLabel(entry, section).then((label) {
+            setState(() {
+              entry
+                ..label = label
+                ..labelLoading = false;
             });
-          }
+          });
+        }
       });
     }
   }
@@ -101,14 +104,19 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
 
   void _showLabelDialog(PhotoEntry entry) {
     final controller = TextEditingController(
-        text: entry.label == 'Unlabeled' ? '' : entry.label);
+        text: entry.labelLoading || entry.label == 'Unlabeled'
+            ? ''
+            : entry.label);
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
         title: const Text('Label Photo'),
         content: TextField(
           controller: controller,
-          decoration: const InputDecoration(labelText: 'Label'),
+          decoration: InputDecoration(
+            labelText: 'Label',
+            hintText: entry.labelLoading ? 'Generating...' : null,
+          ),
         ),
         actions: [
           TextButton(
@@ -118,7 +126,9 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
           TextButton(
             onPressed: () {
               setState(() {
-                entry.label = controller.text;
+                entry
+                  ..label = controller.text
+                  ..labelLoading = false;
               });
               Navigator.pop(context);
             },
@@ -198,7 +208,39 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
                             ),
                           ),
                         ),
-                        if (photo.label.isNotEmpty && photo.label != 'Unlabeled')
+                        if (photo.labelLoading)
+                          Positioned(
+                            bottom: 0,
+                            left: 0,
+                            right: 0,
+                            child: Container(
+                              color: Colors.black54,
+                              padding: const EdgeInsets.all(2),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: const [
+                                  SizedBox(
+                                    width: 12,
+                                    height: 12,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      valueColor:
+                                          AlwaysStoppedAnimation(Colors.white),
+                                    ),
+                                  ),
+                                  SizedBox(width: 6),
+                                  Text(
+                                    'Generating...',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                        else if (photo.label.isNotEmpty && photo.label != 'Unlabeled')
                           Positioned(
                             bottom: 0,
                             left: 0,
