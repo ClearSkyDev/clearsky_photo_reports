@@ -113,30 +113,44 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
   // Generate the HTML string for the report preview
   String generateHtmlPreview() {
     final buffer = StringBuffer();
-    buffer.writeln('<html><head><title>Photo Report</title></head><body>');
+    buffer.writeln('<html><head><title>Photo Report</title>');
+    buffer.writeln('<style>'
+        'body { font-family: Arial, sans-serif; }'
+        '.cover { text-align:center; padding:40px; }'
+        '.cover table { margin:20px auto; border-collapse:collapse; }'
+        '.cover td { padding:4px 8px; }'
+        '.signature { margin-top:40px; }'
+        '</style></head><body>');
+
+    buffer.writeln('<div class="cover">');
     buffer.writeln(
         '<img src="assets/images/clearsky_logo.png" alt="ClearSky Logo" style="width:200px;">');
-    buffer.writeln('<h1>ClearSky Photo Report</h1>');
-    buffer.writeln('<h2>Inspection Details</h2>');
-    buffer.writeln('<p>');
-    buffer.writeln('Client Name: ${_metadata.clientName}<br>');
-    buffer.writeln('Property Address: ${_metadata.propertyAddress}<br>');
-    buffer.writeln(
-        'Inspection Date: ${_metadata.inspectionDate.toLocal().toString().split(" ")[0]}<br>');
+    buffer.writeln('<h1>Roof Inspection Report</h1>');
+    buffer.writeln('<h2>Prepared by ClearSky Roof Inspectors</h2>');
+
+    buffer.writeln('<table>');
+    buffer.writeln('<tr><td><strong>Client Name:</strong></td><td>${_metadata.clientName}</td></tr>');
+    buffer.writeln('<tr><td><strong>Property Address:</strong></td><td>${_metadata.propertyAddress}</td></tr>');
+    buffer.writeln('<tr><td><strong>Inspection Date:</strong></td><td>${_metadata.inspectionDate.toLocal().toString().split(" ")[0]}</td></tr>');
     if (_metadata.insuranceCarrier != null) {
-      buffer.writeln('Insurance Carrier: ${_metadata.insuranceCarrier}<br>');
+      buffer.writeln('<tr><td><strong>Insurance Carrier:</strong></td><td>${_metadata.insuranceCarrier}</td></tr>');
     }
-    buffer.writeln('Peril Type: ${_metadata.perilType.name}<br>');
+    buffer.writeln('<tr><td><strong>Peril Type:</strong></td><td>${_metadata.perilType.name}</td></tr>');
     if (_metadata.inspectorName != null) {
-      buffer.writeln('Inspector Name: ${_metadata.inspectorName}<br>');
+      buffer.writeln('<tr><td><strong>Inspector Name:</strong></td><td>${_metadata.inspectorName}</td></tr>');
     }
     if (_metadata.reportId != null) {
-      buffer.writeln('Report ID: ${_metadata.reportId}<br>');
+      buffer.writeln('<tr><td><strong>Report ID:</strong></td><td>${_metadata.reportId}</td></tr>');
     }
     if (_metadata.weatherNotes != null) {
-      buffer.writeln('Weather Notes: ${_metadata.weatherNotes}<br>');
+      buffer.writeln('<tr><td><strong>Weather Notes:</strong></td><td>${_metadata.weatherNotes}</td></tr>');
     }
-    buffer.writeln('</p>');
+    buffer.writeln('</table>');
+
+    buffer.writeln('<p class="signature">Inspector Signature: ________________________________</p>');
+    buffer.writeln('<p style="font-size:12px;">$_coverDisclaimer</p>');
+    buffer.writeln('</div>');
+    buffer.writeln('<hr>');
 
     if (widget.sections != null) {
       for (var section in kInspectionSections) {
