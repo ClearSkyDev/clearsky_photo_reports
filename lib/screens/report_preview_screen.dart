@@ -9,6 +9,7 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:pdf/pdf.dart';
 import 'package:printing/printing.dart';
 import 'send_report_screen.dart';
+import 'report_preview_webview.dart';
 
 class ReportPreviewScreen extends StatefulWidget {
   final List<PhotoEntry>? photos;
@@ -103,8 +104,8 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
     return all;
   }
 
-  // HTML download
-  void _downloadHtml() {
+  // Generate the HTML string for the report preview
+  String generateHtmlPreview() {
     final buffer = StringBuffer();
     buffer.writeln('<html><head><title>Photo Report</title></head><body>');
     buffer.writeln('<h1>ClearSky Photo Report</h1>');
@@ -170,7 +171,12 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
         '<p style="text-align: center; margin-top: 40px;">$_contactInfo</p>');
     buffer.writeln('</body></html>');
 
-    final htmlContent = buffer.toString();
+    return buffer.toString();
+  }
+
+  // HTML download
+  void _downloadHtml() {
+    final htmlContent = generateHtmlPreview();
     _saveHtmlFile(htmlContent);
   }
 
@@ -320,6 +326,19 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
     );
   }
 
+  void _previewFullReport() {
+    final htmlContent = generateHtmlPreview();
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ReportPreviewWebView(
+          html: htmlContent,
+          onExportPdf: _downloadPdf,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -397,11 +416,11 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                ElevatedButton(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blueAccent,
                     foregroundColor: Colors.white,
@@ -418,8 +437,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blueAccent,
                     foregroundColor: Colors.white,
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
@@ -427,13 +445,20 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
                   onPressed: _downloadPdf,
                   child: const Text("Download PDF"),
                 ),
-              ],
-            ),
+            ],
           ),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 32),
-            child: ElevatedButton(
-              onPressed: () {
+        ),
+        Padding(
+          padding: const EdgeInsets.only(bottom: 16),
+          child: ElevatedButton(
+            onPressed: _previewFullReport,
+            child: const Text('Preview Full Report'),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(bottom: 32),
+          child: ElevatedButton(
+            onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
