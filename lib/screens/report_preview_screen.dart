@@ -54,16 +54,16 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
     buffer.writeln('<h1>ClearSky Photo Report</h1>');
     buffer.writeln('<h2>Inspection Details</h2>');
     buffer.writeln('<p>');
-    buffer.writeln('Client: ${_metadata.clientName}<br>');
-    buffer.writeln('Property: ${_metadata.propertyAddress}<br>');
+    buffer.writeln('Client Name: ${_metadata.clientName}<br>');
+    buffer.writeln('Property Address: ${_metadata.propertyAddress}<br>');
     buffer.writeln(
         'Inspection Date: ${_metadata.inspectionDate.toLocal().toString().split(" ")[0]}<br>');
     if (_metadata.insuranceCarrier != null) {
-      buffer.writeln('Carrier: ${_metadata.insuranceCarrier}<br>');
+      buffer.writeln('Insurance Carrier: ${_metadata.insuranceCarrier}<br>');
     }
     buffer.writeln('Peril Type: ${_metadata.perilType.name}<br>');
     if (_metadata.inspectorName != null) {
-      buffer.writeln('Inspector: ${_metadata.inspectorName}<br>');
+      buffer.writeln('Inspector Name: ${_metadata.inspectorName}<br>');
     }
     buffer.writeln('</p>');
 
@@ -161,14 +161,14 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
               pw.Text(_contactInfo, textAlign: pw.TextAlign.center),
           build: (pw.Context context) => [
             pw.Header(level: 0, text: 'ClearSky Photo Report'),
-            pw.Text('Client: ${_metadata.clientName}'),
-            pw.Text('Property: ${_metadata.propertyAddress}'),
-            pw.Text("Inspection Date: ${_metadata.inspectionDate.toLocal().toString().split(' ')[0]}"),
+            pw.Text('Client Name: ${_metadata.clientName}'),
+            pw.Text('Property Address: ${_metadata.propertyAddress}'),
+            pw.Text('Inspection Date: ${_metadata.inspectionDate.toLocal().toString().split(' ')[0]}'),
             if (_metadata.insuranceCarrier != null)
-              pw.Text('Carrier: ${_metadata.insuranceCarrier}'),
+              pw.Text('Insurance Carrier: ${_metadata.insuranceCarrier}'),
             pw.Text('Peril Type: ${_metadata.perilType.name}'),
             if (_metadata.inspectorName != null)
-              pw.Text('Inspector: ${_metadata.inspectorName}'),
+              pw.Text('Inspector Name: ${_metadata.inspectorName}'),
             pw.SizedBox(height: 20),
             ...widgets,
           ],
@@ -192,14 +192,14 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Client: ${_metadata.clientName}'),
-                Text('Property: ${_metadata.propertyAddress}'),
+                Text('Client Name: ${_metadata.clientName}'),
+                Text('Property Address: ${_metadata.propertyAddress}'),
                 Text('Inspection Date: ${_metadata.inspectionDate.toLocal().toString().split(" ")[0]}'),
                 if (_metadata.insuranceCarrier != null)
-                  Text('Carrier: ${_metadata.insuranceCarrier}'),
+                  Text('Insurance Carrier: ${_metadata.insuranceCarrier}'),
                 Text('Peril Type: ${_metadata.perilType.name}'),
                 if (_metadata.inspectorName != null)
-                  Text('Inspector: ${_metadata.inspectorName}'),
+                  Text('Inspector Name: ${_metadata.inspectorName}'),
               ],
             ),
           ),
