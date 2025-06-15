@@ -5,6 +5,12 @@ import '../models/saved_report.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'dart:io';
+import '../utils/local_report_store.dart';
+
+/// If Firebase is not desired:
+/// - Use `path_provider` and `shared_preferences` or `hive` to save report JSON locally
+/// - Save photo paths using app directory
+/// - Create a LocalReportStore that mirrors the Firestore logic with local files
 
 class SendReportScreen extends StatefulWidget {
   final InspectionMetadata metadata;
