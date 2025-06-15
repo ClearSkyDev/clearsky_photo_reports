@@ -6,7 +6,15 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('ClearSky Home')),
+      appBar: AppBar(
+        title: Row(
+          children: [
+            Image.asset('assets/images/clearsky_logo.png', height: 32),
+            const SizedBox(width: 8),
+            const Text('ClearSky Photo Reports'),
+          ],
+        ),
+      ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
