@@ -10,6 +10,8 @@ import 'package:pdf/pdf.dart';
 import 'package:printing/printing.dart';
 import 'send_report_screen.dart';
 import 'report_preview_webview.dart';
+import 'report_settings_screen.dart' show ReportSettings;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ReportPreviewScreen extends StatefulWidget {
   final List<PhotoEntry>? photos;
@@ -44,12 +46,26 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
       'This report is a professional opinion based on visual inspection only.';
   late final InspectionMetadata _metadata;
   late final TextEditingController _summaryController;
+  String _template = 'legacy';
 
   @override
   void initState() {
     super.initState();
     _metadata = widget.metadata;
     _summaryController = TextEditingController(text: widget.summary ?? '');
+    _loadTemplate();
+  }
+
+  Future<void> _loadTemplate() async {
+    final prefs = await SharedPreferences.getInstance();
+    final data = prefs.getString('report_settings');
+    if (data != null) {
+      final map = jsonDecode(data) as Map<String, dynamic>;
+      final settings = ReportSettings.fromMap(map);
+      setState(() {
+        _template = settings.template;
+      });
+    }
   }
 
   @override
@@ -124,13 +140,21 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
   String generateHtmlPreview() {
     final buffer = StringBuffer();
     buffer.writeln('<html><head><title>Photo Report</title>');
-    buffer.writeln('<style>'
-        'body { font-family: Arial, sans-serif; }'
-        '.cover { text-align:center; padding:40px; }'
-        '.cover table { margin:20px auto; border-collapse:collapse; }'
-        '.cover td { padding:4px 8px; }'
-        '.signature { margin-top:40px; }'
-        '</style></head><body>');
+    String style;
+    switch (_template) {
+      case 'modern':
+        style =
+            'body { font-family: Arial, sans-serif; } h2 { background:#e0e0e0; padding:4px; }';
+        break;
+      case 'clean':
+        style =
+            'body { font-family: Helvetica, sans-serif; } h2 { border-bottom:1px solid #ccc; }';
+        break;
+      default:
+        style =
+            'body { font-family: Arial, sans-serif; }.cover { text-align:center; padding:40px; }.cover table { margin:20px auto; border-collapse:collapse; }.cover td { padding:4px 8px; }.signature { margin-top:40px; }';
+    }
+    buffer.writeln('<style>$style</style></head><body>');
 
     buffer.writeln('<div class="cover">');
     buffer.writeln(
@@ -238,6 +262,23 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
     html.Url.revokeObjectUrl(url);
   }
 
+  pw.Widget _pdfSectionHeader(String text) {
+    if (_template == 'modern') {
+      return pw.Container(
+        color: PdfColors.blue100,
+        padding: const pw.EdgeInsets.all(4),
+        child: pw.Text(text,
+            style: pw.TextStyle(
+                fontSize: 18,
+                fontWeight: pw.FontWeight.bold,
+                color: PdfColors.blue800)),
+      );
+    }
+    return pw.Text(text,
+        style:
+            pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold));
+  }
+
   // Helper to load all images before PDF generation
   Future<List<pw.Widget>> _buildPdfWidgets() async {
     final List<pw.Widget> widgets = [];
@@ -274,9 +315,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
       for (var section in kInspectionSections) {
         final photos = widget.sections![section] ?? [];
         if (photos.isEmpty) continue;
-        widgets.add(pw.Text(section,
-            style: pw.TextStyle(
-                fontSize: 18, fontWeight: pw.FontWeight.bold)));
+        widgets.add(_pdfSectionHeader(section));
         widgets.add(pw.SizedBox(height: 8));
         widgets.add(await buildWrap(photos));
         widgets.add(pw.SizedBox(height: 20));
@@ -287,16 +326,12 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
       for (int i = 0; i < widget.additionalStructures!.length; i++) {
         final name = widget.additionalNames![i];
         final sections = widget.additionalStructures![i];
-        widgets.add(pw.Text(name,
-            style: pw.TextStyle(
-                fontSize: 20, fontWeight: pw.FontWeight.bold)));
+        widgets.add(_pdfSectionHeader(name));
         widgets.add(pw.SizedBox(height: 10));
         for (var section in kInspectionSections) {
           final photos = sections[section] ?? [];
           if (photos.isEmpty) continue;
-          widgets.add(pw.Text(section,
-              style: pw.TextStyle(
-                  fontSize: 18, fontWeight: pw.FontWeight.bold)));
+          widgets.add(_pdfSectionHeader(section));
           widgets.add(pw.SizedBox(height: 8));
           widgets.add(await buildWrap(photos));
           widgets.add(pw.SizedBox(height: 20));
