@@ -38,6 +38,8 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
       'ClearSky Roof Inspectors | www.clearskyroof.com | (555) 123-4567';
   static const String _disclaimerText =
       'This report is for informational purposes only and is not a warranty.';
+  static const String _coverDisclaimer =
+      'This report is a professional opinion based on visual inspection only.';
   late final InspectionMetadata _metadata;
 
   @override
@@ -291,6 +293,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
           build: (context) => pw.Center(
             child: pw.Column(
               mainAxisAlignment: pw.MainAxisAlignment.center,
+              crossAxisAlignment: pw.CrossAxisAlignment.center,
               children: [
                 pw.Image(pw.MemoryImage(logoBytes), width: 150),
                 pw.SizedBox(height: 20),
@@ -306,8 +309,21 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
                   'Prepared by ClearSky Roof Inspectors',
                   style: const pw.TextStyle(fontSize: 18),
                 ),
-                pw.SizedBox(height: 10),
-                pw.Text(dateStr, style: const pw.TextStyle(fontSize: 14)),
+                pw.SizedBox(height: 20),
+                pw.Text('Client Name: ${_metadata.clientName}'),
+                pw.Text('Property Address: ${_metadata.propertyAddress}'),
+                pw.Text('Inspection Date: ${_metadata.inspectionDate.toLocal().toString().split(' ')[0]}'),
+                if (_metadata.insuranceCarrier != null)
+                  pw.Text('Insurance Carrier: ${_metadata.insuranceCarrier}'),
+                pw.Text('Peril Type: ${_metadata.perilType.name}'),
+                if (_metadata.inspectorName != null)
+                  pw.Text('Inspector Name: ${_metadata.inspectorName}'),
+                pw.SizedBox(height: 20),
+                pw.Text(
+                  _coverDisclaimer,
+                  style: const pw.TextStyle(fontSize: 12),
+                  textAlign: pw.TextAlign.center,
+                ),
               ],
             ),
           ),
