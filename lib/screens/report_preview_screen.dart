@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart' show NetworkAssetBundle;
+import 'package:flutter/services.dart' show NetworkAssetBundle, rootBundle;
 import 'dart:convert';
 import '../models/photo_entry.dart';
 import 'dart:html' as html; // for HTML download (web only)
@@ -90,14 +90,46 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
     final pdf = pw.Document();
     final widgets = await _buildPdfWidgets();
 
-    pdf.addPage(
-      pw.MultiPage(
-        build: (pw.Context context) => [
-          pw.Header(level: 0, text: 'ClearSky Photo Report'),
-          ...widgets,
-        ],
-      ),
-    );
+    final logoData = await rootBundle.load('assets/images/clearsky_logo.png');
+    final logoBytes = logoData.buffer.asUint8List();
+    final dateStr = DateTime.now().toLocal().toString().split(' ')[0];
+
+    pdf
+      ..addPage(
+        pw.Page(
+          build: (context) => pw.Center(
+            child: pw.Column(
+              mainAxisAlignment: pw.MainAxisAlignment.center,
+              children: [
+                pw.Image(pw.MemoryImage(logoBytes), width: 150),
+                pw.SizedBox(height: 20),
+                pw.Text(
+                  'Roof Inspection Report',
+                  style: pw.TextStyle(
+                    fontSize: 24,
+                    fontWeight: pw.FontWeight.bold,
+                  ),
+                ),
+                pw.SizedBox(height: 10),
+                pw.Text(
+                  'Prepared by ClearSky Roof Inspectors',
+                  style: const pw.TextStyle(fontSize: 18),
+                ),
+                pw.SizedBox(height: 10),
+                pw.Text(dateStr, style: const pw.TextStyle(fontSize: 14)),
+              ],
+            ),
+          ),
+        ),
+      )
+      ..addPage(
+        pw.MultiPage(
+          build: (pw.Context context) => [
+            pw.Header(level: 0, text: 'ClearSky Photo Report'),
+            ...widgets,
+          ],
+        ),
+      );
 
     await Printing.layoutPdf(
       onLayout: (PdfPageFormat format) async => pdf.save(),
