@@ -1,0 +1,76 @@
+// Model for persisting completed reports in Firestore
+class SavedReport {
+  final String id;
+  final Map<String, dynamic> inspectionMetadata;
+  final Map<String, List<ReportPhotoEntry>> sectionPhotos;
+  final DateTime createdAt;
+
+  SavedReport({
+    this.id = '',
+    required this.inspectionMetadata,
+    required this.sectionPhotos,
+    DateTime? createdAt,
+  }) : createdAt = createdAt ?? DateTime.now();
+
+  Map<String, dynamic> toMap() {
+    return {
+      'inspectionMetadata': inspectionMetadata,
+      'sectionPhotos': {
+        for (var entry in sectionPhotos.entries)
+          entry.key: entry.value.map((p) => p.toMap()).toList(),
+      },
+      'createdAt': createdAt.millisecondsSinceEpoch,
+    };
+  }
+
+  factory SavedReport.fromMap(Map<String, dynamic> map, String id) {
+    final sections = <String, List<ReportPhotoEntry>>{};
+    final rawSections = map['sectionPhotos'] as Map<String, dynamic>? ?? {};
+    rawSections.forEach((key, value) {
+      final list = (value as List<dynamic>)
+          .map((item) => ReportPhotoEntry.fromMap(Map<String, dynamic>.from(item)))
+          .toList();
+      sections[key] = list;
+    });
+
+    return SavedReport(
+      id: id,
+      inspectionMetadata:
+          Map<String, dynamic>.from(map['inspectionMetadata'] ?? {}),
+      sectionPhotos: sections,
+      createdAt: map['createdAt'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(map['createdAt'])
+          : DateTime.now(),
+    );
+  }
+}
+
+class ReportPhotoEntry {
+  final String label;
+  final String photoUrl;
+  final DateTime? timestamp;
+
+  ReportPhotoEntry({
+    required this.label,
+    required this.photoUrl,
+    this.timestamp,
+  });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'label': label,
+      'photoUrl': photoUrl,
+      if (timestamp != null) 'timestamp': timestamp!.millisecondsSinceEpoch,
+    };
+  }
+
+  factory ReportPhotoEntry.fromMap(Map<String, dynamic> map) {
+    return ReportPhotoEntry(
+      label: map['label'] as String? ?? '',
+      photoUrl: map['photoUrl'] as String? ?? '',
+      timestamp: map['timestamp'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(map['timestamp'])
+          : null,
+    );
+  }
+}
