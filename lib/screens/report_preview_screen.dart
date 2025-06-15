@@ -17,6 +17,8 @@ class ReportPreviewScreen extends StatefulWidget {
 }
 
 class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
+  static const String _contactInfo =
+      'ClearSky Roof Inspectors | www.clearskyroof.com | (555) 123-4567';
   String _timestampedFileName(String ext) {
     final now = DateTime.now();
     final y = now.year.toString().padLeft(4, '0');
@@ -45,6 +47,8 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
       buffer.writeln('</div>');
     }
 
+    buffer.writeln(
+        '<p style="text-align: center; margin-top: 40px;">$_contactInfo</p>');
     buffer.writeln('</body></html>');
 
     final htmlContent = buffer.toString();
@@ -97,6 +101,8 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
     pdf
       ..addPage(
         pw.Page(
+          footer: (context) =>
+              pw.Text(_contactInfo, textAlign: pw.TextAlign.center),
           build: (context) => pw.Center(
             child: pw.Column(
               mainAxisAlignment: pw.MainAxisAlignment.center,
@@ -124,6 +130,8 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
       )
       ..addPage(
         pw.MultiPage(
+          footer: (context) =>
+              pw.Text(_contactInfo, textAlign: pw.TextAlign.center),
           build: (pw.Context context) => [
             pw.Header(level: 0, text: 'ClearSky Photo Report'),
             ...widgets,
