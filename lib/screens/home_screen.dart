@@ -28,7 +28,7 @@ class HomeScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
-              onPressed: () => Navigator.pushNamed(context, '/upload'),
+              onPressed: () => Navigator.pushNamed(context, '/metadata'),
               child: const Text('Upload Photos'),
             ),
             ElevatedButton(
