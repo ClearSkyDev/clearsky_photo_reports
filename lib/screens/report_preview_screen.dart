@@ -39,14 +39,27 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
     super.initState();
     _metadata = widget.metadata;
   }
-  String _timestampedFileName(String ext) {
-    final now = DateTime.now();
-    final y = now.year.toString().padLeft(4, '0');
-    final m = now.month.toString().padLeft(2, '0');
-    final d = now.day.toString().padLeft(2, '0');
-    final h = now.hour.toString().padLeft(2, '0');
-    final min = now.minute.toString().padLeft(2, '0');
-    return 'clearsky_report_${y}${m}${d}_${h}${min}.$ext';
+  String _metadataFileName(String ext) {
+    final sanitizedAddress =
+        _metadata.propertyAddress.replaceAll(RegExp(r'[^A-Za-z0-9]'), '');
+    final monthNames = [
+      '',
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December'
+    ];
+    final month = monthNames[_metadata.inspectionDate.month];
+    final day = _metadata.inspectionDate.day.toString().padLeft(2, '0');
+    return '${sanitizedAddress}_${month}$day.$ext';
   }
   void _updateLabel(int index, String value) {
     if (widget.photos == null) return;
@@ -174,7 +187,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
     final blob = html.Blob([bytes]);
     final url = html.Url.createObjectUrlFromBlob(blob);
     final anchor = html.AnchorElement(href: url)
-      ..setAttribute("download", _timestampedFileName('html'))
+      ..setAttribute("download", _metadataFileName('html'))
       ..click();
     html.Url.revokeObjectUrl(url);
   }
@@ -309,7 +322,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
 
     await Printing.layoutPdf(
       onLayout: (PdfPageFormat format) async => pdf.save(),
-      name: _timestampedFileName('pdf'),
+      name: _metadataFileName('pdf'),
     );
   }
 
