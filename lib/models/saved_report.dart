@@ -38,6 +38,8 @@ class SavedReport {
   final List<ReportCollaborator> collaborators;
   final String? lastEditedBy;
   final DateTime? lastEditedAt;
+  final double? latitude;
+  final double? longitude;
 
   SavedReport({
     this.id = '',
@@ -64,6 +66,8 @@ class SavedReport {
     this.collaborators = const [],
     this.lastEditedBy,
     this.lastEditedAt,
+    this.latitude,
+    this.longitude,
   }) : createdAt = createdAt ?? DateTime.now();
 
   Map<String, dynamic> toMap() {
@@ -97,6 +101,8 @@ class SavedReport {
       if (lastEditedBy != null) 'lastEditedBy': lastEditedBy,
       if (lastEditedAt != null)
         'lastEditedAt': lastEditedAt!.millisecondsSinceEpoch,
+      if (latitude != null) 'latitude': latitude,
+      if (longitude != null) 'longitude': longitude,
     };
   }
 
@@ -163,6 +169,8 @@ class SavedReport {
       lastEditedAt: map['lastEditedAt'] != null
           ? DateTime.fromMillisecondsSinceEpoch(map['lastEditedAt'])
           : null,
+      latitude: (map['latitude'] as num?)?.toDouble(),
+      longitude: (map['longitude'] as num?)?.toDouble(),
     );
   }
 }
