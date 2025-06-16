@@ -84,6 +84,7 @@ class LocalReportStore {
       createdAt: report.createdAt,
       isFinalized: report.isFinalized,
       publicReportId: report.publicReportId,
+      publicViewLink: report.publicViewLink,
       lastAuditPassed: report.lastAuditPassed,
       lastAuditIssues: report.lastAuditIssues,
       reportOwner: report.reportOwner,

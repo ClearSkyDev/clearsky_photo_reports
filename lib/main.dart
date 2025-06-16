@@ -18,6 +18,8 @@ import 'screens/report_settings_screen.dart';
 import 'screens/report_theme_screen.dart';
 import 'screens/profile_screen.dart';
 import 'screens/template_manager_screen.dart';
+import 'screens/public_report_screen.dart';
+import 'screens/public_links_screen.dart';
 import 'services/auth_service.dart';
 
 Future<void> main() async {
@@ -51,6 +53,16 @@ class ClearSkyApp extends StatelessWidget {
         '/templates': (context) => const TemplateManagerScreen(),
         '/profile': (context) => const ProfileScreen(),
         '/manageTeam': (context) => const ManageTeamScreen(),
+        '/publicLinks': (context) => const PublicLinksScreen(),
+      },
+      onGenerateRoute: (settings) {
+        final name = settings.name ?? '';
+        if (name.startsWith('/public/')) {
+          final id = name.substring('/public/'.length);
+          return MaterialPageRoute(
+              builder: (_) => PublicReportScreen(publicId: id));
+        }
+        return null;
       },
       home: const AuthGate(),
     );
