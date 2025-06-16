@@ -3,6 +3,7 @@ import '../utils/profile_storage.dart';
 import '../models/inspector_profile.dart';
 
 import '../models/inspection_metadata.dart';
+import '../models/checklist.dart';
 import 'photo_upload_screen.dart';
 
 class MetadataScreen extends StatefulWidget {
@@ -70,6 +71,7 @@ class _MetadataScreenState extends State<MetadataScreen> {
             ? _weatherNotesController.text
             : null,
       );
+      inspectionChecklist.markComplete('Metadata Saved');
       Navigator.push(
         context,
         MaterialPageRoute(

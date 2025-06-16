@@ -8,6 +8,7 @@ import '../models/photo_entry.dart';
 import '../models/inspection_metadata.dart';
 import '../models/inspection_sections.dart';
 import '../models/saved_report.dart';
+import '../models/checklist.dart';
 import 'dart:html' as html; // for HTML download (web only)
 import 'package:pdf/widgets.dart' as pw;
 import 'package:pdf/pdf.dart';
@@ -69,6 +70,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
     _metadata = widget.metadata;
     _summaryController = TextEditingController(text: widget.summary ?? '');
     _signature = widget.signature;
+    inspectionChecklist.markComplete('Report Previewed');
     _loadTemplate();
   }
 
@@ -214,6 +216,13 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
     buffer.writeln('<p style="font-size:12px;">$_coverDisclaimer</p>');
     buffer.writeln('</div>');
     buffer.writeln('<hr>');
+    buffer.writeln('<h2>Inspection Checklist</h2>');
+    buffer.writeln('<ul>');
+    for (final step in inspectionChecklist.steps) {
+      final icon = step.isComplete ? '✓' : '✗';
+      buffer.writeln('<li>$icon ${step.title}</li>');
+    }
+    buffer.writeln('</ul>');
 
     if (widget.sections != null) {
       for (var section in kInspectionSections) {
@@ -275,6 +284,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
   void _downloadHtml() {
     final htmlContent = generateHtmlPreview();
     _saveHtmlFile(htmlContent);
+    inspectionChecklist.markComplete('Report Exported');
   }
 
   void _saveHtmlFile(String htmlContent) {
@@ -456,6 +466,21 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
             if (_metadata.inspectorName != null)
               pw.Text('Inspector Name: ${_metadata.inspectorName}'),
             pw.SizedBox(height: 20),
+            pw.Text('Inspection Checklist',
+                style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+            pw.SizedBox(height: 4),
+            pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: [
+                for (final step in inspectionChecklist.steps)
+                  pw.Row(children: [
+                    pw.Text(step.isComplete ? '✓' : '✗'),
+                    pw.SizedBox(width: 4),
+                    pw.Text(step.title),
+                  ])
+              ],
+            ),
+            pw.SizedBox(height: 20),
             ...widgets,
             pw.SizedBox(height: 40),
             pw.Column(
@@ -507,6 +532,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('PDF exported')),
     );
+    inspectionChecklist.markComplete('Report Exported');
   }
 
   Future<void> _exportZip() async {
@@ -529,6 +555,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('ZIP exported')),
         );
+        inspectionChecklist.markComplete('Report Exported');
       }
     } finally {
       if (mounted && Navigator.of(context).canPop()) {

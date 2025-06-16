@@ -11,9 +11,11 @@ import 'capture_signature_screen.dart';
 import '../utils/local_report_store.dart';
 import '../utils/export_utils.dart';
 import '../utils/profile_storage.dart';
+import '../models/checklist.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import '../utils/share_utils.dart';
+import 'inspection_checklist_screen.dart';
 
 /// If Firebase is not desired:
 /// - Use `path_provider` and `shared_preferences` or `hive` to save report JSON locally
@@ -205,6 +207,12 @@ class _SendReportScreenState extends State<SendReportScreen> {
 
   Future<void> _exportZip() async {
     if (_savedReport == null || _exporting) return;
+    if (!inspectionChecklist.allComplete) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Complete all checklist steps first')),
+      );
+      return;
+    }
     setState(() => _exporting = true);
     showDialog(
       context: context,
@@ -225,6 +233,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('ZIP exported')),
         );
+        inspectionChecklist.markComplete('Report Exported');
       }
     } finally {
       if (mounted && Navigator.of(context).canPop()) {
@@ -325,6 +334,16 @@ class _SendReportScreenState extends State<SendReportScreen> {
                         onPressed: _shareReport,
                         child: const Text('Share Report')),
               ],
+            ),
+            const SizedBox(height: 12),
+            ElevatedButton(
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const InspectionChecklistScreen(),
+                ),
+              ),
+              child: const Text('View Checklist'),
             ),
             const SizedBox(height: 12),
             ElevatedButton(
