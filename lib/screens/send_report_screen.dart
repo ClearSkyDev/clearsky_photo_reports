@@ -21,6 +21,7 @@ import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import '../utils/share_utils.dart';
 import 'inspection_checklist_screen.dart';
+import 'photo_map_screen.dart';
 
 /// If Firebase is not desired:
 /// - Use `path_provider` and `shared_preferences` or `hive` to save report JSON locally
@@ -59,6 +60,22 @@ class _SendReportScreenState extends State<SendReportScreen> {
   File? _exportedFile;
   bool _finalized = false;
   String? _publicId;
+
+  List<PhotoEntry> _gpsPhotos() {
+    final result = <PhotoEntry>[];
+    if (widget.structures != null) {
+      for (final struct in widget.structures!) {
+        for (var photos in struct.sectionPhotos.values) {
+          for (var p in photos) {
+            if (p.latitude != null && p.longitude != null) {
+              result.add(p);
+            }
+          }
+        }
+      }
+    }
+    return result;
+  }
 
   @override
   void initState() {
@@ -486,6 +503,21 @@ class _SendReportScreenState extends State<SendReportScreen> {
                         child: const Text('Share Report')),
               ],
             ),
+            if (_gpsPhotos().isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => PhotoMapScreen(photos: _gpsPhotos()),
+                      ),
+                    );
+                  },
+                  child: const Text('View Inspection Map'),
+                ),
+              ),
             if (_finalized && _publicId != null) ...[
               const SizedBox(height: 12),
               Card(
