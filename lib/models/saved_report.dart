@@ -2,6 +2,7 @@ import 'inspected_structure.dart';
 
 // Model for persisting completed reports in Firestore
 import 'report_theme.dart';
+import '../utils/photo_audit.dart';
 
 class SavedReport {
   final String id;
@@ -18,6 +19,8 @@ class SavedReport {
   final DateTime createdAt;
   final bool isFinalized;
   final ReportTheme? theme;
+  final bool? lastAuditPassed;
+  final List<PhotoAuditIssue>? lastAuditIssues;
 
   SavedReport({
     this.id = '',
@@ -31,6 +34,8 @@ class SavedReport {
     DateTime? createdAt,
     this.isFinalized = false,
     this.theme,
+    this.lastAuditPassed,
+    this.lastAuditIssues,
   }) : createdAt = createdAt ?? DateTime.now();
 
   Map<String, dynamic> toMap() {
@@ -45,6 +50,9 @@ class SavedReport {
       if (signature != null) 'signature': signature,
       if (publicReportId != null) 'publicReportId': publicReportId,
       if (theme != null) 'theme': theme!.toMap(),
+      if (lastAuditPassed != null) 'lastAuditPassed': lastAuditPassed,
+      if (lastAuditIssues != null)
+        'lastAuditIssues': lastAuditIssues!.map((e) => e.toMap()).toList(),
     };
   }
 
@@ -72,6 +80,13 @@ class SavedReport {
       isFinalized: map['isFinalized'] as bool? ?? false,
       theme: map['theme'] != null
           ? ReportTheme.fromMap(Map<String, dynamic>.from(map['theme']))
+          : null,
+      lastAuditPassed: map['lastAuditPassed'] as bool?,
+      lastAuditIssues: map['lastAuditIssues'] != null
+          ? (map['lastAuditIssues'] as List)
+              .map((e) =>
+                  PhotoAuditIssue.fromMap(Map<String, dynamic>.from(e as Map)))
+              .toList()
           : null,
     );
   }
