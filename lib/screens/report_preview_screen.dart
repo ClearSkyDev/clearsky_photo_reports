@@ -146,7 +146,8 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
             url: p.url,
             label: '${group.key}$suffix',
             latitude: p.latitude,
-            longitude: p.longitude));
+            longitude: p.longitude,
+            note: p.note));
       }
     }
     return all;
@@ -253,7 +254,10 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
             if (_showGps && photo.latitude != null && photo.longitude != null) {
               gps = '<br><a href="https://www.google.com/maps/search/?api=1&query=${photo.latitude},${photo.longitude}">${photo.latitude!.toStringAsFixed(4)}, ${photo.longitude!.toStringAsFixed(4)}</a>';
             }
-            buffer.writeln('<span>$label - $damage<br>$ts$gps</span>');
+            final note = photo.note.isNotEmpty
+                ? '<br><em>${photo.note}</em>'
+                : '';
+            buffer.writeln('<span>$label - $damage<br>$ts$gps$note</span>');
             buffer.writeln('</div>');
           }
           buffer.writeln('</div>');
@@ -355,6 +359,11 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
                       ),
                     ),
                   ),
+                if (photo.note.isNotEmpty)
+                  pw.Text(photo.note,
+                      textAlign: pw.TextAlign.center,
+                      style: const pw.TextStyle(
+                          fontSize: 10, fontStyle: pw.FontStyle.italic)),
               ],
             ),
           ),
@@ -776,6 +785,14 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
                                                 fontSize: 10,
                                                 decoration: TextDecoration.underline),
                                           ),
+                                        ),
+                                      if (photo.note.isNotEmpty)
+                                        Text(
+                                          photo.note,
+                                          textAlign: TextAlign.center,
+                                          style: const TextStyle(
+                                              fontSize: 10,
+                                              fontStyle: FontStyle.italic),
                                         ),
                                     ],
                                   ),

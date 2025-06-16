@@ -63,6 +63,7 @@ class LocalReportStore {
             latitude: pEntry.latitude,
             longitude: pEntry.longitude,
             damageType: pEntry.damageType,
+            note: pEntry.note,
           ));
         }
         map[entry.key] = list;

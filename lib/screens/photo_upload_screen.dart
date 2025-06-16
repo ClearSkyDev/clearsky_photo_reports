@@ -157,16 +157,38 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
         text: entry.labelLoading || entry.label == 'Unlabeled'
             ? ''
             : entry.label);
+    final noteController = TextEditingController(text: entry.note);
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Label Photo'),
-        content: TextField(
-          controller: controller,
-          decoration: InputDecoration(
-            labelText: 'Label',
-            hintText: entry.labelLoading ? 'Generating...' : null,
-          ),
+        title: const Text('Photo Details'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: controller,
+              decoration: InputDecoration(
+                labelText: 'Label',
+                hintText: entry.labelLoading ? 'Generating...' : null,
+              ),
+            ),
+            const SizedBox(height: 8),
+            TextField(
+              controller: noteController,
+              decoration: const InputDecoration(labelText: 'Inspector Note'),
+            ),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 4,
+              children: [
+                for (final n in ['No damage found', 'Minor damage', 'Severe damage'])
+                  ActionChip(
+                    label: Text(n),
+                    onPressed: () => noteController.text = n,
+                  ),
+              ],
+            ),
+          ],
         ),
         actions: [
           TextButton(
@@ -179,6 +201,7 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
                 entry
                   ..label = controller.text
                   ..labelLoading = false;
+                entry.note = noteController.text;
               });
               Navigator.pop(context);
             },

@@ -4,6 +4,7 @@ class PhotoEntry {
   bool labelLoading;
   String damageType;
   bool damageLoading;
+  String note;
   final DateTime capturedAt;
   final double? latitude;
   final double? longitude;
@@ -17,5 +18,6 @@ class PhotoEntry {
     this.labelLoading = false,
     this.damageType = 'Unknown',
     this.damageLoading = false,
+    this.note = '',
   }) : capturedAt = capturedAt ?? DateTime.now();
 }
