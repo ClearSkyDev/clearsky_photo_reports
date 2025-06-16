@@ -10,6 +10,7 @@ class ReportSettings {
   final String? logoPath;
   final int primaryColor;
   final bool includeDisclaimer;
+  final bool showGpsData;
   final String footerText;
   final String template;
 
@@ -19,6 +20,7 @@ class ReportSettings {
     this.logoPath,
     required this.primaryColor,
     required this.includeDisclaimer,
+    required this.showGpsData,
     required this.footerText,
     required this.template,
   });
@@ -30,6 +32,7 @@ class ReportSettings {
       if (logoPath != null) 'logoPath': logoPath,
       'primaryColor': primaryColor,
       'includeDisclaimer': includeDisclaimer,
+      'showGpsData': showGpsData,
       'footerText': footerText,
       'template': template,
     };
@@ -44,6 +47,7 @@ class ReportSettings {
           ? map['primaryColor'] as int
           : int.tryParse(map['primaryColor']?.toString() ?? '') ?? 0xff2196f3,
       includeDisclaimer: map['includeDisclaimer'] as bool? ?? true,
+      showGpsData: map['showGpsData'] as bool? ?? true,
       footerText: map['footerText'] ?? '',
       template: map['template'] ?? 'legacy',
     );
@@ -64,6 +68,7 @@ class _ReportSettingsScreenState extends State<ReportSettingsScreen> {
   final ImagePicker _picker = ImagePicker();
   String? _logoPath;
   bool _includeDisclaimer = true;
+  bool _showGpsData = true;
 
   static const Map<String, MaterialColor> _colors = {
     'Blue': Colors.blue,
@@ -112,6 +117,7 @@ class _ReportSettingsScreenState extends State<ReportSettingsScreen> {
                     orElse: () => const MapEntry('Blue', Colors.blue))
                 .key;
         _includeDisclaimer = settings.includeDisclaimer;
+        _showGpsData = settings.showGpsData;
         _selectedTemplate = _templates.entries
                 .firstWhere(
                     (e) => e.value == settings.template,
@@ -128,6 +134,7 @@ class _ReportSettingsScreenState extends State<ReportSettingsScreen> {
       logoPath: _logoPath,
       primaryColor: _colors[_selectedColor]!.value,
       includeDisclaimer: _includeDisclaimer,
+      showGpsData: _showGpsData,
       footerText: _footerController.text.trim(),
       template: _templates[_selectedTemplate]!,
     );
@@ -216,6 +223,15 @@ class _ReportSettingsScreenState extends State<ReportSettingsScreen> {
               onChanged: (val) {
                 setState(() {
                   _includeDisclaimer = val;
+                });
+              },
+            ),
+            SwitchListTile(
+              title: const Text('Show GPS on Photos'),
+              value: _showGpsData,
+              onChanged: (val) {
+                setState(() {
+                  _showGpsData = val;
                 });
               },
             ),

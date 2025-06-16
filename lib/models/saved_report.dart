@@ -62,12 +62,16 @@ class ReportPhotoEntry {
   final String label;
   final String photoUrl;
   final DateTime? timestamp;
+  final double? latitude;
+  final double? longitude;
   final String damageType;
 
   ReportPhotoEntry({
     required this.label,
     required this.photoUrl,
     this.timestamp,
+    this.latitude,
+    this.longitude,
     this.damageType = 'Unknown',
   });
 
@@ -76,6 +80,8 @@ class ReportPhotoEntry {
       'label': label,
       'photoUrl': photoUrl,
       if (timestamp != null) 'timestamp': timestamp!.millisecondsSinceEpoch,
+      if (latitude != null) 'latitude': latitude,
+      if (longitude != null) 'longitude': longitude,
       'damageType': damageType,
     };
   }
@@ -87,6 +93,8 @@ class ReportPhotoEntry {
       timestamp: map['timestamp'] != null
           ? DateTime.fromMillisecondsSinceEpoch(map['timestamp'])
           : null,
+      latitude: (map['latitude'] as num?)?.toDouble(),
+      longitude: (map['longitude'] as num?)?.toDouble(),
       damageType: map['damageType'] as String? ?? 'Unknown',
     );
   }

@@ -57,6 +57,8 @@ class LocalReportStore {
           label: pEntry.label,
           photoUrl: dest,
           timestamp: pEntry.timestamp,
+          latitude: pEntry.latitude,
+          longitude: pEntry.longitude,
           damageType: pEntry.damageType,
         ));
       }

@@ -12,6 +12,7 @@ import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/inspection_metadata.dart';
 import '../models/inspection_sections.dart';
@@ -37,7 +38,7 @@ Future<File?> exportAsZip(SavedReport report) async {
   final meta = InspectionMetadata.fromMap(report.inspectionMetadata);
   final addressSlug = _slugify(meta.propertyAddress);
   final fileName = '${addressSlug}_clearsky_report.zip';
-  final htmlStr = _generateHtml(report);
+  final htmlStr = await _generateHtml(report);
   final pdfBytes = await _generatePdf(report);
 
   final archive = Archive();
@@ -96,8 +97,15 @@ Future<File?> exportAsZip(SavedReport report) async {
   return reportFile;
 }
 
-String _generateHtml(SavedReport report) {
+Future<String> _generateHtml(SavedReport report) async {
   final meta = InspectionMetadata.fromMap(report.inspectionMetadata);
+  final prefs = await SharedPreferences.getInstance();
+  final data = prefs.getString('report_settings');
+  bool showGps = true;
+  if (data != null) {
+    final map = jsonDecode(data) as Map<String, dynamic>;
+    showGps = map['showGpsData'] as bool? ?? true;
+  }
   final buffer = StringBuffer()
     ..writeln('<html><head><title>Photo Report</title>')
     ..writeln(
@@ -134,9 +142,14 @@ String _generateHtml(SavedReport report) {
           photo.damageType.isNotEmpty ? photo.damageType : 'Unknown';
       buffer
         ..writeln('<div style="width:300px;margin:5px;text-align:center;">')
-        ..writeln(
-            '<img src="${photo.photoUrl}" width="300" height="300" style="object-fit:cover;"><br>')
-        ..writeln('<span>$label - $damage</span>')
+        ..writeln('<img src="${photo.photoUrl}" width="300" height="300" style="object-fit:cover;"><br>');
+      final ts = photo.timestamp?.toLocal().toString().split('.').first ?? '';
+      String gps = '';
+      if (showGps && photo.latitude != null && photo.longitude != null) {
+        gps = '<br><a href="https://www.google.com/maps/search/?api=1&query=${photo.latitude},${photo.longitude}">${photo.latitude!.toStringAsFixed(4)}, ${photo.longitude!.toStringAsFixed(4)}</a>';
+      }
+      buffer
+        ..writeln('<span>$label - $damage<br>$ts$gps</span>')
         ..writeln('</div>');
     }
     buffer.writeln('</div>');
@@ -153,6 +166,13 @@ String _generateHtml(SavedReport report) {
 
 Future<Uint8List> _generatePdf(SavedReport report) async {
   final meta = InspectionMetadata.fromMap(report.inspectionMetadata);
+  final prefs = await SharedPreferences.getInstance();
+  final data = prefs.getString('report_settings');
+  bool showGps = true;
+  if (data != null) {
+    final map = jsonDecode(data) as Map<String, dynamic>;
+    showGps = map['showGpsData'] as bool? ?? true;
+  }
   final pdf = pw.Document();
 
   Future<pw.Widget> buildWrap(List<ReportPhotoEntry> photos) async {
@@ -176,6 +196,21 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
                 pw.Text('$label - $damage',
                     textAlign: pw.TextAlign.center,
                     style: const pw.TextStyle(fontSize: 12)),
+                pw.Text(
+                    photo.timestamp?.toLocal().toString().split('.').first ?? '',
+                    style: const pw.TextStyle(fontSize: 10)),
+                if (showGps && photo.latitude != null && photo.longitude != null)
+                  pw.UrlLink(
+                    destination:
+                        'https://www.google.com/maps/search/?api=1&query=${photo.latitude},${photo.longitude}',
+                    child: pw.Text(
+                      '${photo.latitude!.toStringAsFixed(4)}, ${photo.longitude!.toStringAsFixed(4)}',
+                      style: const pw.TextStyle(
+                        fontSize: 10,
+                        decoration: pw.TextDecoration.underline,
+                      ),
+                    ),
+                  ),
               ],
             ),
           ),

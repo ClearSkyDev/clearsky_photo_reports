@@ -91,7 +91,9 @@ class _SendReportScreenState extends State<SendReportScreen> {
           result.add(ReportPhotoEntry(
               label: p.label,
               photoUrl: url,
-              timestamp: DateTime.now(),
+              timestamp: p.capturedAt,
+              latitude: p.latitude,
+              longitude: p.longitude,
               damageType: p.damageType));
         } catch (_) {}
       }

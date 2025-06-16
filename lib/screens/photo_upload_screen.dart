@@ -8,6 +8,8 @@ import '../models/inspection_metadata.dart';
 import '../models/checklist.dart';
 import '../utils/label_suggestion.dart';
 import '../utils/damage_classification.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'report_preview_screen.dart';
 import 'signature_screen.dart';
 
@@ -46,6 +48,7 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
   Future<void> _pickImages(String section, {int? structure}) async {
     final List<XFile> selected = await _picker.pickMultiImage();
     if (selected.isNotEmpty) {
+      final position = await _getPosition();
       setState(() {
         final target = structure == null
             ? sectionPhotos[section]!
@@ -54,6 +57,9 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
         for (var xfile in selected) {
           final entry = PhotoEntry(
             url: xfile.path,
+            capturedAt: DateTime.now(),
+            latitude: position?.latitude,
+            longitude: position?.longitude,
             label: '',
             labelLoading: true,
             damageLoading: true,
@@ -83,6 +89,19 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
         }
       });
     }
+  }
+
+  Future<Position?> _getPosition() async {
+    try {
+      return await Geolocator.getCurrentPosition();
+    } catch (_) {
+      return null;
+    }
+  }
+
+  void _openMap(double lat, double lng) {
+    final uri = Uri.parse('https://www.google.com/maps/search/?api=1&query=$lat,$lng');
+    launchUrl(uri, mode: LaunchMode.externalApplication);
   }
 
   void _removePhoto(String section, int index, {int? structure}) {
@@ -332,13 +351,44 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
                               child: Container(
                                 color: Colors.black54,
                                 padding: const EdgeInsets.all(2),
-                                child: Text(
-                                  photos[index].label,
-                                  textAlign: TextAlign.center,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 12,
-                                  ),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      photos[index].label,
+                                      textAlign: TextAlign.center,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                    Text(
+                                      photos[index]
+                                          .capturedAt
+                                          .toLocal()
+                                          .toString()
+                                          .split('.').first,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 10,
+                                      ),
+                                    ),
+                                    if (photos[index].latitude != null &&
+                                        photos[index].longitude != null)
+                                      GestureDetector(
+                                        onTap: () => _openMap(
+                                            photos[index].latitude!,
+                                            photos[index].longitude!),
+                                        child: Text(
+                                          '${photos[index].latitude!.toStringAsFixed(4)}, ${photos[index].longitude!.toStringAsFixed(4)}',
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 10,
+                                            decoration: TextDecoration.underline,
+                                          ),
+                                        ),
+                                      ),
+                                  ],
                                 ),
                               ),
                             ),
