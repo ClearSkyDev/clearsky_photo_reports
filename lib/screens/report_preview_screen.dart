@@ -446,21 +446,20 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
               pw.Text('Inspector Name: ${_metadata.inspectorName}'),
             pw.SizedBox(height: 20),
             ...widgets,
-              pw.SizedBox(height: 40),
-              pw.Column(
-                crossAxisAlignment: pw.CrossAxisAlignment.start,
-                children: [
+            pw.SizedBox(height: 40),
+            pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: [
+                pw.Text('Inspector Signature'),
+                pw.SizedBox(height: 4),
+                if (_signature != null)
+                  pw.Image(pw.MemoryImage(_signature!), height: 80)
+                else
                   pw.Container(height: 1, width: double.infinity, color: PdfColors.black),
-                  pw.SizedBox(height: 8),
-                  pw.Text('Inspector Signature'),
-                  if (_signature != null) ...[
-                    pw.SizedBox(height: 4),
-                    pw.Image(pw.MemoryImage(_signature!), height: 80),
-                  ],
-                  if (_metadata.inspectorName != null)
-                    pw.Text('${_metadata.inspectorName!} – $dateStr'),
-                ],
-              ),
+                if (_metadata.inspectorName != null)
+                  pw.Text('${_metadata.inspectorName!} – $dateStr'),
+              ],
+            ),
           ],
         ),
       );
