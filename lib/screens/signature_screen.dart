@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import '../models/inspection_metadata.dart';
 import '../models/photo_entry.dart';
+import '../models/checklist.dart';
 import 'report_preview_screen.dart';
 import '../widgets/signature_pad.dart';
 
@@ -39,6 +40,7 @@ class _SignatureScreenState extends State<SignatureScreen> {
 
   void _continue() {
     if (_signatureBytes == null) return;
+    inspectionChecklist.markComplete('Signature Captured');
     Navigator.push(
       context,
       MaterialPageRoute(

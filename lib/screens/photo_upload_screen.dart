@@ -5,6 +5,7 @@ import 'package:reorderables/reorderables.dart';
 import '../models/inspection_sections.dart';
 import '../models/photo_entry.dart';
 import '../models/inspection_metadata.dart';
+import '../models/checklist.dart';
 import '../utils/label_suggestion.dart';
 import '../utils/damage_classification.dart';
 import 'report_preview_screen.dart';
@@ -49,6 +50,7 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
         final target = structure == null
             ? sectionPhotos[section]!
             : additionalStructures[structure][section]!;
+        final wasEmpty = target.isEmpty;
         for (var xfile in selected) {
           final entry = PhotoEntry(
             url: xfile.path,
@@ -71,6 +73,13 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
                 ..damageLoading = false;
             });
           });
+        }
+        if (wasEmpty) {
+          if (section == 'Address Photo') {
+            inspectionChecklist.markComplete('Address Photo');
+          } else {
+            inspectionChecklist.markComplete('Elevation Photos');
+          }
         }
       });
     }

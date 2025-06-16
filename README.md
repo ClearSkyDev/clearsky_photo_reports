@@ -21,6 +21,11 @@ Running the script outputs a pre-filled questionnaire based on sample photos.
 
 The preview screen now also includes a signature canvas so inspectors can sign the report before exporting.
 
+## Inspection Checklist
+
+The app tracks key inspection tasks such as uploading photos, filling out metadata and capturing a signature.
+Progress can be viewed from the "View Checklist" button on the Send Report screen and a summary is included in the generated HTML/PDF reports.
+
 ## Flutter Report Preview
 
 The Flutter implementation renders the inspection report HTML differently depending on the platform:
