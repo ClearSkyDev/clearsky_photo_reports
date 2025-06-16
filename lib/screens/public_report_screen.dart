@@ -139,13 +139,13 @@ class _PublicReportScreenState extends State<PublicReportScreen> {
           const SizedBox(height: 16),
           ElevatedButton(
             onPressed: () async {
-              final file = await exportAsZip(report);
+              final file = await exportFinalZip(report);
               if (file != null) {
                 ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('ZIP downloaded')));
               }
             },
-            child: const Text('Download Report'),
+            child: const Text('Download ZIP'),
           ),
           const SizedBox(height: 24),
           TextField(
