@@ -6,6 +6,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'dart:io';
 import 'dart:typed_data';
+import '../utils/signature_storage.dart';
+import 'capture_signature_screen.dart';
 import '../utils/local_report_store.dart';
 import '../utils/export_utils.dart';
 
@@ -42,12 +44,18 @@ class _SendReportScreenState extends State<SendReportScreen> {
   String? _docId;
   SavedReport? _savedReport;
   bool _exporting = false;
+  Uint8List? _signature;
+  bool _signatureLocked = false;
 
   @override
   void initState() {
     super.initState();
-    // Save the report as soon as this screen is opened
-    _saveReport();
+    _initialize();
+  }
+
+  Future<void> _initialize() async {
+    _signature = widget.signature ?? await SignatureStorage.load();
+    await _saveReport();
   }
 
   Future<void> _saveReport() async {
@@ -105,11 +113,11 @@ class _SendReportScreenState extends State<SendReportScreen> {
     }
 
     String? signatureUrl;
-    if (widget.signature != null) {
+    if (_signature != null) {
       try {
         final ref =
             storage.ref().child('reports/$reportId/signature.png');
-        await ref.putData(widget.signature!,
+        await ref.putData(_signature!,
             SettableMetadata(contentType: 'image/png'));
         signatureUrl = await ref.getDownloadURL();
       } catch (_) {}
@@ -153,6 +161,27 @@ class _SendReportScreenState extends State<SendReportScreen> {
         const SnackBar(content: Text('Report saved to cloud')),
       );
     }
+  }
+
+  Future<void> _reSign() async {
+    final result = await Navigator.push<Uint8List>(
+      context,
+      MaterialPageRoute(builder: (_) => const CaptureSignatureScreen()),
+    );
+    if (result != null) {
+      setState(() {
+        _signature = result;
+        _signatureLocked = false;
+      });
+    }
+  }
+
+  Future<void> _lockSignature() async {
+    if (_signature == null) return;
+    await SignatureStorage.save(_signature!);
+    setState(() {
+      _signatureLocked = true;
+    });
   }
 
   void _downloadPdf() {
@@ -227,6 +256,26 @@ class _SendReportScreenState extends State<SendReportScreen> {
                 ),
               ),
             ),
+            if (_signature != null) ...[
+              const SizedBox(height: 12),
+              Image.memory(_signature!, height: 100),
+              if (!_signatureLocked) ...[
+                const SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    ElevatedButton(
+                      onPressed: _reSign,
+                      child: const Text('Re-sign'),
+                    ),
+                    ElevatedButton(
+                      onPressed: _lockSignature,
+                      child: const Text('Use This Signature'),
+                    ),
+                  ],
+                ),
+              ],
+            ],
             TextField(
               controller: _emailController,
               decoration: const InputDecoration(labelText: 'Client Email'),
