@@ -10,6 +10,7 @@ import '../utils/signature_storage.dart';
 import 'capture_signature_screen.dart';
 import '../utils/local_report_store.dart';
 import '../utils/export_utils.dart';
+import '../utils/profile_storage.dart';
 
 /// If Firebase is not desired:
 /// - Use `path_provider` and `shared_preferences` or `hive` to save report JSON locally
@@ -67,6 +68,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
 
     final doc = firestore.collection('reports').doc();
     final reportId = doc.id;
+    final profile = await ProfileStorage.load();
 
     Future<List<ReportPhotoEntry>> uploadSection(
         String section, List<PhotoEntry> photos) async {
@@ -131,7 +133,9 @@ class _SendReportScreenState extends State<SendReportScreen> {
       if (widget.metadata.insuranceCarrier != null)
         'insuranceCarrier': widget.metadata.insuranceCarrier,
       'perilType': widget.metadata.perilType.name,
-      if (widget.metadata.inspectorName != null)
+      if (profile?.name != null)
+        'inspectorName': profile!.name
+      else if (widget.metadata.inspectorName != null)
         'inspectorName': widget.metadata.inspectorName,
       if (widget.metadata.reportId != null)
         'reportId': widget.metadata.reportId,
@@ -141,7 +145,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
 
     final saved = SavedReport(
       id: reportId,
-      userId: null,
+      userId: profile?.id,
       inspectionMetadata: metadataMap,
       sectionPhotos: sectionPhotos,
       summary: widget.summary,

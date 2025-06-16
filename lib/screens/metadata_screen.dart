@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../utils/profile_storage.dart';
+import '../models/inspector_profile.dart';
 
 import '../models/inspection_metadata.dart';
 import 'photo_upload_screen.dart';
@@ -20,6 +22,19 @@ class _MetadataScreenState extends State<MetadataScreen> {
   final TextEditingController _weatherNotesController = TextEditingController();
   DateTime _inspectionDate = DateTime.now();
   PerilType _selectedPeril = PerilType.wind;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProfile();
+  }
+
+  Future<void> _loadProfile() async {
+    final profile = await ProfileStorage.load();
+    if (profile != null) {
+      _inspectorNameController.text = profile.name;
+    }
+  }
 
   Future<void> _pickDate() async {
     final picked = await showDatePicker(

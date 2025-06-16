@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../utils/profile_storage.dart';
+import '../models/inspector_profile.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -64,7 +66,23 @@ class HomeScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
-              onPressed: () => Navigator.pushNamed(context, '/history'),
+              onPressed: () async {
+                final profile = await ProfileStorage.load();
+                String? name;
+                if (profile != null && profile.role != InspectorRole.admin) {
+                  name = profile.name;
+                }
+                if (context.mounted) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => ReportHistoryScreen(
+                        inspectorName: name,
+                      ),
+                    ),
+                  );
+                }
+              },
               child: const Text('View History'),
             ),
             ElevatedButton(
@@ -78,6 +96,18 @@ class HomeScreen extends StatelessWidget {
               ),
               onPressed: () => Navigator.pushNamed(context, '/settings'),
               child: const Text('Report Settings'),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blueAccent,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              onPressed: () => Navigator.pushNamed(context, '/profile'),
+              child: const Text('Profile'),
             ),
           ],
         ),
