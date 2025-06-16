@@ -292,6 +292,35 @@ class _SendReportScreenState extends State<SendReportScreen> {
     // TODO: reuse _saveHtmlFile logic
   }
 
+  Future<void> _exportCsv() async {
+    if (_savedReport == null || _exporting) return;
+    setState(() => _exporting = true);
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const AlertDialog(
+        content: SizedBox(
+          height: 60,
+          child: Center(child: CircularProgressIndicator()),
+        ),
+      ),
+    );
+    try {
+      final file = await exportCsv(_savedReport!);
+      if (mounted) {
+        setState(() => _exportedFile = file);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('CSV exported')),
+        );
+      }
+    } finally {
+      if (mounted && Navigator.of(context).canPop()) {
+        Navigator.of(context).pop();
+      }
+      if (mounted) setState(() => _exporting = false);
+    }
+  }
+
   Future<void> _exportZip() async {
     if (_savedReport == null || _exporting) return;
     if (!inspectionChecklist.allComplete) {
@@ -489,6 +518,15 @@ class _SendReportScreenState extends State<SendReportScreen> {
                 ElevatedButton(
                     onPressed: _downloadHtml,
                     child: const Text('Download HTML')),
+                ElevatedButton(
+                    onPressed: _exporting ? null : _exportCsv,
+                    child: _exporting
+                        ? const SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Text('Export CSV')),
                 ElevatedButton(
                     onPressed: _exporting ? null : _exportZip,
                     child: _exporting
