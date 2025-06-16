@@ -7,6 +7,7 @@ import '../models/saved_report.dart';
 import '../models/inspection_metadata.dart';
 import '../utils/export_utils.dart';
 import 'client_signature_screen.dart';
+import 'message_thread_screen.dart';
 
 /// Displays a finalized report via the public share link.
 class PublicReportScreen extends StatefulWidget {
@@ -158,6 +159,18 @@ class _PublicReportScreenState extends State<PublicReportScreen> {
           ElevatedButton(
             onPressed: () => _addComment(reportId),
             child: const Text('Submit Comment'),
+          ),
+          const SizedBox(height: 8),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => MessageThreadScreen(reportId: reportId),
+                ),
+              );
+            },
+            child: const Text('Open Messages'),
           ),
         ],
       ),

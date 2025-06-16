@@ -45,6 +45,10 @@ After exporting, inspectors can lock a report from the Send Report screen. Final
 
 Finalized reports generate a unique public link that can be shared with clients. Visiting the link displays a simplified report view with sections and photos. Clients may download the full report as a ZIP archive and leave optional comments which are saved back to Firestore for the inspector to review. The ZIP now includes the finalized PDF and all labeled photos organized by section. On web the archive is uploaded to Firebase Storage and a download link is provided. Download events are logged in Firestore. Admin users can view and revoke links from the dashboard.
 
+## Client Messaging
+
+Each report has a dedicated message thread stored under `reports/{id}/messages`. The public portal and inspector app display a chat-style view where clients can send questions or attach images and PDFs. Messages track who has read them so inspectors can see unread counts. Inspectors can resolve, export or mute a thread from the history screen.
+
 ## Report Map View
 
 Reports with saved GPS coordinates appear on an interactive map available from the dashboard. Pins are colored based on report status and can be filtered by inspector, status or date. Tap a pin to see a quick summary and open the full report.
