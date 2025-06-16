@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:reorderables/reorderables.dart';
 
 import '../models/photo_entry.dart';
 
@@ -124,39 +125,59 @@ class _SectionedPhotoUploadScreenState extends State<SectionedPhotoUploadScreen>
             ),
             const SizedBox(height: 8),
             if (photos.isNotEmpty)
-              GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: photos.length,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3,
-                  crossAxisSpacing: 6,
-                  mainAxisSpacing: 6,
-                ),
-                itemBuilder: (context, index) {
-                  return Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      Image.network(photos[index].url, fit: BoxFit.cover),
-                      Positioned(
-                        top: 4,
-                        right: 4,
-                        child: GestureDetector(
-                          onTap: () => onRemove(index),
-                          child: const CircleAvatar(
+              ReorderableWrap(
+                needsLongPressDraggable: true,
+                spacing: 6,
+                runSpacing: 6,
+                onReorder: (oldIndex, newIndex) {
+                  setState(() {
+                    final item = photos.removeAt(oldIndex);
+                    photos.insert(newIndex, item);
+                  });
+                },
+                children: [
+                  for (int index = 0; index < photos.length; index++)
+                    Stack(
+                      key: ValueKey('${photos[index].url}-$index'),
+                      fit: StackFit.expand,
+                      children: [
+                        Image.network(photos[index].url, fit: BoxFit.cover),
+                        Positioned(
+                          top: 4,
+                          left: 4,
+                          child: CircleAvatar(
                             radius: 12,
                             backgroundColor: Colors.black54,
-                            child: Icon(
-                              Icons.close,
-                              size: 14,
-                              color: Colors.white,
+                            child: Text(
+                              '${index + 1}',
+                              style: const TextStyle(fontSize: 12, color: Colors.white),
                             ),
                           ),
                         ),
-                      ),
-                    ],
-                  );
-                },
+                        Positioned(
+                          top: 4,
+                          right: 4,
+                          child: GestureDetector(
+                            onTap: () => onRemove(index),
+                            child: const CircleAvatar(
+                              radius: 12,
+                              backgroundColor: Colors.black54,
+                              child: Icon(
+                                Icons.close,
+                                size: 14,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          bottom: 4,
+                          right: 4,
+                          child: const Icon(Icons.drag_handle, color: Colors.white),
+                        ),
+                      ],
+                    ),
+                ],
               ),
           ],
         ),
