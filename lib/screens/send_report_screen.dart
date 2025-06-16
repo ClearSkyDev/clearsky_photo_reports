@@ -987,6 +987,21 @@ class _SendReportScreenState extends State<SendReportScreen> {
                   ),
                 ),
               ),
+            const SizedBox(height: 12),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => CreateInvoiceScreen(
+                      reportId: _savedReport?.id ?? _docId!,
+                      clientName: m.clientName,
+                    ),
+                  ),
+                );
+              },
+              child: const Text('Create Invoice'),
+            ),
             ],
             if (!_finalized)
               SwitchListTile(

@@ -25,6 +25,8 @@ import 'screens/signature_status_screen.dart';
 import 'screens/report_map_screen.dart';
 import 'screens/analytics_dashboard_screen.dart';
 import 'screens/report_search_screen.dart';
+import 'screens/invoice_list_screen.dart';
+import 'screens/create_invoice_screen.dart';
 import 'services/auth_service.dart';
 import 'services/offline_sync_service.dart';
 
@@ -65,6 +67,7 @@ class ClearSkyApp extends StatelessWidget {
         '/reportMap': (context) => const ReportMapScreen(),
         '/analytics': (context) => const AnalyticsDashboardScreen(),
         '/search': (context) => const ReportSearchScreen(),
+        '/invoices': (context) => const InvoiceListScreen(),
       },
       onGenerateRoute: (settings) {
         final name = settings.name ?? '';
