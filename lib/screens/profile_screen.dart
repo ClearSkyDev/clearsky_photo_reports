@@ -143,6 +143,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
               icon: const Icon(Icons.border_color),
               label: const Text('Change Signature'),
             ),
+            const SizedBox(height: 12),
+            ElevatedButton(
+              onPressed: () => Navigator.pushNamed(context, '/notifications'),
+              child: const Text('Notification Settings'),
+            ),
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: _save,
