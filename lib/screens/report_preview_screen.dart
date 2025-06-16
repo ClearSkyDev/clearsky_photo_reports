@@ -865,6 +865,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
                         metadata: _metadata,
                         structures: widget.structures,
                         summary: _summaryController.text,
+                        summaryText: null,
                         signature: _signature,
                       ),
                     ),

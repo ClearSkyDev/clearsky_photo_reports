@@ -7,6 +7,8 @@ class SavedReport {
   final Map<String, dynamic> inspectionMetadata;
   final List<InspectedStructure> structures;
   final String? summary;
+  /// Paragraph summarizing the overall findings.
+  final String? summaryText;
   /// Either a download URL or base64 encoded PNG of the inspector signature.
   final String? signature;
   /// Random ID used for public sharing of the report.
@@ -20,6 +22,7 @@ class SavedReport {
     required this.inspectionMetadata,
     required this.structures,
     this.summary,
+    this.summaryText,
     this.signature,
     this.publicReportId,
     DateTime? createdAt,
@@ -34,6 +37,7 @@ class SavedReport {
       'isFinalized': isFinalized,
       if (userId != null) 'userId': userId,
       if (summary != null) 'summary': summary,
+      if (summaryText != null) 'summaryText': summaryText,
       if (signature != null) 'signature': signature,
       if (publicReportId != null) 'publicReportId': publicReportId,
     };
@@ -54,6 +58,7 @@ class SavedReport {
           Map<String, dynamic>.from(map['inspectionMetadata'] ?? {}),
       structures: structs,
       summary: map['summary'] as String?,
+      summaryText: map['summaryText'] as String?,
       signature: map['signature'] as String?,
       publicReportId: map['publicReportId'] as String?,
       createdAt: map['createdAt'] != null
