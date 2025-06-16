@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:reorderables/reorderables.dart';
 
 import '../models/inspection_sections.dart';
 import '../models/photo_entry.dart';
@@ -221,96 +222,114 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
             ),
             const SizedBox(height: 8),
             if (photos.isNotEmpty)
-              GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: photos.length,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3,
-                  crossAxisSpacing: 6,
-                  mainAxisSpacing: 6,
-                ),
-                itemBuilder: (context, index) {
-                  final photo = photos[index];
-                  return GestureDetector(
-                    onTap: () => onLabel(photo),
-                    child: Stack(
-                      fit: StackFit.expand,
-                      children: [
-                        AspectRatio(
-                          aspectRatio: 1,
-                          child: Image.network(photo.url, fit: BoxFit.cover),
-                        ),
-                        Positioned(
-                          top: 4,
-                          right: 4,
-                          child: GestureDetector(
-                            onTap: () => onRemove(index),
-                            child: const CircleAvatar(
+              ReorderableWrap(
+                needsLongPressDraggable: true,
+                spacing: 6,
+                runSpacing: 6,
+                onReorder: (oldIndex, newIndex) {
+                  setState(() {
+                    final item = photos.removeAt(oldIndex);
+                    photos.insert(newIndex, item);
+                  });
+                },
+                children: [
+                  for (int index = 0; index < photos.length; index++)
+                    GestureDetector(
+                      key: ValueKey('${photos[index].url}-$index'),
+                      onTap: () => onLabel(photos[index]),
+                      child: Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          AspectRatio(
+                            aspectRatio: 1,
+                            child: Image.network(photos[index].url, fit: BoxFit.cover),
+                          ),
+                          Positioned(
+                            top: 4,
+                            left: 4,
+                            child: CircleAvatar(
                               radius: 12,
                               backgroundColor: Colors.black54,
-                              child: Icon(
-                                Icons.close,
-                                size: 14,
-                                color: Colors.white,
+                              child: Text(
+                                '${index + 1}',
+                                style: const TextStyle(fontSize: 12, color: Colors.white),
                               ),
                             ),
                           ),
-                        ),
-                        if (photo.labelLoading)
                           Positioned(
-                            bottom: 0,
-                            left: 0,
-                            right: 0,
-                            child: Container(
-                              color: Colors.black54,
-                              padding: const EdgeInsets.all(2),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: const [
-                                  SizedBox(
-                                    width: 12,
-                                    height: 12,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      valueColor:
-                                          AlwaysStoppedAnimation(Colors.white),
-                                    ),
-                                  ),
-                                  SizedBox(width: 6),
-                                  Text(
-                                    'Generating...',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          )
-                        else if (photo.label.isNotEmpty && photo.label != 'Unlabeled')
-                          Positioned(
-                            bottom: 0,
-                            left: 0,
-                            right: 0,
-                            child: Container(
-                              color: Colors.black54,
-                              padding: const EdgeInsets.all(2),
-                              child: Text(
-                                photo.label,
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(
+                            top: 4,
+                            right: 4,
+                            child: GestureDetector(
+                              onTap: () => onRemove(index),
+                              child: const CircleAvatar(
+                                radius: 12,
+                                backgroundColor: Colors.black54,
+                                child: Icon(
+                                  Icons.close,
+                                  size: 14,
                                   color: Colors.white,
-                                  fontSize: 12,
                                 ),
                               ),
                             ),
                           ),
-                      ],
+                          if (photos[index].labelLoading)
+                            Positioned(
+                              bottom: 0,
+                              left: 0,
+                              right: 0,
+                              child: Container(
+                                color: Colors.black54,
+                                padding: const EdgeInsets.all(2),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: const [
+                                    SizedBox(
+                                      width: 12,
+                                      height: 12,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        valueColor: AlwaysStoppedAnimation(Colors.white),
+                                      ),
+                                    ),
+                                    SizedBox(width: 6),
+                                    Text(
+                                      'Generating...',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            )
+                          else if (photos[index].label.isNotEmpty && photos[index].label != 'Unlabeled')
+                            Positioned(
+                              bottom: 0,
+                              left: 0,
+                              right: 0,
+                              child: Container(
+                                color: Colors.black54,
+                                padding: const EdgeInsets.all(2),
+                                child: Text(
+                                  photos[index].label,
+                                  textAlign: TextAlign.center,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          Positioned(
+                            bottom: 4,
+                            right: 4,
+                            child: const Icon(Icons.drag_handle, color: Colors.white),
+                          ),
+                        ],
+                      ),
                     ),
-                  );
-                },
+                ],
               ),
           ],
         ),
