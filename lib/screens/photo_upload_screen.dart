@@ -14,6 +14,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'report_preview_screen.dart';
 import 'signature_screen.dart';
 import 'photo_map_screen.dart';
+import 'photo_detail_screen.dart';
 
 class PhotoUploadScreen extends StatefulWidget {
   final InspectionMetadata metadata;
@@ -297,6 +298,15 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
                     GestureDetector(
                       key: ValueKey('${photos[index].url}-$index'),
                       onTap: () => onLabel(photos[index]),
+                      onLongPress: () async {
+                        final updated = await Navigator.push<bool>(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => PhotoDetailScreen(entry: photos[index]),
+                          ),
+                        );
+                        if (updated == true) setState(() {});
+                      },
                       child: Stack(
                         fit: StackFit.expand,
                         children: [

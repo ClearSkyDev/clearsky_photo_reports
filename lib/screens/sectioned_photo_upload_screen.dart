@@ -5,6 +5,7 @@ import 'package:reorderables/reorderables.dart';
 import '../models/photo_entry.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'photo_detail_screen.dart';
 
 class SectionedPhotoUploadScreen extends StatefulWidget {
   const SectionedPhotoUploadScreen({super.key});
@@ -160,10 +161,20 @@ class _SectionedPhotoUploadScreenState extends State<SectionedPhotoUploadScreen>
                 },
                 children: [
                   for (int index = 0; index < photos.length; index++)
-                    Stack(
+                    GestureDetector(
                       key: ValueKey('${photos[index].url}-$index'),
-                      fit: StackFit.expand,
-                      children: [
+                      onLongPress: () async {
+                        final updated = await Navigator.push<bool>(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => PhotoDetailScreen(entry: photos[index]),
+                          ),
+                        );
+                        if (updated == true) setState(() {});
+                      },
+                      child: Stack(
+                        fit: StackFit.expand,
+                        children: [
                         Image.network(photos[index].url, fit: BoxFit.cover),
                         Positioned(
                           top: 4,
