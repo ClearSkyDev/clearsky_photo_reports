@@ -95,6 +95,18 @@ class _SendReportScreenState extends State<SendReportScreen> {
     return result;
   }
 
+  int _totalPhotoCount() {
+    int count = 0;
+    if (widget.structures != null) {
+      for (final struct in widget.structures!) {
+        for (var photos in struct.sectionPhotos.values) {
+          count += photos.length;
+        }
+      }
+    }
+    return count;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -258,6 +270,18 @@ class _SendReportScreenState extends State<SendReportScreen> {
     );
 
     await doc.set(saved.toMap());
+
+    final metricsRef =
+        FirebaseFirestore.instance.collection('metrics').doc(reportId);
+    final zipMatch =
+        RegExp(r'(\d{5})(?:[-\s]|\b)').firstMatch(widget.metadata.propertyAddress);
+    await metricsRef.set({
+      'inspectorId': profile?.id ?? '',
+      'createdAt': DateTime.now().millisecondsSinceEpoch,
+      'photoCount': _totalPhotoCount(),
+      'status': 'draft',
+      if (zipMatch != null) 'zipCode': zipMatch.group(1),
+    });
 
     setState(() {
       _saving = false;
@@ -560,6 +584,16 @@ class _SendReportScreenState extends State<SendReportScreen> {
             'signatureRequested': _requestSignature,
             'signatureStatus': _requestSignature ? 'pending' : 'none'
           });
+      final metricsRef =
+          FirebaseFirestore.instance.collection('metrics').doc(_docId);
+      final metricSnap = await metricsRef.get();
+      final createdAt = metricSnap.data()?['createdAt'] as int?;
+      await metricsRef.update({
+        'finalizedAt': DateTime.now().millisecondsSinceEpoch,
+        'status': 'finalized',
+        if (createdAt != null)
+          'durationMillis': DateTime.now().millisecondsSinceEpoch - createdAt,
+      });
     } catch (_) {}
 
     setState(() {
