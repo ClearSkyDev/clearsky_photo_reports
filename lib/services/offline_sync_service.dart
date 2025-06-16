@@ -1,0 +1,134 @@
+import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:flutter/material.dart';
+
+import '../models/saved_report.dart';
+import '../models/inspected_structure.dart';
+import 'offline_draft_store.dart';
+
+class OfflineSyncService {
+  OfflineSyncService._();
+  static final OfflineSyncService instance = OfflineSyncService._();
+
+  final ValueNotifier<bool> online = ValueNotifier(true);
+  StreamSubscription<ConnectivityResult>? _connSub;
+
+  Future<void> init() async {
+    await Hive.initFlutter();
+    await OfflineDraftStore.instance.init();
+    final initial = await Connectivity().checkConnectivity();
+    online.value = initial != ConnectivityResult.none;
+    _connSub = Connectivity().onConnectivityChanged.listen((result) {
+      final newOnline = result != ConnectivityResult.none;
+      if (!online.value && newOnline) {
+        syncDrafts();
+      }
+      online.value = newOnline;
+    });
+  }
+
+  Future<void> dispose() async {
+    await _connSub?.cancel();
+  }
+
+  Future<void> saveDraft(SavedReport report) {
+    return OfflineDraftStore.instance.saveReport(report);
+  }
+
+  int get pendingCount => OfflineDraftStore.instance.count;
+
+  Future<void> syncDrafts() async {
+    if (!online.value) return;
+    final drafts = OfflineDraftStore.instance.loadReports();
+    for (final draft in drafts) {
+      try {
+        await _uploadDraft(draft);
+        await OfflineDraftStore.instance.delete(draft.id);
+      } catch (_) {}
+    }
+  }
+
+  Future<void> _uploadDraft(SavedReport draft) async {
+    final firestore = FirebaseFirestore.instance;
+    final storage = FirebaseStorage.instance;
+
+    final structs = <InspectedStructure>[];
+    for (final struct in draft.structures) {
+      final sections = <String, List<ReportPhotoEntry>>{};
+      for (var entry in struct.sectionPhotos.entries) {
+        final uploaded = <ReportPhotoEntry>[];
+        for (var i = 0; i < entry.value.length; i++) {
+          final p = entry.value[i];
+          final file = File(p.photoUrl);
+          if (!await file.exists()) continue;
+          final ref = storage.ref().child(
+              'reports/${draft.id}/${struct.name}/${entry.key}/photo_$i.jpg');
+          await ref.putFile(file);
+          final url = await ref.getDownloadURL();
+          uploaded.add(ReportPhotoEntry(
+            label: p.label,
+            photoUrl: url,
+            timestamp: p.timestamp,
+            latitude: p.latitude,
+            longitude: p.longitude,
+            damageType: p.damageType,
+            note: p.note,
+            sourceType: p.sourceType,
+            captureDevice: p.captureDevice,
+          ));
+        }
+        if (uploaded.isNotEmpty) {
+          sections[entry.key] = uploaded;
+        }
+      }
+      structs.add(InspectedStructure(name: struct.name, sectionPhotos: sections));
+    }
+
+    String? signatureUrl;
+    if (draft.signature != null) {
+      try {
+        final bytes = draft.signature!.startsWith('data:image')
+            ? base64Decode(draft.signature!.split(',').last)
+            : await File(draft.signature!).readAsBytes();
+        final ref = storage.ref().child('reports/${draft.id}/signature.png');
+        await ref.putData(bytes, SettableMetadata(contentType: 'image/png'));
+        signatureUrl = await ref.getDownloadURL();
+      } catch (_) {}
+    }
+
+    final saved = SavedReport(
+      id: draft.id,
+      userId: draft.userId,
+      inspectionMetadata: draft.inspectionMetadata,
+      structures: structs,
+      summary: draft.summary,
+      summaryText: draft.summaryText,
+      signature: signatureUrl,
+      templateId: draft.templateId,
+      createdAt: draft.createdAt,
+      isFinalized: draft.isFinalized,
+      signatureRequested: draft.signatureRequested,
+      signatureStatus: draft.signatureStatus,
+      publicReportId: draft.publicReportId,
+      publicViewLink: draft.publicViewLink,
+      theme: draft.theme,
+      lastAuditPassed: draft.lastAuditPassed,
+      lastAuditIssues: draft.lastAuditIssues,
+      reportOwner: draft.reportOwner,
+      collaborators: draft.collaborators,
+      lastEditedBy: draft.lastEditedBy,
+      lastEditedAt: draft.lastEditedAt,
+      latitude: draft.latitude,
+      longitude: draft.longitude,
+      searchIndex: draft.searchIndex,
+    );
+
+    await firestore.collection('reports').doc(draft.id).set(saved.toMap());
+  }
+}

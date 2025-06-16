@@ -35,6 +35,7 @@ import 'manage_collaborators_screen.dart';
 import '../utils/permission_utils.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
+import '../services/offline_sync_service.dart';
 
 /// If Firebase is not desired:
 /// - Use `path_provider` and `shared_preferences` or `hive` to save report JSON locally
@@ -131,6 +132,10 @@ class _SendReportScreenState extends State<SendReportScreen> {
 
   Future<void> _saveReport() async {
     if (_saving) return;
+    if (!OfflineSyncService.instance.online.value) {
+      await _saveReportOffline();
+      return;
+    }
     setState(() => _saving = true);
 
     final firestore = FirebaseFirestore.instance;
@@ -327,6 +332,119 @@ class _SendReportScreenState extends State<SendReportScreen> {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Report saved to cloud')),
+      );
+    }
+  }
+
+  Future<void> _saveReportOffline() async {
+    if (_saving) return;
+    setState(() => _saving = true);
+    final id = DateTime.now().millisecondsSinceEpoch.toString();
+    final profile = _profile ?? await ProfileStorage.load();
+    final structs = <InspectedStructure>[];
+    if (widget.structures != null) {
+      for (final struct in widget.structures!) {
+        final sections = <String, List<ReportPhotoEntry>>{};
+        for (var entry in struct.sectionPhotos.entries) {
+          final list = entry.value
+              .map((p) => ReportPhotoEntry(
+                    label: p.label,
+                    photoUrl: p.url,
+                    timestamp: p.capturedAt,
+                    latitude: p.latitude,
+                    longitude: p.longitude,
+                    damageType: p.damageType,
+                    note: p.note,
+                    sourceType: p.sourceType,
+                    captureDevice: p.captureDevice,
+                  ))
+              .toList();
+          sections[entry.key] = list;
+        }
+        structs.add(InspectedStructure(name: struct.name, sectionPhotos: sections));
+      }
+    }
+
+    final metadataMap = {
+      'clientName': widget.metadata.clientName,
+      'propertyAddress': widget.metadata.propertyAddress,
+      'inspectionDate': widget.metadata.inspectionDate.toIso8601String(),
+      if (widget.metadata.insuranceCarrier != null)
+        'insuranceCarrier': widget.metadata.insuranceCarrier,
+      'perilType': widget.metadata.perilType.name,
+      'inspectionType': widget.metadata.inspectionType.name,
+      if (profile?.name != null)
+        'inspectorName': profile!.name
+      else if (widget.metadata.inspectorName != null)
+        'inspectorName': widget.metadata.inspectorName,
+      if (widget.metadata.reportId != null)
+        'reportId': widget.metadata.reportId,
+      if (widget.metadata.weatherNotes != null)
+        'weatherNotes': widget.metadata.weatherNotes,
+    };
+
+    final prefs = await SharedPreferences.getInstance();
+    ReportTheme theme = ReportTheme.defaultTheme;
+    final themeData = prefs.getString('report_theme');
+    if (themeData != null) {
+      theme =
+          ReportTheme.fromMap(jsonDecode(themeData) as Map<String, dynamic>);
+    }
+
+    double? latitude;
+    double? longitude;
+    final gps = _gpsPhotos();
+    if (gps.isNotEmpty) {
+      latitude = gps.first.latitude;
+      longitude = gps.first.longitude;
+    }
+
+    String? sigData;
+    if (_signature != null) {
+      sigData = 'data:image/png;base64,${base64Encode(_signature!)}';
+    }
+
+    final saved = SavedReport(
+      id: id,
+      userId: profile?.id,
+      inspectionMetadata: metadataMap,
+      structures: structs,
+      summary: widget.summary,
+      summaryText: _summaryTextController.text,
+      signature: sigData,
+      theme: theme,
+      templateId: widget.template?.id,
+      lastAuditPassed: null,
+      lastAuditIssues: null,
+      signatureRequested: false,
+      signatureStatus: 'none',
+      reportOwner: profile?.id,
+      collaborators: profile != null
+          ? [
+              ReportCollaborator(
+                  id: profile.id,
+                  name: profile.name,
+                  role: CollaboratorRole.lead)
+            ]
+          : const [],
+      lastEditedBy: profile?.id,
+      lastEditedAt: DateTime.now(),
+      latitude: latitude,
+      longitude: longitude,
+    );
+
+    await OfflineSyncService.instance.saveDraft(saved);
+
+    setState(() {
+      _saving = false;
+      _docId = id;
+      _savedReport = saved;
+      _finalized = false;
+    });
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Report saved locally')),
       );
     }
   }

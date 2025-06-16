@@ -26,12 +26,14 @@ import 'screens/report_map_screen.dart';
 import 'screens/analytics_dashboard_screen.dart';
 import 'screens/report_search_screen.dart';
 import 'services/auth_service.dart';
+import 'services/offline_sync_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  await OfflineSyncService.instance.init();
   runApp(const ClearSkyApp());
 }
 
