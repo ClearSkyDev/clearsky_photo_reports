@@ -8,6 +8,9 @@ import 'package:flutter/services.dart' show rootBundle;
 // Only used on web to trigger downloads
 // ignore: avoid_web_libraries_in_flutter
 import 'dart:html' as html;
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
@@ -104,6 +107,93 @@ Future<File?> exportAsZip(SavedReport report) async {
 
   final reportFile = File(filePath);
   return reportFile;
+}
+
+/// Exports the finalized report as a ZIP file containing the PDF and
+/// all labeled photos. When running on the web, the ZIP is uploaded to
+/// Firebase Storage and the download URL is opened in a new tab.
+Future<File?> exportFinalZip(SavedReport report,
+    {bool organizeBySection = true}) async {
+  final meta = InspectionMetadata.fromMap(report.inspectionMetadata);
+  final addressSlug = _slugify(meta.propertyAddress);
+  final fileName = '${addressSlug}_clearsky.zip';
+
+  final pdfBytes = await _generatePdf(report);
+
+  final archive = Archive();
+  archive.addFile(ArchiveFile('report.pdf', pdfBytes.length, pdfBytes));
+
+  for (final struct in report.structures) {
+    for (final entry in struct.sectionPhotos.entries) {
+      final photos = entry.value.where((p) => p.label.isNotEmpty).toList();
+      if (photos.isEmpty) continue;
+      final sectionFolder =
+          '${struct.name}_${entry.key}'.replaceAll(RegExp(r'\s+'), '');
+      for (final photo in photos) {
+        try {
+          Uint8List bytes;
+          if (photo.photoUrl.startsWith('http')) {
+            final resp = await http.get(Uri.parse(photo.photoUrl));
+            if (resp.statusCode != 200) continue;
+            bytes = resp.bodyBytes;
+          } else {
+            final file = File(photo.photoUrl);
+            if (!await file.exists()) continue;
+            bytes = await file.readAsBytes();
+          }
+          final label = photo.label.replaceAll(RegExp(r'[^A-Za-z0-9_-]'), '_');
+          final ext = p.extension(photo.photoUrl);
+          final name = organizeBySection
+              ? 'photos/$sectionFolder/$label$ext'
+              : 'photos/${label}_$sectionFolder$ext';
+          archive.addFile(ArchiveFile(name, bytes.length, bytes));
+        } catch (_) {}
+      }
+    }
+  }
+
+  final zipData = ZipEncoder().encode(archive)!;
+
+  if (kIsWeb) {
+    final storage = FirebaseStorage.instance;
+    final ref = storage.ref().child('report_zips/${report.id}/$fileName');
+    await ref.putData(Uint8List.fromList(zipData),
+        SettableMetadata(contentType: 'application/zip'));
+    final url = await ref.getDownloadURL();
+    try {
+      await FirebaseFirestore.instance.collection('downloads').add({
+        'reportId': report.id,
+        'timestamp': Timestamp.now(),
+        'type': 'zip',
+      });
+    } catch (_) {}
+    html.AnchorElement(href: url)
+      ..target = '_blank'
+      ..click();
+    return null;
+  }
+
+  Directory? dir;
+  try {
+    dir = await getDownloadsDirectory();
+  } catch (_) {
+    dir = await getApplicationDocumentsDirectory();
+  }
+  dir ??= await getApplicationDocumentsDirectory();
+
+  final path = p.join(dir.path, fileName);
+  final file = File(path);
+  await file.writeAsBytes(zipData, flush: true);
+
+  try {
+    await FirebaseFirestore.instance.collection('downloads').add({
+      'reportId': report.id,
+      'timestamp': Timestamp.now(),
+      'type': 'zip',
+    });
+  } catch (_) {}
+
+  return file;
 }
 
 Future<String> _generateHtml(SavedReport report) async {

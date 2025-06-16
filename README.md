@@ -43,7 +43,7 @@ After exporting, inspectors can lock a report from the Send Report screen. Final
 
 ## Public Client Portal
 
-Finalized reports generate a unique public link that can be shared with clients. Visiting the link displays a simplified report view with sections and photos. Clients may download the full report as a ZIP archive and leave optional comments which are saved back to Firestore for the inspector to review. Admin users can view and revoke links from the dashboard.
+Finalized reports generate a unique public link that can be shared with clients. Visiting the link displays a simplified report view with sections and photos. Clients may download the full report as a ZIP archive and leave optional comments which are saved back to Firestore for the inspector to review. The ZIP now includes the finalized PDF and all labeled photos organized by section. On web the archive is uploaded to Firebase Storage and a download link is provided. Download events are logged in Firestore. Admin users can view and revoke links from the dashboard.
 
 ## Report Map View
 

@@ -507,7 +507,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
       ),
     );
     try {
-      final file = await exportAsZip(_savedReport!);
+      final file = await exportFinalZip(_savedReport!);
       if (mounted) {
         setState(() => _exportedFile = file);
         ScaffoldMessenger.of(context).showSnackBar(
@@ -808,7 +808,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
                             height: 16,
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
-                        : const Text('Export ZIP')),
+                        : const Text('Download ZIP')),
               if (_exportedFile != null)
                 ElevatedButton(
                     onPressed: _shareReport,
