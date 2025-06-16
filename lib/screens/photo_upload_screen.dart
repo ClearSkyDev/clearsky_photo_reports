@@ -7,6 +7,7 @@ import '../models/photo_entry.dart';
 import '../models/inspection_metadata.dart';
 import '../models/inspected_structure.dart';
 import '../models/checklist.dart';
+import '../models/report_template.dart';
 import '../utils/label_suggestion.dart';
 import '../utils/damage_classification.dart';
 import 'package:geolocator/geolocator.dart';
@@ -18,7 +19,8 @@ import 'photo_detail_screen.dart';
 
 class PhotoUploadScreen extends StatefulWidget {
   final InspectionMetadata metadata;
-  const PhotoUploadScreen({super.key, required this.metadata});
+  final ReportTemplate? template;
+  const PhotoUploadScreen({super.key, required this.metadata, this.template});
 
   @override
   State<PhotoUploadScreen> createState() => _PhotoUploadScreenState();
@@ -39,10 +41,11 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
   void initState() {
     super.initState();
     _metadata = widget.metadata;
+    final sections = widget.template?.sections ?? kInspectionSections;
     _structures.add(
       InspectedStructure(
         name: 'Main Structure',
-        sectionPhotos: {for (var s in kInspectionSections) s: []},
+        sectionPhotos: {for (var s in sections) s: []},
       ),
     );
   }
@@ -120,7 +123,9 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
       _structures.add(
         InspectedStructure(
             name: name,
-            sectionPhotos: {for (var s in kInspectionSections) s: []}),
+            sectionPhotos: {
+              for (var s in widget.template?.sections ?? kInspectionSections) s: []
+            }),
       );
       _currentStructure = _structures.length - 1;
     });
@@ -281,6 +286,14 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
                 ),
               ],
             ),
+            if (widget.template?.photoPrompts[label] != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 4, bottom: 4),
+                child: Text(
+                  widget.template!.photoPrompts[label]!,
+                  style: const TextStyle(fontSize: 12, color: Colors.grey),
+                ),
+              ),
             const SizedBox(height: 8),
             if (photos.isNotEmpty)
               ReorderableWrap(
@@ -533,7 +546,7 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
     }
 
 
-    for (var section in kInspectionSections) {
+    for (var section in widget.template?.sections ?? kInspectionSections) {
       final photos = _structures[_currentStructure].sectionPhotos[section]!;
       items.add(
         _buildSection(
@@ -606,6 +619,7 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
                   builder: (context) => SignatureScreen(
                     structures: _structures,
                     metadata: _metadata,
+                    template: widget.template,
                   ),
                 ),
               );

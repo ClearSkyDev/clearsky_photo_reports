@@ -7,17 +7,20 @@ import '../models/inspection_metadata.dart';
 import '../models/photo_entry.dart';
 import '../models/inspected_structure.dart';
 import '../models/checklist.dart';
+import '../models/report_template.dart';
 import 'report_preview_screen.dart';
 import '../widgets/signature_pad.dart';
 
 class SignatureScreen extends StatefulWidget {
   final InspectionMetadata metadata;
   final List<InspectedStructure> structures;
+  final ReportTemplate? template;
 
   const SignatureScreen({
     super.key,
     required this.metadata,
     required this.structures,
+    this.template,
   });
 
   @override
@@ -45,6 +48,7 @@ class _SignatureScreenState extends State<SignatureScreen> {
           metadata: widget.metadata,
           structures: widget.structures,
           signature: _signatureBytes,
+          template: widget.template,
         ),
       ),
     );
