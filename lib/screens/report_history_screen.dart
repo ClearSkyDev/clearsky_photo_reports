@@ -122,6 +122,9 @@ class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
                     url: e.photoUrl,
                     label: e.label,
                     damageType: e.damageType,
+                    capturedAt: e.timestamp ?? DateTime.now(),
+                    latitude: e.latitude,
+                    longitude: e.longitude,
                   ))
               .toList();
         });

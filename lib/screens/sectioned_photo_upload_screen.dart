@@ -3,6 +3,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:reorderables/reorderables.dart';
 
 import '../models/photo_entry.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SectionedPhotoUploadScreen extends StatefulWidget {
   const SectionedPhotoUploadScreen({super.key});
@@ -39,15 +41,36 @@ class _SectionedPhotoUploadScreenState extends State<SectionedPhotoUploadScreen>
   Future<void> _pickImages(String section, [String? structure]) async {
     final List<XFile> selected = await _picker.pickMultiImage();
     if (selected.isNotEmpty) {
+      final position = await _getPosition();
       setState(() {
         final target = structure == null
             ? _sections[section]!
             : _additionalStructures[structure]![section]!;
         target.addAll(
-          selected.map((xfile) => PhotoEntry(url: xfile.path)).toList(),
+          selected
+              .map((xfile) => PhotoEntry(
+                    url: xfile.path,
+                    capturedAt: DateTime.now(),
+                    latitude: position?.latitude,
+                    longitude: position?.longitude,
+                  ))
+              .toList(),
         );
       });
     }
+  }
+
+  Future<Position?> _getPosition() async {
+    try {
+      return await Geolocator.getCurrentPosition();
+    } catch (_) {
+      return null;
+    }
+  }
+
+  void _openMap(double lat, double lng) {
+    final uri = Uri.parse('https://www.google.com/maps/search/?api=1&query=$lat,$lng');
+    launchUrl(uri, mode: LaunchMode.externalApplication);
   }
 
   void _removePhoto(String section, int index, [String? structure]) {
@@ -174,6 +197,43 @@ class _SectionedPhotoUploadScreenState extends State<SectionedPhotoUploadScreen>
                           bottom: 4,
                           right: 4,
                           child: const Icon(Icons.drag_handle, color: Colors.white),
+                        ),
+                        Positioned(
+                          bottom: 0,
+                          left: 0,
+                          right: 0,
+                          child: Container(
+                            color: Colors.black54,
+                            padding: const EdgeInsets.all(2),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  photos[index].capturedAt
+                                      .toLocal()
+                                      .toString()
+                                      .split('.').first,
+                                  style: const TextStyle(
+                                      color: Colors.white, fontSize: 10),
+                                ),
+                                if (photos[index].latitude != null &&
+                                    photos[index].longitude != null)
+                                  GestureDetector(
+                                    onTap: () => _openMap(
+                                        photos[index].latitude!,
+                                        photos[index].longitude!),
+                                    child: Text(
+                                      '${photos[index].latitude!.toStringAsFixed(4)}, ${photos[index].longitude!.toStringAsFixed(4)}',
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 10,
+                                        decoration: TextDecoration.underline,
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
                         ),
                       ],
                     ),

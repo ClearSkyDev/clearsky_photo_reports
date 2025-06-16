@@ -18,6 +18,7 @@ import 'report_preview_webview.dart';
 import 'report_settings_screen.dart' show ReportSettings;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:path/path.dart' as p;
+import 'package:url_launcher/url_launcher.dart';
 import 'package:path_provider/path_provider.dart';
 import '../utils/export_utils.dart';
 import '../utils/share_utils.dart';
@@ -61,6 +62,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
   late final TextEditingController _summaryController;
   Uint8List? _signature;
   String _template = 'legacy';
+  bool _showGps = true;
   bool _exporting = false;
   File? _exportedFile;
 
@@ -82,6 +84,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
       final settings = ReportSettings.fromMap(map);
       setState(() {
         _template = settings.template;
+        _showGps = settings.showGpsData;
       });
     }
   }
@@ -234,11 +237,14 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
           final label = photo.label.isNotEmpty ? photo.label : 'Unlabeled';
           final damage =
               photo.damageType.isNotEmpty ? photo.damageType : 'Unknown';
-          buffer.writeln(
-              '<div style="width:300px;margin:5px;text-align:center;">');
-          buffer.writeln(
-              '<img src="${photo.url}" width="300" height="300" style="object-fit:cover;"><br>');
-          buffer.writeln('<span>$label - $damage</span>');
+          buffer.writeln('<div style="width:300px;margin:5px;text-align:center;">');
+          buffer.writeln('<img src="${photo.url}" width="300" height="300" style="object-fit:cover;"><br>');
+          final ts = photo.capturedAt.toLocal().toString().split('.').first;
+          String gps = '';
+          if (_showGps && photo.latitude != null && photo.longitude != null) {
+            gps = '<br><a href="https://www.google.com/maps/search/?api=1&query=${photo.latitude},${photo.longitude}">${photo.latitude!.toStringAsFixed(4)}, ${photo.longitude!.toStringAsFixed(4)}</a>';
+          }
+          buffer.writeln('<span>$label - $damage<br>$ts$gps</span>');
           buffer.writeln('</div>');
         }
         buffer.writeln('</div>');
@@ -259,11 +265,14 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
             final label = photo.label.isNotEmpty ? photo.label : 'Unlabeled';
             final damage =
                 photo.damageType.isNotEmpty ? photo.damageType : 'Unknown';
-            buffer.writeln(
-                '<div style="width:300px;margin:5px;text-align:center;">');
-            buffer.writeln(
-                '<img src="${photo.url}" width="300" height="300" style="object-fit:cover;"><br>');
-            buffer.writeln('<span>$label - $damage</span>');
+            buffer.writeln('<div style="width:300px;margin:5px;text-align:center;">');
+            buffer.writeln('<img src="${photo.url}" width="300" height="300" style="object-fit:cover;"><br>');
+            final ts = photo.capturedAt.toLocal().toString().split('.').first;
+            String gps = '';
+            if (_showGps && photo.latitude != null && photo.longitude != null) {
+              gps = '<br><a href="https://www.google.com/maps/search/?api=1&query=${photo.latitude},${photo.longitude}">${photo.latitude!.toStringAsFixed(4)}, ${photo.longitude!.toStringAsFixed(4)}</a>';
+            }
+            buffer.writeln('<span>$label - $damage<br>$ts$gps</span>');
             buffer.writeln('</div>');
           }
           buffer.writeln('</div>');
@@ -296,6 +305,11 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
       ..setAttribute("download", fileName)
       ..click();
     html.Url.revokeObjectUrl(url);
+  }
+
+  void _openMap(double lat, double lng) {
+    final uri = Uri.parse('https://www.google.com/maps/search/?api=1&query=$lat,$lng');
+    launchUrl(uri, mode: LaunchMode.externalApplication);
   }
 
   pw.Widget _pdfSectionHeader(String text) {
@@ -340,6 +354,26 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
                 pw.Text('$label - $damage',
                     textAlign: pw.TextAlign.center,
                     style: const pw.TextStyle(fontSize: 12)),
+                pw.Text(
+                    photo.capturedAt
+                        .toLocal()
+                        .toString()
+                        .split('.').first,
+                    style: const pw.TextStyle(fontSize: 10)),
+                if (_showGps &&
+                    photo.latitude != null &&
+                    photo.longitude != null)
+                  pw.UrlLink(
+                    destination:
+                        'https://www.google.com/maps/search/?api=1&query=${photo.latitude},${photo.longitude}',
+                    child: pw.Text(
+                      '${photo.latitude!.toStringAsFixed(4)}, ${photo.longitude!.toStringAsFixed(4)}',
+                      style: const pw.TextStyle(
+                        fontSize: 10,
+                        decoration: pw.TextDecoration.underline,
+                      ),
+                    ),
+                  ),
               ],
             ),
           ),
@@ -745,7 +779,30 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
                                 ),
                                 Padding(
                                   padding: const EdgeInsets.all(4.0),
-                                  child: Text(label),
+                                  child: Column(
+                                    children: [
+                                      Text(label),
+                                      Text(
+                                        photo.capturedAt
+                                            .toLocal()
+                                            .toString()
+                                            .split('.').first,
+                                        style: const TextStyle(fontSize: 10),
+                                      ),
+                                      if (_showGps &&
+                                          photo.latitude != null &&
+                                          photo.longitude != null)
+                                        GestureDetector(
+                                          onTap: () => _openMap(photo.latitude!, photo.longitude!),
+                                          child: Text(
+                                            '${photo.latitude!.toStringAsFixed(4)}, ${photo.longitude!.toStringAsFixed(4)}',
+                                            style: const TextStyle(
+                                                fontSize: 10,
+                                                decoration: TextDecoration.underline),
+                                          ),
+                                        ),
+                                    ],
+                                  ),
                                 ),
                               ],
                             );
