@@ -5,6 +5,7 @@ import 'report_theme.dart';
 import '../utils/photo_audit.dart';
 import 'report_change.dart';
 import 'report_snapshot.dart';
+import 'report_collaborator.dart';
 
 class SavedReport {
   final String id;
@@ -26,6 +27,10 @@ class SavedReport {
   final List<PhotoAuditIssue>? lastAuditIssues;
   final List<ReportChange> changeLog;
   final List<ReportSnapshot> snapshots;
+  final String? reportOwner;
+  final List<ReportCollaborator> collaborators;
+  final String? lastEditedBy;
+  final DateTime? lastEditedAt;
 
   SavedReport({
     this.id = '',
@@ -44,6 +49,10 @@ class SavedReport {
     this.lastAuditIssues,
     this.changeLog = const [],
     this.snapshots = const [],
+    this.reportOwner,
+    this.collaborators = const [],
+    this.lastEditedBy,
+    this.lastEditedAt,
   }) : createdAt = createdAt ?? DateTime.now();
 
   Map<String, dynamic> toMap() {
@@ -66,6 +75,12 @@ class SavedReport {
         'changeLog': changeLog.map((e) => e.toMap()).toList(),
       if (snapshots.isNotEmpty)
         'snapshots': snapshots.map((e) => e.toMap()).toList(),
+      if (reportOwner != null) 'reportOwner': reportOwner,
+      if (collaborators.isNotEmpty)
+        'collaborators': collaborators.map((e) => e.toMap()).toList(),
+      if (lastEditedBy != null) 'lastEditedBy': lastEditedBy,
+      if (lastEditedAt != null)
+        'lastEditedAt': lastEditedAt!.millisecondsSinceEpoch,
     };
   }
 
@@ -114,6 +129,17 @@ class SavedReport {
                   ReportSnapshot.fromMap(Map<String, dynamic>.from(e as Map)))
               .toList()
           : [],
+      reportOwner: map['reportOwner'] as String?,
+      collaborators: map['collaborators'] != null
+          ? (map['collaborators'] as List)
+              .map((e) => ReportCollaborator.fromMap(
+                  Map<String, dynamic>.from(e as Map)))
+              .toList()
+          : [],
+      lastEditedBy: map['lastEditedBy'] as String?,
+      lastEditedAt: map['lastEditedAt'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(map['lastEditedAt'])
+          : null,
     );
   }
 }
