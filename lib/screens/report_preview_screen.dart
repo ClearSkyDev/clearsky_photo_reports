@@ -6,6 +6,7 @@ import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import '../models/photo_entry.dart';
 import '../models/inspection_metadata.dart';
+import '../models/inspection_type.dart';
 import '../models/inspection_sections.dart';
 import '../models/saved_report.dart';
 import '../models/inspected_structure.dart';
@@ -141,7 +142,8 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
 
     if (widget.structures != null) {
       for (final struct in widget.structures!) {
-        for (var section in widget.template?.sections ?? kInspectionSections) {
+        for (var section
+            in widget.template?.sections ?? sectionsForType(_metadata.inspectionType)) {
           final photos = struct.sectionPhotos[section] ?? [];
           if (photos.isNotEmpty) {
             final label = widget.structures!.length > 1
@@ -214,6 +216,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
       if (_metadata.insuranceCarrier != null)
         'insuranceCarrier': _metadata.insuranceCarrier,
       'perilType': _metadata.perilType.name,
+      'inspectionType': _metadata.inspectionType.name,
       if (_metadata.inspectorName != null)
         'inspectorName': _metadata.inspectorName,
     };
@@ -279,6 +282,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
       buffer.writeln('<tr><td><strong>Insurance Carrier:</strong></td><td>${_metadata.insuranceCarrier}</td></tr>');
     }
     buffer.writeln('<tr><td><strong>Peril Type:</strong></td><td>${_metadata.perilType.name}</td></tr>');
+    buffer.writeln('<tr><td><strong>Inspection Type:</strong></td><td>${_metadata.inspectionType.name}</td></tr>');
     if (_metadata.inspectorName != null) {
       buffer.writeln('<tr><td><strong>Inspector Name:</strong></td><td>${_metadata.inspectorName}</td></tr>');
     }
@@ -337,7 +341,8 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
         if (widget.structures!.length > 1) {
           buffer.writeln('<h2>${struct.name}</h2>');
         }
-        for (var section in widget.template?.sections ?? kInspectionSections) {
+        for (var section
+            in widget.template?.sections ?? sectionsForType(_metadata.inspectionType)) {
           final photos = struct.sectionPhotos[section] ?? [];
           if (photos.isEmpty) continue;
           if (widget.structures!.length > 1) {
@@ -484,7 +489,8 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
           widgets.add(_pdfSectionHeader(struct.name));
           widgets.add(pw.SizedBox(height: 10));
         }
-        for (var section in widget.template?.sections ?? kInspectionSections) {
+        for (var section
+            in widget.template?.sections ?? sectionsForType(_metadata.inspectionType)) {
           final photos = struct.sectionPhotos[section] ?? [];
           if (photos.isEmpty) continue;
           widgets.add(_pdfSectionHeader(section));
@@ -542,6 +548,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
                 if (_metadata.insuranceCarrier != null)
                   pw.Text('Insurance Carrier: ${_metadata.insuranceCarrier}'),
                 pw.Text('Peril Type: ${_metadata.perilType.name}'),
+                pw.Text('Inspection Type: ${_metadata.inspectionType.name}'),
                 if (_metadata.inspectorName != null)
                   pw.Text('Inspector Name: ${_metadata.inspectorName}'),
                 pw.SizedBox(height: 20),
@@ -608,6 +615,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
             if (_metadata.insuranceCarrier != null)
               pw.Text('Insurance Carrier: ${_metadata.insuranceCarrier}'),
             pw.Text('Peril Type: ${_metadata.perilType.name}'),
+            pw.Text('Inspection Type: ${_metadata.inspectionType.name}'),
             if (_metadata.inspectorName != null)
               pw.Text('Inspector Name: ${_metadata.inspectorName}'),
             pw.SizedBox(height: 20),
@@ -805,6 +813,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
                 if (_metadata.insuranceCarrier != null)
                   Text('Insurance Carrier: ${_metadata.insuranceCarrier}'),
                 Text('Peril Type: ${_metadata.perilType.name}'),
+                Text('Inspection Type: ${_metadata.inspectionType.name}'),
                 if (_metadata.inspectorName != null)
                   Text('Inspector Name: ${_metadata.inspectorName}'),
               ],

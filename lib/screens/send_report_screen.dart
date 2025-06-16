@@ -201,6 +201,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
       if (widget.metadata.insuranceCarrier != null)
         'insuranceCarrier': widget.metadata.insuranceCarrier,
       'perilType': widget.metadata.perilType.name,
+      'inspectionType': widget.metadata.inspectionType.name,
       if (profile?.name != null)
         'inspectorName': profile!.name
       else if (widget.metadata.inspectorName != null)
@@ -346,6 +347,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
       if (widget.metadata.insuranceCarrier != null)
         'insuranceCarrier': widget.metadata.insuranceCarrier,
       'perilType': widget.metadata.perilType.name,
+      'inspectionType': widget.metadata.inspectionType.name,
       if (widget.metadata.inspectorName != null)
         'inspectorName': widget.metadata.inspectorName,
       if (widget.metadata.reportId != null)
