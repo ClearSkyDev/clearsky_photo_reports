@@ -5,6 +5,7 @@ import '../models/inspector_profile.dart';
 import '../models/inspection_metadata.dart';
 import '../models/inspection_type.dart';
 import '../models/checklist.dart';
+import '../models/checklist_template.dart';
 import 'photo_upload_screen.dart';
 import '../models/report_template.dart';
 import '../utils/template_store.dart';
@@ -133,6 +134,11 @@ class _MetadataScreenState extends State<MetadataScreen> {
             ? _weatherNotesController.text
             : null,
       );
+      final template = defaultChecklists.firstWhere(
+        (c) => c.roofType == _selectedType && c.claimType == _selectedPeril,
+        orElse: () => defaultChecklists.first,
+      );
+      inspectionChecklist.loadTemplate(template);
       inspectionChecklist.markComplete('Metadata Saved');
       Navigator.push(
         context,

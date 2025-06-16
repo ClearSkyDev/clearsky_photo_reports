@@ -39,12 +39,15 @@ class _InspectionChecklistScreenState extends State<InspectionChecklistScreen> {
               itemCount: steps.length,
               itemBuilder: (_, i) {
                 final step = steps[i];
-                return ListTile(
-                  leading: Icon(
-                    step.isComplete ? Icons.check_circle : Icons.radio_button_unchecked,
-                    color: step.isComplete ? Colors.green : Colors.grey,
-                  ),
+                final subtitle = step.requiredPhotos > 0
+                    ? '${step.photosTaken}/${step.requiredPhotos} photos'
+                    : null;
+                return CheckboxListTile(
+                  value: step.isComplete,
+                  onChanged: (_) {},
                   title: Text(step.title),
+                  subtitle: subtitle != null ? Text(subtitle) : null,
+                  controlAffinity: ListTileControlAffinity.leading,
                 );
               },
             ),

@@ -72,7 +72,6 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
       setState(() {
         final index = structure ?? _currentStructure;
         final target = _structures[index].sectionPhotos[section]!;
-        final wasEmpty = target.isEmpty;
         for (var xfile in selected) {
           final entry = PhotoEntry(
             url: xfile.path,
@@ -84,6 +83,7 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
             damageLoading: true,
           );
           target.add(entry);
+          inspectionChecklist.recordPhoto(section);
           getSuggestedLabel(entry, section, _metadata).then((label) {
             setState(() {
               entry
@@ -98,13 +98,6 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
                 ..damageLoading = false;
             });
           });
-        }
-        if (wasEmpty) {
-          if (section == 'Address Photo') {
-            inspectionChecklist.markComplete('Address Photo');
-          } else {
-            inspectionChecklist.markComplete('Elevation Photos');
-          }
         }
       });
     }

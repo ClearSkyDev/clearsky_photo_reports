@@ -605,9 +605,9 @@ class _SendReportScreenState extends State<SendReportScreen> {
           .showSnackBar(const SnackBar(content: Text('Permission denied')));
       return;
     }
-    if (!inspectionChecklist.allComplete) {
+    if (!inspectionChecklist.allRequiredComplete) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Complete all checklist steps first')),
+        const SnackBar(content: Text('Checklist incomplete')),
       );
       return;
     }
