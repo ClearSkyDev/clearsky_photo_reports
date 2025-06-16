@@ -35,6 +35,10 @@ class DashboardScreen extends StatelessWidget {
               onPressed: () => Navigator.pushNamed(context, '/reportMap'),
               child: const Text('Map View'),
             ),
+            ElevatedButton(
+              onPressed: () => Navigator.pushNamed(context, '/search'),
+              child: const Text('Search Reports'),
+            ),
             if (user.role == UserRole.admin)
               ElevatedButton(
                 onPressed: () => Navigator.pushNamed(context, '/manageTeam'),

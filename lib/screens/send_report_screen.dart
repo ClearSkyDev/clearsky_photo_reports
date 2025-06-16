@@ -242,6 +242,17 @@ class _SendReportScreenState extends State<SendReportScreen> {
       }
     }
 
+    final labels = <String>{};
+    final damages = <String>{};
+    for (final struct in structs) {
+      for (final photos in struct.sectionPhotos.values) {
+        for (final p in photos) {
+          if (p.label.isNotEmpty) labels.add(p.label);
+          if (p.damageType.isNotEmpty) damages.add(p.damageType);
+        }
+      }
+    }
+
     final saved = SavedReport(
       id: reportId,
       userId: profile?.id,
@@ -269,6 +280,26 @@ class _SendReportScreenState extends State<SendReportScreen> {
       lastEditedAt: DateTime.now(),
       latitude: latitude,
       longitude: longitude,
+      searchIndex: {
+        'address': widget.metadata.propertyAddress,
+        'address_lc': widget.metadata.propertyAddress.toLowerCase(),
+        'clientName': widget.metadata.clientName,
+        'clientName_lc': widget.metadata.clientName.toLowerCase(),
+        if (profile?.name != null)
+          'inspectorName': profile!.name
+        else if (widget.metadata.inspectorName != null)
+          'inspectorName': widget.metadata.inspectorName,
+        if (profile?.name != null)
+          'inspectorName_lc': profile!.name.toLowerCase()
+        else if (widget.metadata.inspectorName != null)
+          'inspectorName_lc': widget.metadata.inspectorName!.toLowerCase(),
+        'type': widget.metadata.inspectionType.name,
+        'type_lc': widget.metadata.inspectionType.name.toLowerCase(),
+        'labels': labels.toList(),
+        'labels_lc': labels.map((e) => e.toLowerCase()).toList(),
+        'damageTags': damages.toList(),
+        'damageTags_lc': damages.map((e) => e.toLowerCase()).toList(),
+      },
     );
 
     await doc.set(saved.toMap());
