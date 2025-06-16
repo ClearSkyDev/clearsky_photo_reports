@@ -1,9 +1,11 @@
+import 'inspected_structure.dart';
+
 // Model for persisting completed reports in Firestore
 class SavedReport {
   final String id;
   final String? userId;
   final Map<String, dynamic> inspectionMetadata;
-  final Map<String, List<ReportPhotoEntry>> sectionPhotos;
+  final List<InspectedStructure> structures;
   final String? summary;
   /// Either a download URL or base64 encoded PNG of the inspector signature.
   final String? signature;
@@ -13,7 +15,7 @@ class SavedReport {
     this.id = '',
     this.userId,
     required this.inspectionMetadata,
-    required this.sectionPhotos,
+    required this.structures,
     this.summary,
     this.signature,
     DateTime? createdAt,
@@ -22,10 +24,7 @@ class SavedReport {
   Map<String, dynamic> toMap() {
     return {
       'inspectionMetadata': inspectionMetadata,
-      'sectionPhotos': {
-        for (var entry in sectionPhotos.entries)
-          entry.key: entry.value.map((p) => p.toMap()).toList(),
-      },
+      'structures': structures.map((s) => s.toMap()).toList(),
       'createdAt': createdAt.millisecondsSinceEpoch,
       if (userId != null) 'userId': userId,
       if (summary != null) 'summary': summary,
@@ -34,21 +33,19 @@ class SavedReport {
   }
 
   factory SavedReport.fromMap(Map<String, dynamic> map, String id) {
-    final sections = <String, List<ReportPhotoEntry>>{};
-    final rawSections = map['sectionPhotos'] as Map<String, dynamic>? ?? {};
-    rawSections.forEach((key, value) {
-      final list = (value as List<dynamic>)
-          .map((item) => ReportPhotoEntry.fromMap(Map<String, dynamic>.from(item)))
-          .toList();
-      sections[key] = list;
-    });
+    final structs = <InspectedStructure>[];
+    final rawStructs = map['structures'] as List<dynamic>? ?? [];
+    for (final item in rawStructs) {
+      structs.add(
+          InspectedStructure.fromMap(Map<String, dynamic>.from(item as Map)));
+    }
 
     return SavedReport(
       id: id,
       userId: map['userId'] as String?,
       inspectionMetadata:
           Map<String, dynamic>.from(map['inspectionMetadata'] ?? {}),
-      sectionPhotos: sections,
+      structures: structs,
       summary: map['summary'] as String?,
       signature: map['signature'] as String?,
       createdAt: map['createdAt'] != null

@@ -7,6 +7,7 @@ import 'package:path/path.dart' as p;
 
 import '../models/saved_report.dart';
 import '../models/inspection_metadata.dart';
+import '../models/inspected_structure.dart';
 
 /// Stores reports on the local device using JSON files.
 ///
@@ -42,34 +43,38 @@ class LocalReportStore {
       await reportDir.create(recursive: true);
     }
 
-    final updatedPhotos = <String, List<ReportPhotoEntry>>{};
-    for (var entry in report.sectionPhotos.entries) {
-      final list = <ReportPhotoEntry>[];
-      for (var i = 0; i < entry.value.length; i++) {
-        final pEntry = entry.value[i];
-        final src = File(pEntry.photoUrl);
-        final ext = p.extension(src.path);
-        final dest = p.join(reportDir.path, '${entry.key}_$i$ext');
-        if (await src.exists()) {
-          await src.copy(dest);
+    final updatedStructs = <InspectedStructure>[];
+    for (final struct in report.structures) {
+      final map = <String, List<ReportPhotoEntry>>{};
+      for (var entry in struct.sectionPhotos.entries) {
+        final list = <ReportPhotoEntry>[];
+        for (var i = 0; i < entry.value.length; i++) {
+          final pEntry = entry.value[i];
+          final src = File(pEntry.photoUrl);
+          final ext = p.extension(src.path);
+          final dest = p.join(reportDir.path, '${struct.name}_${entry.key}_$i$ext');
+          if (await src.exists()) {
+            await src.copy(dest);
+          }
+          list.add(ReportPhotoEntry(
+            label: pEntry.label,
+            photoUrl: dest,
+            timestamp: pEntry.timestamp,
+            latitude: pEntry.latitude,
+            longitude: pEntry.longitude,
+            damageType: pEntry.damageType,
+          ));
         }
-        list.add(ReportPhotoEntry(
-          label: pEntry.label,
-          photoUrl: dest,
-          timestamp: pEntry.timestamp,
-          latitude: pEntry.latitude,
-          longitude: pEntry.longitude,
-          damageType: pEntry.damageType,
-        ));
+        map[entry.key] = list;
       }
-      updatedPhotos[entry.key] = list;
+      updatedStructs.add(InspectedStructure(name: struct.name, sectionPhotos: map));
     }
 
     final saved = SavedReport(
       id: id,
       userId: report.userId,
       inspectionMetadata: report.inspectionMetadata,
-      sectionPhotos: updatedPhotos,
+      structures: updatedStructs,
       summary: report.summary,
       createdAt: report.createdAt,
     );

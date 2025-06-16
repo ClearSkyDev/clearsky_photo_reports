@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../models/saved_report.dart';
 import '../models/inspection_metadata.dart';
 import '../models/photo_entry.dart';
+import '../models/inspected_structure.dart';
 import 'report_preview_screen.dart';
 import '../utils/profile_storage.dart';
 import '../models/inspector_profile.dart';
@@ -102,11 +103,14 @@ class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
     String date = meta.inspectionDate.toLocal().toString().split(' ')[0];
     String subtitle = '${meta.clientName} • $date';
     String? thumbUrl;
-    for (var photos in report.sectionPhotos.values) {
-      if (photos.isNotEmpty) {
-        thumbUrl = photos.first.photoUrl;
-        break;
+    for (var struct in report.structures) {
+      for (var photos in struct.sectionPhotos.values) {
+        if (photos.isNotEmpty) {
+          thumbUrl = photos.first.photoUrl;
+          break;
+        }
       }
+      if (thumbUrl != null) break;
     }
     return ListTile(
       leading: thumbUrl != null
@@ -115,25 +119,29 @@ class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
       title: Text(meta.propertyAddress),
       subtitle: Text(subtitle),
       onTap: () {
-        final sections = <String, List<PhotoEntry>>{};
-        report.sectionPhotos.forEach((key, value) {
-          sections[key] = value
-              .map((e) => PhotoEntry(
-                    url: e.photoUrl,
-                    label: e.label,
-                    damageType: e.damageType,
-                    capturedAt: e.timestamp ?? DateTime.now(),
-                    latitude: e.latitude,
-                    longitude: e.longitude,
-                  ))
-              .toList();
-        });
+        final structs = <InspectedStructure>[];
+        for (var s in report.structures) {
+          final sections = <String, List<PhotoEntry>>{};
+          s.sectionPhotos.forEach((key, value) {
+            sections[key] = value
+                .map((e) => PhotoEntry(
+                      url: e.photoUrl,
+                      label: e.label,
+                      damageType: e.damageType,
+                      capturedAt: e.timestamp ?? DateTime.now(),
+                      latitude: e.latitude,
+                      longitude: e.longitude,
+                    ))
+                .toList();
+          });
+          structs.add(InspectedStructure(name: s.name, sectionPhotos: sections));
+        }
         Navigator.push(
           context,
           MaterialPageRoute(
             builder: (_) => ReportPreviewScreen(
               metadata: meta,
-              sections: sections,
+              structures: structs,
               readOnly: true,
               summary: report.summary,
               savedReport: report,

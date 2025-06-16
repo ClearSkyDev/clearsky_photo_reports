@@ -5,6 +5,7 @@ import 'package:reorderables/reorderables.dart';
 import '../models/inspection_sections.dart';
 import '../models/photo_entry.dart';
 import '../models/inspection_metadata.dart';
+import '../models/inspected_structure.dart';
 import '../models/checklist.dart';
 import '../utils/label_suggestion.dart';
 import '../utils/damage_classification.dart';
@@ -29,19 +30,19 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
   int _autoLabelRemaining = 0;
   int _autoLabelTotal = 0;
 
-  // Photos for the main structure
-  late final Map<String, List<PhotoEntry>> sectionPhotos = {
-    for (var s in kInspectionSections) s: [],
-  };
-
-  // Additional structures
-  final List<String> additionalNames = [];
-  final List<Map<String, List<PhotoEntry>>> additionalStructures = [];
+  final List<InspectedStructure> _structures = [];
+  int _currentStructure = 0;
 
   @override
   void initState() {
     super.initState();
     _metadata = widget.metadata;
+    _structures.add(
+      InspectedStructure(
+        name: 'Main Structure',
+        sectionPhotos: {for (var s in kInspectionSections) s: []},
+      ),
+    );
   }
 
 
@@ -50,9 +51,8 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
     if (selected.isNotEmpty) {
       final position = await _getPosition();
       setState(() {
-        final target = structure == null
-            ? sectionPhotos[section]!
-            : additionalStructures[structure][section]!;
+        final index = structure ?? _currentStructure;
+        final target = _structures[index].sectionPhotos[section]!;
         final wasEmpty = target.isEmpty;
         for (var xfile in selected) {
           final entry = PhotoEntry(
@@ -106,9 +106,8 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
 
   void _removePhoto(String section, int index, {int? structure}) {
     setState(() {
-      final target = structure == null
-          ? sectionPhotos[section]!
-          : additionalStructures[structure][section]!;
+      final idx = structure ?? _currentStructure;
+      final target = _structures[idx].sectionPhotos[section]!;
       target.removeAt(index);
     });
   }
@@ -116,8 +115,12 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
   void _addStructure(String name) {
     if (name.isEmpty) return;
     setState(() {
-      additionalNames.add(name);
-      additionalStructures.add({for (var s in kInspectionSections) s: []});
+      _structures.add(
+        InspectedStructure(
+            name: name,
+            sectionPhotos: {for (var s in kInspectionSections) s: []}),
+      );
+      _currentStructure = _structures.length - 1;
     });
   }
 
@@ -187,15 +190,8 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
 
   Future<void> _autoLabelAll() async {
     final List<MapEntry<String, PhotoEntry>> unlabeled = [];
-    sectionPhotos.forEach((section, photos) {
-      for (var p in photos) {
-        if (p.label.isEmpty || p.label == 'Unlabeled') {
-          unlabeled.add(MapEntry(section, p));
-        }
-      }
-    });
-    for (var struct in additionalStructures) {
-      struct.forEach((section, photos) {
+    for (var struct in _structures) {
+      struct.sectionPhotos.forEach((section, photos) {
         for (var p in photos) {
           if (p.label.isEmpty || p.label == 'Unlabeled') {
             unlabeled.add(MapEntry(section, p));
@@ -443,11 +439,8 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
   }
 
   bool get _hasPhotos {
-    for (var p in sectionPhotos.values) {
-      if (p.isNotEmpty) return true;
-    }
-    for (var m in additionalStructures) {
-      for (var p in m.values) {
+    for (var s in _structures) {
+      for (var p in s.sectionPhotos.values) {
         if (p.isNotEmpty) return true;
       }
     }
@@ -493,10 +486,11 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
 
 
     for (var section in kInspectionSections) {
+      final photos = _structures[_currentStructure].sectionPhotos[section]!;
       items.add(
         _buildSection(
           section,
-          sectionPhotos[section]!,
+          photos,
           () => _pickImages(section),
           (i) => _removePhoto(section, i),
           (p) => _showLabelDialog(p),
@@ -504,38 +498,31 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
       );
     }
 
-    for (int i = 0; i < additionalStructures.length; i++) {
-      final name = additionalNames[i];
-      final sections = additionalStructures[i];
-      items.add(
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          child: Text(
-            name,
-            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          ),
-        ),
-      );
-      for (var section in kInspectionSections) {
-        items.add(
-          _buildSection(
-            '$name - $section',
-            sections[section]!,
-            () => _pickImages(section, structure: i),
-            (idx) => _removePhoto(section, idx, structure: i),
-            (p) => _showLabelDialog(p),
-          ),
-        );
-      }
-    }
-
     items.add(
       Padding(
         padding: const EdgeInsets.symmetric(vertical: 12),
-        child: ElevatedButton.icon(
-          onPressed: _showAddStructureDialog,
-          icon: const Icon(Icons.add),
-          label: const Text('Add Structure'),
+        child: Row(
+          children: [
+            Expanded(
+              child: DropdownButton<int>(
+                value: _currentStructure,
+                onChanged: (val) => setState(() => _currentStructure = val!),
+                items: [
+                  for (int i = 0; i < _structures.length; i++)
+                    DropdownMenuItem(
+                      value: i,
+                      child: Text(_structures[i].name),
+                    ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            ElevatedButton.icon(
+              onPressed: _showAddStructureDialog,
+              icon: const Icon(Icons.add),
+              label: const Text('Add Structure'),
+            ),
+          ],
         ),
       ),
     );
@@ -550,9 +537,7 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
                 context,
                 MaterialPageRoute(
                   builder: (context) => SignatureScreen(
-                    sections: sectionPhotos,
-                    additionalStructures: additionalStructures,
-                    additionalNames: additionalNames,
+                    structures: _structures,
                     metadata: _metadata,
                   ),
                 ),
