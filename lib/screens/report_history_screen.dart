@@ -5,6 +5,8 @@ import '../models/saved_report.dart';
 import '../models/inspection_metadata.dart';
 import '../models/photo_entry.dart';
 import 'report_preview_screen.dart';
+import '../utils/profile_storage.dart';
+import '../models/inspector_profile.dart';
 
 class ReportHistoryScreen extends StatefulWidget {
   final String? inspectorName;
@@ -78,9 +80,16 @@ class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
     Query query = firestore
         .collection('reports')
         .orderBy('createdAt', descending: true);
-    if (widget.inspectorName != null && widget.inspectorName!.isNotEmpty) {
-      query = query.where('inspectionMetadata.inspectorName',
-          isEqualTo: widget.inspectorName);
+    String? inspector = widget.inspectorName;
+    if (inspector == null) {
+      final profile = await ProfileStorage.load();
+      if (profile != null && profile.role != InspectorRole.admin) {
+        inspector = profile.name;
+      }
+    }
+    if (inspector != null && inspector.isNotEmpty) {
+      query =
+          query.where('inspectionMetadata.inspectorName', isEqualTo: inspector);
     }
     final snapshot = await query.get();
     return snapshot.docs
