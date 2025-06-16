@@ -1,32 +1,35 @@
-import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+
 import 'firebase_options.dart';
+import 'models/inspector_user.dart';
+import 'screens/dashboard_screen.dart';
+import 'screens/login_screen.dart';
+import 'screens/report_history_screen.dart';
+import 'screens/manage_team_screen.dart';
+
 import 'screens/home_screen.dart';
 import 'screens/report_screen.dart';
 import 'screens/metadata_screen.dart';
 import 'screens/sectioned_photo_upload_screen.dart';
 import 'screens/drone_media_upload_screen.dart';
-import 'screens/report_history_screen.dart';
 import 'screens/report_settings_screen.dart';
 import 'screens/report_theme_screen.dart';
-import 'screens/login_screen.dart';
 import 'screens/profile_screen.dart';
 import 'screens/template_manager_screen.dart';
-import 'models/inspector_profile.dart';
-import 'utils/profile_storage.dart';
+import 'services/auth_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  final profile = await ProfileStorage.load();
-  runApp(ClearSkyApp(initialProfile: profile));
+  runApp(const ClearSkyApp());
 }
 
 class ClearSkyApp extends StatelessWidget {
-  final InspectorProfile? initialProfile;
-  const ClearSkyApp({super.key, this.initialProfile});
+  const ClearSkyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -36,11 +39,8 @@ class ClearSkyApp extends StatelessWidget {
         primarySwatch: Colors.blueGrey,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      initialRoute: initialProfile == null ? '/login' : '/',
       routes: {
-        '/': (context) => const HomeScreen(),
-        '/login': (context) => const LoginScreen(),
-        '/profile': (context) => const ProfileScreen(),
+        '/home': (context) => const HomeScreen(),
         '/report': (context) => const ReportScreen(),
         '/metadata': (context) => const MetadataScreen(),
         '/sectionedUpload': (context) => const SectionedPhotoUploadScreen(),
@@ -49,6 +49,44 @@ class ClearSkyApp extends StatelessWidget {
         '/settings': (context) => const ReportSettingsScreen(),
         '/theme': (context) => const ReportThemeScreen(),
         '/templates': (context) => const TemplateManagerScreen(),
+        '/profile': (context) => const ProfileScreen(),
+        '/manageTeam': (context) => const ManageTeamScreen(),
+      },
+      home: const AuthGate(),
+    );
+  }
+}
+
+class AuthGate extends StatelessWidget {
+  const AuthGate({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<User?>(
+      stream: AuthService().authStateChanges(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+        if (!snapshot.hasData) {
+          return const LoginScreen();
+        }
+        return FutureBuilder<InspectorUser?>(
+          future: AuthService().fetchUser(snapshot.data!.uid),
+          builder: (context, snap) {
+            if (!snap.hasData) {
+              return const Scaffold(
+                body: Center(child: CircularProgressIndicator()),
+              );
+            }
+            if (snap.data == null) {
+              return const LoginScreen();
+            }
+            return DashboardScreen(user: snap.data!);
+          },
+        );
       },
     );
   }

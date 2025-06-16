@@ -1,11 +1,6 @@
-import 'dart:convert';
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 
-import '../models/inspector_profile.dart';
-import '../utils/profile_storage.dart';
-import 'capture_signature_screen.dart';
+import '../services/auth_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -15,103 +10,78 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _companyController = TextEditingController();
-  InspectorRole _role = InspectorRole.inspector;
-  Uint8List? _signature;
+  bool _isLogin = true;
+  String? _error;
+  bool _loading = false;
 
-  Future<void> _captureSignature() async {
-    final result = await Navigator.push<Uint8List>(
-      context,
-      MaterialPageRoute(builder: (_) => const CaptureSignatureScreen()),
-    );
-    if (result != null) {
-      setState(() {
-        _signature = result;
-      });
-    }
-  }
-
-  Future<void> _login() async {
-    final profile = InspectorProfile(
-      id: _emailController.text.trim(),
-      name: _nameController.text.trim(),
-      email: _emailController.text.trim(),
-      phone: _phoneController.text.trim().isNotEmpty
-          ? _phoneController.text.trim()
-          : null,
-      company: _companyController.text.trim().isNotEmpty
-          ? _companyController.text.trim()
-          : null,
-      signature: _signature != null ? base64Encode(_signature!) : null,
-      role: _role,
-    );
-    await ProfileStorage.save(profile);
-    if (mounted) {
-      Navigator.pushReplacementNamed(context, '/');
+  Future<void> _submit() async {
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
+    try {
+      if (_isLogin) {
+        await AuthService().signIn(
+          email: _emailController.text.trim(),
+          password: _passwordController.text.trim(),
+        );
+      } else {
+        await AuthService().signUp(
+          email: _emailController.text.trim(),
+          password: _passwordController.text.trim(),
+          companyId: _companyController.text.trim(),
+        );
+      }
+    } catch (e) {
+      setState(() => _error = e.toString());
+    } finally {
+      if (mounted) setState(() => _loading = false);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Inspector Login')),
+      appBar: AppBar(title: Text(_isLogin ? 'Login' : 'Sign Up')),
       body: Padding(
         padding: const EdgeInsets.all(16),
-        child: ListView(
+        child: Column(
           children: [
-            TextField(
-              controller: _nameController,
-              decoration: const InputDecoration(labelText: 'Name'),
-            ),
             TextField(
               controller: _emailController,
               decoration: const InputDecoration(labelText: 'Email'),
             ),
             TextField(
-              controller: _phoneController,
-              decoration: const InputDecoration(labelText: 'Phone'),
+              controller: _passwordController,
+              decoration: const InputDecoration(labelText: 'Password'),
+              obscureText: true,
             ),
-            TextField(
-              controller: _companyController,
-              decoration: const InputDecoration(labelText: 'Company'),
-            ),
-            DropdownButtonFormField<InspectorRole>(
-              value: _role,
-              decoration: const InputDecoration(labelText: 'Role'),
-              items: InspectorRole.values
-                  .map(
-                    (r) => DropdownMenuItem(
-                      value: r,
-                      child: Text(r.name),
-                    ),
-                  )
-                  .toList(),
-              onChanged: (val) {
-                if (val != null) {
-                  setState(() {
-                    _role = val;
-                  });
-                }
-              },
-            ),
-            const SizedBox(height: 12),
-            if (_signature != null)
-              Image.memory(
-                _signature!,
-                height: 80,
+            if (!_isLogin)
+              TextField(
+                controller: _companyController,
+                decoration: const InputDecoration(labelText: 'Company ID'),
               ),
-            TextButton.icon(
-              onPressed: _captureSignature,
-              icon: const Icon(Icons.border_color),
-              label: const Text('Add Signature'),
-            ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 12),
+            if (_error != null)
+              Text(
+                _error!,
+                style: const TextStyle(color: Colors.red),
+              ),
+            const SizedBox(height: 12),
             ElevatedButton(
-              onPressed: _login,
-              child: const Text('Continue'),
+              onPressed: _loading ? null : _submit,
+              child: Text(_isLogin ? 'Login' : 'Create Account'),
+            ),
+            TextButton(
+              onPressed: _loading
+                  ? null
+                  : () => setState(() => _isLogin = !_isLogin),
+              child: Text(_isLogin
+                  ? 'Need an account? Sign Up'
+                  : 'Have an account? Login'),
             ),
           ],
         ),
