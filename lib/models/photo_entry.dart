@@ -1,5 +1,6 @@
 class PhotoEntry {
-  final String url;
+  String url;
+  String? originalUrl;
   String label;
   bool labelLoading;
   String damageType;
@@ -11,6 +12,7 @@ class PhotoEntry {
 
   PhotoEntry({
     required this.url,
+    this.originalUrl,
     DateTime? capturedAt,
     this.latitude,
     this.longitude,
