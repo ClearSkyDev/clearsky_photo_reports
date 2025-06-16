@@ -30,7 +30,8 @@ The preview screen now also includes a signature canvas so inspectors can sign t
 
 ## Inspection Checklist
 
-The app tracks key inspection tasks such as uploading photos, filling out metadata and capturing a signature.
+The app now supports dynamic checklists that vary by roof type and claim type. When starting a new report the correct checklist is loaded automatically and can be customized.
+Each step tracks the number of required photos and checkboxes indicate progress. Incomplete steps are highlighted in the final report summary.
 Progress can be viewed from the "View Checklist" button on the Send Report screen and a summary is included in the generated HTML/PDF reports.
 
 ## Photo Notes

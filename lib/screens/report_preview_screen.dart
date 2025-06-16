@@ -332,7 +332,9 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
     buffer.writeln('<ul>');
     for (final step in inspectionChecklist.steps) {
       final icon = step.isComplete ? '✓' : '✗';
-      buffer.writeln('<li>$icon ${step.title}</li>');
+      final color = step.isComplete ? 'black' : 'red';
+      final req = step.requiredPhotos > 0 ? ' (${step.photosTaken}/${step.requiredPhotos})' : '';
+      buffer.writeln('<li style="color:$color">$icon ${step.title}$req</li>');
     }
     buffer.writeln('</ul>');
 
@@ -627,9 +629,17 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
               children: [
                 for (final step in inspectionChecklist.steps)
                   pw.Row(children: [
-                    pw.Text(step.isComplete ? '✓' : '✗'),
+                    pw.Text(step.isComplete ? '✓' : '✗',
+                        style: pw.TextStyle(
+                            color: step.isComplete ? PdfColors.black : PdfColors.red)),
                     pw.SizedBox(width: 4),
-                    pw.Text(step.title),
+                    pw.Text(
+                      step.requiredPhotos > 0
+                          ? '${step.title} (${step.photosTaken}/${step.requiredPhotos})'
+                          : step.title,
+                      style: pw.TextStyle(
+                          color: step.isComplete ? PdfColors.black : PdfColors.red),
+                    ),
                   ])
               ],
             ),
