@@ -7,6 +7,7 @@ import 'screens/metadata_screen.dart';
 import 'screens/sectioned_photo_upload_screen.dart';
 import 'screens/report_history_screen.dart';
 import 'screens/report_settings_screen.dart';
+import 'screens/report_theme_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/profile_screen.dart';
 import 'models/inspector_profile.dart';
@@ -43,6 +44,7 @@ class ClearSkyApp extends StatelessWidget {
         '/sectionedUpload': (context) => const SectionedPhotoUploadScreen(),
         '/history': (context) => const ReportHistoryScreen(),
         '/settings': (context) => const ReportSettingsScreen(),
+        '/theme': (context) => const ReportThemeScreen(),
       },
     );
   }

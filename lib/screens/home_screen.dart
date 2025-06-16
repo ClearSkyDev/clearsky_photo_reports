@@ -109,6 +109,18 @@ class HomeScreen extends StatelessWidget {
               onPressed: () => Navigator.pushNamed(context, '/profile'),
               child: const Text('Profile'),
             ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blueAccent,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              onPressed: () => Navigator.pushNamed(context, '/theme'),
+              child: const Text('Report Theme'),
+            ),
           ],
         ),
       ),
