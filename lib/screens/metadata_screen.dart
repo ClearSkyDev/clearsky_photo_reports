@@ -10,7 +10,10 @@ import '../models/report_template.dart';
 import '../utils/template_store.dart';
 
 class MetadataScreen extends StatefulWidget {
-  const MetadataScreen({super.key});
+  final InspectionMetadata? initialMetadata;
+  final ReportTemplate? initialTemplate;
+
+  const MetadataScreen({super.key, this.initialMetadata, this.initialTemplate});
 
   @override
   State<MetadataScreen> createState() => _MetadataScreenState();
@@ -33,14 +36,29 @@ class _MetadataScreenState extends State<MetadataScreen> {
   @override
   void initState() {
     super.initState();
-    _loadProfile();
+    if (widget.initialMetadata != null) {
+      final meta = widget.initialMetadata!;
+      _clientNameController.text = meta.clientName;
+      _propertyAddressController.text = meta.propertyAddress;
+      _inspectionDate = meta.inspectionDate;
+      _selectedPeril = meta.perilType;
+      _selectedType = meta.inspectionType;
+      _insuranceCarrierController.text = meta.insuranceCarrier ?? '';
+      _inspectorNameController.text = meta.inspectorName ?? '';
+      _reportIdController.text = meta.reportId ?? '';
+      _weatherNotesController.text = meta.weatherNotes ?? '';
+    } else {
+      _loadProfile();
+    }
     _loadTemplates();
   }
 
   Future<void> _loadProfile() async {
     final profile = await ProfileStorage.load();
     if (profile != null) {
-      _inspectorNameController.text = profile.name;
+      if (_inspectorNameController.text.isEmpty) {
+        _inspectorNameController.text = profile.name;
+      }
     }
   }
 
@@ -49,8 +67,17 @@ class _MetadataScreenState extends State<MetadataScreen> {
     setState(() {
       _templates = items;
       if (_templates.isNotEmpty) {
-        _selectedTemplate = _templates.first;
-        _applyTemplate(_selectedTemplate!);
+        if (widget.initialTemplate != null) {
+          _selectedTemplate = _templates.firstWhere(
+            (t) => t.id == widget.initialTemplate!.id,
+            orElse: () => _templates.first,
+          );
+        } else {
+          _selectedTemplate = _templates.first;
+        }
+        if (widget.initialMetadata == null) {
+          _applyTemplate(_selectedTemplate!);
+        }
       }
     });
   }
