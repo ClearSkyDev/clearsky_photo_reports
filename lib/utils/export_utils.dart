@@ -46,14 +46,15 @@ Future<File?> exportAsZip(SavedReport report) async {
   archive.addFile(ArchiveFile('report.html', htmlBytes.length, htmlBytes));
   archive.addFile(ArchiveFile('report.pdf', pdfBytes.length, pdfBytes));
 
-  for (final entry in report.sectionPhotos.entries) {
-    final section = entry.key.replaceAll(RegExp(r'\s+'), '');
-    for (final photo in entry.value) {
-      try {
-        final file = File(photo.photoUrl);
-        if (!await file.exists()) continue;
-        final bytes = await file.readAsBytes();
-        final label = photo.label.isNotEmpty ? photo.label : 'Unlabeled';
+  for (final struct in report.structures) {
+    for (final entry in struct.sectionPhotos.entries) {
+      final section = '${struct.name}_${entry.key}'.replaceAll(RegExp(r'\s+'), '');
+      for (final photo in entry.value) {
+        try {
+          final file = File(photo.photoUrl);
+          if (!await file.exists()) continue;
+          final bytes = await file.readAsBytes();
+          final label = photo.label.isNotEmpty ? photo.label : 'Unlabeled';
         final damage =
             photo.damageType.isNotEmpty ? photo.damageType : 'Unknown';
         final damage =
@@ -66,7 +67,9 @@ Future<File?> exportAsZip(SavedReport report) async {
       } catch (_) {
         // ignore file errors
       }
+      }
     }
+  }
   }
 
   final zipData = ZipEncoder().encode(archive)!;
@@ -131,28 +134,34 @@ Future<String> _generateHtml(SavedReport report) async {
       ..writeln('<p>${report.summary}</p>')
       ..writeln('</div>');
   }
-  for (final section in kInspectionSections) {
-    final photos = report.sectionPhotos[section] ?? [];
-    if (photos.isEmpty) continue;
-    buffer.writeln('<h2>$section</h2>');
-    buffer.writeln('<div style="display:flex;flex-wrap:wrap;">');
-    for (final photo in photos) {
-      final label = photo.label.isNotEmpty ? photo.label : 'Unlabeled';
-      final damage =
-          photo.damageType.isNotEmpty ? photo.damageType : 'Unknown';
-      buffer
-        ..writeln('<div style="width:300px;margin:5px;text-align:center;">')
-        ..writeln('<img src="${photo.photoUrl}" width="300" height="300" style="object-fit:cover;"><br>');
-      final ts = photo.timestamp?.toLocal().toString().split('.').first ?? '';
-      String gps = '';
-      if (showGps && photo.latitude != null && photo.longitude != null) {
-        gps = '<br><a href="https://www.google.com/maps/search/?api=1&query=${photo.latitude},${photo.longitude}">${photo.latitude!.toStringAsFixed(4)}, ${photo.longitude!.toStringAsFixed(4)}</a>';
-      }
-      buffer
-        ..writeln('<span>$label - $damage<br>$ts$gps</span>')
-        ..writeln('</div>');
+  for (final struct in report.structures) {
+    if (report.structures.length > 1) {
+      buffer.writeln('<h2>${struct.name}</h2>');
     }
-    buffer.writeln('</div>');
+    for (final section in kInspectionSections) {
+      final photos = struct.sectionPhotos[section] ?? [];
+      if (photos.isEmpty) continue;
+      if (report.structures.length > 1) buffer.writeln('<h3>$section</h3>');
+      else buffer.writeln('<h2>$section</h2>');
+      buffer.writeln('<div style="display:flex;flex-wrap:wrap;">');
+      for (final photo in photos) {
+        final label = photo.label.isNotEmpty ? photo.label : 'Unlabeled';
+        final damage =
+            photo.damageType.isNotEmpty ? photo.damageType : 'Unknown';
+        buffer
+          ..writeln('<div style="width:300px;margin:5px;text-align:center;">')
+          ..writeln('<img src="${photo.photoUrl}" width="300" height="300" style="object-fit:cover;"><br>');
+        final ts = photo.timestamp?.toLocal().toString().split('.').first ?? '';
+        String gps = '';
+        if (showGps && photo.latitude != null && photo.longitude != null) {
+          gps = '<br><a href="https://www.google.com/maps/search/?api=1&query=${photo.latitude},${photo.longitude}">${photo.latitude!.toStringAsFixed(4)}, ${photo.longitude!.toStringAsFixed(4)}</a>';
+        }
+        buffer
+          ..writeln('<span>$label - $damage<br>$ts$gps</span>')
+          ..writeln('</div>');
+      }
+      buffer.writeln('</div>');
+    }
   }
 
   buffer
@@ -222,15 +231,19 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
 
   Future<List<pw.Widget>> buildSections() async {
     final widgets = <pw.Widget>[];
-    for (final section in kInspectionSections) {
-      final photos = report.sectionPhotos[section] ?? [];
-      if (photos.isEmpty) continue;
-      widgets.add(pw.Text(section,
-          style: pw.TextStyle(
-              fontSize: 18, fontWeight: pw.FontWeight.bold)));
-      widgets.add(pw.SizedBox(height: 8));
-      widgets.add(await buildWrap(photos));
-      widgets.add(pw.SizedBox(height: 20));
+    for (final struct in report.structures) {
+      if (report.structures.length > 1) {
+        widgets.add(_pdfSectionHeader(struct.name));
+        widgets.add(pw.SizedBox(height: 10));
+      }
+      for (final section in kInspectionSections) {
+        final photos = struct.sectionPhotos[section] ?? [];
+        if (photos.isEmpty) continue;
+        widgets.add(_pdfSectionHeader(section));
+        widgets.add(pw.SizedBox(height: 8));
+        widgets.add(await buildWrap(photos));
+        widgets.add(pw.SizedBox(height: 20));
+      }
     }
     return widgets;
   }

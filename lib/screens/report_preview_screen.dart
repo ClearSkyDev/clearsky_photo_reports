@@ -8,6 +8,7 @@ import '../models/photo_entry.dart';
 import '../models/inspection_metadata.dart';
 import '../models/inspection_sections.dart';
 import '../models/saved_report.dart';
+import '../models/inspected_structure.dart';
 import '../models/checklist.dart';
 import 'dart:html' as html; // for HTML download (web only)
 import 'package:pdf/widgets.dart' as pw;
@@ -23,12 +24,12 @@ import 'package:path_provider/path_provider.dart';
 import '../utils/export_utils.dart';
 import '../utils/share_utils.dart';
 
+import '../models/inspected_structure.dart';
+
 class ReportPreviewScreen extends StatefulWidget {
   final List<PhotoEntry>? photos;
   final InspectionMetadata metadata;
-  final Map<String, List<PhotoEntry>>? sections;
-  final List<Map<String, List<PhotoEntry>>>? additionalStructures;
-  final List<String>? additionalNames;
+  final List<InspectedStructure>? structures;
   final bool readOnly;
   final String? summary;
   final SavedReport? savedReport;
@@ -37,9 +38,7 @@ class ReportPreviewScreen extends StatefulWidget {
   const ReportPreviewScreen({
     super.key,
     this.photos,
-    this.sections,
-    this.additionalStructures,
-    this.additionalNames,
+    this.structures,
     required this.metadata,
     this.readOnly = false,
     this.summary,
@@ -117,24 +116,15 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
   List<MapEntry<String, List<PhotoEntry>>> _gatherGroups() {
     final List<MapEntry<String, List<PhotoEntry>>> groups = [];
 
-    if (widget.sections != null) {
-      for (var section in kInspectionSections) {
-        final photos = widget.sections![section] ?? [];
-        if (photos.isNotEmpty) {
-          groups.add(MapEntry(section, photos));
-        }
-      }
-    }
-
-    if (widget.additionalStructures != null &&
-        widget.additionalNames != null) {
-      for (int i = 0; i < widget.additionalStructures!.length; i++) {
-        final name = widget.additionalNames![i];
-        final sections = widget.additionalStructures![i];
+    if (widget.structures != null) {
+      for (final struct in widget.structures!) {
         for (var section in kInspectionSections) {
-          final photos = sections[section] ?? [];
+          final photos = struct.sectionPhotos[section] ?? [];
           if (photos.isNotEmpty) {
-            groups.add(MapEntry('$name - $section', photos));
+            final label = widget.structures!.length > 1
+                ? '${struct.name} - $section'
+                : section;
+            groups.add(MapEntry(label, photos));
           }
         }
       }
@@ -227,39 +217,19 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
     }
     buffer.writeln('</ul>');
 
-    if (widget.sections != null) {
-      for (var section in kInspectionSections) {
-        final photos = widget.sections![section] ?? [];
-        if (photos.isEmpty) continue;
-        buffer.writeln('<h2>$section</h2>');
-        buffer.writeln('<div style="display:flex;flex-wrap:wrap;">');
-        for (var photo in photos) {
-          final label = photo.label.isNotEmpty ? photo.label : 'Unlabeled';
-          final damage =
-              photo.damageType.isNotEmpty ? photo.damageType : 'Unknown';
-          buffer.writeln('<div style="width:300px;margin:5px;text-align:center;">');
-          buffer.writeln('<img src="${photo.url}" width="300" height="300" style="object-fit:cover;"><br>');
-          final ts = photo.capturedAt.toLocal().toString().split('.').first;
-          String gps = '';
-          if (_showGps && photo.latitude != null && photo.longitude != null) {
-            gps = '<br><a href="https://www.google.com/maps/search/?api=1&query=${photo.latitude},${photo.longitude}">${photo.latitude!.toStringAsFixed(4)}, ${photo.longitude!.toStringAsFixed(4)}</a>';
-          }
-          buffer.writeln('<span>$label - $damage<br>$ts$gps</span>');
-          buffer.writeln('</div>');
+    if (widget.structures != null) {
+      for (final struct in widget.structures!) {
+        if (widget.structures!.length > 1) {
+          buffer.writeln('<h2>${struct.name}</h2>');
         }
-        buffer.writeln('</div>');
-      }
-    }
-
-    if (widget.additionalStructures != null && widget.additionalNames != null) {
-      for (int i = 0; i < widget.additionalStructures!.length; i++) {
-        final name = widget.additionalNames![i];
-        final sections = widget.additionalStructures![i];
-        buffer.writeln('<h2>$name</h2>');
         for (var section in kInspectionSections) {
-          final photos = sections[section] ?? [];
+          final photos = struct.sectionPhotos[section] ?? [];
           if (photos.isEmpty) continue;
-          buffer.writeln('<h3>$section</h3>');
+          if (widget.structures!.length > 1) {
+            buffer.writeln('<h3>$section</h3>');
+          } else {
+            buffer.writeln('<h2>$section</h2>');
+          }
           buffer.writeln('<div style="display:flex;flex-wrap:wrap;">');
           for (var photo in photos) {
             final label = photo.label.isNotEmpty ? photo.label : 'Unlabeled';
@@ -383,25 +353,14 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
       return pw.Wrap(spacing: 10, runSpacing: 10, children: items);
     }
 
-    if (widget.sections != null) {
-      for (var section in kInspectionSections) {
-        final photos = widget.sections![section] ?? [];
-        if (photos.isEmpty) continue;
-        widgets.add(_pdfSectionHeader(section));
-        widgets.add(pw.SizedBox(height: 8));
-        widgets.add(await buildWrap(photos));
-        widgets.add(pw.SizedBox(height: 20));
-      }
-    }
-
-    if (widget.additionalStructures != null && widget.additionalNames != null) {
-      for (int i = 0; i < widget.additionalStructures!.length; i++) {
-        final name = widget.additionalNames![i];
-        final sections = widget.additionalStructures![i];
-        widgets.add(_pdfSectionHeader(name));
-        widgets.add(pw.SizedBox(height: 10));
+    if (widget.structures != null) {
+      for (final struct in widget.structures!) {
+        if (widget.structures!.length > 1) {
+          widgets.add(_pdfSectionHeader(struct.name));
+          widgets.add(pw.SizedBox(height: 10));
+        }
         for (var section in kInspectionSections) {
-          final photos = sections[section] ?? [];
+          final photos = struct.sectionPhotos[section] ?? [];
           if (photos.isEmpty) continue;
           widgets.add(_pdfSectionHeader(section));
           widgets.add(pw.SizedBox(height: 8));
@@ -639,18 +598,13 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
       }
     }
 
-    if (widget.sections != null) {
-      for (final entry in widget.sections!.entries) {
-        await addPhotos(entry.key, entry.value);
-      }
-    }
-
-    if (widget.additionalStructures != null && widget.additionalNames != null) {
-      for (int i = 0; i < widget.additionalStructures!.length; i++) {
-        final name = widget.additionalNames![i];
-        final sections = widget.additionalStructures![i];
-        for (final entry in sections.entries) {
-          await addPhotos('$name - ${entry.key}', entry.value);
+    if (widget.structures != null) {
+      for (final struct in widget.structures!) {
+        for (final entry in struct.sectionPhotos.entries) {
+          final label = widget.structures!.length > 1
+              ? '${struct.name} - ${entry.key}'
+              : entry.key;
+          await addPhotos(label, entry.value);
         }
       }
     }
@@ -898,9 +852,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
                     MaterialPageRoute(
                       builder: (_) => SendReportScreen(
                         metadata: _metadata,
-                        sections: widget.sections,
-                        additionalStructures: widget.additionalStructures,
-                        additionalNames: widget.additionalNames,
+                        structures: widget.structures,
                         summary: _summaryController.text,
                         signature: _signature,
                       ),

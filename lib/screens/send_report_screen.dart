@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/inspection_metadata.dart';
 import '../models/photo_entry.dart';
 import '../models/saved_report.dart';
+import '../models/inspected_structure.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'dart:io';
@@ -24,18 +25,14 @@ import 'inspection_checklist_screen.dart';
 
 class SendReportScreen extends StatefulWidget {
   final InspectionMetadata metadata;
-  final Map<String, List<PhotoEntry>>? sections;
-  final List<Map<String, List<PhotoEntry>>>? additionalStructures;
-  final List<String>? additionalNames;
+  final List<InspectedStructure>? structures;
   final String? summary;
   final Uint8List? signature;
 
   const SendReportScreen({
     super.key,
     required this.metadata,
-    this.sections,
-    this.additionalStructures,
-    this.additionalNames,
+    this.structures,
     this.summary,
     this.signature,
   });
@@ -100,28 +97,18 @@ class _SendReportScreenState extends State<SendReportScreen> {
       return result;
     }
 
-    final sectionPhotos = <String, List<ReportPhotoEntry>>{};
+    final structs = <InspectedStructure>[];
 
-    if (widget.sections != null) {
-      for (var entry in widget.sections!.entries) {
-        final uploaded = await uploadSection(entry.key, entry.value);
-        if (uploaded.isNotEmpty) {
-          sectionPhotos[entry.key] = uploaded;
-        }
-      }
-    }
-
-    if (widget.additionalStructures != null && widget.additionalNames != null) {
-      for (int i = 0; i < widget.additionalStructures!.length; i++) {
-        final name = widget.additionalNames![i];
-        final sections = widget.additionalStructures![i];
-        for (var entry in sections.entries) {
-          final label = '$name - ${entry.key}';
-          final uploaded = await uploadSection(label, entry.value);
+    if (widget.structures != null) {
+      for (final struct in widget.structures!) {
+        final uploadedSections = <String, List<ReportPhotoEntry>>{};
+        for (var entry in struct.sectionPhotos.entries) {
+          final uploaded = await uploadSection('${struct.name}/${entry.key}', entry.value);
           if (uploaded.isNotEmpty) {
-            sectionPhotos[label] = uploaded;
+            uploadedSections[entry.key] = uploaded;
           }
         }
+        structs.add(InspectedStructure(name: struct.name, sectionPhotos: uploadedSections));
       }
     }
 
@@ -158,7 +145,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
       id: reportId,
       userId: profile?.id,
       inspectionMetadata: metadataMap,
-      sectionPhotos: sectionPhotos,
+      structures: structs,
       summary: widget.summary,
       signature: signatureUrl,
     );

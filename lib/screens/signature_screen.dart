@@ -5,22 +5,19 @@ import 'package:flutter/material.dart';
 
 import '../models/inspection_metadata.dart';
 import '../models/photo_entry.dart';
+import '../models/inspected_structure.dart';
 import '../models/checklist.dart';
 import 'report_preview_screen.dart';
 import '../widgets/signature_pad.dart';
 
 class SignatureScreen extends StatefulWidget {
   final InspectionMetadata metadata;
-  final Map<String, List<PhotoEntry>> sections;
-  final List<Map<String, List<PhotoEntry>>> additionalStructures;
-  final List<String> additionalNames;
+  final List<InspectedStructure> structures;
 
   const SignatureScreen({
     super.key,
     required this.metadata,
-    required this.sections,
-    required this.additionalStructures,
-    required this.additionalNames,
+    required this.structures,
   });
 
   @override
@@ -45,10 +42,8 @@ class _SignatureScreenState extends State<SignatureScreen> {
       context,
       MaterialPageRoute(
         builder: (_) => ReportPreviewScreen(
-          sections: widget.sections,
-          additionalStructures: widget.additionalStructures,
-          additionalNames: widget.additionalNames,
           metadata: widget.metadata,
+          structures: widget.structures,
           signature: _signatureBytes,
         ),
       ),
