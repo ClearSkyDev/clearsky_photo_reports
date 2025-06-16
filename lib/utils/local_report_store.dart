@@ -78,6 +78,7 @@ class LocalReportStore {
       structures: updatedStructs,
       summary: report.summary,
       summaryText: report.summaryText,
+      templateId: report.templateId,
       createdAt: report.createdAt,
       isFinalized: report.isFinalized,
       publicReportId: report.publicReportId,

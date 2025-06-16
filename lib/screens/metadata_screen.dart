@@ -5,6 +5,8 @@ import '../models/inspector_profile.dart';
 import '../models/inspection_metadata.dart';
 import '../models/checklist.dart';
 import 'photo_upload_screen.dart';
+import '../models/report_template.dart';
+import '../utils/template_store.dart';
 
 class MetadataScreen extends StatefulWidget {
   const MetadataScreen({super.key});
@@ -23,17 +25,47 @@ class _MetadataScreenState extends State<MetadataScreen> {
   final TextEditingController _weatherNotesController = TextEditingController();
   DateTime _inspectionDate = DateTime.now();
   PerilType _selectedPeril = PerilType.wind;
+  List<ReportTemplate> _templates = [];
+  ReportTemplate? _selectedTemplate;
 
   @override
   void initState() {
     super.initState();
     _loadProfile();
+    _loadTemplates();
   }
 
   Future<void> _loadProfile() async {
     final profile = await ProfileStorage.load();
     if (profile != null) {
       _inspectorNameController.text = profile.name;
+    }
+  }
+
+  Future<void> _loadTemplates() async {
+    final items = await TemplateStore.loadTemplates();
+    setState(() {
+      _templates = items;
+      if (_templates.isNotEmpty) {
+        _selectedTemplate = _templates.first;
+        _applyTemplate(_selectedTemplate!);
+      }
+    });
+  }
+
+  void _applyTemplate(ReportTemplate template) {
+    final meta = template.defaultMetadata;
+    if (meta['clientName'] != null) {
+      _clientNameController.text = meta['clientName'];
+    }
+    if (meta['propertyAddress'] != null) {
+      _propertyAddressController.text = meta['propertyAddress'];
+    }
+    if (meta['inspectorName'] != null) {
+      _inspectorNameController.text = meta['inspectorName'];
+    }
+    if (meta['weatherNotes'] != null) {
+      _weatherNotesController.text = meta['weatherNotes'];
     }
   }
 
@@ -75,7 +107,10 @@ class _MetadataScreenState extends State<MetadataScreen> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => PhotoUploadScreen(metadata: metadata),
+          builder: (context) => PhotoUploadScreen(
+            metadata: metadata,
+            template: _selectedTemplate,
+          ),
         ),
       );
     }
@@ -91,6 +126,28 @@ class _MetadataScreenState extends State<MetadataScreen> {
           key: _formKey,
           child: ListView(
             children: [
+              if (_templates.isNotEmpty)
+                DropdownButtonFormField<String>(
+                  value: _selectedTemplate?.id,
+                  decoration:
+                      const InputDecoration(labelText: 'Inspection Template'),
+                  items: _templates
+                      .map(
+                        (t) => DropdownMenuItem(
+                          value: t.id,
+                          child: Text(t.name),
+                        ),
+                      )
+                      .toList(),
+                  onChanged: (val) {
+                    final template =
+                        _templates.firstWhere((t) => t.id == val, orElse: () => _templates.first);
+                    setState(() {
+                      _selectedTemplate = template;
+                      _applyTemplate(template);
+                    });
+                  },
+                ),
               TextFormField(
                 controller: _clientNameController,
                 decoration: const InputDecoration(labelText: 'Client Name'),

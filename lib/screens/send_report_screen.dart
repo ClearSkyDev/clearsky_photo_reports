@@ -12,6 +12,7 @@ import 'capture_signature_screen.dart';
 import '../utils/local_report_store.dart';
 import '../utils/export_utils.dart';
 import '../utils/profile_storage.dart';
+import '../models/report_template.dart';
 import '../models/checklist.dart';
 import '../utils/summary_utils.dart';
 import 'package:flutter/services.dart';
@@ -38,6 +39,7 @@ class SendReportScreen extends StatefulWidget {
   final String? summary;
   final String? summaryText;
   final Uint8List? signature;
+  final ReportTemplate? template;
 
   const SendReportScreen({
     super.key,
@@ -46,6 +48,7 @@ class SendReportScreen extends StatefulWidget {
     this.summary,
     this.summaryText,
     this.signature,
+    this.template,
   });
 
   @override
@@ -199,6 +202,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
       summaryText: _summaryTextController.text,
       signature: signatureUrl,
       theme: theme,
+      templateId: widget.template?.id,
       lastAuditPassed: null,
       lastAuditIssues: null,
     );
@@ -295,6 +299,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
           createdAt: _savedReport!.createdAt,
           isFinalized: _savedReport!.isFinalized,
           publicReportId: _savedReport!.publicReportId,
+          templateId: _savedReport!.templateId,
           lastAuditPassed: _savedReport!.lastAuditPassed,
           lastAuditIssues: _savedReport!.lastAuditIssues,
         );
@@ -494,6 +499,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
           createdAt: _savedReport!.createdAt,
           isFinalized: true,
           publicReportId: publicId,
+          templateId: _savedReport!.templateId,
           lastAuditPassed: _savedReport!.lastAuditPassed,
           lastAuditIssues: _savedReport!.lastAuditIssues,
         );

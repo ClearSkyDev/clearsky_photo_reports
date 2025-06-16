@@ -16,6 +16,7 @@ class SavedReport {
   final String? signature;
   /// Random ID used for public sharing of the report.
   final String? publicReportId;
+  final String? templateId;
   final DateTime createdAt;
   final bool isFinalized;
   final ReportTheme? theme;
@@ -31,6 +32,7 @@ class SavedReport {
     this.summaryText,
     this.signature,
     this.publicReportId,
+    this.templateId,
     DateTime? createdAt,
     this.isFinalized = false,
     this.theme,
@@ -49,6 +51,7 @@ class SavedReport {
       if (summaryText != null) 'summaryText': summaryText,
       if (signature != null) 'signature': signature,
       if (publicReportId != null) 'publicReportId': publicReportId,
+      if (templateId != null) 'templateId': templateId,
       if (theme != null) 'theme': theme!.toMap(),
       if (lastAuditPassed != null) 'lastAuditPassed': lastAuditPassed,
       if (lastAuditIssues != null)
@@ -74,6 +77,7 @@ class SavedReport {
       summaryText: map['summaryText'] as String?,
       signature: map['signature'] as String?,
       publicReportId: map['publicReportId'] as String?,
+      templateId: map['templateId'] as String?,
       createdAt: map['createdAt'] != null
           ? DateTime.fromMillisecondsSinceEpoch(map['createdAt'])
           : DateTime.now(),

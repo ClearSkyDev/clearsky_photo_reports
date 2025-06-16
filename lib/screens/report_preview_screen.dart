@@ -10,6 +10,7 @@ import '../models/inspection_sections.dart';
 import '../models/saved_report.dart';
 import '../models/inspected_structure.dart';
 import '../models/checklist.dart';
+import '../models/report_template.dart';
 import 'dart:html' as html; // for HTML download (web only)
 import 'package:pdf/widgets.dart' as pw;
 import 'package:pdf/pdf.dart';
@@ -32,6 +33,7 @@ class ReportPreviewScreen extends StatefulWidget {
   final List<PhotoEntry>? photos;
   final InspectionMetadata metadata;
   final List<InspectedStructure>? structures;
+  final ReportTemplate? template;
   final bool readOnly;
   final String? summary;
   final SavedReport? savedReport;
@@ -42,6 +44,7 @@ class ReportPreviewScreen extends StatefulWidget {
     this.photos,
     this.structures,
     required this.metadata,
+    this.template,
     this.readOnly = false,
     this.summary,
     this.savedReport,
@@ -128,7 +131,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
 
     if (widget.structures != null) {
       for (final struct in widget.structures!) {
-        for (var section in kInspectionSections) {
+        for (var section in widget.template?.sections ?? kInspectionSections) {
           final photos = struct.sectionPhotos[section] ?? [];
           if (photos.isNotEmpty) {
             final label = widget.structures!.length > 1
@@ -245,7 +248,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
         if (widget.structures!.length > 1) {
           buffer.writeln('<h2>${struct.name}</h2>');
         }
-        for (var section in kInspectionSections) {
+        for (var section in widget.template?.sections ?? kInspectionSections) {
           final photos = struct.sectionPhotos[section] ?? [];
           if (photos.isEmpty) continue;
           if (widget.structures!.length > 1) {
@@ -392,7 +395,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
           widgets.add(_pdfSectionHeader(struct.name));
           widgets.add(pw.SizedBox(height: 10));
         }
-        for (var section in kInspectionSections) {
+        for (var section in widget.template?.sections ?? kInspectionSections) {
           final photos = struct.sectionPhotos[section] ?? [];
           if (photos.isEmpty) continue;
           widgets.add(_pdfSectionHeader(section));
@@ -924,6 +927,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
                         summary: _summaryController.text,
                         summaryText: null,
                         signature: _signature,
+                        template: widget.template,
                       ),
                     ),
                   );

@@ -10,6 +10,7 @@ import 'screens/report_settings_screen.dart';
 import 'screens/report_theme_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/profile_screen.dart';
+import 'screens/template_manager_screen.dart';
 import 'models/inspector_profile.dart';
 import 'utils/profile_storage.dart';
 
@@ -45,6 +46,7 @@ class ClearSkyApp extends StatelessWidget {
         '/history': (context) => const ReportHistoryScreen(),
         '/settings': (context) => const ReportSettingsScreen(),
         '/theme': (context) => const ReportThemeScreen(),
+        '/templates': (context) => const TemplateManagerScreen(),
       },
     );
   }
