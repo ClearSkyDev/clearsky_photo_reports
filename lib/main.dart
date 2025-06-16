@@ -5,6 +5,7 @@ import 'screens/home_screen.dart';
 import 'screens/report_screen.dart';
 import 'screens/metadata_screen.dart';
 import 'screens/sectioned_photo_upload_screen.dart';
+import 'screens/drone_media_upload_screen.dart';
 import 'screens/report_history_screen.dart';
 import 'screens/report_settings_screen.dart';
 import 'screens/report_theme_screen.dart';
@@ -43,6 +44,7 @@ class ClearSkyApp extends StatelessWidget {
         '/report': (context) => const ReportScreen(),
         '/metadata': (context) => const MetadataScreen(),
         '/sectionedUpload': (context) => const SectionedPhotoUploadScreen(),
+        '/droneMedia': (context) => const DroneMediaUploadScreen(),
         '/history': (context) => const ReportHistoryScreen(),
         '/settings': (context) => const ReportSettingsScreen(),
         '/theme': (context) => const ReportThemeScreen(),

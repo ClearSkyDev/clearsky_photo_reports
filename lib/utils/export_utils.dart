@@ -247,6 +247,8 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
                       textAlign: pw.TextAlign.center,
                       style: const pw.TextStyle(
                           fontSize: 10, fontStyle: pw.FontStyle.italic)),
+                pw.Text('Source: ${photo.sourceType.name}${photo.captureDevice != null ? ' (${photo.captureDevice})' : ''}',
+                    style: const pw.TextStyle(fontSize: 10)),
               ],
             ),
           ),

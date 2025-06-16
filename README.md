@@ -1,6 +1,13 @@
 # clearsky-photo-reports
 AI powered roof inspection reporting app
 
+## Drone & Infrared Media
+
+Photos can now be tagged with a source type of `camera`, `drone` or `thermal`.
+The new **Drone Media Upload** screen allows bulk importing of aerial or
+infrared photos. Thumbnails show an icon representing the source and reports
+include the capture source for each image.
+
 ## React Native Prototype
 
 A minimal React Native + Expo implementation for the ClearSky Photo Intake screen is provided under `react_native/App.js`. This prototype demonstrates the collapsible inspection sections and photo upload workflow using Expo's image picker.
