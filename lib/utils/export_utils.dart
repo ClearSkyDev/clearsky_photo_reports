@@ -14,6 +14,8 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../models/report_theme.dart';
+
 import '../models/inspection_metadata.dart';
 import '../models/inspection_sections.dart';
 import '../models/saved_report.dart';
@@ -107,17 +109,21 @@ Future<String> _generateHtml(SavedReport report) async {
   final meta = InspectionMetadata.fromMap(report.inspectionMetadata);
   final prefs = await SharedPreferences.getInstance();
   final data = prefs.getString('report_settings');
+  final themeData = prefs.getString('report_theme');
   bool showGps = true;
   if (data != null) {
     final map = jsonDecode(data) as Map<String, dynamic>;
     showGps = map['showGpsData'] as bool? ?? true;
   }
+  ReportTheme theme = ReportTheme.defaultTheme;
+  if (themeData != null) {
+    theme = ReportTheme.fromMap(jsonDecode(themeData) as Map<String, dynamic>);
+  }
   final buffer = StringBuffer()
     ..writeln('<html><head><title>Photo Report</title>')
-    ..writeln(
-        '<style>body{font-family:Arial,sans-serif;} h2{background:#e0e0e0;padding:4px;}</style>')
+    ..writeln('<style>body{font-family:${theme.fontFamily},sans-serif;} h2{background:#${theme.primaryColor.toRadixString(16).padLeft(8,'0').substring(2)};padding:4px;}</style>')
     ..writeln('</head><body>')
-    ..writeln('<h1>Roof Inspection Report</h1>')
+    ..writeln('<img src="${theme.logoPath ?? 'assets/images/clearsky_logo.png'}" width="150"><h1>Roof Inspection Report</h1>')
     ..writeln('<p><strong>Client Name:</strong> ${meta.clientName}<br>')
     ..writeln('<strong>Property Address:</strong> ${meta.propertyAddress}<br>')
     ..writeln(
@@ -188,10 +194,15 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
   final meta = InspectionMetadata.fromMap(report.inspectionMetadata);
   final prefs = await SharedPreferences.getInstance();
   final data = prefs.getString('report_settings');
+  final themeData = prefs.getString('report_theme');
   bool showGps = true;
   if (data != null) {
     final map = jsonDecode(data) as Map<String, dynamic>;
     showGps = map['showGpsData'] as bool? ?? true;
+  }
+  ReportTheme theme = ReportTheme.defaultTheme;
+  if (themeData != null) {
+    theme = ReportTheme.fromMap(jsonDecode(themeData) as Map<String, dynamic>);
   }
   final pdf = pw.Document();
 
@@ -265,7 +276,7 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
   }
 
   final widgets = await buildSections();
-  final logoData = await rootBundle.load('assets/images/clearsky_logo.png');
+  final logoData = await rootBundle.load(theme.logoPath ?? 'assets/images/clearsky_logo.png');
   final logoBytes = logoData.buffer.asUint8List();
   final dateStr = DateTime.now().toLocal().toString().split(' ')[0];
   final summary = report.summary ?? '';
@@ -285,10 +296,13 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
               pw.SizedBox(height: 20),
               pw.Text('Roof Inspection Report',
                   style: pw.TextStyle(
-                      fontSize: 24, fontWeight: pw.FontWeight.bold)),
+                      fontSize: 24,
+                      fontWeight: pw.FontWeight.bold,
+                      color: PdfColor.fromInt(theme.primaryColor))),
               pw.SizedBox(height: 10),
               pw.Text('Prepared by ClearSky Roof Inspectors',
-                  style: const pw.TextStyle(fontSize: 18)),
+                  style: pw.TextStyle(
+                      fontSize: 18, color: PdfColor.fromInt(theme.primaryColor))),
               pw.SizedBox(height: 20),
               pw.Text('Client Name: ${meta.clientName}'),
               pw.Text('Property Address: ${meta.propertyAddress}'),

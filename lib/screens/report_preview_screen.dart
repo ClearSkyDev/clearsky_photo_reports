@@ -17,6 +17,7 @@ import 'package:printing/printing.dart';
 import 'send_report_screen.dart';
 import 'report_preview_webview.dart';
 import 'report_settings_screen.dart' show ReportSettings;
+import '../models/report_theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:path/path.dart' as p;
 import 'package:url_launcher/url_launcher.dart';
@@ -63,6 +64,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
   Uint8List? _signature;
   String _template = 'legacy';
   bool _showGps = true;
+  ReportTheme _theme = ReportTheme.defaultTheme;
   bool _exporting = false;
   File? _exportedFile;
 
@@ -79,12 +81,19 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
   Future<void> _loadTemplate() async {
     final prefs = await SharedPreferences.getInstance();
     final data = prefs.getString('report_settings');
+    final themeData = prefs.getString('report_theme');
     if (data != null) {
       final map = jsonDecode(data) as Map<String, dynamic>;
       final settings = ReportSettings.fromMap(map);
       setState(() {
         _template = settings.template;
         _showGps = settings.showGpsData;
+      });
+    }
+    if (themeData != null) {
+      final map = jsonDecode(themeData) as Map<String, dynamic>;
+      setState(() {
+        _theme = ReportTheme.fromMap(map);
       });
     }
   }
@@ -163,25 +172,27 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
   String generateHtmlPreview() {
     final buffer = StringBuffer();
     buffer.writeln('<html><head><title>Photo Report</title>');
+    final color = '#${_theme.primaryColor.toRadixString(16).padLeft(8, '0').substring(2)}';
     String style;
     switch (_template) {
       case 'modern':
         style =
-            'body { font-family: Arial, sans-serif; } h2 { background:#e0e0e0; padding:4px; }';
+            'h2 { background:$color; padding:4px; }';
         break;
       case 'clean':
         style =
-            'body { font-family: Helvetica, sans-serif; } h2 { border-bottom:1px solid #ccc; }';
+            'h2 { border-bottom:1px solid $color; }';
         break;
       default:
         style =
-            'body { font-family: Arial, sans-serif; }.cover { text-align:center; padding:40px; }.cover table { margin:20px auto; border-collapse:collapse; }.cover td { padding:4px 8px; }.signature { margin-top:40px; }';
+            '.cover { text-align:center; padding:40px; } .cover table { margin:20px auto; border-collapse:collapse; } .cover td { padding:4px 8px; } .signature { margin-top:40px; }';
     }
-    buffer.writeln('<style>$style</style></head><body>');
+    final bodyStyle = 'body { font-family:${_theme.fontFamily}, sans-serif; }';
+    buffer.writeln('<style>$bodyStyle $style</style></head><body>');
 
     buffer.writeln('<div class="cover">');
-    buffer.writeln(
-        '<img src="assets/images/clearsky_logo.png" alt="ClearSky Logo" style="width:200px;">');
+    final logo = _theme.logoPath ?? 'assets/images/clearsky_logo.png';
+    buffer.writeln('<img src="$logo" alt="Logo" style="width:200px;">');
     buffer.writeln('<h1>Roof Inspection Report</h1>');
     buffer.writeln('<h2>Prepared by ClearSky Roof Inspectors</h2>');
 
@@ -300,18 +311,20 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
   pw.Widget _pdfSectionHeader(String text) {
     if (_template == 'modern') {
       return pw.Container(
-        color: PdfColors.blue100,
+        color: PdfColor.fromInt(_theme.primaryColor).withOpacity(0.2),
         padding: const pw.EdgeInsets.all(4),
         child: pw.Text(text,
             style: pw.TextStyle(
                 fontSize: 18,
                 fontWeight: pw.FontWeight.bold,
-                color: PdfColors.blue800)),
+                color: PdfColor.fromInt(_theme.primaryColor))),
       );
     }
     return pw.Text(text,
-        style:
-            pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold));
+        style: pw.TextStyle(
+            fontSize: 18,
+            fontWeight: pw.FontWeight.bold,
+            color: PdfColor.fromInt(_theme.primaryColor)));
   }
 
   // Helper to load all images before PDF generation
@@ -397,8 +410,8 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
   Future<Uint8List> _downloadPdf() async {
     final pdf = pw.Document();
     final widgets = await _buildPdfWidgets();
-
-    final logoData = await rootBundle.load('assets/images/clearsky_logo.png');
+    final logoAsset = _theme.logoPath ?? 'assets/images/clearsky_logo.png';
+    final logoData = await rootBundle.load(logoAsset);
     final logoBytes = logoData.buffer.asUint8List();
     final dateStr = DateTime.now().toLocal().toString().split(' ')[0];
 
@@ -419,12 +432,16 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
                   style: pw.TextStyle(
                     fontSize: 24,
                     fontWeight: pw.FontWeight.bold,
+                    color: PdfColor.fromInt(_theme.primaryColor),
                   ),
                 ),
                 pw.SizedBox(height: 10),
                 pw.Text(
                   'Prepared by ClearSky Roof Inspectors',
-                  style: const pw.TextStyle(fontSize: 18),
+                  style: pw.TextStyle(
+                    fontSize: 18,
+                    color: PdfColor.fromInt(_theme.primaryColor),
+                  ),
                 ),
                 pw.SizedBox(height: 20),
                 pw.Text('Client Name: ${_metadata.clientName}'),

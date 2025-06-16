@@ -1,6 +1,8 @@
 import 'inspected_structure.dart';
 
 // Model for persisting completed reports in Firestore
+import 'report_theme.dart';
+
 class SavedReport {
   final String id;
   final String? userId;
@@ -15,6 +17,7 @@ class SavedReport {
   final String? publicReportId;
   final DateTime createdAt;
   final bool isFinalized;
+  final ReportTheme? theme;
 
   SavedReport({
     this.id = '',
@@ -27,6 +30,7 @@ class SavedReport {
     this.publicReportId,
     DateTime? createdAt,
     this.isFinalized = false,
+    this.theme,
   }) : createdAt = createdAt ?? DateTime.now();
 
   Map<String, dynamic> toMap() {
@@ -40,6 +44,7 @@ class SavedReport {
       if (summaryText != null) 'summaryText': summaryText,
       if (signature != null) 'signature': signature,
       if (publicReportId != null) 'publicReportId': publicReportId,
+      if (theme != null) 'theme': theme!.toMap(),
     };
   }
 
@@ -65,6 +70,9 @@ class SavedReport {
           ? DateTime.fromMillisecondsSinceEpoch(map['createdAt'])
           : DateTime.now(),
       isFinalized: map['isFinalized'] as bool? ?? false,
+      theme: map['theme'] != null
+          ? ReportTheme.fromMap(Map<String, dynamic>.from(map['theme']))
+          : null,
     );
   }
 }

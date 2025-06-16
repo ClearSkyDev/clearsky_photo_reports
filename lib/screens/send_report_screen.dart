@@ -22,6 +22,9 @@ import 'package:path_provider/path_provider.dart';
 import '../utils/share_utils.dart';
 import 'inspection_checklist_screen.dart';
 import 'photo_map_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
+import '../models/report_theme.dart';
 
 /// If Firebase is not desired:
 /// - Use `path_provider` and `shared_preferences` or `hive` to save report JSON locally
@@ -177,6 +180,13 @@ class _SendReportScreenState extends State<SendReportScreen> {
         'weatherNotes': widget.metadata.weatherNotes,
     };
 
+    final prefs = await SharedPreferences.getInstance();
+    ReportTheme theme = ReportTheme.defaultTheme;
+    final themeData = prefs.getString('report_theme');
+    if (themeData != null) {
+      theme = ReportTheme.fromMap(jsonDecode(themeData) as Map<String, dynamic>);
+    }
+
     final saved = SavedReport(
       id: reportId,
       userId: profile?.id,
@@ -185,6 +195,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
       summary: widget.summary,
       summaryText: _summaryTextController.text,
       signature: signatureUrl,
+      theme: theme,
     );
 
     await doc.set(saved.toMap());
