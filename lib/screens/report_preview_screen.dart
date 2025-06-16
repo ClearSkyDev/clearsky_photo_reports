@@ -26,6 +26,7 @@ class ReportPreviewScreen extends StatefulWidget {
   final bool readOnly;
   final String? summary;
   final SavedReport? savedReport;
+  final Uint8List? signature;
 
   const ReportPreviewScreen({
     super.key,
@@ -37,6 +38,7 @@ class ReportPreviewScreen extends StatefulWidget {
     this.readOnly = false,
     this.summary,
     this.savedReport,
+    this.signature,
   });
 
   @override
@@ -52,6 +54,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
       'This report is a professional opinion based on visual inspection only.';
   late final InspectionMetadata _metadata;
   late final TextEditingController _summaryController;
+  Uint8List? _signature;
   String _template = 'legacy';
   bool _exporting = false;
 
@@ -60,6 +63,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
     super.initState();
     _metadata = widget.metadata;
     _summaryController = TextEditingController(text: widget.summary ?? '');
+    _signature = widget.signature;
     _loadTemplate();
   }
 
@@ -195,7 +199,13 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
       buffer.writeln('</div>');
     }
 
-    buffer.writeln('<p class="signature">Inspector Signature: ________________________________</p>');
+    if (_signature != null) {
+      final encoded = base64Encode(_signature!);
+      buffer.writeln(
+          '<p class="signature"><img src="data:image/png;base64,$encoded" height="100"></p>');
+    } else {
+      buffer.writeln('<p class="signature">Inspector Signature: ________________________________</p>');
+    }
     buffer.writeln('<p style="font-size:12px;">$_coverDisclaimer</p>');
     buffer.writeln('</div>');
     buffer.writeln('<hr>');
@@ -436,17 +446,21 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
               pw.Text('Inspector Name: ${_metadata.inspectorName}'),
             pw.SizedBox(height: 20),
             ...widgets,
-            pw.SizedBox(height: 40),
-            pw.Column(
-              crossAxisAlignment: pw.CrossAxisAlignment.start,
-              children: [
-                pw.Container(height: 1, width: double.infinity, color: PdfColors.black),
-                pw.SizedBox(height: 8),
-                pw.Text('Inspector Signature'),
-                if (_metadata.inspectorName != null)
-                  pw.Text('${_metadata.inspectorName!} – $dateStr'),
-              ],
-            ),
+              pw.SizedBox(height: 40),
+              pw.Column(
+                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                children: [
+                  pw.Container(height: 1, width: double.infinity, color: PdfColors.black),
+                  pw.SizedBox(height: 8),
+                  pw.Text('Inspector Signature'),
+                  if (_signature != null) ...[
+                    pw.SizedBox(height: 4),
+                    pw.Image(pw.MemoryImage(_signature!), height: 80),
+                  ],
+                  if (_metadata.inspectorName != null)
+                    pw.Text('${_metadata.inspectorName!} – $dateStr'),
+                ],
+              ),
           ],
         ),
       );
@@ -605,6 +619,21 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
                     maxLines: 3,
                   ),
           ),
+          if (_signature != null)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Inspector Signature',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 4),
+                  Image.memory(_signature!, height: 100),
+                ],
+              ),
+            ),
           Expanded(
             child: Builder(
               builder: (context) {

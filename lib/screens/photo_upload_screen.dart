@@ -6,6 +6,7 @@ import '../models/photo_entry.dart';
 import '../models/inspection_metadata.dart';
 import '../utils/label_suggestion.dart';
 import 'report_preview_screen.dart';
+import 'signature_screen.dart';
 
 class PhotoUploadScreen extends StatefulWidget {
   final InspectionMetadata metadata;
@@ -424,7 +425,7 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => ReportPreviewScreen(
+                  builder: (context) => SignatureScreen(
                     sections: sectionPhotos,
                     additionalStructures: additionalStructures,
                     additionalNames: additionalNames,
