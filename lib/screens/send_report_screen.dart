@@ -13,6 +13,7 @@ import '../utils/local_report_store.dart';
 import '../utils/export_utils.dart';
 import '../utils/profile_storage.dart';
 import '../models/checklist.dart';
+import '../utils/summary_utils.dart';
 import 'package:flutter/services.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -30,6 +31,7 @@ class SendReportScreen extends StatefulWidget {
   final InspectionMetadata metadata;
   final List<InspectedStructure>? structures;
   final String? summary;
+  final String? summaryText;
   final Uint8List? signature;
 
   const SendReportScreen({
@@ -37,6 +39,7 @@ class SendReportScreen extends StatefulWidget {
     required this.metadata,
     this.structures,
     this.summary,
+    this.summaryText,
     this.signature,
   });
 
@@ -46,6 +49,7 @@ class SendReportScreen extends StatefulWidget {
 
 class _SendReportScreenState extends State<SendReportScreen> {
   final TextEditingController _emailController = TextEditingController();
+  late final TextEditingController _summaryTextController;
   bool _saving = false;
   String? _docId;
   SavedReport? _savedReport;
@@ -59,7 +63,16 @@ class _SendReportScreenState extends State<SendReportScreen> {
   @override
   void initState() {
     super.initState();
+    _summaryTextController =
+        TextEditingController(text: widget.summaryText ?? '');
     _initialize();
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _summaryTextController.dispose();
+    super.dispose();
   }
 
   Future<void> _initialize() async {
@@ -152,6 +165,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
       inspectionMetadata: metadataMap,
       structures: structs,
       summary: widget.summary,
+      summaryText: _summaryTextController.text,
       signature: signatureUrl,
     );
 
@@ -209,6 +223,47 @@ class _SendReportScreenState extends State<SendReportScreen> {
     if (_publicId == null) return;
     final uri = Uri.parse(_publicUrl);
     launchUrl(uri, mode: LaunchMode.externalApplication);
+  }
+
+  void _autoGenerateSummary() {
+    final metaMap = {
+      'clientName': widget.metadata.clientName,
+      'propertyAddress': widget.metadata.propertyAddress,
+      'inspectionDate': widget.metadata.inspectionDate.toIso8601String(),
+      if (widget.metadata.insuranceCarrier != null)
+        'insuranceCarrier': widget.metadata.insuranceCarrier,
+      'perilType': widget.metadata.perilType.name,
+      if (widget.metadata.inspectorName != null)
+        'inspectorName': widget.metadata.inspectorName,
+      if (widget.metadata.reportId != null)
+        'reportId': widget.metadata.reportId,
+      if (widget.metadata.weatherNotes != null)
+        'weatherNotes': widget.metadata.weatherNotes,
+    };
+    final report = SavedReport(
+      inspectionMetadata: metaMap,
+      structures: widget.structures ?? [],
+      summary: widget.summary,
+      summaryText: _summaryTextController.text,
+    );
+    final text = generateSummaryText(report);
+    setState(() {
+      _summaryTextController.text = text;
+      if (_savedReport != null) {
+        _savedReport = SavedReport(
+          id: _savedReport!.id,
+          userId: _savedReport!.userId,
+          inspectionMetadata: _savedReport!.inspectionMetadata,
+          structures: _savedReport!.structures,
+          summary: _savedReport!.summary,
+          summaryText: text,
+          signature: _savedReport!.signature,
+          createdAt: _savedReport!.createdAt,
+          isFinalized: _savedReport!.isFinalized,
+          publicReportId: _savedReport!.publicReportId,
+        );
+      }
+    });
   }
 
   void _downloadPdf() {
@@ -298,7 +353,11 @@ class _SendReportScreenState extends State<SendReportScreen> {
       await FirebaseFirestore.instance
           .collection('reports')
           .doc(_docId)
-          .update({'isFinalized': true, 'publicReportId': publicId});
+          .update({
+            'isFinalized': true,
+            'publicReportId': publicId,
+            'summaryText': _summaryTextController.text
+          });
     } catch (_) {}
 
     setState(() {
@@ -311,6 +370,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
           inspectionMetadata: _savedReport!.inspectionMetadata,
           structures: _savedReport!.structures,
           summary: _savedReport!.summary,
+          summaryText: _summaryTextController.text,
           signature: _savedReport!.signature,
           createdAt: _savedReport!.createdAt,
           isFinalized: true,
@@ -385,6 +445,18 @@ class _SendReportScreenState extends State<SendReportScreen> {
                 ),
               ],
             ],
+            TextField(
+              controller: _summaryTextController,
+              decoration: const InputDecoration(
+                  labelText: 'Summary of Findings'),
+              maxLines: 3,
+            ),
+            const SizedBox(height: 8),
+            ElevatedButton(
+              onPressed: _autoGenerateSummary,
+              child: const Text('Auto-Generate'),
+            ),
+            const SizedBox(height: 12),
             TextField(
               controller: _emailController,
               decoration: const InputDecoration(labelText: 'Client Email'),

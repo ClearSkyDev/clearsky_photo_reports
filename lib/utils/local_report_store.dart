@@ -76,6 +76,7 @@ class LocalReportStore {
       inspectionMetadata: report.inspectionMetadata,
       structures: updatedStructs,
       summary: report.summary,
+      summaryText: report.summaryText,
       createdAt: report.createdAt,
       isFinalized: report.isFinalized,
       publicReportId: report.publicReportId,

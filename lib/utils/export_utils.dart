@@ -127,6 +127,13 @@ Future<String> _generateHtml(SavedReport report) async {
   if (meta.inspectorName != null) {
     buffer.writeln('<p><strong>Inspector Name:</strong> ${meta.inspectorName}</p>');
   }
+  if (report.summaryText != null && report.summaryText!.isNotEmpty) {
+    buffer
+      ..writeln('<div style="border:1px solid #ccc;padding:8px;margin-top:20px;">')
+      ..writeln('<strong>Summary of Findings</strong><br>')
+      ..writeln('<p>${report.summaryText}</p>')
+      ..writeln('</div>');
+  }
   if (report.summary != null && report.summary!.isNotEmpty) {
     buffer
       ..writeln('<div style="border:1px solid #ccc;padding:8px;margin-top:20px;">')
@@ -253,6 +260,7 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
   final logoBytes = logoData.buffer.asUint8List();
   final dateStr = DateTime.now().toLocal().toString().split(' ')[0];
   final summary = report.summary ?? '';
+  final summaryText = report.summaryText ?? '';
 
   pdf
     ..addPage(
@@ -283,6 +291,22 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
               if (meta.inspectorName != null)
                 pw.Text('Inspector Name: ${meta.inspectorName}'),
               pw.SizedBox(height: 20),
+              if (summaryText.isNotEmpty)
+                pw.Container(
+                  width: double.infinity,
+                  padding: const pw.EdgeInsets.all(8),
+                  decoration:
+                      pw.BoxDecoration(border: pw.Border.all(color: PdfColors.grey)),
+                  child: pw.Column(
+                    crossAxisAlignment: pw.CrossAxisAlignment.start,
+                    children: [
+                      pw.Text('Summary of Findings',
+                          style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                      pw.SizedBox(height: 4),
+                      pw.Text(summaryText),
+                    ],
+                  ),
+                ),
               if (summary.isNotEmpty)
                 pw.Container(
                   width: double.infinity,
