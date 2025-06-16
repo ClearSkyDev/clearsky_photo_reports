@@ -39,6 +39,17 @@ class _SectionedPhotoUploadScreenState extends State<SectionedPhotoUploadScreen>
   // Nested map for additional structures: {structureName: {sectionName: photos}}
   final Map<String, Map<String, List<PhotoEntry>>> _additionalStructures = {};
 
+  IconData _getSourceIcon(SourceType type) {
+    switch (type) {
+      case SourceType.drone:
+        return Icons.flight;
+      case SourceType.thermal:
+        return Icons.thermostat;
+      default:
+        return Icons.camera_alt;
+    }
+  }
+
   Future<void> _pickImages(String section, [String? structure]) async {
     final List<XFile> selected = await _picker.pickMultiImage();
     if (selected.isNotEmpty) {
@@ -208,6 +219,15 @@ class _SectionedPhotoUploadScreenState extends State<SectionedPhotoUploadScreen>
                           bottom: 4,
                           right: 4,
                           child: const Icon(Icons.drag_handle, color: Colors.white),
+                        ),
+                        Positioned(
+                          bottom: 4,
+                          left: 4,
+                          child: Icon(
+                            _getSourceIcon(photos[index].sourceType),
+                            size: 16,
+                            color: Colors.white,
+                          ),
                         ),
                         Positioned(
                           bottom: 0,

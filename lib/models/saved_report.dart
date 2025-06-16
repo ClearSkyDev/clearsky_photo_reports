@@ -6,6 +6,7 @@ import '../utils/photo_audit.dart';
 import 'report_change.dart';
 import 'report_snapshot.dart';
 import 'report_collaborator.dart';
+import 'photo_entry.dart' show SourceType;
 
 class SavedReport {
   final String id;
@@ -152,6 +153,8 @@ class ReportPhotoEntry {
   final double? longitude;
   final String damageType;
   final String note;
+  final SourceType sourceType;
+  final String? captureDevice;
 
   ReportPhotoEntry({
     required this.label,
@@ -161,6 +164,8 @@ class ReportPhotoEntry {
     this.longitude,
     this.damageType = 'Unknown',
     this.note = '',
+    this.sourceType = SourceType.camera,
+    this.captureDevice,
   });
 
   Map<String, dynamic> toMap() {
@@ -172,6 +177,8 @@ class ReportPhotoEntry {
       if (longitude != null) 'longitude': longitude,
       'damageType': damageType,
       if (note.isNotEmpty) 'note': note,
+      'sourceType': sourceType.name,
+      if (captureDevice != null) 'captureDevice': captureDevice,
     };
   }
 
@@ -186,6 +193,10 @@ class ReportPhotoEntry {
       longitude: (map['longitude'] as num?)?.toDouble(),
       damageType: map['damageType'] as String? ?? 'Unknown',
       note: map['note'] as String? ?? '',
+      sourceType: SourceType.values.firstWhere(
+          (e) => e.name == map['sourceType'],
+          orElse: () => SourceType.camera),
+      captureDevice: map['captureDevice'] as String?,
     );
   }
 }

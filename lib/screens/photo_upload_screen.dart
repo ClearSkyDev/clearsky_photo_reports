@@ -39,6 +39,17 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
   final List<InspectedStructure> _structures = [];
   int _currentStructure = 0;
 
+  IconData _getSourceIcon(SourceType type) {
+    switch (type) {
+      case SourceType.drone:
+        return Icons.flight;
+      case SourceType.thermal:
+        return Icons.thermostat;
+      default:
+        return Icons.camera_alt;
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -486,6 +497,15 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
                                 ),
                               ),
                             ),
+                          Positioned(
+                            bottom: 4,
+                            left: 4,
+                            child: Icon(
+                              _getSourceIcon(photos[index].sourceType),
+                              size: 16,
+                              color: Colors.white,
+                            ),
+                          ),
                           Positioned(
                             bottom: 4,
                             right: 4,

@@ -1,3 +1,5 @@
+enum SourceType { camera, drone, thermal }
+
 class PhotoEntry {
   String url;
   String? originalUrl;
@@ -6,6 +8,8 @@ class PhotoEntry {
   String damageType;
   bool damageLoading;
   String note;
+  SourceType sourceType;
+  String? captureDevice;
   final DateTime capturedAt;
   final double? latitude;
   final double? longitude;
@@ -21,5 +25,7 @@ class PhotoEntry {
     this.damageType = 'Unknown',
     this.damageLoading = false,
     this.note = '',
+    this.sourceType = SourceType.camera,
+    this.captureDevice,
   }) : capturedAt = capturedAt ?? DateTime.now();
 }

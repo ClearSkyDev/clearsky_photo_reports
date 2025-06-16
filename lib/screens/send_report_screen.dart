@@ -143,7 +143,9 @@ class _SendReportScreenState extends State<SendReportScreen> {
               latitude: p.latitude,
               longitude: p.longitude,
               damageType: p.damageType,
-              note: p.note));
+              note: p.note,
+              sourceType: p.sourceType,
+              captureDevice: p.captureDevice));
         } catch (_) {}
       }
       return result;
