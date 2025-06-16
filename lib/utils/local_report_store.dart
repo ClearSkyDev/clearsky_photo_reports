@@ -57,6 +57,7 @@ class LocalReportStore {
           label: pEntry.label,
           photoUrl: dest,
           timestamp: pEntry.timestamp,
+          damageType: pEntry.damageType,
         ));
       }
       updatedPhotos[entry.key] = list;

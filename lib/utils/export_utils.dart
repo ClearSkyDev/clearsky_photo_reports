@@ -53,6 +53,10 @@ Future<File?> exportAsZip(SavedReport report) async {
         if (!await file.exists()) continue;
         final bytes = await file.readAsBytes();
         final label = photo.label.isNotEmpty ? photo.label : 'Unlabeled';
+        final damage =
+            photo.damageType.isNotEmpty ? photo.damageType : 'Unknown';
+        final damage =
+            photo.damageType.isNotEmpty ? photo.damageType : 'Unknown';
         final cleanLabel =
             label.replaceAll(RegExp(r'[^A-Za-z0-9_-]'), '_');
         final ext = p.extension(file.path);
@@ -126,11 +130,13 @@ String _generateHtml(SavedReport report) {
     buffer.writeln('<div style="display:flex;flex-wrap:wrap;">');
     for (final photo in photos) {
       final label = photo.label.isNotEmpty ? photo.label : 'Unlabeled';
+      final damage =
+          photo.damageType.isNotEmpty ? photo.damageType : 'Unknown';
       buffer
         ..writeln('<div style="width:300px;margin:5px;text-align:center;">')
         ..writeln(
             '<img src="${photo.photoUrl}" width="300" height="300" style="object-fit:cover;"><br>')
-        ..writeln('<span>$label</span>')
+        ..writeln('<span>$label - $damage</span>')
         ..writeln('</div>');
     }
     buffer.writeln('</div>');
@@ -157,6 +163,8 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
         if (!await file.exists()) continue;
         final bytes = await file.readAsBytes();
         final label = photo.label.isNotEmpty ? photo.label : 'Unlabeled';
+        final damage =
+            photo.damageType.isNotEmpty ? photo.damageType : 'Unknown';
         items.add(
           pw.Container(
             width: 150,
@@ -165,7 +173,7 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
                 pw.Image(pw.MemoryImage(bytes),
                     width: 150, height: 150, fit: pw.BoxFit.cover),
                 pw.SizedBox(height: 4),
-                pw.Text(label,
+                pw.Text('$label - $damage',
                     textAlign: pw.TextAlign.center,
                     style: const pw.TextStyle(fontSize: 12)),
               ],

@@ -87,7 +87,10 @@ class _SendReportScreenState extends State<SendReportScreen> {
           await ref.putFile(file);
           final url = await ref.getDownloadURL();
           result.add(ReportPhotoEntry(
-              label: p.label, photoUrl: url, timestamp: DateTime.now()));
+              label: p.label,
+              photoUrl: url,
+              timestamp: DateTime.now(),
+              damageType: p.damageType));
         } catch (_) {}
       }
       return result;
