@@ -62,11 +62,13 @@ class ReportPhotoEntry {
   final String label;
   final String photoUrl;
   final DateTime? timestamp;
+  final String damageType;
 
   ReportPhotoEntry({
     required this.label,
     required this.photoUrl,
     this.timestamp,
+    this.damageType = 'Unknown',
   });
 
   Map<String, dynamic> toMap() {
@@ -74,6 +76,7 @@ class ReportPhotoEntry {
       'label': label,
       'photoUrl': photoUrl,
       if (timestamp != null) 'timestamp': timestamp!.millisecondsSinceEpoch,
+      'damageType': damageType,
     };
   }
 
@@ -84,6 +87,7 @@ class ReportPhotoEntry {
       timestamp: map['timestamp'] != null
           ? DateTime.fromMillisecondsSinceEpoch(map['timestamp'])
           : null,
+      damageType: map['damageType'] as String? ?? 'Unknown',
     );
   }
 }

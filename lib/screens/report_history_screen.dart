@@ -117,8 +117,13 @@ class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
       onTap: () {
         final sections = <String, List<PhotoEntry>>{};
         report.sectionPhotos.forEach((key, value) {
-          sections[key] =
-              value.map((e) => PhotoEntry(url: e.photoUrl, label: e.label)).toList();
+          sections[key] = value
+              .map((e) => PhotoEntry(
+                    url: e.photoUrl,
+                    label: e.label,
+                    damageType: e.damageType,
+                  ))
+              .toList();
         });
         Navigator.push(
           context,

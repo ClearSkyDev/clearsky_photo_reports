@@ -223,11 +223,13 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
         buffer.writeln('<div style="display:flex;flex-wrap:wrap;">');
         for (var photo in photos) {
           final label = photo.label.isNotEmpty ? photo.label : 'Unlabeled';
+          final damage =
+              photo.damageType.isNotEmpty ? photo.damageType : 'Unknown';
           buffer.writeln(
               '<div style="width:300px;margin:5px;text-align:center;">');
           buffer.writeln(
               '<img src="${photo.url}" width="300" height="300" style="object-fit:cover;"><br>');
-          buffer.writeln('<span>$label</span>');
+          buffer.writeln('<span>$label - $damage</span>');
           buffer.writeln('</div>');
         }
         buffer.writeln('</div>');
@@ -246,11 +248,13 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
           buffer.writeln('<div style="display:flex;flex-wrap:wrap;">');
           for (var photo in photos) {
             final label = photo.label.isNotEmpty ? photo.label : 'Unlabeled';
+            final damage =
+                photo.damageType.isNotEmpty ? photo.damageType : 'Unknown';
             buffer.writeln(
                 '<div style="width:300px;margin:5px;text-align:center;">');
             buffer.writeln(
                 '<img src="${photo.url}" width="300" height="300" style="object-fit:cover;"><br>');
-            buffer.writeln('<span>$label</span>');
+            buffer.writeln('<span>$label - $damage</span>');
             buffer.writeln('</div>');
           }
           buffer.writeln('</div>');
@@ -312,6 +316,8 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
             await NetworkAssetBundle(Uri.parse(photo.url)).load("");
         final bytes = imageData.buffer.asUint8List();
         final label = photo.label.isNotEmpty ? photo.label : 'Unlabeled';
+        final damage =
+            photo.damageType.isNotEmpty ? photo.damageType : 'Unknown';
 
         items.add(
           pw.Container(
@@ -321,7 +327,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
                 pw.Image(pw.MemoryImage(bytes),
                     width: 150, height: 150, fit: pw.BoxFit.cover),
                 pw.SizedBox(height: 4),
-                pw.Text(label,
+                pw.Text('$label - $damage',
                     textAlign: pw.TextAlign.center,
                     style: const pw.TextStyle(fontSize: 12)),
               ],

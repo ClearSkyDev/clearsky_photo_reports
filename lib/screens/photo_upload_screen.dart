@@ -6,6 +6,7 @@ import '../models/inspection_sections.dart';
 import '../models/photo_entry.dart';
 import '../models/inspection_metadata.dart';
 import '../utils/label_suggestion.dart';
+import '../utils/damage_classification.dart';
 import 'report_preview_screen.dart';
 import 'signature_screen.dart';
 
@@ -49,14 +50,25 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
             ? sectionPhotos[section]!
             : additionalStructures[structure][section]!;
         for (var xfile in selected) {
-          final entry =
-              PhotoEntry(url: xfile.path, label: '', labelLoading: true);
+          final entry = PhotoEntry(
+            url: xfile.path,
+            label: '',
+            labelLoading: true,
+            damageLoading: true,
+          );
           target.add(entry);
           getSuggestedLabel(entry, section, _metadata).then((label) {
             setState(() {
               entry
                 ..label = label
                 ..labelLoading = false;
+            });
+          });
+          getDamageType(entry, section, _metadata).then((damage) {
+            setState(() {
+              entry
+                ..damageType = damage
+                ..damageLoading = false;
             });
           });
         }
@@ -317,6 +329,40 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
                                   style: const TextStyle(
                                     color: Colors.white,
                                     fontSize: 12,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          if (photos[index].damageLoading)
+                            Positioned(
+                              bottom: 20,
+                              left: 0,
+                              child: Container(
+                                color: Colors.redAccent,
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 4, vertical: 2),
+                                child: const Text(
+                                  'Detecting...',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 10,
+                                  ),
+                                ),
+                              ),
+                            )
+                          else if (photos[index].damageType.isNotEmpty && photos[index].damageType != 'Unknown')
+                            Positioned(
+                              bottom: 20,
+                              left: 0,
+                              child: Container(
+                                color: Colors.redAccent,
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 4, vertical: 2),
+                                child: Text(
+                                  photos[index].damageType,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 10,
                                   ),
                                 ),
                               ),
