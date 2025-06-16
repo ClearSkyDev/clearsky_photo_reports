@@ -1,0 +1,17 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /reports/{reportId} {
+      allow read: if request.auth != null && request.auth.token.email == resource.data.clientEmail;
+    }
+    match /reports/{reportId}/messages/{msgId} {
+      allow read, write: if request.auth != null && request.auth.token.email == get(/databases/$(database)/documents/reports/$(reportId)).data.clientEmail;
+    }
+    match /invoices/{invoiceId} {
+      allow read: if request.auth != null && request.auth.token.email == resource.data.clientEmail;
+    }
+    match /clientActivity/{id} {
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.uid;
+    }
+  }
+}
