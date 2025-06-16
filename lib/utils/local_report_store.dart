@@ -122,4 +122,16 @@ class LocalReportStore {
     reports.sort((a, b) => b.createdAt.compareTo(a.createdAt));
     return reports;
   }
+
+  Future<void> saveSnapshot(SavedReport report) async {
+    final base = await _reportsDir;
+    final id = report.id.isNotEmpty ? report.id : 'snapshot';
+    final dir = Directory(p.join(base.path, id));
+    if (!await dir.exists()) {
+      await dir.create(recursive: true);
+    }
+    final file = File(
+        p.join(dir.path, 'snapshot_${DateTime.now().millisecondsSinceEpoch}.json'));
+    await file.writeAsString(jsonEncode(report.toMap()));
+  }
 }

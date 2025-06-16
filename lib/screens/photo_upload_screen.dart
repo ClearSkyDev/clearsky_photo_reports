@@ -16,6 +16,8 @@ import 'report_preview_screen.dart';
 import 'signature_screen.dart';
 import 'photo_map_screen.dart';
 import 'photo_detail_screen.dart';
+import '../utils/change_history.dart';
+import '../models/report_change.dart';
 
 class PhotoUploadScreen extends StatefulWidget {
   final InspectionMetadata metadata;
@@ -204,10 +206,25 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
           TextButton(
             onPressed: () {
               setState(() {
+                final before = {
+                  'label': entry.label,
+                  'note': entry.note,
+                };
                 entry
                   ..label = controller.text
                   ..labelLoading = false;
                 entry.note = noteController.text;
+                changeHistory.add(
+                  ReportChange(
+                    type: 'photo_edit',
+                    target: entry.url,
+                    before: before,
+                    after: {
+                      'label': entry.label,
+                      'note': entry.note,
+                    },
+                  ),
+                );
               });
               Navigator.pop(context);
             },
@@ -508,6 +525,26 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
     return result;
   }
 
+  void _undoLastChange() {
+    final change = changeHistory.undo();
+    if (change == null) return;
+    if (change.type == 'photo_edit') {
+      for (var struct in _structures) {
+        for (var photos in struct.sectionPhotos.values) {
+          for (var p in photos) {
+            if (p.url == change.target) {
+              setState(() {
+                p.label = change.before['label'] ?? p.label;
+                p.note = change.before['note'] ?? p.note;
+              });
+              return;
+            }
+          }
+        }
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final List<Widget> items = [];
@@ -643,6 +680,12 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
             const Text('Photo Upload'),
           ],
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.undo),
+            onPressed: _undoLastChange,
+          ),
+        ],
       ),
       body: ListView(
         padding: const EdgeInsets.all(8),

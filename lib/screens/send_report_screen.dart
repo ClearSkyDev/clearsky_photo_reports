@@ -23,6 +23,7 @@ import 'package:path_provider/path_provider.dart';
 import '../utils/share_utils.dart';
 import 'inspection_checklist_screen.dart';
 import 'photo_map_screen.dart';
+import 'change_history_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import '../models/report_theme.dart';
@@ -373,6 +374,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
           const SnackBar(content: Text('ZIP exported')),
         );
         inspectionChecklist.markComplete('Report Exported');
+        LocalReportStore.instance.saveSnapshot(_savedReport!);
       }
     } finally {
       if (mounted && Navigator.of(context).canPop()) {
@@ -502,9 +504,15 @@ class _SendReportScreenState extends State<SendReportScreen> {
           templateId: _savedReport!.templateId,
           lastAuditPassed: _savedReport!.lastAuditPassed,
           lastAuditIssues: _savedReport!.lastAuditIssues,
+          changeLog: _savedReport!.changeLog,
+          snapshots: _savedReport!.snapshots,
         );
       }
     });
+
+    if (_savedReport != null) {
+      LocalReportStore.instance.saveSnapshot(_savedReport!);
+    }
 
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -684,6 +692,20 @@ class _SendReportScreenState extends State<SendReportScreen> {
                 style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
                 child: const Text('Finalize & Lock Report'),
               ),
+            const SizedBox(height: 12),
+            ElevatedButton(
+              onPressed: _savedReport == null
+                  ? null
+                  : () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => ChangeHistoryScreen(report: _savedReport!),
+                        ),
+                      );
+                    },
+              child: const Text('View History'),
+            ),
             const SizedBox(height: 12),
             ElevatedButton(
               onPressed: () => Navigator.push(

@@ -3,6 +3,8 @@ import 'inspected_structure.dart';
 // Model for persisting completed reports in Firestore
 import 'report_theme.dart';
 import '../utils/photo_audit.dart';
+import 'report_change.dart';
+import 'report_snapshot.dart';
 
 class SavedReport {
   final String id;
@@ -22,6 +24,8 @@ class SavedReport {
   final ReportTheme? theme;
   final bool? lastAuditPassed;
   final List<PhotoAuditIssue>? lastAuditIssues;
+  final List<ReportChange> changeLog;
+  final List<ReportSnapshot> snapshots;
 
   SavedReport({
     this.id = '',
@@ -38,6 +42,8 @@ class SavedReport {
     this.theme,
     this.lastAuditPassed,
     this.lastAuditIssues,
+    this.changeLog = const [],
+    this.snapshots = const [],
   }) : createdAt = createdAt ?? DateTime.now();
 
   Map<String, dynamic> toMap() {
@@ -56,6 +62,10 @@ class SavedReport {
       if (lastAuditPassed != null) 'lastAuditPassed': lastAuditPassed,
       if (lastAuditIssues != null)
         'lastAuditIssues': lastAuditIssues!.map((e) => e.toMap()).toList(),
+      if (changeLog.isNotEmpty)
+        'changeLog': changeLog.map((e) => e.toMap()).toList(),
+      if (snapshots.isNotEmpty)
+        'snapshots': snapshots.map((e) => e.toMap()).toList(),
     };
   }
 
@@ -92,6 +102,18 @@ class SavedReport {
                   PhotoAuditIssue.fromMap(Map<String, dynamic>.from(e as Map)))
               .toList()
           : null,
+      changeLog: map['changeLog'] != null
+          ? (map['changeLog'] as List)
+              .map((e) =>
+                  ReportChange.fromMap(Map<String, dynamic>.from(e as Map)))
+              .toList()
+          : [],
+      snapshots: map['snapshots'] != null
+          ? (map['snapshots'] as List)
+              .map((e) =>
+                  ReportSnapshot.fromMap(Map<String, dynamic>.from(e as Map)))
+              .toList()
+          : [],
     );
   }
 }
