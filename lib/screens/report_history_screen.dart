@@ -118,6 +118,8 @@ class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
           : const Icon(Icons.description),
       title: Text(meta.propertyAddress),
       subtitle: Text(subtitle),
+      trailing:
+          report.isFinalized ? const Icon(Icons.lock, color: Colors.red) : null,
       onTap: () {
         final structs = <InspectedStructure>[];
         for (var s in report.structures) {

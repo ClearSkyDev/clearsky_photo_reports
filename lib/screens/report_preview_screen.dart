@@ -631,6 +631,17 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
       appBar: AppBar(title: const Text('Review Report')),
       body: Column(
         children: [
+          if (widget.savedReport?.isFinalized == true)
+            Container(
+              width: double.infinity,
+              color: Colors.redAccent,
+              padding: const EdgeInsets.all(8),
+              child: const Text(
+                'FINALIZED',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(

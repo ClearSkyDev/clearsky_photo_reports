@@ -10,6 +10,7 @@ class SavedReport {
   /// Either a download URL or base64 encoded PNG of the inspector signature.
   final String? signature;
   final DateTime createdAt;
+  final bool isFinalized;
 
   SavedReport({
     this.id = '',
@@ -19,6 +20,7 @@ class SavedReport {
     this.summary,
     this.signature,
     DateTime? createdAt,
+    this.isFinalized = false,
   }) : createdAt = createdAt ?? DateTime.now();
 
   Map<String, dynamic> toMap() {
@@ -26,6 +28,7 @@ class SavedReport {
       'inspectionMetadata': inspectionMetadata,
       'structures': structures.map((s) => s.toMap()).toList(),
       'createdAt': createdAt.millisecondsSinceEpoch,
+      'isFinalized': isFinalized,
       if (userId != null) 'userId': userId,
       if (summary != null) 'summary': summary,
       if (signature != null) 'signature': signature,
@@ -51,6 +54,7 @@ class SavedReport {
       createdAt: map['createdAt'] != null
           ? DateTime.fromMillisecondsSinceEpoch(map['createdAt'])
           : DateTime.now(),
+      isFinalized: map['isFinalized'] as bool? ?? false,
     );
   }
 }
