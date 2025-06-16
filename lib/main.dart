@@ -20,6 +20,8 @@ import 'screens/profile_screen.dart';
 import 'screens/template_manager_screen.dart';
 import 'screens/public_report_screen.dart';
 import 'screens/public_links_screen.dart';
+import 'screens/client_signature_screen.dart';
+import 'screens/signature_status_screen.dart';
 import 'services/auth_service.dart';
 
 Future<void> main() async {
@@ -54,9 +56,16 @@ class ClearSkyApp extends StatelessWidget {
         '/profile': (context) => const ProfileScreen(),
         '/manageTeam': (context) => const ManageTeamScreen(),
         '/publicLinks': (context) => const PublicLinksScreen(),
+        '/signatureStatus': (context) => const SignatureStatusScreen(),
       },
       onGenerateRoute: (settings) {
         final name = settings.name ?? '';
+        if (name.startsWith('/public/') && name.endsWith('/sign')) {
+          final id =
+              name.substring('/public/'.length, name.length - '/sign'.length);
+          return MaterialPageRoute(
+              builder: (_) => ClientSignatureScreen(reportId: id));
+        }
         if (name.startsWith('/public/')) {
           final id = name.substring('/public/'.length);
           return MaterialPageRoute(

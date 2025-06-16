@@ -386,6 +386,25 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
                 pw.Text('${meta.inspectorName!} – $dateStr'),
             ],
           ),
+          if (report.homeownerSignature != null && !report.homeownerSignature!.declined) ...[
+            pw.SizedBox(height: 20),
+            pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: [
+                pw.Container(height: 1, width: double.infinity, color: PdfColors.black),
+                pw.SizedBox(height: 8),
+                pw.Text('Homeowner Signature'),
+                pw.SizedBox(height: 4),
+                pw.Image(pw.MemoryImage(base64Decode(report.homeownerSignature!.image)), height: 80),
+                pw.Text('Signed by ${report.homeownerSignature!.name} – ${report.homeownerSignature!.timestamp.toLocal().toString().split(' ')[0]}'),
+              ],
+            ),
+          ],
+          if (report.homeownerSignature != null && report.homeownerSignature!.declined)
+            pw.Padding(
+              padding: const pw.EdgeInsets.only(top: 20),
+              child: pw.Text('Client declined to sign: ${report.homeownerSignature!.declineReason ?? ''}'),
+            ),
         ],
       ),
     );

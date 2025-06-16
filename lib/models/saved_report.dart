@@ -6,6 +6,7 @@ import '../utils/photo_audit.dart';
 import 'report_change.dart';
 import 'report_snapshot.dart';
 import 'report_collaborator.dart';
+import 'homeowner_signature.dart';
 import 'photo_entry.dart' show SourceType;
 
 class SavedReport {
@@ -25,6 +26,9 @@ class SavedReport {
   final String? templateId;
   final DateTime createdAt;
   final bool isFinalized;
+  final bool signatureRequested;
+  final String signatureStatus; // pending, signed, declined, none
+  final HomeownerSignature? homeownerSignature;
   final ReportTheme? theme;
   final bool? lastAuditPassed;
   final List<PhotoAuditIssue>? lastAuditIssues;
@@ -48,6 +52,9 @@ class SavedReport {
     this.templateId,
     DateTime? createdAt,
     this.isFinalized = false,
+    this.signatureRequested = false,
+    this.signatureStatus = 'none',
+    this.homeownerSignature,
     this.theme,
     this.lastAuditPassed,
     this.lastAuditIssues,
@@ -72,6 +79,10 @@ class SavedReport {
       if (publicReportId != null) 'publicReportId': publicReportId,
       if (publicViewLink != null) 'publicViewLink': publicViewLink,
       if (templateId != null) 'templateId': templateId,
+      'signatureRequested': signatureRequested,
+      'signatureStatus': signatureStatus,
+      if (homeownerSignature != null)
+        'homeownerSignature': homeownerSignature!.toMap(),
       if (theme != null) 'theme': theme!.toMap(),
       if (lastAuditPassed != null) 'lastAuditPassed': lastAuditPassed,
       if (lastAuditIssues != null)
@@ -113,6 +124,12 @@ class SavedReport {
           ? DateTime.fromMillisecondsSinceEpoch(map['createdAt'])
           : DateTime.now(),
       isFinalized: map['isFinalized'] as bool? ?? false,
+      signatureRequested: map['signatureRequested'] as bool? ?? false,
+      signatureStatus: map['signatureStatus'] as String? ?? 'none',
+      homeownerSignature: map['homeownerSignature'] != null
+          ? HomeownerSignature.fromMap(
+              Map<String, dynamic>.from(map['homeownerSignature']))
+          : null,
       theme: map['theme'] != null
           ? ReportTheme.fromMap(Map<String, dynamic>.from(map['theme']))
           : null,
