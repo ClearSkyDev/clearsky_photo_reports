@@ -13,6 +13,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'report_preview_screen.dart';
 import 'signature_screen.dart';
+import 'photo_map_screen.dart';
 
 class PhotoUploadScreen extends StatefulWidget {
   final InspectionMetadata metadata;
@@ -447,6 +448,20 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
     return false;
   }
 
+  List<PhotoEntry> get _gpsPhotos {
+    final List<PhotoEntry> result = [];
+    for (var s in _structures) {
+      for (var photos in s.sectionPhotos.values) {
+        for (var p in photos) {
+          if (p.latitude != null && p.longitude != null) {
+            result.add(p);
+          }
+        }
+      }
+    }
+    return result;
+  }
+
   @override
   Widget build(BuildContext context) {
     final List<Widget> items = [];
@@ -526,6 +541,25 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
         ),
       ),
     );
+
+    if (_gpsPhotos.isNotEmpty) {
+      items.add(
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          child: ElevatedButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => PhotoMapScreen(photos: _gpsPhotos),
+                ),
+              );
+            },
+            child: const Text('View Inspection Map'),
+          ),
+        ),
+      );
+    }
 
     if (_hasPhotos) {
       items.add(

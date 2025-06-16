@@ -23,6 +23,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:path_provider/path_provider.dart';
 import '../utils/export_utils.dart';
 import '../utils/share_utils.dart';
+import 'photo_map_screen.dart';
 
 import '../models/inspected_structure.dart';
 
@@ -141,10 +142,20 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
     for (var group in _gatherGroups()) {
       for (var p in group.value) {
         final suffix = p.label != 'Unlabeled' ? ' - ${p.label}' : '';
-        all.add(PhotoEntry(url: p.url, label: '${group.key}$suffix'));
+        all.add(PhotoEntry(
+            url: p.url,
+            label: '${group.key}$suffix',
+            latitude: p.latitude,
+            longitude: p.longitude));
       }
     }
     return all;
+  }
+
+  List<PhotoEntry> _gpsPhotos() {
+    return _gatherAllPhotos()
+        .where((p) => p.latitude != null && p.longitude != null)
+        .toList();
   }
 
   // Generate the HTML string for the report preview
@@ -839,14 +850,26 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
-                    ),
-                    onPressed: _shareReport,
-                    child: const Text('Share Report'),
-                  ),
-              ],
+              ),
+              onPressed: _shareReport,
+              child: const Text('Share Report'),
             ),
-          ),
-          if (!widget.readOnly) ...[
+            if (_gpsPhotos().isNotEmpty)
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => PhotoMapScreen(photos: _gpsPhotos()),
+                    ),
+                  );
+                },
+                child: const Text('View Inspection Map'),
+              ),
+          ],
+        ),
+      ),
+      if (!widget.readOnly) ...[
             Padding(
               padding: const EdgeInsets.only(bottom: 16),
               child: ElevatedButton(
