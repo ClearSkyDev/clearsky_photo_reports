@@ -17,6 +17,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/report_theme.dart';
 
 import '../models/inspection_metadata.dart';
+import '../models/inspection_type.dart';
 import '../models/inspection_sections.dart';
 import '../models/saved_report.dart';
 
@@ -133,6 +134,7 @@ Future<String> _generateHtml(SavedReport report) async {
     buffer.writeln('<p><strong>Insurance Carrier:</strong> ${meta.insuranceCarrier}</p>');
   }
   buffer.writeln('<p><strong>Peril Type:</strong> ${meta.perilType.name}</p>');
+  buffer.writeln('<p><strong>Inspection Type:</strong> ${meta.inspectionType.name}</p>');
   if (meta.inspectorName != null) {
     buffer.writeln('<p><strong>Inspector Name:</strong> ${meta.inspectorName}</p>');
   }
@@ -150,11 +152,12 @@ Future<String> _generateHtml(SavedReport report) async {
       ..writeln('<p>${report.summary}</p>')
       ..writeln('</div>');
   }
-  for (final struct in report.structures) {
-    if (report.structures.length > 1) {
-      buffer.writeln('<h2>${struct.name}</h2>');
-    }
-    for (final section in kInspectionSections) {
+    for (final struct in report.structures) {
+      if (report.structures.length > 1) {
+        buffer.writeln('<h2>${struct.name}</h2>');
+      }
+      for (final section
+          in sectionsForType(meta.inspectionType)) {
       final photos = struct.sectionPhotos[section] ?? [];
       if (photos.isEmpty) continue;
       if (report.structures.length > 1) buffer.writeln('<h3>$section</h3>');
@@ -265,7 +268,7 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
         widgets.add(_pdfSectionHeader(struct.name));
         widgets.add(pw.SizedBox(height: 10));
       }
-      for (final section in kInspectionSections) {
+      for (final section in sectionsForType(meta.inspectionType)) {
         final photos = struct.sectionPhotos[section] ?? [];
         if (photos.isEmpty) continue;
         widgets.add(_pdfSectionHeader(section));
@@ -313,6 +316,7 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
               if (meta.insuranceCarrier != null)
                 pw.Text('Insurance Carrier: ${meta.insuranceCarrier}'),
               pw.Text('Peril Type: ${meta.perilType.name}'),
+              pw.Text('Inspection Type: ${meta.inspectionType.name}'),
               if (meta.inspectorName != null)
                 pw.Text('Inspector Name: ${meta.inspectorName}'),
               pw.SizedBox(height: 20),
@@ -371,6 +375,7 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
           if (meta.insuranceCarrier != null)
             pw.Text('Insurance Carrier: ${meta.insuranceCarrier}'),
           pw.Text('Peril Type: ${meta.perilType.name}'),
+          pw.Text('Inspection Type: ${meta.inspectionType.name}'),
           if (meta.inspectorName != null)
             pw.Text('Inspector Name: ${meta.inspectorName}'),
           pw.SizedBox(height: 20),

@@ -54,7 +54,8 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
   void initState() {
     super.initState();
     _metadata = widget.metadata;
-    final sections = widget.template?.sections ?? kInspectionSections;
+    final sections =
+        widget.template?.sections ?? sectionsForType(widget.metadata.inspectionType);
     _structures.add(
       InspectedStructure(
         name: 'Main Structure',
@@ -137,7 +138,8 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
         InspectedStructure(
             name: name,
             sectionPhotos: {
-              for (var s in widget.template?.sections ?? kInspectionSections) s: []
+              for (var s in widget.template?.sections ??
+                  sectionsForType(widget.metadata.inspectionType)) s: []
             }),
       );
       _currentStructure = _structures.length - 1;
@@ -603,7 +605,8 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
     }
 
 
-    for (var section in widget.template?.sections ?? kInspectionSections) {
+    for (var section
+        in widget.template?.sections ?? sectionsForType(_metadata.inspectionType)) {
       final photos = _structures[_currentStructure].sectionPhotos[section]!;
       items.add(
         _buildSection(

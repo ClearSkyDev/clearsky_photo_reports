@@ -3,6 +3,7 @@ import '../utils/profile_storage.dart';
 import '../models/inspector_profile.dart';
 
 import '../models/inspection_metadata.dart';
+import '../models/inspection_type.dart';
 import '../models/checklist.dart';
 import 'photo_upload_screen.dart';
 import '../models/report_template.dart';
@@ -25,6 +26,7 @@ class _MetadataScreenState extends State<MetadataScreen> {
   final TextEditingController _weatherNotesController = TextEditingController();
   DateTime _inspectionDate = DateTime.now();
   PerilType _selectedPeril = PerilType.wind;
+  InspectionType _selectedType = InspectionType.residentialRoof;
   List<ReportTemplate> _templates = [];
   ReportTemplate? _selectedTemplate;
 
@@ -93,6 +95,7 @@ class _MetadataScreenState extends State<MetadataScreen> {
             ? _insuranceCarrierController.text
             : null,
         perilType: _selectedPeril,
+        inspectionType: _selectedType,
         inspectorName: _inspectorNameController.text.isNotEmpty
             ? _inspectorNameController.text
             : null,
@@ -176,6 +179,26 @@ class _MetadataScreenState extends State<MetadataScreen> {
                 controller: _insuranceCarrierController,
                 decoration:
                     const InputDecoration(labelText: 'Insurance Carrier'),
+              ),
+              DropdownButtonFormField<InspectionType>(
+                value: _selectedType,
+                decoration:
+                    const InputDecoration(labelText: 'Inspection Type'),
+                items: InspectionType.values
+                    .map(
+                      (t) => DropdownMenuItem(
+                        value: t,
+                        child: Text(t.name[0].toUpperCase() + t.name.substring(1)),
+                      ),
+                    )
+                    .toList(),
+                onChanged: (value) {
+                  if (value != null) {
+                    setState(() {
+                      _selectedType = value;
+                    });
+                  }
+                },
               ),
               DropdownButtonFormField<PerilType>(
                 value: _selectedPeril,

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../models/saved_report.dart';
 import '../models/inspection_metadata.dart';
+import '../models/inspection_type.dart';
 import '../models/photo_entry.dart';
 import '../models/inspected_structure.dart';
 import 'report_preview_screen.dart';
@@ -23,6 +24,7 @@ class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
   DateTimeRange? _selectedRange;
   bool _sortDescending = true;
   final Set<PerilType> _selectedPerils = {};
+  final Set<InspectionType> _selectedTypes = {};
 
   @override
   void initState() {
@@ -64,6 +66,9 @@ class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
         }
       }
       if (_selectedPerils.isNotEmpty && !_selectedPerils.contains(meta.perilType)) {
+        return false;
+      }
+      if (_selectedTypes.isNotEmpty && !_selectedTypes.contains(meta.inspectionType)) {
         return false;
       }
       return true;
@@ -233,6 +238,27 @@ class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
                                     _selectedPerils.add(p);
                                   } else {
                                     _selectedPerils.remove(p);
+                                  }
+                                });
+                              },
+                            ),
+                          )
+                          .toList(),
+                    ),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 4,
+                      children: InspectionType.values
+                          .map(
+                            (t) => FilterChip(
+                              label: Text(t.name),
+                              selected: _selectedTypes.contains(t),
+                              onSelected: (selected) {
+                                setState(() {
+                                  if (selected) {
+                                    _selectedTypes.add(t);
+                                  } else {
+                                    _selectedTypes.remove(t);
                                   }
                                 });
                               },
