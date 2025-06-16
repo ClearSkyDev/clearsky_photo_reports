@@ -139,7 +139,7 @@ Future<String> _generateHtml(SavedReport report) async {
   if (report.summaryText != null && report.summaryText!.isNotEmpty) {
     buffer
       ..writeln('<div style="border:1px solid #ccc;padding:8px;margin-top:20px;">')
-      ..writeln('<strong>Summary of Findings</strong><br>')
+      ..writeln('<strong>Inspection Summary</strong><br>')
       ..writeln('<p>${report.summaryText}</p>')
       ..writeln('</div>');
   }
@@ -325,7 +325,7 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
                   child: pw.Column(
                     crossAxisAlignment: pw.CrossAxisAlignment.start,
                     children: [
-                      pw.Text('Summary of Findings',
+                      pw.Text('Inspection Summary',
                           style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
                       pw.SizedBox(height: 4),
                       pw.Text(summaryText),
