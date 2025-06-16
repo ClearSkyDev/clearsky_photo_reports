@@ -29,6 +29,22 @@ class AuthService {
     return _auth.signInWithEmailAndPassword(email: email, password: password);
   }
 
+  Future<void> sendSignInLink(String email, String url) {
+    final settings = ActionCodeSettings(
+      url: url,
+      handleCodeInApp: true,
+      iOSBundleId: 'com.clearsky.photoReports',
+      androidPackageName: 'com.clearsky.photoReports',
+      androidInstallApp: true,
+      androidMinimumVersion: '21',
+    );
+    return _auth.sendSignInLinkToEmail(email: email, actionCodeSettings: settings);
+  }
+
+  Future<void> signInWithLink(String email, String link) {
+    return _auth.signInWithEmailLink(email: email, emailLink: link);
+  }
+
   Future<void> signOut() => _auth.signOut();
 
   Future<InspectorUser?> fetchUser(String uid) async {

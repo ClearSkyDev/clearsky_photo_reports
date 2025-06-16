@@ -283,6 +283,8 @@ Future<String> _generateHtml(SavedReport report) async {
   return buffer.toString();
 }
 
+Future<Uint8List> generatePdf(SavedReport report) => _generatePdf(report);
+
 Future<Uint8List> _generatePdf(SavedReport report) async {
   final meta = InspectionMetadata.fromMap(report.inspectionMetadata);
   final prefs = await SharedPreferences.getInstance();

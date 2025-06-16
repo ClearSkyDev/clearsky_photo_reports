@@ -49,6 +49,16 @@ Finalized reports generate a unique public link that can be shared with clients.
 
 Each report has a dedicated message thread stored under `reports/{id}/messages`. The public portal and inspector app display a chat-style view where clients can send questions or attach images and PDFs. Messages track who has read them so inspectors can see unread counts. Inspectors can resolve, export or mute a thread from the history screen.
 
+## Secure Client Dashboard
+
+Authenticated clients can access a full dashboard built with Flutter Web. Login supports regular email/password credentials or magic links sent via Firebase Auth. The dashboard provides tabs for Reports, Messages, Invoices and Settings. Clients can view finalized reports as PDFs, download ZIP archives, join message threads and pay outstanding invoices. All activity is logged to the `clientActivity` collection for visibility. Example Firestore rules are provided in `firestore_client.rules` which ensure clients only access documents matching their email address.
+
+Run the client portal with:
+
+```bash
+flutter run -d chrome -t lib/client_portal_main.dart
+```
+
 ## Report Map View
 
 Reports with saved GPS coordinates appear on an interactive map available from the dashboard. Pins are colored based on report status and can be filtered by inspector, status or date. Tap a pin to see a quick summary and open the full report.
