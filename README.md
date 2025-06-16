@@ -26,6 +26,10 @@ The preview screen now also includes a signature canvas so inspectors can sign t
 The app tracks key inspection tasks such as uploading photos, filling out metadata and capturing a signature.
 Progress can be viewed from the "View Checklist" button on the Send Report screen and a summary is included in the generated HTML/PDF reports.
 
+## Report Finalization
+
+After exporting, inspectors can lock a report from the Send Report screen. Finalized reports cannot be edited but can still be exported or shared. A "FINALIZED" banner and lock icon identify locked reports in the history list and preview.
+
 ## Flutter Report Preview
 
 The Flutter implementation renders the inspection report HTML differently depending on the platform:

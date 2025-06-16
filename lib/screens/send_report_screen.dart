@@ -50,6 +50,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
   Uint8List? _signature;
   bool _signatureLocked = false;
   File? _exportedFile;
+  bool _finalized = false;
 
   @override
   void initState() {
@@ -156,6 +157,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
       _saving = false;
       _docId = reportId;
       _savedReport = saved;
+      _finalized = saved.isFinalized;
     });
 
     if (mounted) {
@@ -166,6 +168,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
   }
 
   Future<void> _reSign() async {
+    if (_finalized) return;
     final result = await Navigator.push<Uint8List>(
       context,
       MaterialPageRoute(builder: (_) => const CaptureSignatureScreen()),
@@ -179,7 +182,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
   }
 
   Future<void> _lockSignature() async {
-    if (_signature == null) return;
+    if (_signature == null || _finalized) return;
     await SignatureStorage.save(_signature!);
     setState(() {
       _signatureLocked = true;
@@ -246,6 +249,58 @@ class _SendReportScreenState extends State<SendReportScreen> {
     // TODO: call sendReportByEmail
   }
 
+  Future<void> _finalizeReport() async {
+    if (_savedReport == null || _finalized) return;
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Finalize Report'),
+        content: const Text(
+            'Lock this report and prevent any further edits?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Finalize'),
+          ),
+        ],
+      ),
+    );
+    if (confirm != true) return;
+
+    try {
+      await FirebaseFirestore.instance
+          .collection('reports')
+          .doc(_docId)
+          .update({'isFinalized': true});
+    } catch (_) {}
+
+    setState(() {
+      _finalized = true;
+      if (_savedReport != null) {
+        _savedReport = SavedReport(
+          id: _savedReport!.id,
+          userId: _savedReport!.userId,
+          inspectionMetadata: _savedReport!.inspectionMetadata,
+          structures: _savedReport!.structures,
+          summary: _savedReport!.summary,
+          signature: _savedReport!.signature,
+          createdAt: _savedReport!.createdAt,
+          isFinalized: true,
+        );
+      }
+    });
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Report finalized')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final m = widget.metadata;
@@ -256,6 +311,16 @@ class _SendReportScreenState extends State<SendReportScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            if (_finalized)
+              Container(
+                padding: const EdgeInsets.all(8),
+                color: Colors.redAccent,
+                child: const Text(
+                  'FINALIZED',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
             Card(
               child: Padding(
                 padding: const EdgeInsets.all(12),
@@ -278,7 +343,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
             if (_signature != null) ...[
               const SizedBox(height: 12),
               Image.memory(_signature!, height: 100),
-              if (!_signatureLocked) ...[
+              if (!_signatureLocked && !_finalized) ...[
                 const SizedBox(height: 8),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -324,6 +389,13 @@ class _SendReportScreenState extends State<SendReportScreen> {
                         child: const Text('Share Report')),
               ],
             ),
+            const SizedBox(height: 12),
+            if (!_finalized)
+              ElevatedButton(
+                onPressed: _finalizeReport,
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
+                child: const Text('Finalize & Lock Report'),
+              ),
             const SizedBox(height: 12),
             ElevatedButton(
               onPressed: () => Navigator.push(
