@@ -26,6 +26,7 @@ import 'package:path_provider/path_provider.dart';
 import '../utils/export_utils.dart';
 import '../utils/share_utils.dart';
 import 'photo_map_screen.dart';
+import '../services/ai_summary_service.dart';
 
 import '../models/inspected_structure.dart';
 
@@ -64,6 +65,10 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
       'This report is a professional opinion based on visual inspection only.';
   late final InspectionMetadata _metadata;
   late final TextEditingController _summaryController;
+  late final TextEditingController _adjusterSummaryController;
+  late final TextEditingController _homeownerSummaryController;
+  bool _editingSummaries = true;
+  bool _loadingSummary = false;
   Uint8List? _signature;
   String _template = 'legacy';
   bool _showGps = true;
@@ -76,9 +81,12 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
     super.initState();
     _metadata = widget.metadata;
     _summaryController = TextEditingController(text: widget.summary ?? '');
+    _adjusterSummaryController = TextEditingController();
+    _homeownerSummaryController = TextEditingController();
     _signature = widget.signature;
     inspectionChecklist.markComplete('Report Previewed');
     _loadTemplate();
+    _generateSummary();
   }
 
   Future<void> _loadTemplate() async {
@@ -104,6 +112,8 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
   @override
   void dispose() {
     _summaryController.dispose();
+    _adjusterSummaryController.dispose();
+    _homeownerSummaryController.dispose();
     super.dispose();
   }
   String _metadataFileName(String ext) {
@@ -171,6 +181,68 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
         .toList();
   }
 
+  Widget _summaryField(TextEditingController controller, String label) {
+    if (_editingSummaries) {
+      return TextField(
+        controller: controller,
+        decoration:
+            InputDecoration(labelText: label, border: const OutlineInputBorder()),
+        maxLines: 3,
+      );
+    }
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(border: Border.all(color: Colors.grey)),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
+          const SizedBox(height: 4),
+          Text(controller.text),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _generateSummary() async {
+    final metaMap = {
+      'clientName': _metadata.clientName,
+      'propertyAddress': _metadata.propertyAddress,
+      'inspectionDate': _metadata.inspectionDate.toIso8601String(),
+      if (_metadata.insuranceCarrier != null)
+        'insuranceCarrier': _metadata.insuranceCarrier,
+      'perilType': _metadata.perilType.name,
+      if (_metadata.inspectorName != null)
+        'inspectorName': _metadata.inspectorName,
+    };
+    final report = SavedReport(
+      inspectionMetadata: metaMap,
+      structures: widget.structures ?? [],
+      summary: _summaryController.text,
+      summaryText: _adjusterSummaryController.text,
+    );
+    final key = const String.fromEnvironment('OPENAI_API_KEY', defaultValue: '')
+        .isNotEmpty
+        ? const String.fromEnvironment('OPENAI_API_KEY')
+        : (Platform.environment['OPENAI_API_KEY'] ?? '');
+    if (key.isEmpty) return;
+    setState(() => _loadingSummary = true);
+    try {
+      final service = AiSummaryService(apiKey: key);
+      final result = await service.generateSummary(report);
+      setState(() {
+        _adjusterSummaryController.text = result.adjuster;
+        _homeownerSummaryController.text = result.homeowner;
+      });
+    } catch (_) {
+      // ignore errors
+    } finally {
+      if (mounted) setState(() => _loadingSummary = false);
+    }
+  }
+
   // Generate the HTML string for the report preview
   String generateHtmlPreview() {
     final buffer = StringBuffer();
@@ -218,8 +290,25 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
     }
     buffer.writeln('</table>');
 
+    if (_adjusterSummaryController.text.isNotEmpty ||
+        _homeownerSummaryController.text.isNotEmpty) {
+      buffer.writeln(
+          '<div style="border:1px solid #ccc;padding:8px;margin-top:20px;">');
+      buffer.writeln('<strong>Inspection Summary</strong><br>');
+      if (_adjusterSummaryController.text.isNotEmpty) {
+        buffer.writeln(
+            '<p><em>For Adjuster:</em> ${_adjusterSummaryController.text}</p>');
+      }
+      if (_homeownerSummaryController.text.isNotEmpty) {
+        buffer.writeln(
+            '<p><em>For Homeowner:</em> ${_homeownerSummaryController.text}</p>');
+      }
+      buffer.writeln('</div>');
+    }
+
     if (_summaryController.text.isNotEmpty) {
-      buffer.writeln('<div style="border:1px solid #ccc;padding:8px;margin-top:20px;">');
+      buffer.writeln(
+          '<div style="border:1px solid #ccc;padding:8px;margin-top:20px;">');
       buffer.writeln('<strong>Inspector Notes / Summary</strong><br>');
       buffer.writeln('<p>${_summaryController.text}</p>');
       buffer.writeln('</div>');
@@ -456,6 +545,29 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
                 if (_metadata.inspectorName != null)
                   pw.Text('Inspector Name: ${_metadata.inspectorName}'),
                 pw.SizedBox(height: 20),
+                if (_adjusterSummaryController.text.isNotEmpty ||
+                    _homeownerSummaryController.text.isNotEmpty)
+                  pw.Container(
+                    width: double.infinity,
+                    padding: const pw.EdgeInsets.all(8),
+                    decoration:
+                        pw.BoxDecoration(border: pw.Border.all(color: PdfColors.grey)),
+                    child: pw.Column(
+                      crossAxisAlignment: pw.CrossAxisAlignment.start,
+                      children: [
+                        pw.Text('Inspection Summary',
+                            style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                        if (_adjusterSummaryController.text.isNotEmpty) ...[
+                          pw.SizedBox(height: 4),
+                          pw.Text('For Adjuster: ${_adjusterSummaryController.text}'),
+                        ],
+                        if (_homeownerSummaryController.text.isNotEmpty) ...[
+                          pw.SizedBox(height: 4),
+                          pw.Text('For Homeowner: ${_homeownerSummaryController.text}'),
+                        ]
+                      ],
+                    ),
+                  ),
                 if (_summaryController.text.isNotEmpty)
                   pw.Container(
                     width: double.infinity,
@@ -724,9 +836,39 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
                     decoration: const InputDecoration(
                       labelText: 'Inspector Notes / Summary',
                       border: OutlineInputBorder(),
-                    ),
-                    maxLines: 3,
                   ),
+                  maxLines: 3,
+                ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _summaryField(_adjusterSummaryController, 'Adjuster Summary'),
+                const SizedBox(height: 8),
+                _summaryField(
+                    _homeownerSummaryController, 'Homeowner Summary'),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    ElevatedButton(
+                      onPressed: _loadingSummary ? null : _generateSummary,
+                      child: const Text('Regenerate'),
+                    ),
+                    const SizedBox(width: 8),
+                    ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          _editingSummaries = !_editingSummaries;
+                        });
+                      },
+                      child: Text(_editingSummaries ? 'Done' : 'Edit'),
+                    ),
+                  ],
+                )
+              ],
+            ),
           ),
           if (_signature != null)
             Padding(
@@ -925,7 +1067,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
                         metadata: _metadata,
                         structures: widget.structures,
                         summary: _summaryController.text,
-                        summaryText: null,
+                        summaryText: _adjusterSummaryController.text,
                         signature: _signature,
                         template: widget.template,
                       ),

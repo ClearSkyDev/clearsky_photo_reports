@@ -15,6 +15,7 @@ import '../utils/profile_storage.dart';
 import '../models/report_template.dart';
 import '../models/checklist.dart';
 import '../utils/summary_utils.dart';
+import '../services/ai_summary_service.dart';
 import '../models/report_collaborator.dart';
 import '../models/inspector_profile.dart';
 import 'package:flutter/services.dart';
@@ -337,7 +338,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
     launchUrl(uri, mode: LaunchMode.externalApplication);
   }
 
-  void _autoGenerateSummary() {
+  Future<void> _autoGenerateSummary() async {
     final metaMap = {
       'clientName': widget.metadata.clientName,
       'propertyAddress': widget.metadata.propertyAddress,
@@ -360,7 +361,22 @@ class _SendReportScreenState extends State<SendReportScreen> {
       latitude: _gpsPhotos().isNotEmpty ? _gpsPhotos().first.latitude : null,
       longitude: _gpsPhotos().isNotEmpty ? _gpsPhotos().first.longitude : null,
     );
-    final text = generateSummaryText(report);
+    final key = const String.fromEnvironment('OPENAI_API_KEY', defaultValue: '')
+        .isNotEmpty
+        ? const String.fromEnvironment('OPENAI_API_KEY')
+        : (Platform.environment['OPENAI_API_KEY'] ?? '');
+    String text;
+    if (key.isNotEmpty) {
+      try {
+        final svc = AiSummaryService(apiKey: key);
+        final result = await svc.generateSummary(report);
+        text = result.adjuster;
+      } catch (_) {
+        text = generateSummaryText(report);
+      }
+    } else {
+      text = generateSummaryText(report);
+    }
     setState(() {
       _summaryTextController.text = text;
       if (_savedReport != null) {
