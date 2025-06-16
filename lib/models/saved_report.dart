@@ -76,6 +76,7 @@ class ReportPhotoEntry {
   final double? latitude;
   final double? longitude;
   final String damageType;
+  final String note;
 
   ReportPhotoEntry({
     required this.label,
@@ -84,6 +85,7 @@ class ReportPhotoEntry {
     this.latitude,
     this.longitude,
     this.damageType = 'Unknown',
+    this.note = '',
   });
 
   Map<String, dynamic> toMap() {
@@ -94,6 +96,7 @@ class ReportPhotoEntry {
       if (latitude != null) 'latitude': latitude,
       if (longitude != null) 'longitude': longitude,
       'damageType': damageType,
+      if (note.isNotEmpty) 'note': note,
     };
   }
 
@@ -107,6 +110,7 @@ class ReportPhotoEntry {
       latitude: (map['latitude'] as num?)?.toDouble(),
       longitude: (map['longitude'] as num?)?.toDouble(),
       damageType: map['damageType'] as String? ?? 'Unknown',
+      note: map['note'] as String? ?? '',
     );
   }
 }

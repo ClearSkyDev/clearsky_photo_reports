@@ -26,6 +26,10 @@ The preview screen now also includes a signature canvas so inspectors can sign t
 The app tracks key inspection tasks such as uploading photos, filling out metadata and capturing a signature.
 Progress can be viewed from the "View Checklist" button on the Send Report screen and a summary is included in the generated HTML/PDF reports.
 
+## Photo Notes
+
+Each photo can include an optional inspector note. Tap a photo in the upload screen to add or edit a note. Notes appear under the image in generated reports and are exported with the report data.
+
 ## Report Finalization
 
 After exporting, inspectors can lock a report from the Send Report screen. Finalized reports cannot be edited but can still be exported or shared. A "FINALIZED" banner and lock icon identify locked reports in the history list and preview.

@@ -163,8 +163,9 @@ Future<String> _generateHtml(SavedReport report) async {
         if (showGps && photo.latitude != null && photo.longitude != null) {
           gps = '<br><a href="https://www.google.com/maps/search/?api=1&query=${photo.latitude},${photo.longitude}">${photo.latitude!.toStringAsFixed(4)}, ${photo.longitude!.toStringAsFixed(4)}</a>';
         }
+        final note = photo.note.isNotEmpty ? '<br><em>${photo.note}</em>' : '';
         buffer
-          ..writeln('<span>$label - $damage<br>$ts$gps</span>')
+          ..writeln('<span>$label - $damage<br>$ts$gps$note</span>')
           ..writeln('</div>');
       }
       buffer.writeln('</div>');
@@ -227,6 +228,11 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
                       ),
                     ),
                   ),
+                if (photo.note.isNotEmpty)
+                  pw.Text(photo.note,
+                      textAlign: pw.TextAlign.center,
+                      style: const pw.TextStyle(
+                          fontSize: 10, fontStyle: pw.FontStyle.italic)),
               ],
             ),
           ),

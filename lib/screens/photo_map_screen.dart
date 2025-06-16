@@ -57,6 +57,13 @@ class PhotoMapScreen extends StatelessWidget {
                                     fit: BoxFit.cover),
                               const SizedBox(height: 8),
                               Text(p.label),
+                              if (p.note.isNotEmpty) ...[
+                                const SizedBox(height: 4),
+                                Text(
+                                  p.note,
+                                  style: const TextStyle(fontStyle: FontStyle.italic, fontSize: 12),
+                                ),
+                              ],
                             ],
                           ),
                         ),

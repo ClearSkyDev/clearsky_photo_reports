@@ -133,6 +133,7 @@ class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
                       capturedAt: e.timestamp ?? DateTime.now(),
                       latitude: e.latitude,
                       longitude: e.longitude,
+                      note: e.note,
                     ))
                 .toList();
           });
