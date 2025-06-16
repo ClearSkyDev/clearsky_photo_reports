@@ -15,6 +15,8 @@ import '../utils/profile_storage.dart';
 import '../models/report_template.dart';
 import '../models/checklist.dart';
 import '../utils/summary_utils.dart';
+import '../models/report_collaborator.dart';
+import '../models/inspector_profile.dart';
 import 'package:flutter/services.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -28,6 +30,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import '../models/report_theme.dart';
 import '../utils/photo_audit.dart';
+import 'manage_collaborators_screen.dart';
+import '../utils/permission_utils.dart';
 
 /// If Firebase is not desired:
 /// - Use `path_provider` and `shared_preferences` or `hive` to save report JSON locally
@@ -62,6 +66,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
   bool _saving = false;
   String? _docId;
   SavedReport? _savedReport;
+  InspectorProfile? _profile;
   bool _exporting = false;
   Uint8List? _signature;
   bool _signatureLocked = false;
@@ -104,6 +109,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
 
   Future<void> _initialize() async {
     _signature = widget.signature ?? await SignatureStorage.load();
+    _profile = await ProfileStorage.load();
     await _saveReport();
   }
 
@@ -116,7 +122,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
 
     final doc = firestore.collection('reports').doc();
     final reportId = doc.id;
-    final profile = await ProfileStorage.load();
+    final profile = _profile ?? await ProfileStorage.load();
 
     Future<List<ReportPhotoEntry>> uploadSection(
         String section, List<PhotoEntry> photos) async {
@@ -206,6 +212,17 @@ class _SendReportScreenState extends State<SendReportScreen> {
       templateId: widget.template?.id,
       lastAuditPassed: null,
       lastAuditIssues: null,
+      reportOwner: profile?.id,
+      collaborators: profile != null
+          ? [
+              ReportCollaborator(
+                  id: profile.id,
+                  name: profile.name,
+                  role: CollaboratorRole.lead)
+            ]
+          : const [],
+      lastEditedBy: profile?.id,
+      lastEditedAt: DateTime.now(),
     );
 
     await doc.set(saved.toMap());
@@ -303,6 +320,10 @@ class _SendReportScreenState extends State<SendReportScreen> {
           templateId: _savedReport!.templateId,
           lastAuditPassed: _savedReport!.lastAuditPassed,
           lastAuditIssues: _savedReport!.lastAuditIssues,
+          reportOwner: _savedReport!.reportOwner,
+          collaborators: _savedReport!.collaborators,
+          lastEditedBy: _savedReport!.lastEditedBy,
+          lastEditedAt: _savedReport!.lastEditedAt,
         );
       }
     });
@@ -318,6 +339,11 @@ class _SendReportScreenState extends State<SendReportScreen> {
 
   Future<void> _exportCsv() async {
     if (_savedReport == null || _exporting) return;
+    if (!canEditReport(_savedReport!, _profile)) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Permission denied')));
+      return;
+    }
     setState(() => _exporting = true);
     showDialog(
       context: context,
@@ -347,6 +373,11 @@ class _SendReportScreenState extends State<SendReportScreen> {
 
   Future<void> _exportZip() async {
     if (_savedReport == null || _exporting) return;
+    if (!canEditReport(_savedReport!, _profile)) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Permission denied')));
+      return;
+    }
     if (!inspectionChecklist.allComplete) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Complete all checklist steps first')),
@@ -454,6 +485,11 @@ class _SendReportScreenState extends State<SendReportScreen> {
 
   Future<void> _finalizeReport() async {
     if (_savedReport == null || _finalized) return;
+    if (!canEditReport(_savedReport!, _profile)) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Permission denied')));
+      return;
+    }
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -506,6 +542,10 @@ class _SendReportScreenState extends State<SendReportScreen> {
           lastAuditIssues: _savedReport!.lastAuditIssues,
           changeLog: _savedReport!.changeLog,
           snapshots: _savedReport!.snapshots,
+          reportOwner: _savedReport!.reportOwner,
+          collaborators: _savedReport!.collaborators,
+          lastEditedBy: _savedReport!.lastEditedBy,
+          lastEditedAt: _savedReport!.lastEditedAt,
         );
       }
     });
@@ -531,6 +571,23 @@ class _SendReportScreenState extends State<SendReportScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            if (_savedReport?.lastEditedBy != null &&
+                _savedReport!.lastEditedBy != _profile?.id)
+              Container(
+                padding: const EdgeInsets.all(8),
+                color: Colors.orangeAccent,
+                child: Text(
+                  '${_savedReport!.collaborators.firstWhere(
+                        (c) => c.id == _savedReport!.lastEditedBy,
+                        orElse: () => ReportCollaborator(
+                            id: _savedReport!.lastEditedBy!,
+                            name: _savedReport!.lastEditedBy!,
+                            role: CollaboratorRole.viewer),
+                      ).name} editing...',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(color: Colors.white),
+                ),
+              ),
             if (_finalized)
               Container(
                 padding: const EdgeInsets.all(8),
@@ -706,6 +763,45 @@ class _SendReportScreenState extends State<SendReportScreen> {
                     },
               child: const Text('View History'),
             ),
+            const SizedBox(height: 12),
+            if (_savedReport != null)
+              ElevatedButton(
+                onPressed: () async {
+                  final result = await Navigator.push<List<ReportCollaborator>>(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) =>
+                          ManageCollaboratorsScreen(report: _savedReport!),
+                    ),
+                  );
+                  if (result != null) {
+                    setState(() {
+                      _savedReport = SavedReport(
+                        id: _savedReport!.id,
+                        userId: _savedReport!.userId,
+                        inspectionMetadata: _savedReport!.inspectionMetadata,
+                        structures: _savedReport!.structures,
+                        summary: _savedReport!.summary,
+                        summaryText: _savedReport!.summaryText,
+                        signature: _savedReport!.signature,
+                        createdAt: _savedReport!.createdAt,
+                        isFinalized: _savedReport!.isFinalized,
+                        publicReportId: _savedReport!.publicReportId,
+                        templateId: _savedReport!.templateId,
+                        lastAuditPassed: _savedReport!.lastAuditPassed,
+                        lastAuditIssues: _savedReport!.lastAuditIssues,
+                        changeLog: _savedReport!.changeLog,
+                        snapshots: _savedReport!.snapshots,
+                        reportOwner: _savedReport!.reportOwner,
+                        collaborators: result,
+                        lastEditedBy: _savedReport!.lastEditedBy,
+                        lastEditedAt: _savedReport!.lastEditedAt,
+                      );
+                    });
+                  }
+                },
+                child: const Text('Manage Collaborators'),
+              ),
             const SizedBox(height: 12),
             ElevatedButton(
               onPressed: () => Navigator.push(

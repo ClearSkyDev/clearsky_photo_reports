@@ -84,6 +84,10 @@ class LocalReportStore {
       publicReportId: report.publicReportId,
       lastAuditPassed: report.lastAuditPassed,
       lastAuditIssues: report.lastAuditIssues,
+      reportOwner: report.reportOwner,
+      collaborators: report.collaborators,
+      lastEditedBy: report.lastEditedBy,
+      lastEditedAt: report.lastEditedAt,
     );
 
     final file = File(p.join(reportDir.path, 'report.json'));
