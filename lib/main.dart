@@ -23,6 +23,7 @@ import 'screens/public_links_screen.dart';
 import 'screens/client_signature_screen.dart';
 import 'screens/signature_status_screen.dart';
 import 'screens/report_map_screen.dart';
+import 'screens/analytics_dashboard_screen.dart';
 import 'services/auth_service.dart';
 
 Future<void> main() async {
@@ -59,6 +60,7 @@ class ClearSkyApp extends StatelessWidget {
         '/publicLinks': (context) => const PublicLinksScreen(),
         '/signatureStatus': (context) => const SignatureStatusScreen(),
         '/reportMap': (context) => const ReportMapScreen(),
+        '/analytics': (context) => const AnalyticsDashboardScreen(),
       },
       onGenerateRoute: (settings) {
         final name = settings.name ?? '';

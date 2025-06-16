@@ -50,6 +50,11 @@ class DashboardScreen extends StatelessWidget {
                 onPressed: () => Navigator.pushNamed(context, '/signatureStatus'),
                 child: const Text('Signature Status'),
               ),
+            if (user.role == UserRole.admin)
+              ElevatedButton(
+                onPressed: () => Navigator.pushNamed(context, '/analytics'),
+                child: const Text('Analytics Dashboard'),
+              ),
           ],
         ),
       ),
