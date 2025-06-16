@@ -10,6 +10,8 @@ import 'report_preview_screen.dart';
 import 'message_thread_screen.dart';
 import '../utils/profile_storage.dart';
 import '../models/inspector_profile.dart';
+import '../utils/template_store.dart';
+import 'metadata_screen.dart';
 
 class ReportHistoryScreen extends StatefulWidget {
   final String? inspectorName;
@@ -139,6 +141,32 @@ class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
                   ),
                 ),
               );
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.copy),
+            tooltip: 'Clone Report',
+            onPressed: () async {
+              final meta = InspectionMetadata.fromMap(report.inspectionMetadata);
+              ReportTemplate? template;
+              if (report.templateId != null) {
+                final templates = await TemplateStore.loadTemplates();
+                try {
+                  template =
+                      templates.firstWhere((t) => t.id == report.templateId);
+                } catch (_) {}
+              }
+              if (context.mounted) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => MetadataScreen(
+                      initialMetadata: meta,
+                      initialTemplate: template,
+                    ),
+                  ),
+                );
+              }
             },
           ),
           if (report.isFinalized)
