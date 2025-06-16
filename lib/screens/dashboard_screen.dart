@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../models/inspector_user.dart';
 import '../services/auth_service.dart';
+import '../services/offline_sync_service.dart';
 
 class DashboardScreen extends StatelessWidget {
   final InspectorUser user;
@@ -13,6 +14,39 @@ class DashboardScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Dashboard'),
         actions: [
+          ValueListenableBuilder<bool>(
+            valueListenable: OfflineSyncService.instance.online,
+            builder: (context, online, _) {
+              if (!online) {
+                return const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 8),
+                  child: Chip(label: Text('Offline')),
+                );
+              }
+              return Stack(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.sync),
+                    onPressed: OfflineSyncService.instance.syncDrafts,
+                  ),
+                  if (OfflineSyncService.instance.pendingCount > 0)
+                    Positioned(
+                      right: 4,
+                      top: 4,
+                      child: CircleAvatar(
+                        radius: 8,
+                        backgroundColor: Colors.red,
+                        child: Text(
+                          '${OfflineSyncService.instance.pendingCount}',
+                          style:
+                              const TextStyle(fontSize: 10, color: Colors.white),
+                        ),
+                      ),
+                    ),
+                ],
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: () => AuthService().signOut(),

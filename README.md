@@ -71,3 +71,7 @@ This project uses Firebase for data storage and optional photo uploads. Install 
 ## Local Storage Alternative
 
 For scenarios where Firebase is not available, reports can be stored locally using `LocalReportStore`. This implementation saves report JSON files under the application's documents directory and keeps an index of saved reports with `shared_preferences`.
+
+## Offline Mode
+
+When connectivity is lost the app now stores draft reports in a local Hive database. A small "Offline" badge appears in the dashboard and all Firebase calls are skipped. Once a connection is detected a sync button uploads any pending drafts and clears the local storage.
