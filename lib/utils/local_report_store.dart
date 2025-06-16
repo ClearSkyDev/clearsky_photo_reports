@@ -78,6 +78,7 @@ class LocalReportStore {
       summary: report.summary,
       createdAt: report.createdAt,
       isFinalized: report.isFinalized,
+      publicReportId: report.publicReportId,
     );
 
     final file = File(p.join(reportDir.path, 'report.json'));

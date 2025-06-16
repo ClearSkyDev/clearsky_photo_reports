@@ -13,6 +13,9 @@ import '../utils/local_report_store.dart';
 import '../utils/export_utils.dart';
 import '../utils/profile_storage.dart';
 import '../models/checklist.dart';
+import 'package:flutter/services.dart';
+import 'package:qr_flutter/qr_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import '../utils/share_utils.dart';
@@ -51,6 +54,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
   bool _signatureLocked = false;
   File? _exportedFile;
   bool _finalized = false;
+  String? _publicId;
 
   @override
   void initState() {
@@ -158,6 +162,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
       _docId = reportId;
       _savedReport = saved;
       _finalized = saved.isFinalized;
+      _publicId = saved.publicReportId;
     });
 
     if (mounted) {
@@ -187,6 +192,23 @@ class _SendReportScreenState extends State<SendReportScreen> {
     setState(() {
       _signatureLocked = true;
     });
+  }
+
+  String get _publicUrl => 'https://clearskyroof.com/reports/$_publicId';
+
+  Future<void> _copyLink() async {
+    if (_publicId == null) return;
+    await Clipboard.setData(ClipboardData(text: _publicUrl));
+    if (mounted) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Link copied')));
+    }
+  }
+
+  void _openLink() {
+    if (_publicId == null) return;
+    final uri = Uri.parse(_publicUrl);
+    launchUrl(uri, mode: LaunchMode.externalApplication);
   }
 
   void _downloadPdf() {
@@ -271,15 +293,17 @@ class _SendReportScreenState extends State<SendReportScreen> {
     );
     if (confirm != true) return;
 
+    String publicId = FirebaseFirestore.instance.collection('publicReports').doc().id;
     try {
       await FirebaseFirestore.instance
           .collection('reports')
           .doc(_docId)
-          .update({'isFinalized': true});
+          .update({'isFinalized': true, 'publicReportId': publicId});
     } catch (_) {}
 
     setState(() {
       _finalized = true;
+      _publicId = publicId;
       if (_savedReport != null) {
         _savedReport = SavedReport(
           id: _savedReport!.id,
@@ -290,6 +314,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
           signature: _savedReport!.signature,
           createdAt: _savedReport!.createdAt,
           isFinalized: true,
+          publicReportId: publicId,
         );
       }
     });
@@ -389,6 +414,43 @@ class _SendReportScreenState extends State<SendReportScreen> {
                         child: const Text('Share Report')),
               ],
             ),
+            if (_finalized && _publicId != null) ...[
+              const SizedBox(height: 12),
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const Text('Client Share Link',
+                          style: TextStyle(fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 8),
+                      Center(
+                        child: QrImage(
+                          data: _publicUrl,
+                          size: 160,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      SelectableText(_publicUrl, textAlign: TextAlign.center),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          IconButton(
+                            onPressed: _copyLink,
+                            icon: const Icon(Icons.copy),
+                          ),
+                          IconButton(
+                            onPressed: _openLink,
+                            icon: const Icon(Icons.open_in_browser),
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            ],
             const SizedBox(height: 12),
             if (!_finalized)
               ElevatedButton(

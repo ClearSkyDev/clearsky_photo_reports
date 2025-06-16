@@ -9,6 +9,8 @@ class SavedReport {
   final String? summary;
   /// Either a download URL or base64 encoded PNG of the inspector signature.
   final String? signature;
+  /// Random ID used for public sharing of the report.
+  final String? publicReportId;
   final DateTime createdAt;
   final bool isFinalized;
 
@@ -19,6 +21,7 @@ class SavedReport {
     required this.structures,
     this.summary,
     this.signature,
+    this.publicReportId,
     DateTime? createdAt,
     this.isFinalized = false,
   }) : createdAt = createdAt ?? DateTime.now();
@@ -32,6 +35,7 @@ class SavedReport {
       if (userId != null) 'userId': userId,
       if (summary != null) 'summary': summary,
       if (signature != null) 'signature': signature,
+      if (publicReportId != null) 'publicReportId': publicReportId,
     };
   }
 
@@ -51,6 +55,7 @@ class SavedReport {
       structures: structs,
       summary: map['summary'] as String?,
       signature: map['signature'] as String?,
+      publicReportId: map['publicReportId'] as String?,
       createdAt: map['createdAt'] != null
           ? DateTime.fromMillisecondsSinceEpoch(map['createdAt'])
           : DateTime.now(),
