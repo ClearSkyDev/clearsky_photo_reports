@@ -760,6 +760,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
                         additionalStructures: widget.additionalStructures,
                         additionalNames: widget.additionalNames,
                         summary: _summaryController.text,
+                        signature: _signature,
                       ),
                     ),
                   );

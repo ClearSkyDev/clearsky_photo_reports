@@ -5,6 +5,8 @@ class SavedReport {
   final Map<String, dynamic> inspectionMetadata;
   final Map<String, List<ReportPhotoEntry>> sectionPhotos;
   final String? summary;
+  /// Either a download URL or base64 encoded PNG of the inspector signature.
+  final String? signature;
   final DateTime createdAt;
 
   SavedReport({
@@ -13,6 +15,7 @@ class SavedReport {
     required this.inspectionMetadata,
     required this.sectionPhotos,
     this.summary,
+    this.signature,
     DateTime? createdAt,
   }) : createdAt = createdAt ?? DateTime.now();
 
@@ -26,6 +29,7 @@ class SavedReport {
       'createdAt': createdAt.millisecondsSinceEpoch,
       if (userId != null) 'userId': userId,
       if (summary != null) 'summary': summary,
+      if (signature != null) 'signature': signature,
     };
   }
 
@@ -46,6 +50,7 @@ class SavedReport {
           Map<String, dynamic>.from(map['inspectionMetadata'] ?? {}),
       sectionPhotos: sections,
       summary: map['summary'] as String?,
+      signature: map['signature'] as String?,
       createdAt: map['createdAt'] != null
           ? DateTime.fromMillisecondsSinceEpoch(map['createdAt'])
           : DateTime.now(),

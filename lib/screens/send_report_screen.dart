@@ -5,6 +5,7 @@ import '../models/saved_report.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'dart:io';
+import 'dart:typed_data';
 import '../utils/local_report_store.dart';
 import '../utils/export_utils.dart';
 
@@ -19,6 +20,7 @@ class SendReportScreen extends StatefulWidget {
   final List<Map<String, List<PhotoEntry>>>? additionalStructures;
   final List<String>? additionalNames;
   final String? summary;
+  final Uint8List? signature;
 
   const SendReportScreen({
     super.key,
@@ -27,6 +29,7 @@ class SendReportScreen extends StatefulWidget {
     this.additionalStructures,
     this.additionalNames,
     this.summary,
+    this.signature,
   });
 
   @override
@@ -101,6 +104,17 @@ class _SendReportScreenState extends State<SendReportScreen> {
       }
     }
 
+    String? signatureUrl;
+    if (widget.signature != null) {
+      try {
+        final ref =
+            storage.ref().child('reports/$reportId/signature.png');
+        await ref.putData(widget.signature!,
+            SettableMetadata(contentType: 'image/png'));
+        signatureUrl = await ref.getDownloadURL();
+      } catch (_) {}
+    }
+
     final metadataMap = {
       'clientName': widget.metadata.clientName,
       'propertyAddress': widget.metadata.propertyAddress,
@@ -123,6 +137,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
       inspectionMetadata: metadataMap,
       sectionPhotos: sectionPhotos,
       summary: widget.summary,
+      signature: signatureUrl,
     );
 
     await doc.set(saved.toMap());
