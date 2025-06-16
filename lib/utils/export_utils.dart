@@ -40,11 +40,14 @@ Future<File?> exportAsZip(SavedReport report) async {
   final fileName = '${addressSlug}_clearsky_report.zip';
   final htmlStr = await _generateHtml(report);
   final pdfBytes = await _generatePdf(report);
+  final csvStr = generateCsv(report);
 
   final archive = Archive();
   final htmlBytes = utf8.encode(htmlStr);
   archive.addFile(ArchiveFile('report.html', htmlBytes.length, htmlBytes));
   archive.addFile(ArchiveFile('report.pdf', pdfBytes.length, pdfBytes));
+  final csvBytes = utf8.encode(csvStr);
+  archive.addFile(ArchiveFile('report.csv', csvBytes.length, csvBytes));
 
   for (final struct in report.structures) {
     for (final entry in struct.sectionPhotos.entries) {
@@ -372,4 +375,83 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
     );
 
   return pdf.save();
+}
+
+String _csvEscape(String? value) {
+  final v = value ?? '';
+  if (v.contains(RegExp(r'[",\n]'))) {
+    final escaped = v.replaceAll('"', '""');
+    return '"$escaped"';
+  }
+  return v;
+}
+
+String _fileNameFromUrl(String url) {
+  try {
+    final uri = Uri.parse(url);
+    return p.basename(uri.path);
+  } catch (_) {
+    return p.basename(url);
+  }
+}
+
+/// Generate a CSV string of all photo entries in [report].
+String generateCsv(SavedReport report) {
+  final buffer = StringBuffer();
+  buffer.writeln(
+      'file_name,structure,section,label,note,timestamp,latitude,longitude');
+  for (final struct in report.structures) {
+    for (final entry in struct.sectionPhotos.entries) {
+      for (final photo in entry.value) {
+        final fileName = _fileNameFromUrl(photo.photoUrl);
+        final ts = photo.timestamp?.toIso8601String() ?? '';
+        final lat = photo.latitude?.toString() ?? '';
+        final lon = photo.longitude?.toString() ?? '';
+        buffer.writeln([
+          fileName,
+          struct.name,
+          entry.key,
+          photo.label,
+          photo.note,
+          ts,
+          lat,
+          lon
+        ].map(_csvEscape).join(','));
+      }
+    }
+  }
+  return buffer.toString();
+}
+
+/// Exports [report] as a CSV file saved to the user's device.
+/// Returns the saved file on mobile platforms or null on web.
+Future<File?> exportCsv(SavedReport report) async {
+  final meta = InspectionMetadata.fromMap(report.inspectionMetadata);
+  final addressSlug = _slugify(meta.propertyAddress);
+  final fileName = '${addressSlug}_inspection.csv';
+  final csvStr = generateCsv(report);
+  final bytes = utf8.encode(csvStr);
+
+  if (kIsWeb) {
+    final blob = html.Blob([bytes], 'text/csv');
+    final url = html.Url.createObjectUrlFromBlob(blob);
+    final anchor = html.AnchorElement(href: url)
+      ..setAttribute('download', fileName)
+      ..click();
+    html.Url.revokeObjectUrl(url);
+    return null;
+  }
+
+  Directory? dir;
+  try {
+    dir = await getDownloadsDirectory();
+  } catch (_) {
+    dir = await getApplicationDocumentsDirectory();
+  }
+  dir ??= await getApplicationDocumentsDirectory();
+
+  final path = p.join(dir.path, fileName);
+  final file = File(path);
+  await file.writeAsBytes(bytes, flush: true);
+  return file;
 }
