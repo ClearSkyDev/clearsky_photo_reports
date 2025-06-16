@@ -12,7 +12,6 @@ import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:share_plus/share_plus.dart';
 
 import '../models/inspection_metadata.dart';
 import '../models/inspection_sections.dart';
@@ -33,8 +32,8 @@ String _slugify(String input) {
 }
 
 /// Exports [report] as a ZIP archive containing an HTML file, PDF file
-/// and a folder of labeled photos.
-Future<void> exportAsZip(SavedReport report) async {
+/// and a folder of labeled photos. Returns the saved file on mobile.
+Future<File?> exportAsZip(SavedReport report) async {
   final meta = InspectionMetadata.fromMap(report.inspectionMetadata);
   final addressSlug = _slugify(meta.propertyAddress);
   final fileName = '${addressSlug}_clearsky_report.zip';
@@ -74,7 +73,7 @@ Future<void> exportAsZip(SavedReport report) async {
       ..setAttribute('download', fileName)
       ..click();
     html.Url.revokeObjectUrl(url);
-    return;
+    return null;
   }
 
   Directory? dir;
@@ -89,9 +88,8 @@ Future<void> exportAsZip(SavedReport report) async {
   final file = File(filePath);
   await file.writeAsBytes(zipData, flush: true);
 
-  try {
-    await Share.shareXFiles([XFile(filePath)]);
-  } catch (_) {}
+  final reportFile = File(filePath);
+  return reportFile;
 }
 
 String _generateHtml(SavedReport report) {

@@ -3,6 +3,7 @@ import 'package:flutter/services.dart' show NetworkAssetBundle, rootBundle;
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:flutter/foundation.dart';
 import '../models/photo_entry.dart';
 import '../models/inspection_metadata.dart';
 import '../models/inspection_sections.dart';
@@ -15,7 +16,10 @@ import 'send_report_screen.dart';
 import 'report_preview_webview.dart';
 import 'report_settings_screen.dart' show ReportSettings;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
 import '../utils/export_utils.dart';
+import '../utils/share_utils.dart';
 
 class ReportPreviewScreen extends StatefulWidget {
   final List<PhotoEntry>? photos;
@@ -57,6 +61,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
   Uint8List? _signature;
   String _template = 'legacy';
   bool _exporting = false;
+  File? _exportedFile;
 
   @override
   void initState() {
@@ -470,9 +475,31 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
   Future<void> _exportPdf() async {
     final bytes = await _downloadPdf();
     final fileName = _metadataFileName('pdf');
-    await Printing.layoutPdf(
-      onLayout: (PdfPageFormat format) async => bytes,
-      name: fileName,
+    if (kIsWeb) {
+      final blob = html.Blob([bytes], 'application/pdf');
+      final url = html.Url.createObjectUrlFromBlob(blob);
+      final anchor = html.AnchorElement(href: url)
+        ..setAttribute('download', fileName)
+        ..click();
+      html.Url.revokeObjectUrl(url);
+      return;
+    }
+
+    Directory? dir;
+    try {
+      dir = await getDownloadsDirectory();
+    } catch (_) {
+      dir = await getApplicationDocumentsDirectory();
+    }
+    dir ??= await getApplicationDocumentsDirectory();
+
+    final path = p.join(dir.path, fileName);
+    final file = File(path);
+    await file.writeAsBytes(bytes, flush: true);
+    setState(() => _exportedFile = file);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('PDF exported')),
     );
   }
 
@@ -490,8 +517,9 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
       ),
     );
     try {
-      await exportAsZip(widget.savedReport!);
+      final file = await exportAsZip(widget.savedReport!);
       if (mounted) {
+        setState(() => _exportedFile = file);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('ZIP exported')),
         );
@@ -502,6 +530,16 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
       }
       if (mounted) setState(() => _exporting = false);
     }
+  }
+
+  Future<void> _shareReport() async {
+    if (_exportedFile == null) return;
+    final subject = 'Roof Inspection Report for ${_metadata.clientName}';
+    final inspector =
+        _metadata.inspectorName != null ? ' by ${_metadata.inspectorName}' : '';
+    final body =
+        'Attached is the roof inspection report for ${_metadata.clientName}$inspector.';
+    await shareReportFile(_exportedFile!, subject: subject, text: body);
   }
 
   /// Collect report parts into memory for export.
@@ -735,6 +773,20 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
                         : const Text('Export ZIP'),
+                  ),
+                if (_exportedFile != null)
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blueAccent,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    onPressed: _shareReport,
+                    child: const Text('Share Report'),
                   ),
               ],
             ),

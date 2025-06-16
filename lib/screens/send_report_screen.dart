@@ -11,6 +11,9 @@ import 'capture_signature_screen.dart';
 import '../utils/local_report_store.dart';
 import '../utils/export_utils.dart';
 import '../utils/profile_storage.dart';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
+import '../utils/share_utils.dart';
 
 /// If Firebase is not desired:
 /// - Use `path_provider` and `shared_preferences` or `hive` to save report JSON locally
@@ -47,6 +50,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
   bool _exporting = false;
   Uint8List? _signature;
   bool _signatureLocked = false;
+  File? _exportedFile;
 
   @override
   void initState() {
@@ -212,8 +216,9 @@ class _SendReportScreenState extends State<SendReportScreen> {
       ),
     );
     try {
-      await exportAsZip(_savedReport!);
+      final file = await exportAsZip(_savedReport!);
       if (mounted) {
+        setState(() => _exportedFile = file);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('ZIP exported')),
         );
@@ -224,6 +229,15 @@ class _SendReportScreenState extends State<SendReportScreen> {
       }
       if (mounted) setState(() => _exporting = false);
     }
+  }
+
+  Future<void> _shareReport() async {
+    if (_exportedFile == null) return;
+    final m = widget.metadata;
+    final subject = 'Roof Inspection Report for ${m.clientName}';
+    final inspector = m.inspectorName != null ? ' by ${m.inspectorName}' : '';
+    final body = 'Attached is the roof inspection report for ${m.clientName}$inspector.';
+    await shareReportFile(_exportedFile!, subject: subject, text: body);
   }
 
   Future<void> _sendEmail() async {
@@ -303,6 +317,10 @@ class _SendReportScreenState extends State<SendReportScreen> {
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
                         : const Text('Export ZIP')),
+                  if (_exportedFile != null)
+                    ElevatedButton(
+                        onPressed: _shareReport,
+                        child: const Text('Share Report')),
               ],
             ),
             const SizedBox(height: 12),
