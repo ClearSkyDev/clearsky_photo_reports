@@ -25,6 +25,7 @@ import 'photo_map_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import '../models/report_theme.dart';
+import '../utils/photo_audit.dart';
 
 /// If Firebase is not desired:
 /// - Use `path_provider` and `shared_preferences` or `hive` to save report JSON locally
@@ -63,6 +64,8 @@ class _SendReportScreenState extends State<SendReportScreen> {
   File? _exportedFile;
   bool _finalized = false;
   String? _publicId;
+  bool? _auditPassed;
+  List<PhotoAuditIssue> _auditIssues = [];
 
   List<PhotoEntry> _gpsPhotos() {
     final result = <PhotoEntry>[];
@@ -196,6 +199,8 @@ class _SendReportScreenState extends State<SendReportScreen> {
       summaryText: _summaryTextController.text,
       signature: signatureUrl,
       theme: theme,
+      lastAuditPassed: null,
+      lastAuditIssues: null,
     );
 
     await doc.set(saved.toMap());
@@ -290,6 +295,8 @@ class _SendReportScreenState extends State<SendReportScreen> {
           createdAt: _savedReport!.createdAt,
           isFinalized: _savedReport!.isFinalized,
           publicReportId: _savedReport!.publicReportId,
+          lastAuditPassed: _savedReport!.lastAuditPassed,
+          lastAuditIssues: _savedReport!.lastAuditIssues,
         );
       }
     });
@@ -370,6 +377,60 @@ class _SendReportScreenState extends State<SendReportScreen> {
     }
   }
 
+  Future<void> _runAudit() async {
+    if (_savedReport == null) return;
+    final result = await photoAudit(_savedReport!);
+    if (_docId != null) {
+      try {
+        await FirebaseFirestore.instance.collection('reports').doc(_docId).update({
+          'lastAuditPassed': result.passed,
+          'lastAuditIssues': result.issues.map((e) => e.toMap()).toList(),
+        });
+      } catch (_) {}
+    }
+    setState(() {
+      _auditPassed = result.passed;
+      _auditIssues = result.issues;
+    });
+    _showAuditDialog();
+  }
+
+  void _showAuditDialog() {
+    if (_auditPassed == null) return;
+    showDialog(
+      context: context,
+      builder: (_) {
+        return AlertDialog(
+          title: Text(_auditPassed! ? 'Audit Passed' : 'Audit Issues'),
+          content: _auditPassed!
+              ? const Text('No issues found.')
+              : SizedBox(
+                  width: double.maxFinite,
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: _auditIssues.length,
+                    itemBuilder: (context, index) {
+                      final issue = _auditIssues[index];
+                      return ListTile(
+                        leading: Image.network(issue.photo.photoUrl,
+                            width: 56, height: 56, fit: BoxFit.cover),
+                        title: Text(issue.issue),
+                        subtitle: Text('${issue.structure} - ${issue.section}'),
+                      );
+                    },
+                  ),
+                ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Future<void> _shareReport() async {
     if (_exportedFile == null) return;
     final m = widget.metadata;
@@ -433,6 +494,8 @@ class _SendReportScreenState extends State<SendReportScreen> {
           createdAt: _savedReport!.createdAt,
           isFinalized: true,
           publicReportId: publicId,
+          lastAuditPassed: _savedReport!.lastAuditPassed,
+          lastAuditIssues: _savedReport!.lastAuditIssues,
         );
       }
     });
@@ -547,10 +610,13 @@ class _SendReportScreenState extends State<SendReportScreen> {
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
                         : const Text('Export ZIP')),
-                  if (_exportedFile != null)
-                    ElevatedButton(
-                        onPressed: _shareReport,
-                        child: const Text('Share Report')),
+              if (_exportedFile != null)
+                ElevatedButton(
+                    onPressed: _shareReport,
+                    child: const Text('Share Report')),
+              ElevatedButton(
+                  onPressed: _runAudit,
+                  child: const Text('Run Audit')),
               ],
             ),
             if (_gpsPhotos().isNotEmpty)
