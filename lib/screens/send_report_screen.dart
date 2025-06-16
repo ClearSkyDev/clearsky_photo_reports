@@ -32,6 +32,8 @@ import '../models/report_theme.dart';
 import '../utils/photo_audit.dart';
 import 'manage_collaborators_screen.dart';
 import '../utils/permission_utils.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:geocoding/geocoding.dart';
 
 /// If Firebase is not desired:
 /// - Use `path_provider` and `shared_preferences` or `hive` to save report JSON locally
@@ -203,6 +205,29 @@ class _SendReportScreenState extends State<SendReportScreen> {
       theme = ReportTheme.fromMap(jsonDecode(themeData) as Map<String, dynamic>);
     }
 
+    double? latitude;
+    double? longitude;
+    final gps = _gpsPhotos();
+    if (gps.isNotEmpty) {
+      latitude = gps.first.latitude;
+      longitude = gps.first.longitude;
+    } else {
+      try {
+        final pos = await Geolocator.getCurrentPosition();
+        latitude = pos.latitude;
+        longitude = pos.longitude;
+      } catch (_) {
+        try {
+          final locs =
+              await locationFromAddress(widget.metadata.propertyAddress);
+          if (locs.isNotEmpty) {
+            latitude = locs.first.latitude;
+            longitude = locs.first.longitude;
+          }
+        } catch (_) {}
+      }
+    }
+
     final saved = SavedReport(
       id: reportId,
       userId: profile?.id,
@@ -228,6 +253,8 @@ class _SendReportScreenState extends State<SendReportScreen> {
           : const [],
       lastEditedBy: profile?.id,
       lastEditedAt: DateTime.now(),
+      latitude: latitude,
+      longitude: longitude,
     );
 
     await doc.set(saved.toMap());
@@ -306,6 +333,8 @@ class _SendReportScreenState extends State<SendReportScreen> {
       structures: widget.structures ?? [],
       summary: widget.summary,
       summaryText: _summaryTextController.text,
+      latitude: _gpsPhotos().isNotEmpty ? _gpsPhotos().first.latitude : null,
+      longitude: _gpsPhotos().isNotEmpty ? _gpsPhotos().first.longitude : null,
     );
     final text = generateSummaryText(report);
     setState(() {
@@ -329,6 +358,8 @@ class _SendReportScreenState extends State<SendReportScreen> {
           collaborators: _savedReport!.collaborators,
           lastEditedBy: _savedReport!.lastEditedBy,
           lastEditedAt: _savedReport!.lastEditedAt,
+          latitude: _savedReport!.latitude,
+          longitude: _savedReport!.longitude,
         );
       }
     });
@@ -558,6 +589,8 @@ class _SendReportScreenState extends State<SendReportScreen> {
           collaborators: _savedReport!.collaborators,
           lastEditedBy: _savedReport!.lastEditedBy,
           lastEditedAt: _savedReport!.lastEditedAt,
+          latitude: _savedReport!.latitude,
+          longitude: _savedReport!.longitude,
         );
       }
     });
@@ -818,6 +851,8 @@ class _SendReportScreenState extends State<SendReportScreen> {
                         collaborators: result,
                         lastEditedBy: _savedReport!.lastEditedBy,
                         lastEditedAt: _savedReport!.lastEditedAt,
+                        latitude: _savedReport!.latitude,
+                        longitude: _savedReport!.longitude,
                       );
                     });
                   }
