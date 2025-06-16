@@ -1,9 +1,12 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import '../models/saved_report.dart';
 import '../models/inspection_metadata.dart';
 import '../utils/export_utils.dart';
+import 'client_signature_screen.dart';
 
 /// Displays a finalized report via the public share link.
 class PublicReportScreen extends StatefulWidget {
@@ -99,6 +102,39 @@ class _PublicReportScreenState extends State<PublicReportScreen> {
               ),
               const SizedBox(height: 12),
             ],
+          ],
+          const SizedBox(height: 16),
+          if (report.signatureRequested && report.signatureStatus == 'pending')
+            ElevatedButton(
+              onPressed: () async {
+                final result = await Navigator.push<bool>(
+                  context,
+                  MaterialPageRoute(
+                      builder: (_) => ClientSignatureScreen(reportId: reportId)),
+                );
+                if (result != null) {
+                  setState(() {
+                    _futureReport = _loadReport();
+                  });
+                }
+              },
+              child: const Text('Sign Report'),
+            ),
+          if (report.signatureStatus == 'signed' &&
+              report.homeownerSignature != null) ...[
+            const SizedBox(height: 8),
+            Text('Signed by ${report.homeownerSignature!.name}'),
+            const SizedBox(height: 4),
+            Image.memory(
+              base64Decode(report.homeownerSignature!.image),
+              height: 80,
+            ),
+          ],
+          if (report.signatureStatus == 'declined' &&
+              report.homeownerSignature != null) ...[
+            const SizedBox(height: 8),
+            Text('Signature declined: ' +
+                (report.homeownerSignature!.declineReason ?? '')),
           ],
           const SizedBox(height: 16),
           ElevatedButton(

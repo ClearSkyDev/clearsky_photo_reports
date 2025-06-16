@@ -72,6 +72,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
   bool _signatureLocked = false;
   File? _exportedFile;
   bool _finalized = false;
+  bool _requestSignature = false;
   String? _publicId;
   bool? _auditPassed;
   List<PhotoAuditIssue> _auditIssues = [];
@@ -212,6 +213,8 @@ class _SendReportScreenState extends State<SendReportScreen> {
       signature: signatureUrl,
       theme: theme,
       templateId: widget.template?.id,
+      signatureRequested: false,
+      signatureStatus: 'none',
       lastAuditPassed: null,
       lastAuditIssues: null,
       reportOwner: profile?.id,
@@ -522,7 +525,9 @@ class _SendReportScreenState extends State<SendReportScreen> {
             'isFinalized': true,
             'publicReportId': publicId,
             'publicViewLink': viewLink,
-            'summaryText': _summaryTextController.text
+            'summaryText': _summaryTextController.text,
+            'signatureRequested': _requestSignature,
+            'signatureStatus': _requestSignature ? 'pending' : 'none'
           });
     } catch (_) {}
 
@@ -540,6 +545,8 @@ class _SendReportScreenState extends State<SendReportScreen> {
           signature: _savedReport!.signature,
           createdAt: _savedReport!.createdAt,
           isFinalized: true,
+          signatureRequested: _requestSignature,
+          signatureStatus: _requestSignature ? 'pending' : 'none',
           publicReportId: publicId,
           publicViewLink: viewLink,
           templateId: _savedReport!.templateId,
@@ -747,6 +754,16 @@ class _SendReportScreenState extends State<SendReportScreen> {
                 ),
               ),
             ],
+            if (!_finalized)
+              SwitchListTile(
+                title: const Text('Request Homeowner Signature'),
+                value: _requestSignature,
+                onChanged: (val) {
+                  setState(() {
+                    _requestSignature = val;
+                  });
+                },
+              ),
             const SizedBox(height: 12),
             if (!_finalized)
               ElevatedButton(
