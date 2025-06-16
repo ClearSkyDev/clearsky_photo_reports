@@ -7,6 +7,7 @@ import '../models/inspection_type.dart';
 import '../models/photo_entry.dart';
 import '../models/inspected_structure.dart';
 import 'report_preview_screen.dart';
+import 'message_thread_screen.dart';
 import '../utils/profile_storage.dart';
 import '../models/inspector_profile.dart';
 
@@ -123,8 +124,27 @@ class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
           : const Icon(Icons.description),
       title: Text(meta.propertyAddress),
       subtitle: Text(subtitle),
-      trailing:
-          report.isFinalized ? const Icon(Icons.lock, color: Colors.red) : null,
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+            icon: const Icon(Icons.chat),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => MessageThreadScreen(
+                    reportId: report.id,
+                    inspectorView: true,
+                  ),
+                ),
+              );
+            },
+          ),
+          if (report.isFinalized)
+            const Icon(Icons.lock, color: Colors.red),
+        ],
+      ),
       onTap: () {
         final structs = <InspectedStructure>[];
         for (var s in report.structures) {
