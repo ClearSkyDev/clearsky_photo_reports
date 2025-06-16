@@ -41,6 +41,10 @@ Each photo can include an optional inspector note. Tap a photo in the upload scr
 
 After exporting, inspectors can lock a report from the Send Report screen. Finalized reports cannot be edited but can still be exported or shared. A "FINALIZED" banner and lock icon identify locked reports in the history list and preview.
 
+## Public Client Portal
+
+Finalized reports generate a unique public link that can be shared with clients. Visiting the link displays a simplified report view with sections and photos. Clients may download the full report as a ZIP archive and leave optional comments which are saved back to Firestore for the inspector to review. Admin users can view and revoke links from the dashboard.
+
 ## Flutter Report Preview
 
 The Flutter implementation renders the inspection report HTML differently depending on the platform:

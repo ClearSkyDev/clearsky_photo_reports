@@ -266,7 +266,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
     });
   }
 
-  String get _publicUrl => 'https://clearskyroof.com/reports/$_publicId';
+  String get _publicUrl => 'https://clearskyroof.com/public/$_publicId';
 
   Future<void> _copyLink() async {
     if (_publicId == null) return;
@@ -513,6 +513,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
     if (confirm != true) return;
 
     String publicId = FirebaseFirestore.instance.collection('publicReports').doc().id;
+    final viewLink = 'https://clearskyroof.com/public/$publicId';
     try {
       await FirebaseFirestore.instance
           .collection('reports')
@@ -520,6 +521,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
           .update({
             'isFinalized': true,
             'publicReportId': publicId,
+            'publicViewLink': viewLink,
             'summaryText': _summaryTextController.text
           });
     } catch (_) {}
@@ -539,6 +541,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
           createdAt: _savedReport!.createdAt,
           isFinalized: true,
           publicReportId: publicId,
+          publicViewLink: viewLink,
           templateId: _savedReport!.templateId,
           lastAuditPassed: _savedReport!.lastAuditPassed,
           lastAuditIssues: _savedReport!.lastAuditIssues,

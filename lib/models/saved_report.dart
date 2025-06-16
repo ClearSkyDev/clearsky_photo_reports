@@ -20,6 +20,8 @@ class SavedReport {
   final String? signature;
   /// Random ID used for public sharing of the report.
   final String? publicReportId;
+  /// Fully qualified URL that clients can use to view the report.
+  final String? publicViewLink;
   final String? templateId;
   final DateTime createdAt;
   final bool isFinalized;
@@ -42,6 +44,7 @@ class SavedReport {
     this.summaryText,
     this.signature,
     this.publicReportId,
+    this.publicViewLink,
     this.templateId,
     DateTime? createdAt,
     this.isFinalized = false,
@@ -67,6 +70,7 @@ class SavedReport {
       if (summaryText != null) 'summaryText': summaryText,
       if (signature != null) 'signature': signature,
       if (publicReportId != null) 'publicReportId': publicReportId,
+      if (publicViewLink != null) 'publicViewLink': publicViewLink,
       if (templateId != null) 'templateId': templateId,
       if (theme != null) 'theme': theme!.toMap(),
       if (lastAuditPassed != null) 'lastAuditPassed': lastAuditPassed,
@@ -103,6 +107,7 @@ class SavedReport {
       summaryText: map['summaryText'] as String?,
       signature: map['signature'] as String?,
       publicReportId: map['publicReportId'] as String?,
+      publicViewLink: map['publicViewLink'] as String?,
       templateId: map['templateId'] as String?,
       createdAt: map['createdAt'] != null
           ? DateTime.fromMillisecondsSinceEpoch(map['createdAt'])
