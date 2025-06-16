@@ -40,6 +40,7 @@ class SavedReport {
   final DateTime? lastEditedAt;
   final double? latitude;
   final double? longitude;
+  final Map<String, dynamic>? searchIndex;
 
   SavedReport({
     this.id = '',
@@ -68,6 +69,7 @@ class SavedReport {
     this.lastEditedAt,
     this.latitude,
     this.longitude,
+    this.searchIndex,
   }) : createdAt = createdAt ?? DateTime.now();
 
   Map<String, dynamic> toMap() {
@@ -103,6 +105,7 @@ class SavedReport {
         'lastEditedAt': lastEditedAt!.millisecondsSinceEpoch,
       if (latitude != null) 'latitude': latitude,
       if (longitude != null) 'longitude': longitude,
+      if (searchIndex != null) 'searchIndex': searchIndex,
     };
   }
 
@@ -171,6 +174,9 @@ class SavedReport {
           : null,
       latitude: (map['latitude'] as num?)?.toDouble(),
       longitude: (map['longitude'] as num?)?.toDouble(),
+      searchIndex: map['searchIndex'] != null
+          ? Map<String, dynamic>.from(map['searchIndex'])
+          : null,
     );
   }
 }
