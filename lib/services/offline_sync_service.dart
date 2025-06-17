@@ -18,12 +18,19 @@ class OfflineSyncService {
 
   final ValueNotifier<bool> online = ValueNotifier(true);
   StreamSubscription<ConnectivityResult>? _connSub;
+  Timer? _timer;
 
   Future<void> init() async {
     await Hive.initFlutter();
     await OfflineDraftStore.instance.init();
     final initial = await Connectivity().checkConnectivity();
     online.value = initial != ConnectivityResult.none;
+    // Perform an initial sync on startup
+    if (online.value) {
+      unawaited(syncDrafts());
+    }
+    // Periodically attempt to sync any drafts
+    _timer = Timer.periodic(const Duration(minutes: 5), (_) => syncDrafts());
     _connSub = Connectivity().onConnectivityChanged.listen((result) {
       final newOnline = result != ConnectivityResult.none;
       if (!online.value && newOnline) {
@@ -35,6 +42,7 @@ class OfflineSyncService {
 
   Future<void> dispose() async {
     await _connSub?.cancel();
+    _timer?.cancel();
   }
 
   Future<void> saveDraft(SavedReport report) {
