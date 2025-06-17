@@ -19,6 +19,7 @@ import 'photo_map_screen.dart';
 import 'photo_detail_screen.dart';
 import '../utils/change_history.dart';
 import '../models/report_change.dart';
+import '../services/speech_service.dart';
 
 class PhotoUploadScreen extends StatefulWidget {
   final InspectionMetadata metadata;
@@ -121,6 +122,45 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
     launchUrl(uri, mode: LaunchMode.externalApplication);
   }
 
+  Future<void> _dictate(TextEditingController controller, String field) async {
+    final scaffold = ScaffoldMessenger.of(context);
+    scaffold.showSnackBar(const SnackBar(content: Text('Listening...')));
+    final text = await SpeechService.instance.record(
+      fieldType: field,
+      reportId: _metadata.reportId ?? '',
+    );
+    scaffold.hideCurrentSnackBar();
+    if (text == null) return;
+    final use = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Use this text?'),
+        content: Text(text),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Retry'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Use'),
+          ),
+        ],
+      ),
+    );
+    if (use == true) {
+      setState(() {
+        if (controller.text.isEmpty) {
+          controller.text = text;
+        } else {
+          controller.text = '${controller.text} $text';
+        }
+      });
+    } else if (use == false) {
+      await _dictate(controller, field);
+    }
+  }
+
   void _removePhoto(String section, int index, {int? structure}) {
     setState(() {
       final idx = structure ?? _currentStructure;
@@ -217,12 +257,22 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
               decoration: InputDecoration(
                 labelText: 'Label',
                 hintText: entry.labelLoading ? 'Generating...' : null,
+                suffixIcon: IconButton(
+                  icon: const Icon(Icons.mic),
+                  onPressed: () => _dictate(controller, 'label'),
+                ),
               ),
             ),
             const SizedBox(height: 8),
             TextField(
               controller: noteController,
-              decoration: const InputDecoration(labelText: 'Inspector Note'),
+              decoration: InputDecoration(
+                labelText: 'Inspector Note',
+                suffixIcon: IconButton(
+                  icon: const Icon(Icons.mic),
+                  onPressed: () => _dictate(noteController, 'note'),
+                ),
+              ),
             ),
             const SizedBox(height: 8),
             Wrap(
