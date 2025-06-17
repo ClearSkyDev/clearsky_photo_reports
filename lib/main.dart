@@ -30,6 +30,7 @@ import 'screens/invoice_list_screen.dart';
 import 'screens/admin_audit_log_screen.dart';
 import 'screens/create_invoice_screen.dart';
 import 'screens/notification_settings_screen.dart';
+import 'screens/learning_settings_screen.dart';
 import 'services/auth_service.dart';
 import 'services/offline_sync_service.dart';
 import 'services/notification_service.dart';
@@ -80,6 +81,7 @@ class ClearSkyApp extends StatelessWidget {
         '/search': (context) => const ReportSearchScreen(),
         '/invoices': (context) => const InvoiceListScreen(),
         '/notifications': (context) => const NotificationSettingsScreen(),
+        '/learning': (context) => const LearningSettingsScreen(),
         '/changelog': (context) => const ChangelogScreen(),
       },
       onGenerateRoute: (settings) {
