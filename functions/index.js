@@ -1,6 +1,7 @@
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 const nodemailer = require("nodemailer");
+const express = require("express");
 
 admin.initializeApp();
 
@@ -92,3 +93,58 @@ exports.notifyPartnerOnReportUpdate = functions.firestore
       text: `Report for ${after.inspectionMetadata?.propertyAddress || ""} updated.`,
     });
   });
+
+const app = express();
+
+app.get("/report/:id", async (req, res) => {
+  const id = req.params.id;
+  const password = req.query.password;
+  const snap = await admin
+    .firestore()
+    .collection("reports")
+    .where("publicReportId", "==", id)
+    .limit(1)
+    .get();
+  if (snap.empty) {
+    res.status(404).send("Report not found");
+    return;
+  }
+  const data = snap.docs[0].data();
+  if (data.publicViewEnabled === false) {
+    res.status(403).send("Access revoked");
+    return;
+  }
+  if (data.publicViewPassword && data.publicViewPassword !== password) {
+    res.status(403).send("Invalid password");
+    return;
+  }
+  if (data.publicViewExpiry) {
+    const expiry = data.publicViewExpiry.toDate
+      ? data.publicViewExpiry.toDate()
+      : new Date(data.publicViewExpiry);
+    if (expiry < new Date()) {
+      res.status(403).send("Link expired");
+      return;
+    }
+  }
+  let html = "<html><head><title>ClearSky Report</title></head><body>";
+  html += "<h1>ClearSky Roof Inspection Report</h1>";
+  html += `<h3>${data.inspectionMetadata?.propertyAddress || ""}</h3>`;
+  if (data.summaryText) {
+    html += `<h2>Summary</h2><p>${data.summaryText}</p>`;
+  }
+  if (Array.isArray(data.attachments)) {
+    html += "<h2>Attachments</h2>";
+    for (const att of data.attachments) {
+      if (att.url) {
+        const name = att.name || att.url;
+        html += `<div><a href="${att.url}">${name}</a></div>`;
+      }
+    }
+  }
+  html += "</body></html>";
+  res.set("Content-Type", "text/html");
+  res.send(html);
+});
+
+exports.clientPortal = functions.https.onRequest(app);
