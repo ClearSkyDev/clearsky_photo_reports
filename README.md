@@ -94,3 +94,7 @@ When connectivity is lost the app now stores draft reports in a local Hive datab
 ## Admin Audit Logs
 
 Administrators can review a history of actions such as logins, invoice updates and report changes. The **Audit Logs** screen provides search and filtering by user, action, date or target ID and exports the results to CSV for external analysis.
+
+## On-Site AI Chat Assistant
+
+Inspectors can access a contextual AI helper during roof inspections. Tapping the floating **Ask AI** button opens a chat drawer that suggests next photos, reviews checklist progress and answers insurance related questions. Conversations are saved under each report and can be exported for supervisor review.

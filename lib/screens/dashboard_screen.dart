@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 
+import 'dart:io';
+
 import '../models/inspector_user.dart';
 import '../services/auth_service.dart';
 import '../services/offline_sync_service.dart';
+import '../widgets/ai_chat_button.dart';
+import '../widgets/ai_chat_drawer.dart';
 
 class DashboardScreen extends StatelessWidget {
   final InspectorUser user;
@@ -10,7 +14,19 @@ class DashboardScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final key = const String.fromEnvironment('OPENAI_API_KEY', defaultValue: '')
+            .isNotEmpty
+        ? const String.fromEnvironment('OPENAI_API_KEY')
+        : (Platform.environment['OPENAI_API_KEY'] ?? '');
     return Scaffold(
+      endDrawer:
+          AiChatDrawer(reportId: 'dashboard', apiKey: key, context: null),
+      floatingActionButton: Builder(
+        builder: (context) => AiChatButton(
+          reportId: 'dashboard',
+          apiKey: key,
+        ),
+      ),
       appBar: AppBar(
         title: const Text('Dashboard'),
         actions: [
