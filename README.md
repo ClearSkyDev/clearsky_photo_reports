@@ -113,3 +113,7 @@ Inspectors can access a contextual AI helper during roof inspections. Tapping th
 ## AI-Guided Photo Prompts
 
 During photo capture the app now displays a banner suggesting the next required section based on the inspector's role. The banner updates after each photo and includes a button to open the camera directly. Required photo counts differ for ladder assists, adjusters and contractors, so prompts reflect what is still missing for the current report.
+
+## Referral Partner Dashboard
+
+Referral partners can log in to view all properties they referred. The dashboard lists each property status and link to the public report. Basic metrics like total referrals, completion rate and average turnaround are shown at the top.

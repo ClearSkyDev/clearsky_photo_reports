@@ -43,6 +43,8 @@ class SavedReport {
   final List<ReportCollaborator> collaborators;
   final String? lastEditedBy;
   final DateTime? lastEditedAt;
+  final String? partnerId;
+  final DateTime? referralDate;
   final double? latitude;
   final double? longitude;
   final Map<String, dynamic>? searchIndex;
@@ -75,6 +77,8 @@ class SavedReport {
     this.collaborators = const [],
     this.lastEditedBy,
     this.lastEditedAt,
+    this.partnerId,
+    this.referralDate,
     this.latitude,
     this.longitude,
     this.searchIndex,
@@ -114,6 +118,9 @@ class SavedReport {
       if (lastEditedBy != null) 'lastEditedBy': lastEditedBy,
       if (lastEditedAt != null)
         'lastEditedAt': lastEditedAt!.millisecondsSinceEpoch,
+      if (partnerId != null) 'partnerId': partnerId,
+      if (referralDate != null)
+        'referralDate': referralDate!.millisecondsSinceEpoch,
       if (latitude != null) 'latitude': latitude,
       if (longitude != null) 'longitude': longitude,
       if (searchIndex != null) 'searchIndex': searchIndex,
@@ -188,6 +195,10 @@ class SavedReport {
       lastEditedBy: map['lastEditedBy'] as String?,
       lastEditedAt: map['lastEditedAt'] != null
           ? DateTime.fromMillisecondsSinceEpoch(map['lastEditedAt'])
+          : null,
+      partnerId: map['partnerId'] as String?,
+      referralDate: map['referralDate'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(map['referralDate'])
           : null,
       latitude: (map['latitude'] as num?)?.toDouble(),
       longitude: (map['longitude'] as num?)?.toDouble(),

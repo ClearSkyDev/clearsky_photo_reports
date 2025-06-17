@@ -1,4 +1,4 @@
-enum UserRole { admin, lead, inspector, viewer }
+enum UserRole { admin, lead, inspector, viewer, partner }
 
 class InspectorUser {
   final String uid;

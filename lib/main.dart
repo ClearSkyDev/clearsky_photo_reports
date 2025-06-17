@@ -18,6 +18,7 @@ import 'screens/report_settings_screen.dart';
 import 'screens/report_theme_screen.dart';
 import 'screens/profile_screen.dart';
 import 'screens/template_manager_screen.dart';
+import 'screens/partner_dashboard_screen.dart';
 import 'screens/public_report_screen.dart';
 import 'screens/public_links_screen.dart';
 import 'screens/client_signature_screen.dart';
@@ -128,7 +129,11 @@ class AuthGate extends StatelessWidget {
             if (snap.data == null) {
               return const LoginScreen();
             }
-            return DashboardScreen(user: snap.data!);
+            final user = snap.data!;
+            if (user.role == UserRole.partner) {
+              return PartnerDashboardScreen(partnerId: user.uid);
+            }
+            return DashboardScreen(user: user);
           },
         );
       },

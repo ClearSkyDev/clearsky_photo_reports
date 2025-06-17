@@ -15,6 +15,7 @@ class InspectionMetadata {
   final String? lastSentTo;
   final DateTime? lastSentAt;
   final String? lastSendMethod;
+  final String? partnerCode;
 
   InspectionMetadata({
     required this.clientName,
@@ -30,6 +31,7 @@ class InspectionMetadata {
     this.lastSentTo,
     this.lastSentAt,
     this.lastSendMethod,
+    this.partnerCode,
   });
 
   factory InspectionMetadata.fromMap(Map<String, dynamic> map) {
@@ -77,6 +79,7 @@ class InspectionMetadata {
       lastSentTo: map['lastSentTo'] as String?,
       lastSentAt: parseDate(map['lastSentAt']),
       lastSendMethod: map['lastSendMethod'] as String?,
+      partnerCode: map['partnerCode'] as String?,
     );
   }
 }
