@@ -91,6 +91,9 @@ class _SendReportScreenState extends State<SendReportScreen> {
   bool _finalized = false;
   bool _requestSignature = false;
   String? _publicId;
+  bool _publicLinkEnabled = true;
+  final TextEditingController _passwordController = TextEditingController();
+  DateTime? _expiryDate;
   bool? _auditPassed;
   List<PhotoAuditIssue> _auditIssues = [];
   Partner? _partner;
@@ -562,7 +565,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
     });
   }
 
-  String get _publicUrl => 'https://clearskyroof.com/public/$_publicId';
+  String get _publicUrl => 'https://clearsky.app/report/$_publicId';
 
   Future<void> _copyLink() async {
     if (_publicId == null) return;
@@ -1154,8 +1157,9 @@ class _SendReportScreenState extends State<SendReportScreen> {
     );
     if (confirm != true) return;
 
-    String publicId = FirebaseFirestore.instance.collection('publicReports').doc().id;
-    final viewLink = 'https://clearskyroof.com/public/$publicId';
+    String publicId =
+        FirebaseFirestore.instance.collection('publicReports').doc().id;
+    final viewLink = 'https://clearsky.app/report/$publicId';
     try {
       await FirebaseFirestore.instance
           .collection('reports')
@@ -1164,6 +1168,11 @@ class _SendReportScreenState extends State<SendReportScreen> {
             'isFinalized': true,
             'publicReportId': publicId,
             'publicViewLink': viewLink,
+            'publicViewEnabled': _publicLinkEnabled,
+            if (_passwordController.text.isNotEmpty)
+              'publicViewPassword': _passwordController.text,
+            if (_expiryDate != null)
+              'publicViewExpiry': Timestamp.fromDate(_expiryDate!),
             'summaryText': _summaryTextController.text,
             'signatureRequested': _requestSignature,
             'signatureStatus': _requestSignature ? 'pending' : 'none'
@@ -1204,6 +1213,12 @@ class _SendReportScreenState extends State<SendReportScreen> {
           signatureStatus: _requestSignature ? 'pending' : 'none',
           publicReportId: publicId,
           publicViewLink: viewLink,
+          publicViewEnabled: _publicLinkEnabled,
+          publicViewPassword:
+              _passwordController.text.isNotEmpty
+                  ? _passwordController.text
+                  : null,
+          publicViewExpiry: _expiryDate,
           clientEmail: _savedReport!.clientEmail,
           templateId: _savedReport!.templateId,
           lastAuditPassed: _savedReport!.lastAuditPassed,
@@ -1497,6 +1512,50 @@ class _SendReportScreenState extends State<SendReportScreen> {
                   });
                 },
               ),
+            if (!_finalized) ...[
+              SwitchListTile(
+                title: const Text('Enable Public View'),
+                value: _publicLinkEnabled,
+                onChanged: (val) {
+                  setState(() {
+                    _publicLinkEnabled = val;
+                  });
+                },
+              ),
+              TextField(
+                controller: _passwordController,
+                decoration:
+                    const InputDecoration(labelText: 'Password (optional)'),
+              ),
+              Row(
+                children: [
+                  const Text('Expiry: '),
+                  Expanded(
+                    child: Text(_expiryDate == null
+                        ? 'none'
+                        : _expiryDate!
+                            .toLocal()
+                            .toString()
+                            .split(' ')[0]),
+                  ),
+                  TextButton(
+                    onPressed: () async {
+                      final now = DateTime.now();
+                      final picked = await showDatePicker(
+                        context: context,
+                        initialDate: now,
+                        firstDate: now,
+                        lastDate: DateTime(now.year + 5),
+                      );
+                      if (picked != null) {
+                        setState(() => _expiryDate = picked);
+                      }
+                    },
+                    child: const Text('Select'),
+                  ),
+                ],
+              ),
+            ],
             const SizedBox(height: 12),
             if (!_finalized)
               ElevatedButton(

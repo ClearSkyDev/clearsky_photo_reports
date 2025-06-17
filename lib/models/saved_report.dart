@@ -27,6 +27,9 @@ class SavedReport {
   final String? publicReportId;
   /// Fully qualified URL that clients can use to view the report.
   final String? publicViewLink;
+  final bool publicViewEnabled;
+  final String? publicViewPassword;
+  final DateTime? publicViewExpiry;
   /// Email address associated with the client portal account.
   final String? clientEmail;
   final String? templateId;
@@ -63,6 +66,9 @@ class SavedReport {
     this.signature,
     this.publicReportId,
     this.publicViewLink,
+    this.publicViewEnabled = true,
+    this.publicViewPassword,
+    this.publicViewExpiry,
     this.templateId,
     this.clientEmail,
     DateTime? createdAt,
@@ -101,6 +107,10 @@ class SavedReport {
       if (signature != null) 'signature': signature,
       if (publicReportId != null) 'publicReportId': publicReportId,
       if (publicViewLink != null) 'publicViewLink': publicViewLink,
+      'publicViewEnabled': publicViewEnabled,
+      if (publicViewPassword != null) 'publicViewPassword': publicViewPassword,
+      if (publicViewExpiry != null)
+        'publicViewExpiry': publicViewExpiry!.millisecondsSinceEpoch,
       if (templateId != null) 'templateId': templateId,
       if (clientEmail != null) 'clientEmail': clientEmail,
       'signatureRequested': signatureRequested,
@@ -156,6 +166,11 @@ class SavedReport {
       signature: map['signature'] as String?,
       publicReportId: map['publicReportId'] as String?,
       publicViewLink: map['publicViewLink'] as String?,
+      publicViewEnabled: map['publicViewEnabled'] as bool? ?? true,
+      publicViewPassword: map['publicViewPassword'] as String?,
+      publicViewExpiry: map['publicViewExpiry'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(map['publicViewExpiry'])
+          : null,
       clientEmail: map['clientEmail'] as String?,
       templateId: map['templateId'] as String?,
       createdAt: map['createdAt'] != null
