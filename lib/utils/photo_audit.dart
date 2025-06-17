@@ -68,7 +68,12 @@ Future<PhotoAuditResult> photoAudit(SavedReport report) async {
           structure: struct.name,
           section: entry.key,
           issue: 'Missing required elevation photos',
-          photo: ReportPhotoEntry(label: '', photoUrl: '', timestamp: null),
+          photo: ReportPhotoEntry(
+            label: '',
+            caption: '',
+            confidence: 0,
+            photoUrl: '',
+            timestamp: null),
         ));
       }
       for (final photo in entry.value) {

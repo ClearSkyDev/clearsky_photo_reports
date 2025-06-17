@@ -4,6 +4,9 @@ class PhotoEntry {
   String url;
   String? originalUrl;
   String label;
+  String caption;
+  double labelConfidence;
+  String? labelReason;
   bool labelLoading;
   String damageType;
   bool damageLoading;
@@ -23,6 +26,9 @@ class PhotoEntry {
     this.latitude,
     this.longitude,
     this.label = 'Unlabeled',
+    this.caption = '',
+    this.labelConfidence = 0,
+    this.labelReason,
     this.labelLoading = false,
     this.damageType = 'Unknown',
     this.damageLoading = false,

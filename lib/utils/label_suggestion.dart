@@ -1,6 +1,6 @@
 /// Utilities for generating AI-based label suggestions.
 ///
-/// Currently provides a placeholder [getSuggestedLabel] function that returns a
+/// Currently provides a placeholder [getLabelSuggestion] function that returns a
 /// fake label for a photo. In the future this will call an AI service such as
 /// OpenAI or a custom model.
 
@@ -10,6 +10,7 @@ import 'dart:convert';
 
 import '../models/photo_entry.dart';
 import '../models/inspection_metadata.dart';
+import '../models/label_suggestion.dart';
 
 final List<String> _fakeDescriptions = [
   'Hail impact near ridge',
@@ -19,12 +20,13 @@ final List<String> _fakeDescriptions = [
   'Potential leak area',
 ];
 
-/// Returns a fake suggested label for [photo] in the given [sectionName].
+/// Returns a fake suggested [LabelSuggestion] for [photo] in the given
+/// [sectionName].
 ///
 /// [metadata] provides additional context about the inspection that may be
-/// leveraged by future AI models. Currently a random description is returned
-/// after a short delay.
-Future<String> getSuggestedLabel(
+/// leveraged by future AI models. Currently a random description and confidence
+/// score are returned after a short delay.
+Future<LabelSuggestion> getLabelSuggestion(
   PhotoEntry photo,
   String sectionName,
   InspectionMetadata metadata,
@@ -43,6 +45,12 @@ Future<String> getSuggestedLabel(
 
   await Future.delayed(const Duration(milliseconds: 300));
   final desc = _fakeDescriptions[Random().nextInt(_fakeDescriptions.length)];
-  return '$desc ($sectionName)';
+  final confidence = Random().nextDouble() * 0.4 + 0.6; // 0.6 - 1.0
+  return LabelSuggestion(
+    label: '$desc',
+    caption: 'Detected in $sectionName',
+    confidence: double.parse(confidence.toStringAsFixed(2)),
+    reason: 'Placeholder AI analysis',
+  );
 }
 
