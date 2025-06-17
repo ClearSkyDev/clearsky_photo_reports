@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../models/invoice.dart';
+import 'audit_log_service.dart';
 
 class InvoiceService {
   final _collection = FirebaseFirestore.instance.collection('invoices');
@@ -11,6 +12,8 @@ class InvoiceService {
       ...invoice.toMap(),
       'createdAt': FieldValue.serverTimestamp(),
     });
+    await AuditLogService()
+        .logAction('create_invoice', targetId: doc.id, targetType: 'invoice');
     await FirebaseFirestore.instance
         .collection('metrics')
         .doc(invoice.reportId)
@@ -29,8 +32,10 @@ class InvoiceService {
         .toList();
   }
 
-  Future<void> markPaid(String id) {
-    return _collection.doc(id).update({'isPaid': true});
+  Future<void> markPaid(String id) async {
+    await _collection.doc(id).update({'isPaid': true});
+    await AuditLogService()
+        .logAction('mark_invoice_paid', targetId: id, targetType: 'invoice');
   }
 
   Future<Invoice?> fetchInvoiceForReport(String reportId) async {

@@ -97,6 +97,11 @@ class DashboardScreen extends StatelessWidget {
                 onPressed: () => Navigator.pushNamed(context, '/analytics'),
                 child: const Text('Analytics Dashboard'),
               ),
+            if (user.role == UserRole.admin)
+              ElevatedButton(
+                onPressed: () => Navigator.pushNamed(context, '/adminLogs'),
+                child: const Text('Audit Logs'),
+              ),
           ],
         ),
       ),

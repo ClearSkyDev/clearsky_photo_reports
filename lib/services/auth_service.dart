@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import '../models/inspector_user.dart';
+import 'audit_log_service.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -22,11 +23,13 @@ class AuthService {
     );
     final user = InspectorUser(uid: cred.user!.uid, role: role, companyId: companyId);
     await _usersCollection.doc(user.uid).set(user.toMap());
+    await AuditLogService().logAction('sign_up', targetId: user.uid, targetType: 'user');
     return user;
   }
 
-  Future<void> signIn({required String email, required String password}) {
-    return _auth.signInWithEmailAndPassword(email: email, password: password);
+  Future<void> signIn({required String email, required String password}) async {
+    await _auth.signInWithEmailAndPassword(email: email, password: password);
+    await AuditLogService().logAction('login');
   }
 
   Future<void> sendSignInLink(String email, String url) {
