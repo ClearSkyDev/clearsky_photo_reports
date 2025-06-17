@@ -284,7 +284,12 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
     final logo = _theme.logoPath ?? 'assets/images/clearsky_logo.png';
     buffer.writeln('<img src="$logo" alt="Logo" style="width:200px;">');
     buffer.writeln('<h1>Roof Inspection Report</h1>');
-    buffer.writeln('<h2>Prepared by ClearSky Roof Inspectors</h2>');
+    final preparedLabel =
+        _metadata.inspectorRole == InspectorReportRole.adjuster
+            ? 'Prepared from Adjuster Perspective'
+            : 'Prepared by: Third-Party Inspector';
+    buffer.writeln(
+        '<div style="position:absolute;top:10px;right:10px;font-size:12px;font-weight:bold;">$preparedLabel</div>');
 
     buffer.writeln('<table>');
     buffer.writeln('<tr><td><strong>Client Name:</strong></td><td>${_metadata.clientName}</td></tr>');
@@ -558,7 +563,9 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
                 ),
                 pw.SizedBox(height: 10),
                 pw.Text(
-                  'Prepared by ClearSky Roof Inspectors',
+                  _metadata.inspectorRole == InspectorReportRole.adjuster
+                      ? 'Prepared from Adjuster Perspective'
+                      : 'Prepared by: Third-Party Inspector',
                   style: pw.TextStyle(
                     fontSize: 18,
                     color: PdfColor.fromInt(_theme.primaryColor),
