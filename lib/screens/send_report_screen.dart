@@ -1353,10 +1353,12 @@ class _SendReportScreenState extends State<SendReportScreen> {
                         children: [
                           IconButton(
                             onPressed: _copyLink,
+                            tooltip: 'Copy Link',
                             icon: const Icon(Icons.copy),
                           ),
                           IconButton(
                             onPressed: _openLink,
+                            tooltip: 'Open Link',
                             icon: const Icon(Icons.open_in_browser),
                           ),
                         ],

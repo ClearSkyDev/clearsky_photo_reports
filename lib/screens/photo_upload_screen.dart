@@ -260,6 +260,7 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
                 hintText: entry.labelLoading ? 'Generating...' : null,
                 suffixIcon: IconButton(
                   icon: const Icon(Icons.mic),
+                  tooltip: 'Dictate Label',
                   onPressed: () => _dictate(controller, 'label'),
                 ),
               ),
@@ -271,6 +272,7 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
                 labelText: 'Inspector Note',
                 suffixIcon: IconButton(
                   icon: const Icon(Icons.mic),
+                  tooltip: 'Dictate Note',
                   onPressed: () => _dictate(noteController, 'note'),
                 ),
               ),
@@ -451,13 +453,17 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
                             right: 4,
                             child: GestureDetector(
                               onTap: () => onRemove(index),
-                              child: const CircleAvatar(
-                                radius: 12,
-                                backgroundColor: Colors.black54,
-                                child: Icon(
-                                  Icons.close,
-                                  size: 14,
-                                  color: Colors.white,
+                              child: const Semantics(
+                                label: 'Remove photo',
+                                button: true,
+                                child: CircleAvatar(
+                                  radius: 12,
+                                  backgroundColor: Colors.black54,
+                                  child: Icon(
+                                    Icons.close,
+                                    size: 14,
+                                    color: Colors.white,
+                                  ),
                                 ),
                               ),
                             ),
@@ -529,12 +535,16 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
                                         onTap: () => _openMap(
                                             photos[index].latitude!,
                                             photos[index].longitude!),
-                                        child: Text(
-                                          '${photos[index].latitude!.toStringAsFixed(4)}, ${photos[index].longitude!.toStringAsFixed(4)}',
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 10,
-                                            decoration: TextDecoration.underline,
+                                        child: Semantics(
+                                          label: 'Open in maps',
+                                          button: true,
+                                          child: Text(
+                                            '${photos[index].latitude!.toStringAsFixed(4)}, ${photos[index].longitude!.toStringAsFixed(4)}',
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 10,
+                                              decoration: TextDecoration.underline,
+                                            ),
                                           ),
                                         ),
                                       ),
@@ -587,13 +597,16 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
                           ),
                           if (photos[index].label.isNotEmpty &&
                               photos[index].label != 'Unlabeled')
-                            Positioned(
-                              bottom: 24,
-                              right: 4,
-                              child: GestureDetector(
-                                onTap: () => TtsService.instance
-                                    .speak(photos[index].label),
-                                child: const CircleAvatar(
+                          Positioned(
+                            bottom: 24,
+                            right: 4,
+                            child: GestureDetector(
+                              onTap: () => TtsService.instance
+                                  .speak(photos[index].label),
+                              child: const Semantics(
+                                label: 'Speak label',
+                                button: true,
+                                child: CircleAvatar(
                                   radius: 12,
                                   backgroundColor: Colors.black54,
                                   child: Icon(Icons.volume_up,
@@ -601,6 +614,7 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
                                 ),
                               ),
                             ),
+                          ),
                           Positioned(
                             bottom: 4,
                             right: 4,
@@ -792,6 +806,7 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
+          tooltip: 'Back',
           onPressed: () => Navigator.pop(context),
         ),
         title: Row(
@@ -804,6 +819,7 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.undo),
+            tooltip: 'Undo',
             onPressed: _undoLastChange,
           ),
         ],

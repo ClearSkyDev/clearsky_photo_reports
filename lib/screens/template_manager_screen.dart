@@ -104,6 +104,7 @@ class _TemplateManagerScreenState extends State<TemplateManagerScreen> {
               children: [
                 IconButton(
                   icon: const Icon(Icons.copy),
+                  tooltip: 'Duplicate Template',
                   onPressed: () {
                     final copy = t.copyWith(
                       id: DateTime.now().millisecondsSinceEpoch.toString(),
@@ -114,10 +115,12 @@ class _TemplateManagerScreenState extends State<TemplateManagerScreen> {
                 ),
                 IconButton(
                   icon: const Icon(Icons.edit),
+                  tooltip: 'Edit Template',
                   onPressed: () => _editTemplate(t),
                 ),
                 IconButton(
                   icon: const Icon(Icons.delete),
+                  tooltip: 'Delete Template',
                   onPressed: () => _delete(t.id),
                 ),
               ],

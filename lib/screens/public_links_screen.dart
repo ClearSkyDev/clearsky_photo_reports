@@ -61,6 +61,7 @@ class _PublicLinksScreenState extends State<PublicLinksScreen> {
                     children: [
                       IconButton(
                         icon: const Icon(Icons.copy),
+                        tooltip: 'Copy Link',
                         onPressed: () {
                           Clipboard.setData(
                               ClipboardData(text: doc['publicViewLink'] ?? ''));
@@ -68,6 +69,7 @@ class _PublicLinksScreenState extends State<PublicLinksScreen> {
                       ),
                       IconButton(
                         icon: const Icon(Icons.delete),
+                        tooltip: 'Revoke Link',
                         onPressed: () => _revoke(doc.id),
                       ),
                     ],

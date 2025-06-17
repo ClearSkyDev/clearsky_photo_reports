@@ -6,8 +6,8 @@ class AppTheme {
   static const accentColor = Color(0xFFF2B632);
   static const backgroundColor = Color(0xFFF9FAFB);
 
-  static ThemeData build() {
-    final base = ThemeData.light();
+  static ThemeData build({bool highContrast = false}) {
+    final base = highContrast ? ThemeData.highContrastLight() : ThemeData.light();
     return base.copyWith(
       colorScheme: ColorScheme.fromSeed(
         seedColor: primaryColor,

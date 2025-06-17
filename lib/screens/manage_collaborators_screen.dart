@@ -63,6 +63,7 @@ class _ManageCollaboratorsScreenState extends State<ManageCollaboratorsScreen> {
                     subtitle: Text(c.role.name),
                     trailing: IconButton(
                       icon: const Icon(Icons.delete),
+                      tooltip: 'Remove',
                       onPressed: () => _remove(index),
                     ),
                   );
