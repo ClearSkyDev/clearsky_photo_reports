@@ -138,7 +138,10 @@ class _MetadataScreenState extends State<MetadataScreen> {
             : null,
       );
       final template = defaultChecklists.firstWhere(
-        (c) => c.roofType == _selectedType && c.claimType == _selectedPeril,
+        (c) =>
+            c.roofType == _selectedType &&
+            c.claimType == _selectedPeril &&
+            c.role == _selectedRole,
         orElse: () => defaultChecklists.first,
       );
       inspectionChecklist.loadTemplate(template);
