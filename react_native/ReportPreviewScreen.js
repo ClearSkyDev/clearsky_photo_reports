@@ -3,6 +3,7 @@ import { ScrollView, View, Text, Image, TextInput, Button } from 'react-native';
 import Signature from 'react-native-signature-canvas';
 import generateReportHTML from './generateReportHTML';
 import { exportReportAsPDF, exportReportAsHTML } from './exportReport';
+import AnnotatedImage from './AnnotatedImage';
 
 export default function ReportPreviewScreen({ uploadedPhotos, roofQuestionnaire }) {
   const [summaryText, setSummaryText] = useState('');
@@ -17,6 +18,7 @@ export default function ReportPreviewScreen({ uploadedPhotos, roofQuestionnaire 
   const [preparedLabel, setPreparedLabel] = useState('');
   // Holds the inspector signature as a base64 encoded PNG
   const [signatureData, setSignatureData] = useState(null);
+  const [includeAnnotations, setIncludeAnnotations] = useState(true);
 
   // Save the drawn signature when the user taps "Save" on the canvas
   const handleSignature = (signature) => {
@@ -36,7 +38,6 @@ export default function ReportPreviewScreen({ uploadedPhotos, roofQuestionnaire 
   };
 
   const handleExportPDF = async () => {
-    // Include metadata and the saved signature when generating the report markup
     const html = generateReportHTML(
       uploadedPhotos,
       roofQuestionnaire,
@@ -50,13 +51,13 @@ export default function ReportPreviewScreen({ uploadedPhotos, roofQuestionnaire 
       reportId,
       weatherNotes,
       signatureData,
-      preparedLabel
+      preparedLabel,
+      includeAnnotations
     );
     await exportReportAsPDF(html);
   };
 
   const handleExportHTML = async () => {
-    // Metadata and signature are also included when exporting HTML
     const html = generateReportHTML(
       uploadedPhotos,
       roofQuestionnaire,
@@ -70,7 +71,8 @@ export default function ReportPreviewScreen({ uploadedPhotos, roofQuestionnaire 
       reportId,
       weatherNotes,
       signatureData,
-      preparedLabel
+      preparedLabel,
+      includeAnnotations
     );
     await exportReportAsHTML(html);
   };
@@ -157,11 +159,18 @@ export default function ReportPreviewScreen({ uploadedPhotos, roofQuestionnaire 
               .filter((p) => p.sectionPrefix === section)
               .map((photo) => (
                 <View key={photo.id} style={{ marginBottom: 12 }}>
-                  <Image
-                    source={{ uri: photo.imageUri }}
-                    style={{ width: '100%', aspectRatio: 1, borderRadius: 6 }}
-                    resizeMode="cover"
-                  />
+                  {includeAnnotations ? (
+                    <AnnotatedImage
+                      photo={photo}
+                      style={{ width: '100%', aspectRatio: 1, borderRadius: 6 }}
+                    />
+                  ) : (
+                    <Image
+                      source={{ uri: photo.imageUri }}
+                      style={{ width: '100%', aspectRatio: 1, borderRadius: 6 }}
+                      resizeMode="cover"
+                    />
+                  )}
                   <Text>{photo.userLabel}</Text>
                 </View>
               ))}
@@ -209,6 +218,11 @@ export default function ReportPreviewScreen({ uploadedPhotos, roofQuestionnaire 
           webStyle={`.m-signature-pad--footer { display: none; }`}
         />
       </View>
+
+      <Button
+        title={includeAnnotations ? 'Hide Markup' : 'Show Markup'}
+        onPress={() => setIncludeAnnotations(!includeAnnotations)}
+      />
 
       <Button title="Export as PDF" onPress={handleExportPDF} />
       <Button title="Export as HTML" onPress={handleExportHTML} />

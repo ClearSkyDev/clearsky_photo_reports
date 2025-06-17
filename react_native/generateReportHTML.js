@@ -14,7 +14,8 @@ export default function generateReportHTML(
   inspectionDate = new Date().toLocaleDateString(),
   disclaimerText =
     "This report is for informational purposes only and is not a warranty.",
-  preparedLabel = ""
+  preparedLabel = "",
+  includeAnnotations = true
 ) {
   const sectionOrder = [
     'Address',
@@ -50,7 +51,7 @@ export default function generateReportHTML(
   });
 
   const renderAnnotations = (ann) => {
-    if (!ann || !ann.length) return '';
+    if (!includeAnnotations || !ann || !ann.length) return '';
     const shapes = ann
       .map((a) => {
         if (a.type === 'arrow') {
@@ -60,15 +61,31 @@ export default function generateReportHTML(
           const y1 = a.endY - head * Math.sin(angle - Math.PI / 6);
           const x2 = a.endX - head * Math.cos(angle + Math.PI / 6);
           const y2 = a.endY - head * Math.sin(angle + Math.PI / 6);
-          return `<line x1="${a.startX}" y1="${a.startY}" x2="${a.endX}" y2="${a.endY}" stroke="red" stroke-width="2" />`+
-                 `<line x1="${a.endX}" y1="${a.endY}" x2="${x1}" y2="${y1}" stroke="red" stroke-width="2" />`+
-                 `<line x1="${a.endX}" y1="${a.endY}" x2="${x2}" y2="${y2}" stroke="red" stroke-width="2" />`;
+          const mx = (a.startX + a.endX) / 2;
+          const my = (a.startY + a.endY) / 2;
+          return (
+            `<line x1="${a.startX}" y1="${a.startY}" x2="${a.endX}" y2="${a.endY}" stroke="red" stroke-width="2" />` +
+            `<line x1="${a.endX}" y1="${a.endY}" x2="${x1}" y2="${y1}" stroke="red" stroke-width="2" />` +
+            `<line x1="${a.endX}" y1="${a.endY}" x2="${x2}" y2="${y2}" stroke="red" stroke-width="2" />` +
+            (a.measurement ? `<text x="${mx}" y="${my - 4}" fill="red" stroke="red" font-size="16" text-anchor="middle">${a.measurement}</text>` : '')
+          );
         }
         if (a.type === 'circle') {
-          return `<circle cx="${a.x}" cy="${a.y}" r="${a.r}" stroke="red" stroke-width="2" fill="none" />`;
+          return (
+            `<circle cx="${a.x}" cy="${a.y}" r="${a.r}" stroke="red" stroke-width="2" fill="none" />` +
+            (a.measurement ? `<text x="${a.x}" y="${a.y + a.r + 16}" fill="red" stroke="red" font-size="16" text-anchor="middle">${a.measurement}</text>` : '')
+          );
         }
         if (a.type === 'label') {
           return `<text x="${a.x}" y="${a.y}" fill="red" stroke="red" font-size="16">${a.text}</text>`;
+        }
+        if (a.type === 'line') {
+          const mx = (a.startX + a.endX) / 2;
+          const my = (a.startY + a.endY) / 2;
+          return (
+            `<line x1="${a.startX}" y1="${a.startY}" x2="${a.endX}" y2="${a.endY}" stroke="red" stroke-width="2" />` +
+            (a.measurement ? `<text x="${mx}" y="${my - 4}" fill="red" stroke="red" font-size="16" text-anchor="middle">${a.measurement}</text>` : '')
+          );
         }
         return '';
       })

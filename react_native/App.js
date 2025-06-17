@@ -98,8 +98,9 @@ export default function ClearSkyPhotoIntakeScreen() {
 
     if (!result.canceled) {
       const newPhoto = {
-        uri: result.assets[0].uri,
-        label: generateAISuggestion(section),
+        imageUri: result.assets[0].uri,
+        originalUri: result.assets[0].uri,
+        userLabel: generateAISuggestion(section),
         annotations: generateAIAnnotations(),
         showAnnotated: false,
       };
@@ -119,7 +120,7 @@ export default function ClearSkyPhotoIntakeScreen() {
   const handleLabelChange = (section, index, newLabel) => {
     setPhotoData((prevData) => {
       const updatedSection = [...prevData[section]];
-      updatedSection[index].label = newLabel;
+      updatedSection[index].userLabel = newLabel;
       return { ...prevData, [section]: updatedSection };
     });
   };
@@ -172,14 +173,14 @@ export default function ClearSkyPhotoIntakeScreen() {
               />
             ) : (
               <Image
-                source={{ uri: item.uri }}
+                source={{ uri: item.imageUri }}
                 style={{ width: 200, height: 200, borderRadius: 6 }}
                 resizeMode="cover"
               />
             )}
 
             <TextInput
-              value={item.label}
+              value={item.userLabel}
               onChangeText={(text) => handleLabelChange(selectedSection, index, text)}
               placeholder="Enter photo label"
               style={{
@@ -196,7 +197,7 @@ export default function ClearSkyPhotoIntakeScreen() {
                 <TouchableOpacity
                   key={tag}
                   style={styles.tagButton}
-                  onPress={() => handleLabelChange(selectedSection, index, `${item.label} ${tag}`)}
+                  onPress={() => handleLabelChange(selectedSection, index, `${item.userLabel} ${tag}`)}
                 >
                   <Text style={styles.tagText}>{tag}</Text>
                 </TouchableOpacity>

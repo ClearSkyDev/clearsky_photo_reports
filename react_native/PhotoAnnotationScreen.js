@@ -8,6 +8,7 @@ export default function PhotoAnnotationScreen({ photo, onSave, onClose }) {
   const [currentTool, setCurrentTool] = useState('arrow');
   const [temp, setTemp] = useState(null);
   const [labelText, setLabelText] = useState('');
+  const [measurementText, setMeasurementText] = useState('');
 
   const panResponder = useRef(
     PanResponder.create({
@@ -23,14 +24,26 @@ export default function PhotoAnnotationScreen({ photo, onSave, onClose }) {
       onPanResponderRelease: () => {
         if (!temp) return;
         if (currentTool === 'arrow') {
-          setAnnotations([...annotations, { type: 'arrow', ...temp }]);
+          setAnnotations([
+            ...annotations,
+            { type: 'arrow', measurement: measurementText, ...temp },
+          ]);
+        } else if (currentTool === 'line') {
+          setAnnotations([
+            ...annotations,
+            { type: 'line', measurement: measurementText, ...temp },
+          ]);
         } else if (currentTool === 'circle') {
           const dx = temp.endX - temp.startX;
           const dy = temp.endY - temp.startY;
           const r = Math.sqrt(dx * dx + dy * dy);
-          setAnnotations([...annotations, { type: 'circle', x: temp.startX, y: temp.startY, r }]);
+          setAnnotations([
+            ...annotations,
+            { type: 'circle', x: temp.startX, y: temp.startY, r, measurement: measurementText },
+          ]);
         }
         setTemp(null);
+        setMeasurementText('');
       },
     })
   ).current;
@@ -46,6 +59,9 @@ export default function PhotoAnnotationScreen({ photo, onSave, onClose }) {
     if (currentTool === 'arrow') {
       return <Line x1={temp.startX} y1={temp.startY} x2={temp.endX} y2={temp.endY} stroke="red" strokeWidth="2" />;
     }
+    if (currentTool === 'line') {
+      return <Line x1={temp.startX} y1={temp.startY} x2={temp.endX} y2={temp.endY} stroke="red" strokeWidth="2" />;
+    }
     if (currentTool === 'circle') {
       const dx = temp.endX - temp.startX;
       const dy = temp.endY - temp.startY;
@@ -58,7 +74,7 @@ export default function PhotoAnnotationScreen({ photo, onSave, onClose }) {
   return (
     <View style={styles.container}>
       <View style={styles.toolbar}>
-        {['arrow', 'circle', 'label'].map((t) => (
+        {['line', 'arrow', 'circle', 'label'].map((t) => (
           <TouchableOpacity key={t} onPress={() => setCurrentTool(t)}>
             <Text style={currentTool === t ? styles.activeTool : styles.tool}>{t}</Text>
           </TouchableOpacity>
@@ -69,6 +85,14 @@ export default function PhotoAnnotationScreen({ photo, onSave, onClose }) {
             placeholder="Label"
             value={labelText}
             onChangeText={setLabelText}
+          />
+        )}
+        {currentTool !== 'label' && (
+          <TextInput
+            style={styles.labelInput}
+            placeholder="Measurement"
+            value={measurementText}
+            onChangeText={setMeasurementText}
           />
         )}
         <Button title="Undo" onPress={() => setAnnotations(annotations.slice(0, -1))} />
