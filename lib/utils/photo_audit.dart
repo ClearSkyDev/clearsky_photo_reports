@@ -10,12 +10,14 @@ class PhotoAuditIssue {
   final String section;
   final String issue;
   final ReportPhotoEntry photo;
+  final String? suggestion;
 
   PhotoAuditIssue({
     required this.structure,
     required this.section,
     required this.issue,
     required this.photo,
+    this.suggestion,
   });
 
   Map<String, dynamic> toMap() => {
@@ -23,6 +25,7 @@ class PhotoAuditIssue {
         'section': section,
         'issue': issue,
         'photo': photo.toMap(),
+        if (suggestion != null) 'suggestion': suggestion,
       };
 
   factory PhotoAuditIssue.fromMap(Map<String, dynamic> map) {
@@ -30,8 +33,9 @@ class PhotoAuditIssue {
       structure: map['structure'] as String? ?? '',
       section: map['section'] as String? ?? '',
       issue: map['issue'] as String? ?? '',
-      photo: ReportPhotoEntry.fromMap(
-          Map<String, dynamic>.from(map['photo'] ?? {})),
+      photo:
+          ReportPhotoEntry.fromMap(Map<String, dynamic>.from(map['photo'] ?? {})),
+      suggestion: map['suggestion'] as String?,
     );
   }
 }
@@ -86,6 +90,14 @@ Future<PhotoAuditResult> photoAudit(SavedReport report) async {
             photo: photo,
           ));
         }
+        if (photo.caption.isEmpty) {
+          issues.add(PhotoAuditIssue(
+            structure: struct.name,
+            section: entry.key,
+            issue: 'Missing caption',
+            photo: photo,
+          ));
+        }
         if (photo.note.isEmpty) {
           issues.add(PhotoAuditIssue(
             structure: struct.name,
@@ -108,6 +120,18 @@ Future<PhotoAuditResult> photoAudit(SavedReport report) async {
                     'Low resolution (${decoded.width}x${decoded.height})',
                 photo: photo,
               ));
+            }
+            // Blur detection using variance of Sobel filter
+            if (decoded != null) {
+              final score = _blurScore(decoded);
+              if (score < 20) {
+                issues.add(PhotoAuditIssue(
+                  structure: struct.name,
+                  section: entry.key,
+                  issue: 'Blurry or unclear image',
+                  photo: photo,
+                ));
+              }
             }
           }
         } catch (_) {}
@@ -155,5 +179,21 @@ class _EntryInfo {
   final String section;
 
   _EntryInfo(this.photo, this.structure, this.section);
+}
+
+double _blurScore(img.Image image) {
+  final gray = img.grayscale(image);
+  final sobel = img.sobel(gray);
+  double mean = 0;
+  for (final p in sobel.data) {
+    mean += (p & 0xFF);
+  }
+  mean /= sobel.length;
+  double variance = 0;
+  for (final p in sobel.data) {
+    final v = (p & 0xFF) - mean;
+    variance += v * v;
+  }
+  return variance / sobel.length;
 }
 
