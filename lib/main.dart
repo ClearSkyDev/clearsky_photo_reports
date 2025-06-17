@@ -32,6 +32,7 @@ import 'screens/create_invoice_screen.dart';
 import 'screens/notification_settings_screen.dart';
 import 'screens/learning_settings_screen.dart';
 import 'screens/sync_history_screen.dart';
+import 'screens/quick_report_screen.dart';
 import 'services/auth_service.dart';
 import 'services/offline_sync_service.dart';
 import 'services/notification_service.dart';
@@ -107,6 +108,7 @@ class _ClearSkyAppState extends State<ClearSkyApp> {
         '/profile': (context) => const ProfileScreen(),
         '/manageTeam': (context) => const ManageTeamScreen(),
         '/publicLinks': (context) => const PublicLinksScreen(),
+        '/quickReport': (context) => const QuickReportScreen(),
         '/signatureStatus': (context) => const SignatureStatusScreen(),
         '/reportMap': (context) => const ReportMapScreen(),
         '/analytics': (context) => const AnalyticsDashboardScreen(),
