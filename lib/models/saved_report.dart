@@ -13,6 +13,7 @@ import 'report_attachment.dart';
 
 class SavedReport {
   final String id;
+  final int version;
   final String? userId;
   final Map<String, dynamic> inspectionMetadata;
   final List<InspectedStructure> structures;
@@ -57,6 +58,7 @@ class SavedReport {
 
   SavedReport({
     this.id = '',
+    this.version = 1,
     this.userId,
     required this.inspectionMetadata,
     required this.structures,
@@ -139,6 +141,7 @@ class SavedReport {
       if (latitude != null) 'latitude': latitude,
       if (longitude != null) 'longitude': longitude,
       if (searchIndex != null) 'searchIndex': searchIndex,
+      'version': version,
       if (localOnly) 'localOnly': true,
     };
   }
@@ -231,6 +234,7 @@ class SavedReport {
       searchIndex: map['searchIndex'] != null
           ? Map<String, dynamic>.from(map['searchIndex'])
           : null,
+      version: map['version'] as int? ?? 1,
       localOnly: map['localOnly'] as bool? ?? false,
     );
   }

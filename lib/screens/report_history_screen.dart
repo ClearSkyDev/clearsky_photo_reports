@@ -14,6 +14,7 @@ import '../utils/template_store.dart';
 import 'metadata_screen.dart';
 import '../services/offline_draft_store.dart';
 import '../utils/sync_preferences.dart';
+import '../services/offline_sync_service.dart';
 
 class ReportHistoryScreen extends StatefulWidget {
   final String? inspectorName;
@@ -30,6 +31,8 @@ class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
   bool _sortDescending = true;
   final Set<PerilType> _selectedPerils = {};
   final Set<InspectionType> _selectedTypes = {};
+  String _statusFilter = 'all';
+  bool _withAttachments = false;
 
   @override
   void initState() {
@@ -76,6 +79,9 @@ class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
       if (_selectedTypes.isNotEmpty && !_selectedTypes.contains(meta.inspectionType)) {
         return false;
       }
+      if (_statusFilter == 'finalized' && !r.isFinalized) return false;
+      if (_statusFilter == 'draft' && r.isFinalized) return false;
+      if (_withAttachments && r.attachments.isEmpty) return false;
       return true;
     }).toList();
 
@@ -113,7 +119,8 @@ class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
   Widget _buildTile(SavedReport report) {
     final meta = InspectionMetadata.fromMap(report.inspectionMetadata);
     String date = meta.inspectionDate.toLocal().toString().split(' ')[0];
-    String subtitle = '${meta.clientName} • $date';
+    String status = report.isFinalized ? 'Final' : 'Draft';
+    String subtitle = '${meta.clientName} • $date • $status v${report.version}';
     String? thumbUrl;
     for (var struct in report.structures) {
       for (var photos in struct.sectionPhotos.values) {
@@ -133,10 +140,22 @@ class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            report.localOnly ? Icons.cloud_off : Icons.cloud_done,
-            color: report.localOnly ? Colors.red : Colors.green,
-            size: 20,
+          ValueListenableBuilder<double>(
+            valueListenable: OfflineSyncService.instance.progress,
+            builder: (context, prog, _) {
+              if (report.localOnly && prog > 0 && prog < 1) {
+                return const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                );
+              }
+              return Icon(
+                report.localOnly ? Icons.cloud_off : Icons.cloud_done,
+                color: report.localOnly ? Colors.red : Colors.green,
+                size: 20,
+              );
+            },
           ),
           const SizedBox(width: 4),
           IconButton(
@@ -156,7 +175,7 @@ class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
           ),
           IconButton(
             icon: const Icon(Icons.copy),
-            tooltip: 'Clone Report',
+            tooltip: 'Duplicate',
             onPressed: () async {
               final meta = InspectionMetadata.fromMap(report.inspectionMetadata);
               ReportTemplate? template;
@@ -281,6 +300,20 @@ class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
                                 value: 'oldest', child: Text('Oldest')),
                           ],
                         ),
+                        const SizedBox(width: 8),
+                        DropdownButton<String>(
+                          value: _statusFilter,
+                          onChanged: (val) {
+                            if (val != null) {
+                              setState(() => _statusFilter = val);
+                            }
+                          },
+                          items: const [
+                            DropdownMenuItem(value: 'all', child: Text('All')),
+                            DropdownMenuItem(value: 'finalized', child: Text('Finalized')),
+                            DropdownMenuItem(value: 'draft', child: Text('Draft')),
+                          ],
+                        ),
                       ],
                     ),
                     const SizedBox(height: 8),
@@ -324,6 +357,14 @@ class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
                             ),
                           )
                           .toList(),
+                    ),
+                    const SizedBox(height: 8),
+                    FilterChip(
+                      label: const Text('Attachments'),
+                      selected: _withAttachments,
+                      onSelected: (val) {
+                        setState(() => _withAttachments = val);
+                      },
                     ),
                   ],
                 ),

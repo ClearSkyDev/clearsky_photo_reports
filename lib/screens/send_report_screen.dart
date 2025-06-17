@@ -312,8 +312,10 @@ class _SendReportScreenState extends State<SendReportScreen> {
       } catch (_) {}
     }
 
+    final version = (_savedReport?.version ?? 0) + 1;
     final saved = SavedReport(
       id: reportId,
+      version: version,
       userId: profile?.id,
       inspectionMetadata: metadataMap,
       structures: structs,
@@ -493,8 +495,10 @@ class _SendReportScreenState extends State<SendReportScreen> {
 
     final savedAttachments = List<ReportAttachment>.from(_attachments);
 
+    final version = (_savedReport?.version ?? 0) + 1;
     final saved = SavedReport(
       id: id,
+      version: version,
       userId: profile?.id,
       inspectionMetadata: metadataMap,
       structures: structs,
@@ -610,6 +614,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
       structures: widget.structures ?? [],
       summary: widget.summary,
       summaryText: _summaryTextController.text,
+      version: _savedReport?.version ?? 1,
       latitude: _gpsPhotos().isNotEmpty ? _gpsPhotos().first.latitude : null,
       longitude: _gpsPhotos().isNotEmpty ? _gpsPhotos().first.longitude : null,
     );
@@ -634,6 +639,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
       if (_savedReport != null) {
         _savedReport = SavedReport(
           id: _savedReport!.id,
+          version: _savedReport!.version,
           userId: _savedReport!.userId,
           inspectionMetadata: _savedReport!.inspectionMetadata,
           structures: _savedReport!.structures,
@@ -957,6 +963,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
         setState(() {
           _savedReport = SavedReport(
             id: _savedReport!.id,
+            version: _savedReport!.version,
             userId: _savedReport!.userId,
             inspectionMetadata: _savedReport!.inspectionMetadata,
             structures: _savedReport!.structures,
@@ -1099,6 +1106,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
       setState(() {
         _savedReport = SavedReport(
           id: _savedReport!.id,
+          version: _savedReport!.version,
           userId: _savedReport!.userId,
           inspectionMetadata: meta,
           structures: _savedReport!.structures,
@@ -1201,6 +1209,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
       if (_savedReport != null) {
         _savedReport = SavedReport(
           id: _savedReport!.id,
+          version: _savedReport!.version + 1,
           userId: _savedReport!.userId,
           inspectionMetadata: _savedReport!.inspectionMetadata,
           structures: _savedReport!.structures,
@@ -1592,6 +1601,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
                     setState(() {
                       _savedReport = SavedReport(
                         id: _savedReport!.id,
+                        version: _savedReport!.version,
                         userId: _savedReport!.userId,
                         inspectionMetadata: _savedReport!.inspectionMetadata,
                         structures: _savedReport!.structures,
