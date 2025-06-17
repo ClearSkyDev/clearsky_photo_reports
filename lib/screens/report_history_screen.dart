@@ -12,6 +12,8 @@ import '../utils/profile_storage.dart';
 import '../models/inspector_profile.dart';
 import '../utils/template_store.dart';
 import 'metadata_screen.dart';
+import '../services/offline_draft_store.dart';
+import '../utils/sync_preferences.dart';
 
 class ReportHistoryScreen extends StatefulWidget {
   final String? inspectorName;
@@ -101,9 +103,11 @@ class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
           query.where('inspectionMetadata.inspectorName', isEqualTo: inspector);
     }
     final snapshot = await query.get();
-    return snapshot.docs
+    final remote = snapshot.docs
         .map((doc) => SavedReport.fromMap(doc.data(), doc.id))
         .toList();
+    final local = OfflineDraftStore.instance.loadReports();
+    return [...local, ...remote];
   }
 
   Widget _buildTile(SavedReport report) {
@@ -129,6 +133,12 @@ class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
+          Icon(
+            report.localOnly ? Icons.cloud_off : Icons.cloud_done,
+            color: report.localOnly ? Colors.red : Colors.green,
+            size: 20,
+          ),
+          const SizedBox(width: 4),
           IconButton(
             icon: const Icon(Icons.chat),
             onPressed: () {

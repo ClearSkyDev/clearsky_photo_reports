@@ -44,6 +44,7 @@ class SavedReport {
   final double? latitude;
   final double? longitude;
   final Map<String, dynamic>? searchIndex;
+  final bool localOnly;
 
   SavedReport({
     this.id = '',
@@ -74,6 +75,7 @@ class SavedReport {
     this.latitude,
     this.longitude,
     this.searchIndex,
+    this.localOnly = false,
   }) : createdAt = createdAt ?? DateTime.now();
 
   Map<String, dynamic> toMap() {
@@ -111,6 +113,7 @@ class SavedReport {
       if (latitude != null) 'latitude': latitude,
       if (longitude != null) 'longitude': longitude,
       if (searchIndex != null) 'searchIndex': searchIndex,
+      if (localOnly) 'localOnly': true,
     };
   }
 
@@ -186,6 +189,7 @@ class SavedReport {
       searchIndex: map['searchIndex'] != null
           ? Map<String, dynamic>.from(map['searchIndex'])
           : null,
+      localOnly: map['localOnly'] as bool? ?? false,
     );
   }
 }

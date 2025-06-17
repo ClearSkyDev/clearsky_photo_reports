@@ -93,6 +93,15 @@ For scenarios where Firebase is not available, reports can be stored locally usi
 
 When connectivity is lost the app stores draft reports in a local Hive database. A small "Offline" badge appears in the dashboard and all Firebase calls are skipped. Once a connection is detected a sync button uploads any pending drafts and clears the local storage. The sync service also attempts an upload every five minutes when the app is running so pending items are pushed automatically.
 
+## Report History & Cloud Sync
+
+The **Report History** screen lists all saved reports with a search bar and
+filter chips. Each tile displays the property address, inspection date and a
+thumbnail preview. A cloud icon indicates whether the report is stored locally
+or has been uploaded. Cloud sync can be disabled from the Report Settings screen
+via the *Enable Cloud Sync* toggle. When disabled, new reports remain on the
+device and the sync service ignores any drafts.
+
 ## Admin Audit Logs
 
 Administrators can review a history of actions such as logins, invoice updates and report changes. The **Audit Logs** screen provides search and filtering by user, action, date or target ID and exports the results to CSV for external analysis.

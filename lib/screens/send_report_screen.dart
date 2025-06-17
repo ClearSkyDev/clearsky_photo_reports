@@ -37,6 +37,7 @@ import '../utils/permission_utils.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import '../services/offline_sync_service.dart';
+import '../utils/sync_preferences.dart';
 
 /// If Firebase is not desired:
 /// - Use `path_provider` and `shared_preferences` or `hive` to save report JSON locally
@@ -133,7 +134,8 @@ class _SendReportScreenState extends State<SendReportScreen> {
 
   Future<void> _saveReport() async {
     if (_saving) return;
-    if (!OfflineSyncService.instance.online.value) {
+    final cloudEnabled = await SyncPreferences.isCloudSyncEnabled();
+    if (!OfflineSyncService.instance.online.value || !cloudEnabled) {
       await _saveReportOffline();
       return;
     }
@@ -453,6 +455,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
       lastEditedAt: DateTime.now(),
       latitude: latitude,
       longitude: longitude,
+      localOnly: true,
     );
 
     await OfflineSyncService.instance.saveDraft(saved);
