@@ -58,6 +58,8 @@ class LocalReportStore {
           }
           list.add(ReportPhotoEntry(
             label: pEntry.label,
+            caption: pEntry.caption,
+            confidence: pEntry.labelConfidence,
             photoUrl: dest,
             timestamp: pEntry.timestamp,
             latitude: pEntry.latitude,

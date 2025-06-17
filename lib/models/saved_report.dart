@@ -246,6 +246,8 @@ class SavedReport {
 
 class ReportPhotoEntry {
   final String label;
+  final String caption;
+  final double confidence;
   final String photoUrl;
   final DateTime? timestamp;
   final double? latitude;
@@ -259,6 +261,8 @@ class ReportPhotoEntry {
 
   ReportPhotoEntry({
     required this.label,
+    this.caption = '',
+    this.confidence = 0,
     required this.photoUrl,
     this.timestamp,
     this.latitude,
@@ -274,6 +278,8 @@ class ReportPhotoEntry {
   Map<String, dynamic> toMap() {
     return {
       'label': label,
+      if (caption.isNotEmpty) 'caption': caption,
+      if (confidence > 0) 'confidence': confidence,
       'photoUrl': photoUrl,
       if (timestamp != null) 'timestamp': timestamp!.millisecondsSinceEpoch,
       if (latitude != null) 'latitude': latitude,
@@ -290,6 +296,8 @@ class ReportPhotoEntry {
   factory ReportPhotoEntry.fromMap(Map<String, dynamic> map) {
     return ReportPhotoEntry(
       label: map['label'] as String? ?? '',
+      caption: map['caption'] as String? ?? '',
+      confidence: (map['confidence'] as num?)?.toDouble() ?? 0,
       photoUrl: map['photoUrl'] as String? ?? '',
       timestamp: map['timestamp'] != null
           ? DateTime.fromMillisecondsSinceEpoch(map['timestamp'])

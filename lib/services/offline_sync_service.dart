@@ -115,6 +115,8 @@ class OfflineSyncService {
           final url = await ref.getDownloadURL();
           uploaded.add(ReportPhotoEntry(
             label: p.label,
+            caption: p.caption,
+            confidence: p.labelConfidence,
             photoUrl: url,
             timestamp: p.timestamp,
             latitude: p.latitude,

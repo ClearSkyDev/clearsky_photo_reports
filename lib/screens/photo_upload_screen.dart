@@ -56,6 +56,18 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
     }
   }
 
+  Color _confidenceColor(double c) {
+    if (c >= 0.9) return Colors.green;
+    if (c >= 0.7) return Colors.orange;
+    return Colors.redAccent;
+  }
+
+  IconData _confidenceIcon(double c) {
+    if (c >= 0.9) return Icons.check_circle;
+    if (c >= 0.7) return Icons.error;
+    return Icons.delete;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -98,10 +110,13 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
           );
           target.add(entry);
           inspectionChecklist.recordPhoto(section);
-          getSuggestedLabel(entry, section, _metadata).then((label) {
+          getLabelSuggestion(entry, section, _metadata).then((suggestion) {
             setState(() {
               entry
-                ..label = label
+                ..label = suggestion.label
+                ..caption = suggestion.caption
+                ..labelConfidence = suggestion.confidence
+                ..labelReason = suggestion.reason
                 ..labelLoading = false;
             });
           });
@@ -277,7 +292,32 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Photo Details'),
+        title: Row(
+          children: [
+            const Text('Photo Details'),
+            const Spacer(),
+            if (entry.labelReason != null)
+              IconButton(
+                icon: const Icon(Icons.info_outline),
+                tooltip: 'AI reasoning',
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (_) => AlertDialog(
+                      title: const Text('AI Reasoning'),
+                      content: Text(entry.labelReason!),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text('Close'),
+                        )
+                      ],
+                    ),
+                  );
+                },
+              ),
+          ],
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -338,6 +378,18 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
           TextButton(
             onPressed: () {
               setState(() {
+                entry
+                  ..label = controller.text
+                  ..labelLoading = false;
+                entry.note = noteController.text;
+              });
+              Navigator.pop(context);
+            },
+            child: const Text('Accept'),
+          ),
+          TextButton(
+            onPressed: () {
+              setState(() {
                 final before = {
                   'label': entry.label,
                   'note': entry.note,
@@ -361,6 +413,18 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
               Navigator.pop(context);
             },
             child: const Text('Save'),
+          ),
+          TextButton(
+            onPressed: () {
+              setState(() {
+                entry
+                  ..label = 'Unlabeled'
+                  ..caption = ''
+                  ..labelConfidence = 0;
+              });
+              Navigator.pop(context);
+            },
+            child: const Text('Discard'),
           ),
         ],
       ),
@@ -390,10 +454,13 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
     for (var item in unlabeled) {
       final photo = item.value;
       setState(() => photo.labelLoading = true);
-      final label = await getSuggestedLabel(photo, item.key, _metadata);
+      final suggestion = await getLabelSuggestion(photo, item.key, _metadata);
       setState(() {
         photo
-          ..label = label
+          ..label = suggestion.label
+          ..caption = suggestion.caption
+          ..labelConfidence = suggestion.confidence
+          ..labelReason = suggestion.reason
           ..labelLoading = false;
         _autoLabelRemaining--;
       });
@@ -550,14 +617,33 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
                                 child: Column(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Text(
-                                      photos[index].label,
-                                      textAlign: TextAlign.center,
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 12,
-                                      ),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          photos[index].label,
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 4),
+                                        Icon(
+                                          _confidenceIcon(photos[index].labelConfidence),
+                                          size: 14,
+                                          color: _confidenceColor(photos[index].labelConfidence),
+                                        ),
+                                      ],
                                     ),
+                                    if (photos[index].caption.isNotEmpty)
+                                      Text(
+                                        photos[index].caption,
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 10,
+                                        ),
+                                      ),
                                     Text(
                                       photos[index]
                                           .capturedAt

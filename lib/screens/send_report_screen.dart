@@ -180,6 +180,8 @@ class _SendReportScreenState extends State<SendReportScreen> {
           final url = await ref.getDownloadURL();
           result.add(ReportPhotoEntry(
               label: p.label,
+              caption: p.caption,
+              confidence: p.labelConfidence,
               photoUrl: url,
               timestamp: p.capturedAt,
               latitude: p.latitude,
@@ -438,6 +440,8 @@ class _SendReportScreenState extends State<SendReportScreen> {
           final list = entry.value
               .map((p) => ReportPhotoEntry(
                     label: p.label,
+                    caption: p.caption,
+                    confidence: p.labelConfidence,
                     photoUrl: p.url,
                     timestamp: p.capturedAt,
                     latitude: p.latitude,

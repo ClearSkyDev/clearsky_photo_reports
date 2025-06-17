@@ -46,6 +46,8 @@ class _QuickReportScreenState extends State<QuickReportScreen> {
     setState(() {
       _photos[_step] = ReportPhotoEntry(
         label: _labels[_step],
+        caption: '',
+        confidence: 0,
         photoUrl: image.path,
         timestamp: DateTime.now(),
       );
