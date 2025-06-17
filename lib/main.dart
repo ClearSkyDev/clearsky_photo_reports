@@ -32,6 +32,8 @@ import 'screens/notification_settings_screen.dart';
 import 'services/auth_service.dart';
 import 'services/offline_sync_service.dart';
 import 'services/notification_service.dart';
+import 'services/changelog_service.dart';
+import 'screens/changelog_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -40,6 +42,7 @@ Future<void> main() async {
   );
   await OfflineSyncService.instance.init();
   await NotificationService.instance.init();
+  await ChangelogService.instance.init();
   runApp(const ClearSkyApp());
 }
 
@@ -74,6 +77,7 @@ class ClearSkyApp extends StatelessWidget {
         '/search': (context) => const ReportSearchScreen(),
         '/invoices': (context) => const InvoiceListScreen(),
         '/notifications': (context) => const NotificationSettingsScreen(),
+        '/changelog': (context) => const ChangelogScreen(),
       },
       onGenerateRoute: (settings) {
         final name = settings.name ?? '';

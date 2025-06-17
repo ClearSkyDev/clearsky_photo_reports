@@ -1,0 +1,17 @@
+[
+  {
+    "version": "1.1.0",
+    "date": "2025-06-01",
+    "highlights": [
+      "Added AI chat assistant",
+      "New analytics dashboard"
+    ],
+    "notes": "This release introduces an AI assistant for inspection guidance and a dashboard for viewing analytics."
+  },
+  {
+    "version": "1.0.0",
+    "date": "2025-01-10",
+    "highlights": ["Initial release"],
+    "notes": "First production release of ClearSky Photo Reports."
+  }
+]
