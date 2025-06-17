@@ -121,3 +121,9 @@ Referral partners can log in to view all properties they referred. The dashboard
 ## AI Feedback System
 
 All AI-generated captions and report summaries are stored alongside any manual edits. Each correction is saved with a timestamp in the new `ai_feedback` collection so the model can learn from common mistakes. Users may disable learning from the AI Learning screen which also lets them review or clear their personal edit history.
+## Video Report Export
+
+Generate narrated slideshow videos from report photos. Each slide's caption is voiced with text-to-speech and the final MP4 can include optional background music and branding. Videos are rendered on-device using ffmpeg and may be shared or uploaded to Firebase.
+
+
+
