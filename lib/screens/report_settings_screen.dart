@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../utils/sync_preferences.dart';
+import '../models/tts_settings.dart';
+import '../services/tts_service.dart';
 
 class ReportSettings {
   final String companyName;
@@ -91,6 +93,21 @@ class _ReportSettingsScreenState extends State<ReportSettingsScreen> {
   bool _autoLegalBackup = false;
   bool _cloudSyncEnabled = true;
   bool _attachPdf = true;
+  final TextEditingController _ttsLangController = TextEditingController();
+  double _ttsRate = 0.5;
+  String _ttsLanguage = 'en-US';
+  bool _handsFree = false;
+
+  @override
+  void dispose() {
+    _companyController.dispose();
+    _taglineController.dispose();
+    _footerController.dispose();
+    _emailMessageController.dispose();
+    _signatureController.dispose();
+    _ttsLangController.dispose();
+    super.dispose();
+  }
 
   static const Map<String, MaterialColor> _colors = {
     'Blue': Colors.blue,
@@ -110,6 +127,7 @@ class _ReportSettingsScreenState extends State<ReportSettingsScreen> {
   @override
   void initState() {
     super.initState();
+    _ttsLangController.text = _ttsLanguage;
     _loadSettings();
   }
 
@@ -151,10 +169,22 @@ class _ReportSettingsScreenState extends State<ReportSettingsScreen> {
                 .key;
       });
     }
+    final ttsRaw = prefs.getString('tts_settings');
+    if (ttsRaw != null) {
+      final ttsMap = jsonDecode(ttsRaw) as Map<String, dynamic>;
+      final tts = TtsSettings.fromMap(ttsMap);
+      setState(() {
+        _ttsRate = tts.rate;
+        _ttsLanguage = tts.language;
+        _ttsLangController.text = tts.language;
+        _handsFree = tts.handsFree;
+      });
+    }
     _cloudSyncEnabled = await SyncPreferences.isCloudSyncEnabled();
   }
 
   Future<void> _saveSettings() async {
+    _ttsLanguage = _ttsLangController.text.trim();
     final settings = ReportSettings(
       companyName: _companyController.text.trim(),
       tagline: _taglineController.text.trim(),
@@ -171,6 +201,13 @@ class _ReportSettingsScreenState extends State<ReportSettingsScreen> {
     );
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('report_settings', jsonEncode(settings.toMap()));
+    final tts = TtsSettings(
+      language: _ttsLanguage,
+      rate: _ttsRate,
+      handsFree: _handsFree,
+    );
+    await prefs.setString('tts_settings', jsonEncode(tts.toMap()));
+    await TtsService.instance.saveSettings(tts);
     await SyncPreferences.setCloudSyncEnabled(_cloudSyncEnabled);
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -310,6 +347,34 @@ class _ReportSettingsScreenState extends State<ReportSettingsScreen> {
               decoration:
                   const InputDecoration(labelText: 'Custom Footer Text'),
               maxLines: 3,
+            ),
+            const Divider(),
+            const Text('Text To Speech',
+                style: TextStyle(fontWeight: FontWeight.bold)),
+            SwitchListTile(
+              title: const Text('Hands-Free Narration'),
+              value: _handsFree,
+              onChanged: (val) => setState(() => _handsFree = val),
+            ),
+            TextField(
+              decoration: const InputDecoration(labelText: 'Language Code'),
+              controller: _ttsLangController,
+              onChanged: (v) => _ttsLanguage = v,
+            ),
+            Row(
+              children: [
+                const Text('Speed'),
+                Expanded(
+                  child: Slider(
+                    value: _ttsRate,
+                    min: 0.1,
+                    max: 1.0,
+                    divisions: 9,
+                    label: _ttsRate.toStringAsFixed(2),
+                    onChanged: (v) => setState(() => _ttsRate = v),
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 20),
             ElevatedButton(
