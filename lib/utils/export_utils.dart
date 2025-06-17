@@ -357,6 +357,14 @@ Future<String> _generateHtml(SavedReport report) async {
       ..writeln('<p>${report.summary}</p>')
       ..writeln('</div>');
   }
+  if (report.attachments.isNotEmpty) {
+    buffer.writeln('<h2>Attachments</h2><ul>');
+    for (final att in report.attachments) {
+      final label = att.tag.isNotEmpty ? att.tag : att.name;
+      buffer.writeln('<li><a href="${att.url}">$label</a></li>');
+    }
+    buffer.writeln('</ul>');
+  }
     for (final struct in report.structures) {
       if (report.structures.length > 1) {
         buffer.writeln('<h2>${struct.name}</h2>');

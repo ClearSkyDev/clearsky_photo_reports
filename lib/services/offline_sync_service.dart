@@ -7,9 +7,11 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:path/path.dart' as p;
 
 import '../models/saved_report.dart';
 import '../models/inspected_structure.dart';
+import '../models/report_attachment.dart';
 import 'offline_draft_store.dart';
 import '../utils/sync_preferences.dart';
 import 'sync_history_service.dart';
@@ -142,6 +144,31 @@ class OfflineSyncService {
       } catch (_) {}
     }
 
+    final uploadedAttachments = <ReportAttachment>[];
+    for (final att in draft.attachments) {
+      if (att.isExternalUrl || att.url.startsWith('http')) {
+        uploadedAttachments.add(att);
+        continue;
+      }
+      final file = File(att.url);
+      if (!await file.exists()) continue;
+      final name = p.basename(att.url);
+      final ref = storage
+          .ref()
+          .child('reports/${draft.id}/attachments/$name');
+      try {
+        await ref.putFile(file);
+        final url = await ref.getDownloadURL();
+        uploadedAttachments.add(ReportAttachment(
+          name: att.name,
+          url: url,
+          tag: att.tag,
+          type: att.type,
+          uploadedAt: att.uploadedAt,
+        ));
+      } catch (_) {}
+    }
+
     final saved = SavedReport(
       id: draft.id,
       userId: draft.userId,
@@ -168,6 +195,7 @@ class OfflineSyncService {
       latitude: draft.latitude,
       longitude: draft.longitude,
       searchIndex: draft.searchIndex,
+      attachments: uploadedAttachments,
     );
 
     await firestore.collection('reports').doc(draft.id).set(saved.toMap());

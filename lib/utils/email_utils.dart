@@ -10,6 +10,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import '../models/report_attachment.dart';
 
 /// Sends the generated report to [email]. On mobile platforms the PDF is
 /// attached using `flutter_email_sender`. On web a blob download is triggered
@@ -20,6 +21,7 @@ Future<void> sendReportByEmail(
   Uint8List pdfBytes, {
   String subject = 'Roof Inspection Report',
   String message = '',
+  List<String> attachmentPaths = const [],
 }) async {
   if (kIsWeb) {
     final blob = html.Blob([pdfBytes], 'application/pdf');
@@ -42,7 +44,7 @@ Future<void> sendReportByEmail(
     body: message,
     subject: subject,
     recipients: [email],
-    attachmentPaths: [file.path],
+    attachmentPaths: [file.path, ...attachmentPaths],
     isHTML: false,
   );
   try {
@@ -79,14 +81,29 @@ Future<void> sendReportEmail(
   String message = '',
   String signature = '',
   bool attachPdf = true,
+  List<ReportAttachment> attachments = const [],
 }) async {
   final fullMessage = [message, if (signature.isNotEmpty) signature].join('\n\n');
   if (attachPdf) {
-    await sendReportByEmail(email, pdfBytes, subject: subject, message: fullMessage);
+    final localPaths = attachments
+        .where((a) => !a.url.startsWith('http'))
+        .map((a) => a.url)
+        .toList();
+    await sendReportByEmail(email, pdfBytes,
+        subject: subject,
+        message: fullMessage,
+        attachmentPaths: localPaths);
     return;
   }
   final url = await _uploadPdf(pdfBytes);
-  final body = [message, 'Download: $url', if (signature.isNotEmpty) signature]
+  final links = <String>[];
+  for (final a in attachments) {
+    if (a.url.startsWith('http')) {
+      final label = a.tag.isNotEmpty ? a.tag : a.name;
+      links.add('$label: ${a.url}');
+    }
+  }
+  final body = [message, 'Download: $url', if (links.isNotEmpty) links.join('\n'), if (signature.isNotEmpty) signature]
       .join('\n\n');
   if (kIsWeb) {
     final mailto =

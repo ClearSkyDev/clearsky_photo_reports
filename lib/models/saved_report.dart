@@ -9,6 +9,7 @@ import 'report_collaborator.dart';
 import 'homeowner_signature.dart';
 import 'photo_entry.dart' show SourceType;
 import 'ai_summary.dart';
+import 'report_attachment.dart';
 
 class SavedReport {
   final String id;
@@ -39,6 +40,7 @@ class SavedReport {
   final List<PhotoAuditIssue>? lastAuditIssues;
   final List<ReportChange> changeLog;
   final List<ReportSnapshot> snapshots;
+  final List<ReportAttachment> attachments;
   final String? reportOwner;
   final List<ReportCollaborator> collaborators;
   final String? lastEditedBy;
@@ -73,6 +75,7 @@ class SavedReport {
     this.lastAuditIssues,
     this.changeLog = const [],
     this.snapshots = const [],
+    this.attachments = const [],
     this.reportOwner,
     this.collaborators = const [],
     this.lastEditedBy,
@@ -112,6 +115,8 @@ class SavedReport {
         'changeLog': changeLog.map((e) => e.toMap()).toList(),
       if (snapshots.isNotEmpty)
         'snapshots': snapshots.map((e) => e.toMap()).toList(),
+      if (attachments.isNotEmpty)
+        'attachments': attachments.map((e) => e.toMap()).toList(),
       if (reportOwner != null) 'reportOwner': reportOwner,
       if (collaborators.isNotEmpty)
         'collaborators': collaborators.map((e) => e.toMap()).toList(),
@@ -183,6 +188,12 @@ class SavedReport {
           ? (map['snapshots'] as List)
               .map((e) =>
                   ReportSnapshot.fromMap(Map<String, dynamic>.from(e as Map)))
+              .toList()
+          : [],
+      attachments: map['attachments'] != null
+          ? (map['attachments'] as List)
+              .map((e) =>
+                  ReportAttachment.fromMap(Map<String, dynamic>.from(e as Map)))
               .toList()
           : [],
       reportOwner: map['reportOwner'] as String?,
