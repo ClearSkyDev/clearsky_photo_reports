@@ -12,6 +12,8 @@ include the capture source for each image.
 
 A minimal React Native + Expo implementation for the ClearSky Photo Intake screen is provided under `react_native/App.js`. This prototype demonstrates the collapsible inspection sections and photo upload workflow using Expo's image picker.
 
+The intake screen now features a section dropdown so inspectors can quickly switch between Address, Front, Right, Back, Left, Roof Edge, Slopes and Buildings. Each uploaded photo is auto-labeled using sample AI suggestions and optional tags can be appended with a single tap. When enabled, adding a photo marks the related checklist item complete.
+
 ## Questionnaire Generation Demo
 
 The file `react_native/roofQuestionnaire.js` contains a utility that converts approved photo labels into a structured questionnaire object. A small demo script is available under `scripts/demo_generate_questionnaire.js`:
