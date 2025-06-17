@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../utils/sync_preferences.dart';
 
 class ReportSettings {
   final String companyName;
@@ -74,6 +75,7 @@ class _ReportSettingsScreenState extends State<ReportSettingsScreen> {
   bool _includeDisclaimer = true;
   bool _showGpsData = true;
   bool _autoLegalBackup = false;
+  bool _cloudSyncEnabled = true;
 
   static const Map<String, MaterialColor> _colors = {
     'Blue': Colors.blue,
@@ -131,6 +133,7 @@ class _ReportSettingsScreenState extends State<ReportSettingsScreen> {
                 .key;
       });
     }
+    _cloudSyncEnabled = await SyncPreferences.isCloudSyncEnabled();
   }
 
   Future<void> _saveSettings() async {
@@ -147,6 +150,7 @@ class _ReportSettingsScreenState extends State<ReportSettingsScreen> {
     );
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('report_settings', jsonEncode(settings.toMap()));
+    await SyncPreferences.setCloudSyncEnabled(_cloudSyncEnabled);
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Settings saved')),
@@ -248,6 +252,15 @@ class _ReportSettingsScreenState extends State<ReportSettingsScreen> {
               onChanged: (val) {
                 setState(() {
                   _autoLegalBackup = val;
+                });
+              },
+            ),
+            SwitchListTile(
+              title: const Text('Enable Cloud Sync'),
+              value: _cloudSyncEnabled,
+              onChanged: (val) {
+                setState(() {
+                  _cloudSyncEnabled = val;
                 });
               },
             ),

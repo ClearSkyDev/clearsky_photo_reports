@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import '../models/saved_report.dart';
 import '../models/inspected_structure.dart';
 import 'offline_draft_store.dart';
+import '../utils/sync_preferences.dart';
 
 class OfflineSyncService {
   OfflineSyncService._();
@@ -53,6 +54,7 @@ class OfflineSyncService {
 
   Future<void> syncDrafts() async {
     if (!online.value) return;
+    if (!await SyncPreferences.isCloudSyncEnabled()) return;
     final drafts = OfflineDraftStore.instance.loadReports();
     for (final draft in drafts) {
       try {
