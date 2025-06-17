@@ -224,6 +224,8 @@ class _SendReportScreenState extends State<SendReportScreen> {
         'lastSentTo': widget.metadata.lastSentTo,
       if (widget.metadata.lastSentAt != null)
         'lastSentAt': widget.metadata.lastSentAt!.toIso8601String(),
+      if (widget.metadata.lastSendMethod != null)
+        'lastSendMethod': widget.metadata.lastSendMethod,
     };
 
     final prefs = await SharedPreferences.getInstance();
@@ -414,6 +416,8 @@ class _SendReportScreenState extends State<SendReportScreen> {
         'lastSentTo': widget.metadata.lastSentTo,
       if (widget.metadata.lastSentAt != null)
         'lastSentAt': widget.metadata.lastSentAt!.toIso8601String(),
+      if (widget.metadata.lastSendMethod != null)
+        'lastSendMethod': widget.metadata.lastSendMethod,
     };
 
     final prefs = await SharedPreferences.getInstance();
@@ -542,6 +546,8 @@ class _SendReportScreenState extends State<SendReportScreen> {
         'lastSentTo': widget.metadata.lastSentTo,
       if (widget.metadata.lastSentAt != null)
         'lastSentAt': widget.metadata.lastSentAt!.toIso8601String(),
+      if (widget.metadata.lastSendMethod != null)
+        'lastSendMethod': widget.metadata.lastSendMethod,
     };
     final report = SavedReport(
       inspectionMetadata: metaMap,
@@ -786,9 +792,24 @@ class _SendReportScreenState extends State<SendReportScreen> {
     final subjectCtrl = TextEditingController(
         text: 'Roof Inspection Report for ${m.clientName}');
     final inspector = m.inspectorName != null ? ' by ${m.inspectorName}' : '';
-    final bodyCtrl = TextEditingController(
-        text:
-            'Please find attached the roof inspection report for ${m.clientName}${inspector}.');
+    String defaultMessage =
+        'Please find attached the roof inspection report for ${m.clientName}${inspector}.';
+    String signature = '';
+    bool attachPdf = true;
+    final prefs = await SharedPreferences.getInstance();
+    final raw = prefs.getString('report_settings');
+    if (raw != null) {
+      final map = jsonDecode(raw) as Map<String, dynamic>;
+      final settings = ReportSettings.fromMap(map);
+      defaultMessage = settings.emailMessage.isNotEmpty
+          ? settings.emailMessage
+              .replaceAll('{client}', m.clientName)
+              .replaceAll('{inspector}', m.inspectorName ?? '')
+          : defaultMessage;
+      signature = settings.emailSignature;
+      attachPdf = settings.attachPdf;
+    }
+    final bodyCtrl = TextEditingController(text: defaultMessage);
 
     final send = await showDialog<bool>(
       context: context,
@@ -826,11 +847,13 @@ class _SendReportScreenState extends State<SendReportScreen> {
     );
 
     if (send == true) {
-      await _sendEmail(toCtrl.text, subjectCtrl.text, bodyCtrl.text);
+      await _sendEmail(
+          toCtrl.text, subjectCtrl.text, bodyCtrl.text, signature, attachPdf);
     }
   }
 
-  Future<void> _sendEmail(String to, String subject, String body) async {
+  Future<void> _sendEmail(
+      String to, String subject, String body, String signature, bool attachPdf) async {
     if (to.isEmpty || _savedReport == null) return;
     showDialog(
       context: context,
@@ -844,7 +867,8 @@ class _SendReportScreenState extends State<SendReportScreen> {
     );
     try {
       final pdf = await generatePdf(_savedReport!);
-      await sendReportByEmail(to, pdf, subject: subject, message: body);
+      await sendReportEmail(to, pdf,
+          subject: subject, message: body, signature: signature, attachPdf: attachPdf);
       if (_docId != null) {
         try {
           await FirebaseFirestore.instance
@@ -853,12 +877,14 @@ class _SendReportScreenState extends State<SendReportScreen> {
               .update({
             'inspectionMetadata.lastSentTo': to,
             'inspectionMetadata.lastSentAt': FieldValue.serverTimestamp(),
+            'inspectionMetadata.lastSendMethod': attachPdf ? 'attachment' : 'link',
           });
         } catch (_) {}
       }
       final meta = Map<String, dynamic>.from(_savedReport!.inspectionMetadata);
       meta['lastSentTo'] = to;
       meta['lastSentAt'] = DateTime.now().toIso8601String();
+      meta['lastSendMethod'] = attachPdf ? 'attachment' : 'link';
       setState(() {
         _savedReport = SavedReport(
           id: _savedReport!.id,
