@@ -7,11 +7,17 @@ import '../services/auth_service.dart';
 import '../services/offline_sync_service.dart';
 import '../widgets/ai_chat_button.dart';
 import '../widgets/ai_chat_drawer.dart';
+import '../widgets/changelog_banner.dart';
 
-class DashboardScreen extends StatelessWidget {
+class DashboardScreen extends StatefulWidget {
   final InspectorUser user;
   const DashboardScreen({super.key, required this.user});
 
+  @override
+  State<DashboardScreen> createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
     final key = const String.fromEnvironment('OPENAI_API_KEY', defaultValue: '')
@@ -69,10 +75,12 @@ class DashboardScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: Center(
+      body: Align(
+        alignment: Alignment.topCenter,
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
+            const ChangelogBanner(),
             ElevatedButton(
               onPressed: () => Navigator.pushNamed(context, '/history'),
               child: const Text('My Reports'),
@@ -93,27 +101,27 @@ class DashboardScreen extends StatelessWidget {
               onPressed: () => Navigator.pushNamed(context, '/invoices'),
               child: const Text('Unpaid Invoices'),
             ),
-            if (user.role == UserRole.admin)
+            if (widget.user.role == UserRole.admin)
               ElevatedButton(
                 onPressed: () => Navigator.pushNamed(context, '/manageTeam'),
                 child: const Text('Manage Team'),
               ),
-            if (user.role == UserRole.admin)
+            if (widget.user.role == UserRole.admin)
               ElevatedButton(
                 onPressed: () => Navigator.pushNamed(context, '/publicLinks'),
                 child: const Text('Public Links'),
               ),
-            if (user.role == UserRole.admin)
+            if (widget.user.role == UserRole.admin)
               ElevatedButton(
                 onPressed: () => Navigator.pushNamed(context, '/signatureStatus'),
                 child: const Text('Signature Status'),
               ),
-            if (user.role == UserRole.admin)
+            if (widget.user.role == UserRole.admin)
               ElevatedButton(
                 onPressed: () => Navigator.pushNamed(context, '/analytics'),
                 child: const Text('Analytics Dashboard'),
               ),
-            if (user.role == UserRole.admin)
+            if (widget.user.role == UserRole.admin)
               ElevatedButton(
                 onPressed: () => Navigator.pushNamed(context, '/adminLogs'),
                 child: const Text('Audit Logs'),

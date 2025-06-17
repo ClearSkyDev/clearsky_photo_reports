@@ -55,4 +55,5 @@ flutter:
 
   assets:
     - assets/images/clearsky_logo.png
+    - assets/changelog.json
 
