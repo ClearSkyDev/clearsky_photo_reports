@@ -12,6 +12,8 @@ class InspectionMetadata {
   final InspectorReportRole inspectorRole;
   final String? reportId;
   final String? weatherNotes;
+  final String? lastSentTo;
+  final DateTime? lastSentAt;
 
   InspectionMetadata({
     required this.clientName,
@@ -24,6 +26,8 @@ class InspectionMetadata {
     this.inspectorRole = InspectorReportRole.ladder_assist,
     this.reportId,
     this.weatherNotes,
+    this.lastSentTo,
+    this.lastSentAt,
   });
 
   factory InspectionMetadata.fromMap(Map<String, dynamic> map) {
@@ -48,6 +52,13 @@ class InspectionMetadata {
       return InspectorReportRole.ladder_assist;
     }
 
+    DateTime? parseDate(dynamic value) {
+      if (value is Timestamp) return value.toDate();
+      if (value is int) return DateTime.fromMillisecondsSinceEpoch(value);
+      if (value is String) return DateTime.tryParse(value);
+      return null;
+    }
+
     return InspectionMetadata(
       clientName: map['clientName'] ?? '',
       propertyAddress: map['propertyAddress'] ?? '',
@@ -61,6 +72,8 @@ class InspectionMetadata {
       inspectorRole: parseRole(map['inspectorRole'] as String?),
       reportId: map['reportId'] as String?,
       weatherNotes: map['weatherNotes'] as String?,
+      lastSentTo: map['lastSentTo'] as String?,
+      lastSentAt: parseDate(map['lastSentAt']),
     );
   }
 }

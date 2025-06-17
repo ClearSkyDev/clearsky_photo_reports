@@ -24,6 +24,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import '../utils/share_utils.dart';
+import '../utils/email_utils.dart';
 import 'inspection_checklist_screen.dart';
 import 'photo_map_screen.dart';
 import 'change_history_screen.dart';
@@ -219,6 +220,10 @@ class _SendReportScreenState extends State<SendReportScreen> {
         'reportId': widget.metadata.reportId,
       if (widget.metadata.weatherNotes != null)
         'weatherNotes': widget.metadata.weatherNotes,
+      if (widget.metadata.lastSentTo != null)
+        'lastSentTo': widget.metadata.lastSentTo,
+      if (widget.metadata.lastSentAt != null)
+        'lastSentAt': widget.metadata.lastSentAt!.toIso8601String(),
     };
 
     final prefs = await SharedPreferences.getInstance();
@@ -405,6 +410,10 @@ class _SendReportScreenState extends State<SendReportScreen> {
         'reportId': widget.metadata.reportId,
       if (widget.metadata.weatherNotes != null)
         'weatherNotes': widget.metadata.weatherNotes,
+      if (widget.metadata.lastSentTo != null)
+        'lastSentTo': widget.metadata.lastSentTo,
+      if (widget.metadata.lastSentAt != null)
+        'lastSentAt': widget.metadata.lastSentAt!.toIso8601String(),
     };
 
     final prefs = await SharedPreferences.getInstance();
@@ -529,6 +538,10 @@ class _SendReportScreenState extends State<SendReportScreen> {
         'reportId': widget.metadata.reportId,
       if (widget.metadata.weatherNotes != null)
         'weatherNotes': widget.metadata.weatherNotes,
+      if (widget.metadata.lastSentTo != null)
+        'lastSentTo': widget.metadata.lastSentTo,
+      if (widget.metadata.lastSentAt != null)
+        'lastSentAt': widget.metadata.lastSentAt!.toIso8601String(),
     };
     final report = SavedReport(
       inspectionMetadata: metaMap,
@@ -767,9 +780,115 @@ class _SendReportScreenState extends State<SendReportScreen> {
     await shareReportFile(_exportedFile!, subject: subject, text: body);
   }
 
-  Future<void> _sendEmail() async {
-    if (_emailController.text.isEmpty) return;
-    // TODO: call sendReportByEmail
+  Future<void> _openEmailDialog() async {
+    final toCtrl = TextEditingController(text: _emailController.text);
+    final m = widget.metadata;
+    final subjectCtrl = TextEditingController(
+        text: 'Roof Inspection Report for ${m.clientName}');
+    final inspector = m.inspectorName != null ? ' by ${m.inspectorName}' : '';
+    final bodyCtrl = TextEditingController(
+        text:
+            'Please find attached the roof inspection report for ${m.clientName}${inspector}.');
+
+    final send = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Email Report'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: toCtrl,
+              decoration: const InputDecoration(labelText: 'To'),
+            ),
+            TextField(
+              controller: subjectCtrl,
+              decoration: const InputDecoration(labelText: 'Subject'),
+            ),
+            TextField(
+              controller: bodyCtrl,
+              decoration: const InputDecoration(labelText: 'Message'),
+              maxLines: 3,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Send'),
+          )
+        ],
+      ),
+    );
+
+    if (send == true) {
+      await _sendEmail(toCtrl.text, subjectCtrl.text, bodyCtrl.text);
+    }
+  }
+
+  Future<void> _sendEmail(String to, String subject, String body) async {
+    if (to.isEmpty || _savedReport == null) return;
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const AlertDialog(
+        content: SizedBox(
+          height: 60,
+          child: Center(child: CircularProgressIndicator()),
+        ),
+      ),
+    );
+    try {
+      final pdf = await generatePdf(_savedReport!);
+      await sendReportByEmail(to, pdf, subject: subject, message: body);
+      if (_docId != null) {
+        try {
+          await FirebaseFirestore.instance
+              .collection('reports')
+              .doc(_docId)
+              .update({
+            'inspectionMetadata.lastSentTo': to,
+            'inspectionMetadata.lastSentAt': FieldValue.serverTimestamp(),
+          });
+        } catch (_) {}
+      }
+      final meta = Map<String, dynamic>.from(_savedReport!.inspectionMetadata);
+      meta['lastSentTo'] = to;
+      meta['lastSentAt'] = DateTime.now().toIso8601String();
+      setState(() {
+        _savedReport = SavedReport(
+          id: _savedReport!.id,
+          userId: _savedReport!.userId,
+          inspectionMetadata: meta,
+          structures: _savedReport!.structures,
+          summary: _savedReport!.summary,
+          summaryText: _savedReport!.summaryText,
+          signature: _savedReport!.signature,
+          createdAt: _savedReport!.createdAt,
+          isFinalized: _savedReport!.isFinalized,
+          publicReportId: _savedReport!.publicReportId,
+          templateId: _savedReport!.templateId,
+          lastAuditPassed: _savedReport!.lastAuditPassed,
+          lastAuditIssues: _savedReport!.lastAuditIssues,
+          changeLog: _savedReport!.changeLog,
+          snapshots: _savedReport!.snapshots,
+          reportOwner: _savedReport!.reportOwner,
+          collaborators: _savedReport!.collaborators,
+          lastEditedBy: _savedReport!.lastEditedBy,
+          lastEditedAt: _savedReport!.lastEditedAt,
+          latitude: _savedReport!.latitude,
+          longitude: _savedReport!.longitude,
+        );
+      });
+    } finally {
+      if (mounted && Navigator.of(context).canPop()) {
+        Navigator.of(context).pop();
+      }
+    }
   }
 
   Future<void> _finalizeReport() async {
@@ -1175,8 +1294,9 @@ class _SendReportScreenState extends State<SendReportScreen> {
             ),
             const SizedBox(height: 12),
             ElevatedButton(
-              onPressed: _emailController.text.isEmpty ? null : _sendEmail,
-              child: const Text('Send via Email'),
+              onPressed:
+                  _emailController.text.isEmpty ? null : _openEmailDialog,
+              child: const Text('Send to Client'),
             ),
           ],
         ),
