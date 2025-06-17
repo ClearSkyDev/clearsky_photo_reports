@@ -1,6 +1,13 @@
 # clearsky-photo-reports
 AI powered roof inspection reporting app
 
+## Dynamic Summary Assistant
+
+The new `DynamicSummaryService` keeps inspection summaries up to date.
+Section summaries are regenerated as photos are labeled, while manual
+edits are preserved. A single paragraph can be rewritten using the AI
+service and summaries adapt to the selected inspector role.
+
 ## Drone & Infrared Media
 
 Photos can now be tagged with a source type of `camera`, `drone` or `thermal`.
