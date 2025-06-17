@@ -29,6 +29,7 @@ import '../utils/share_utils.dart';
 import 'photo_map_screen.dart';
 import '../services/ai_summary_service.dart';
 import '../models/ai_summary.dart';
+import '../services/speech_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import '../models/inspected_structure.dart';
@@ -199,8 +200,14 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
     if (_editingSummaries) {
       return TextField(
         controller: controller,
-        decoration:
-            InputDecoration(labelText: label, border: const OutlineInputBorder()),
+        decoration: InputDecoration(
+          labelText: label,
+          border: const OutlineInputBorder(),
+          suffixIcon: IconButton(
+            icon: const Icon(Icons.mic),
+            onPressed: () => _dictate(controller, label.toLowerCase()),
+          ),
+        ),
         maxLines: 3,
       );
     }
@@ -453,6 +460,45 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
   void _openMap(double lat, double lng) {
     final uri = Uri.parse('https://www.google.com/maps/search/?api=1&query=$lat,$lng');
     launchUrl(uri, mode: LaunchMode.externalApplication);
+  }
+
+  Future<void> _dictate(TextEditingController controller, String field) async {
+    final scaffold = ScaffoldMessenger.of(context);
+    scaffold.showSnackBar(const SnackBar(content: Text('Listening...')));
+    final text = await SpeechService.instance.record(
+      fieldType: field,
+      reportId: _metadata.reportId ?? widget.savedReport?.id ?? '',
+    );
+    scaffold.hideCurrentSnackBar();
+    if (text == null) return;
+    final use = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Use this text?'),
+        content: Text(text),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Retry'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Use'),
+          ),
+        ],
+      ),
+    );
+    if (use == true) {
+      setState(() {
+        if (controller.text.isEmpty) {
+          controller.text = text;
+        } else {
+          controller.text = '${controller.text} $text';
+        }
+      });
+    } else if (use == false) {
+      await _dictate(controller, field);
+    }
   }
 
   pw.Widget _pdfSectionHeader(String text) {
@@ -950,10 +996,14 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
                   )
                 : TextField(
                     controller: _summaryController,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       labelText: 'Inspector Notes / Summary',
-                      border: OutlineInputBorder(),
-                  ),
+                      border: const OutlineInputBorder(),
+                      suffixIcon: IconButton(
+                        icon: const Icon(Icons.mic),
+                        onPressed: () => _dictate(_summaryController, 'summary'),
+                      ),
+                    ),
                   maxLines: 3,
                 ),
           ),
