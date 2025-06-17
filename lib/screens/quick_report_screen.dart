@@ -69,7 +69,10 @@ class _QuickReportScreenState extends State<QuickReportScreen> {
 
   Future<void> _generateSummary() async {
     setState(() => _loadingSummary = true);
-    final struct = InspectedStructure(name: 'Main Structure', sectionPhotos: {
+    final struct = InspectedStructure(
+        name: 'Main Structure',
+        address: _addressController.text,
+        sectionPhotos: {
       for (var i = 0; i < _labels.length; i++)
         _labels[i]: _photos[i] != null ? [_photos[i]!] : []
     });
@@ -95,7 +98,10 @@ class _QuickReportScreenState extends State<QuickReportScreen> {
 
   Future<void> _export() async {
     setState(() => _exporting = true);
-    final struct = InspectedStructure(name: 'Main Structure', sectionPhotos: {
+    final struct = InspectedStructure(
+        name: 'Main Structure',
+        address: _addressController.text,
+        sectionPhotos: {
       for (var i = 0; i < _labels.length; i++)
         _labels[i]: _photos[i] != null ? [_photos[i]!] : []
     });

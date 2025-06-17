@@ -12,8 +12,10 @@ String generateSummaryText(SavedReport report) {
   buffer.write('${meta.propertyAddress} for ${meta.clientName}. ');
 
   if (report.structures.isNotEmpty) {
-    final names = report.structures.map((s) => s.name).join(', ');
-    buffer.write('Structures examined included $names. ');
+    final names = report.structures
+        .map((s) => s.address?.isNotEmpty == true ? s.address! : s.name)
+        .join(', ');
+    buffer.write('Properties inspected included $names. ');
   }
 
   final sections = <String>{};
