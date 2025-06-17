@@ -313,12 +313,31 @@ class _SendReportScreenState extends State<SendReportScreen> {
         FirebaseFirestore.instance.collection('metrics').doc(reportId);
     final zipMatch =
         RegExp(r'(\d{5})(?:[-\s]|\b)').firstMatch(widget.metadata.propertyAddress);
+    double damagePercent = 0;
+    final totalPhotos = _totalPhotoCount();
+    if (totalPhotos > 0) {
+      int damaged = 0;
+      for (final struct in structs) {
+        for (final photos in struct.sectionPhotos.values) {
+          for (final p in photos) {
+            final t = p.damageType.toLowerCase();
+            if (t.isNotEmpty && t != 'none' && t != 'unknown') {
+              damaged++;
+            }
+          }
+        }
+      }
+      damagePercent = damaged / totalPhotos * 100;
+    }
     await metricsRef.set({
       'inspectorId': profile?.id ?? '',
-      'createdAt': DateTime.now().millisecondsSinceEpoch,
-      'photoCount': _totalPhotoCount(),
+      'createdAt': FieldValue.serverTimestamp(),
+      'photoCount': totalPhotos,
       'status': 'draft',
       if (zipMatch != null) 'zipCode': zipMatch.group(1),
+      'clientName': widget.metadata.clientName,
+      'perilType': widget.metadata.perilType.name,
+      'damagePercent': damagePercent,
     });
 
     setState(() {
@@ -754,12 +773,18 @@ class _SendReportScreenState extends State<SendReportScreen> {
       final metricsRef =
           FirebaseFirestore.instance.collection('metrics').doc(_docId);
       final metricSnap = await metricsRef.get();
-      final createdAt = metricSnap.data()?['createdAt'] as int?;
+      final createdRaw = metricSnap.data()?['createdAt'];
+      int? createdMs;
+      if (createdRaw is Timestamp) {
+        createdMs = createdRaw.millisecondsSinceEpoch;
+      } else if (createdRaw is int) {
+        createdMs = createdRaw;
+      }
       await metricsRef.update({
-        'finalizedAt': DateTime.now().millisecondsSinceEpoch,
+        'finalizedAt': FieldValue.serverTimestamp(),
         'status': 'finalized',
-        if (createdAt != null)
-          'durationMillis': DateTime.now().millisecondsSinceEpoch - createdAt,
+        if (createdMs != null)
+          'durationMillis': DateTime.now().millisecondsSinceEpoch - createdMs,
       });
     } catch (_) {}
 

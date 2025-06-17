@@ -85,7 +85,10 @@ class _MessageThreadScreenState extends State<MessageThreadScreen> {
       text: text,
       attachmentUrl: url,
     );
-    await _messagesCollection.add(msg.toMap());
+    await _messagesCollection.add({
+      ...msg.toMap(),
+      'createdAt': FieldValue.serverTimestamp(),
+    });
     _textController.clear();
     _scrollController.animateTo(
       _scrollController.position.maxScrollExtent + 80,

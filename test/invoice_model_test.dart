@@ -13,5 +13,6 @@ void main() {
       dueDate: DateTime.now(),
     );
     expect(invoice.amount, 12);
+    expect(invoice.createdAt.isBefore(DateTime.now().add(const Duration(seconds: 1))), isTrue);
   });
 }
