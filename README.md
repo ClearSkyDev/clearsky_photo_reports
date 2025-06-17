@@ -125,5 +125,9 @@ All AI-generated captions and report summaries are stored alongside any manual e
 
 Generate narrated slideshow videos from report photos. Each slide's caption is voiced with text-to-speech and the final MP4 can include optional background music and branding. Videos are rendered on-device using ffmpeg and may be shared or uploaded to Firebase.
 
+## External Attachments
+
+Reports can include additional PDF, DOCX or CSV files. Use the **Attach 3rd-Party Reports** section in the Send Report screen to upload documents or provide a link. Attachments are stored with the report and appear as download links in exported HTML and emails.
+
 
 

@@ -38,6 +38,7 @@ class OfflineDraftStore {
       lastAuditIssues: report.lastAuditIssues,
       changeLog: report.changeLog,
       snapshots: report.snapshots,
+      attachments: report.attachments,
       reportOwner: report.reportOwner,
       collaborators: report.collaborators,
       lastEditedBy: report.lastEditedBy,

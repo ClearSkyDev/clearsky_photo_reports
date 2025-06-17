@@ -45,6 +45,8 @@ import '../services/offline_sync_service.dart';
 import '../utils/sync_preferences.dart';
 import '../services/auth_service.dart';
 import '../services/audit_log_service.dart';
+import '../models/report_attachment.dart';
+import 'package:file_picker/file_picker.dart';
 
 /// If Firebase is not desired:
 /// - Use `path_provider` and `shared_preferences` or `hive` to save report JSON locally
@@ -92,6 +94,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
   bool? _auditPassed;
   List<PhotoAuditIssue> _auditIssues = [];
   Partner? _partner;
+  final List<ReportAttachment> _attachments = [];
 
   List<PhotoEntry> _gpsPhotos() {
     final result = <PhotoEntry>[];
@@ -281,6 +284,31 @@ class _SendReportScreenState extends State<SendReportScreen> {
       }
     }
 
+    final uploadedAttachments = <ReportAttachment>[];
+    for (final att in _attachments) {
+      if (att.isExternalUrl || att.url.startsWith('http')) {
+        uploadedAttachments.add(att);
+        continue;
+      }
+      final file = File(att.url);
+      if (!await file.exists()) continue;
+      final name = p.basename(att.url);
+      try {
+        final ref = storage
+            .ref()
+            .child('reports/$reportId/attachments/$name');
+        await ref.putFile(file);
+        final url = await ref.getDownloadURL();
+        uploadedAttachments.add(ReportAttachment(
+          name: att.name,
+          url: url,
+          tag: att.tag,
+          type: att.type,
+          uploadedAt: att.uploadedAt,
+        ));
+      } catch (_) {}
+    }
+
     final saved = SavedReport(
       id: reportId,
       userId: profile?.id,
@@ -311,6 +339,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
       lastEditedAt: DateTime.now(),
       latitude: latitude,
       longitude: longitude,
+      attachments: uploadedAttachments,
       searchIndex: {
         'address': widget.metadata.propertyAddress,
         'address_lc': widget.metadata.propertyAddress.toLowerCase(),
@@ -459,6 +488,8 @@ class _SendReportScreenState extends State<SendReportScreen> {
       sigData = 'data:image/png;base64,${base64Encode(_signature!)}';
     }
 
+    final savedAttachments = List<ReportAttachment>.from(_attachments);
+
     final saved = SavedReport(
       id: id,
       userId: profile?.id,
@@ -489,6 +520,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
       lastEditedAt: DateTime.now(),
       latitude: latitude,
       longitude: longitude,
+      attachments: savedAttachments,
       localOnly: true,
     );
 
@@ -618,6 +650,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
           lastEditedAt: _savedReport!.lastEditedAt,
           latitude: _savedReport!.latitude,
           longitude: _savedReport!.longitude,
+          attachments: _savedReport!.attachments,
         );
       }
     });
@@ -799,6 +832,49 @@ class _SendReportScreenState extends State<SendReportScreen> {
       return;
     }
     await shareReportFile(_audioFile!, subject: 'Inspection Summary');
+  }
+
+  Future<void> _pickAttachment() async {
+    final result = await FilePicker.platform.pickFiles(
+      allowMultiple: false,
+      type: FileType.custom,
+      allowedExtensions: ['pdf', 'docx', 'csv'],
+    );
+    if (result != null && result.files.single.path != null) {
+      final path = result.files.single.path!;
+      final name = p.basename(path);
+      final tagController = TextEditingController(text: name);
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: const Text('Add Attachment'),
+          content: TextField(
+            controller: tagController,
+            decoration: const InputDecoration(labelText: 'Label'),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('Add'),
+            ),
+          ],
+        ),
+      );
+      if (confirmed == true) {
+        setState(() {
+          _attachments.add(ReportAttachment(
+            name: name,
+            url: path,
+            tag: tagController.text,
+            type: p.extension(path).replaceFirst('.', ''),
+          ));
+        });
+      }
+    }
   }
 
   Future<void> _runAudit() async {
@@ -991,7 +1067,11 @@ class _SendReportScreenState extends State<SendReportScreen> {
     try {
       final pdf = await generatePdf(_savedReport!);
       await sendReportEmail(to, pdf,
-          subject: subject, message: body, signature: signature, attachPdf: attachPdf);
+          subject: subject,
+          message: body,
+          signature: signature,
+          attachPdf: attachPdf,
+          attachments: _attachments);
       if (_docId != null) {
         try {
           await FirebaseFirestore.instance
@@ -1037,6 +1117,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
           lastEditedAt: _savedReport!.lastEditedAt,
           latitude: _savedReport!.latitude,
           longitude: _savedReport!.longitude,
+          attachments: _savedReport!.attachments,
         );
       });
     } finally {
@@ -1135,6 +1216,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
           lastEditedAt: _savedReport!.lastEditedAt,
           latitude: _savedReport!.latitude,
           longitude: _savedReport!.longitude,
+          attachments: _savedReport!.attachments,
         );
       }
     });
@@ -1257,6 +1339,28 @@ class _SendReportScreenState extends State<SendReportScreen> {
                 onPressed: _shareAudio,
                 child: const Text('Share Audio'),
               ),
+            const SizedBox(height: 12),
+            const Text('Attach 3rd-Party Reports',
+                style: TextStyle(fontWeight: FontWeight.bold)),
+            ..._attachments.map(
+              (a) => ListTile(
+                title: Text(a.tag.isNotEmpty ? a.tag : a.name),
+                subtitle: Text(a.name),
+                trailing: IconButton(
+                  icon: const Icon(Icons.delete),
+                  onPressed: () {
+                    setState(() {
+                      _attachments.remove(a);
+                    });
+                  },
+                ),
+              ),
+            ),
+            TextButton.icon(
+              onPressed: _pickAttachment,
+              icon: const Icon(Icons.attach_file),
+              label: const Text('Add Attachment'),
+            ),
             const SizedBox(height: 12),
             TextField(
               controller: _emailController,
@@ -1450,6 +1554,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
                         lastEditedAt: _savedReport!.lastEditedAt,
                         latitude: _savedReport!.latitude,
                         longitude: _savedReport!.longitude,
+                        attachments: _savedReport!.attachments,
                       );
                     });
                   }
