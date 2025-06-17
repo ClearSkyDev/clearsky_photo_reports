@@ -33,6 +33,7 @@ import 'services/auth_service.dart';
 import 'services/offline_sync_service.dart';
 import 'services/notification_service.dart';
 import 'services/changelog_service.dart';
+import 'models/checklist.dart';
 import 'screens/changelog_screen.dart';
 
 Future<void> main() async {
@@ -43,6 +44,7 @@ Future<void> main() async {
   await OfflineSyncService.instance.init();
   await NotificationService.instance.init();
   await ChangelogService.instance.init();
+  await inspectionChecklist.loadSaved();
   runApp(const ClearSkyApp());
 }
 

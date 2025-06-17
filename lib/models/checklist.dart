@@ -1,29 +1,53 @@
 import 'package:flutter/foundation.dart';
 import 'checklist_template.dart';
+import 'checklist_field_type.dart';
+import '../utils/checklist_storage.dart';
 
 class ChecklistStep {
   final String title;
+  final ChecklistFieldType type;
   final int requiredPhotos;
   int photosTaken;
   bool isComplete;
+  String textValue;
+  String dropdownValue;
+  bool toggleValue;
+  final List<String> options;
 
   ChecklistStep({
     required this.title,
+    this.type = ChecklistFieldType.toggle,
     this.requiredPhotos = 0,
     this.photosTaken = 0,
     this.isComplete = false,
+    this.textValue = '',
+    this.dropdownValue = '',
+    this.toggleValue = false,
+    this.options = const [],
   });
 }
 
 class InspectionChecklist extends ChangeNotifier {
   final List<ChecklistStep> steps = [];
 
+  Future<void> loadSaved() async {
+    await ChecklistStorage.load(this);
+    notifyListeners();
+  }
+
   void loadTemplate(ChecklistTemplate template) {
     steps
       ..clear()
-      ..addAll(template.items
-          .map((e) => ChecklistStep(title: e.title, requiredPhotos: e.requiredPhotos)));
+      ..addAll(template.items.map(
+        (e) => ChecklistStep(
+          title: e.title,
+          type: e.type,
+          requiredPhotos: e.requiredPhotos,
+          options: e.options,
+        ),
+      ));
     notifyListeners();
+    ChecklistStorage.save(this);
   }
 
   void markComplete(String title) {
@@ -31,6 +55,43 @@ class InspectionChecklist extends ChangeNotifier {
       if (step.title == title && !step.isComplete) {
         step.isComplete = true;
         notifyListeners();
+        ChecklistStorage.save(this);
+        break;
+      }
+    }
+  }
+
+  void updateToggle(String title, bool value) {
+    for (final step in steps) {
+      if (step.title == title && step.type == ChecklistFieldType.toggle) {
+        step.toggleValue = value;
+        step.isComplete = value;
+        notifyListeners();
+        ChecklistStorage.save(this);
+        break;
+      }
+    }
+  }
+
+  void updateText(String title, String value) {
+    for (final step in steps) {
+      if (step.title == title && step.type == ChecklistFieldType.text) {
+        step.textValue = value;
+        step.isComplete = value.isNotEmpty;
+        notifyListeners();
+        ChecklistStorage.save(this);
+        break;
+      }
+    }
+  }
+
+  void updateDropdown(String title, String value) {
+    for (final step in steps) {
+      if (step.title == title && step.type == ChecklistFieldType.dropdown) {
+        step.dropdownValue = value;
+        step.isComplete = value.isNotEmpty;
+        notifyListeners();
+        ChecklistStorage.save(this);
         break;
       }
     }
@@ -44,6 +105,7 @@ class InspectionChecklist extends ChangeNotifier {
           step.isComplete = true;
         }
         notifyListeners();
+        ChecklistStorage.save(this);
         break;
       }
     }
