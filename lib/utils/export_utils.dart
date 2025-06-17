@@ -513,7 +513,10 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
                       fontWeight: pw.FontWeight.bold,
                       color: PdfColor.fromInt(theme.primaryColor))),
               pw.SizedBox(height: 10),
-              pw.Text('Prepared by ClearSky Roof Inspectors',
+              pw.Text(
+                  meta.inspectorRole == InspectorReportRole.adjuster
+                      ? 'Prepared from Adjuster Perspective'
+                      : 'Prepared by: Third-Party Inspector',
                   style: pw.TextStyle(
                       fontSize: 18, color: PdfColor.fromInt(theme.primaryColor))),
               pw.SizedBox(height: 20),

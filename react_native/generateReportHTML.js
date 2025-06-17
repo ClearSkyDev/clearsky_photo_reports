@@ -13,7 +13,8 @@ export default function generateReportHTML(
   signatureData = "",
   inspectionDate = new Date().toLocaleDateString(),
   disclaimerText =
-    "This report is for informational purposes only and is not a warranty."
+    "This report is for informational purposes only and is not a warranty.",
+  preparedLabel = ""
 ) {
   const sectionOrder = [
     'Address',
@@ -69,6 +70,7 @@ export default function generateReportHTML(
     <body>
       <img src="assets/images/clearsky_logo.png" alt="ClearSky Logo" style="max-width:200px;margin-bottom:20px;" />
       <h1>Roof Inspection Report</h1>
+      ${preparedLabel ? `<div style="position:absolute;top:20px;right:20px;font-size:12px;font-weight:bold;">${preparedLabel}</div>` : ''}
       <p><strong>Date:</strong> ${inspectionDate}</p>
       <p><strong>Client:</strong> ${clientName}</p>
       <p><strong>Address:</strong> ${clientAddress}</p>
