@@ -26,6 +26,8 @@ class SavedReport {
   final String? publicReportId;
   /// Fully qualified URL that clients can use to view the report.
   final String? publicViewLink;
+  /// Email address associated with the client portal account.
+  final String? clientEmail;
   final String? templateId;
   final DateTime createdAt;
   final bool isFinalized;
@@ -58,6 +60,7 @@ class SavedReport {
     this.publicReportId,
     this.publicViewLink,
     this.templateId,
+    this.clientEmail,
     DateTime? createdAt,
     this.isFinalized = false,
     this.signatureRequested = false,
@@ -92,6 +95,7 @@ class SavedReport {
       if (publicReportId != null) 'publicReportId': publicReportId,
       if (publicViewLink != null) 'publicViewLink': publicViewLink,
       if (templateId != null) 'templateId': templateId,
+      if (clientEmail != null) 'clientEmail': clientEmail,
       'signatureRequested': signatureRequested,
       'signatureStatus': signatureStatus,
       if (homeownerSignature != null)
@@ -140,6 +144,7 @@ class SavedReport {
       signature: map['signature'] as String?,
       publicReportId: map['publicReportId'] as String?,
       publicViewLink: map['publicViewLink'] as String?,
+      clientEmail: map['clientEmail'] as String?,
       templateId: map['templateId'] as String?,
       createdAt: map['createdAt'] != null
           ? DateTime.fromMillisecondsSinceEpoch(map['createdAt'])

@@ -39,6 +39,8 @@ import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import '../services/offline_sync_service.dart';
 import '../utils/sync_preferences.dart';
+import '../services/auth_service.dart';
+import '../services/audit_log_service.dart';
 
 /// If Firebase is not desired:
 /// - Use `path_provider` and `shared_preferences` or `hive` to save report JSON locally
@@ -279,6 +281,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
       signature: signatureUrl,
       theme: theme,
       templateId: widget.template?.id,
+      clientEmail: _emailController.text.isNotEmpty ? _emailController.text : null,
       signatureRequested: false,
       signatureStatus: 'none',
       lastAuditPassed: null,
@@ -451,6 +454,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
       signature: sigData,
       theme: theme,
       templateId: widget.template?.id,
+      clientEmail: _emailController.text.isNotEmpty ? _emailController.text : null,
       lastAuditPassed: null,
       lastAuditIssues: null,
       signatureRequested: false,
@@ -587,6 +591,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
           createdAt: _savedReport!.createdAt,
           isFinalized: _savedReport!.isFinalized,
           publicReportId: _savedReport!.publicReportId,
+          clientEmail: _savedReport!.clientEmail,
           templateId: _savedReport!.templateId,
           lastAuditPassed: _savedReport!.lastAuditPassed,
           lastAuditIssues: _savedReport!.lastAuditIssues,
@@ -786,6 +791,51 @@ class _SendReportScreenState extends State<SendReportScreen> {
     await shareReportFile(_exportedFile!, subject: subject, text: body);
   }
 
+  Future<void> _assignClientEmail() async {
+    final email = _emailController.text.trim();
+    if (email.isEmpty || _docId == null) return;
+    try {
+      await FirebaseFirestore.instance
+          .collection('reports')
+          .doc(_docId)
+          .update({'clientEmail': email});
+      await AuditLogService().logAction('assign_client', targetId: _docId);
+      await AuthService().sendSignInLink(email, Uri.base.toString());
+      if (_savedReport != null) {
+        setState(() {
+          _savedReport = SavedReport(
+            id: _savedReport!.id,
+            userId: _savedReport!.userId,
+            inspectionMetadata: _savedReport!.inspectionMetadata,
+            structures: _savedReport!.structures,
+            summary: _savedReport!.summary,
+            summaryText: _savedReport!.summaryText,
+            signature: _savedReport!.signature,
+            createdAt: _savedReport!.createdAt,
+            isFinalized: _savedReport!.isFinalized,
+            publicReportId: _savedReport!.publicReportId,
+            clientEmail: email,
+            templateId: _savedReport!.templateId,
+            lastAuditPassed: _savedReport!.lastAuditPassed,
+            lastAuditIssues: _savedReport!.lastAuditIssues,
+            changeLog: _savedReport!.changeLog,
+            snapshots: _savedReport!.snapshots,
+            reportOwner: _savedReport!.reportOwner,
+            collaborators: _savedReport!.collaborators,
+            lastEditedBy: _savedReport!.lastEditedBy,
+            lastEditedAt: _savedReport!.lastEditedAt,
+            latitude: _savedReport!.latitude,
+            longitude: _savedReport!.longitude,
+          );
+        });
+      }
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(const SnackBar(content: Text('Client invited')));
+      }
+    } catch (_) {}
+  }
+
   Future<void> _openEmailDialog() async {
     final toCtrl = TextEditingController(text: _emailController.text);
     final m = widget.metadata;
@@ -875,12 +925,17 @@ class _SendReportScreenState extends State<SendReportScreen> {
               .collection('reports')
               .doc(_docId)
               .update({
+            'clientEmail': to,
             'inspectionMetadata.lastSentTo': to,
             'inspectionMetadata.lastSentAt': FieldValue.serverTimestamp(),
             'inspectionMetadata.lastSendMethod': attachPdf ? 'attachment' : 'link',
           });
         } catch (_) {}
       }
+      try {
+        await AuthService().sendSignInLink(to, Uri.base.toString());
+        await AuditLogService().logAction('invite_client', targetId: _docId);
+      } catch (_) {}
       final meta = Map<String, dynamic>.from(_savedReport!.inspectionMetadata);
       meta['lastSentTo'] = to;
       meta['lastSentAt'] = DateTime.now().toIso8601String();
@@ -897,6 +952,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
           createdAt: _savedReport!.createdAt,
           isFinalized: _savedReport!.isFinalized,
           publicReportId: _savedReport!.publicReportId,
+          clientEmail: to,
           templateId: _savedReport!.templateId,
           lastAuditPassed: _savedReport!.lastAuditPassed,
           lastAuditIssues: _savedReport!.lastAuditIssues,
@@ -994,6 +1050,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
           signatureStatus: _requestSignature ? 'pending' : 'none',
           publicReportId: publicId,
           publicViewLink: viewLink,
+          clientEmail: _savedReport!.clientEmail,
           templateId: _savedReport!.templateId,
           lastAuditPassed: _savedReport!.lastAuditPassed,
           lastAuditIssues: _savedReport!.lastAuditIssues,
@@ -1121,6 +1178,11 @@ class _SendReportScreenState extends State<SendReportScreen> {
             TextField(
               controller: _emailController,
               decoration: const InputDecoration(labelText: 'Client Email'),
+            ),
+            const SizedBox(height: 8),
+            ElevatedButton(
+              onPressed: _assignClientEmail,
+              child: const Text('Assign Client'),
             ),
             const SizedBox(height: 12),
             Row(
@@ -1291,6 +1353,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
                         createdAt: _savedReport!.createdAt,
                         isFinalized: _savedReport!.isFinalized,
                         publicReportId: _savedReport!.publicReportId,
+                        clientEmail: _savedReport!.clientEmail,
                         templateId: _savedReport!.templateId,
                         lastAuditPassed: _savedReport!.lastAuditPassed,
                         lastAuditIssues: _savedReport!.lastAuditIssues,

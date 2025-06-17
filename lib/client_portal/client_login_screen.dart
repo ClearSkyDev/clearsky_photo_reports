@@ -61,7 +61,7 @@ class _ClientLoginScreenState extends State<ClientLoginScreen> {
             if (!_useMagic)
               TextField(
                 controller: _password,
-                decoration: const InputDecoration(labelText: 'Password'),
+                decoration: const InputDecoration(labelText: 'PIN or Password'),
                 obscureText: true,
               ),
             if (_useMagic)
