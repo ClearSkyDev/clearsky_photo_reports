@@ -30,6 +30,7 @@ import 'photo_map_screen.dart';
 import '../services/ai_summary_service.dart';
 import '../models/ai_summary.dart';
 import '../services/speech_service.dart';
+import '../services/tts_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import '../models/inspected_structure.dart';
@@ -1019,6 +1020,12 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
+                    ElevatedButton(
+                      onPressed: () => TtsService.instance
+                          .speak(_adjusterSummaryController.text),
+                      child: const Text('Play Summary'),
+                    ),
+                    const SizedBox(width: 8),
                     ElevatedButton(
                       onPressed: _loadingSummary ? null : _generateSummary,
                       child: const Text('Regenerate'),

@@ -20,6 +20,7 @@ import 'photo_detail_screen.dart';
 import '../utils/change_history.dart';
 import '../models/report_change.dart';
 import '../services/speech_service.dart';
+import '../services/tts_service.dart';
 
 class PhotoUploadScreen extends StatefulWidget {
   final InspectionMetadata metadata;
@@ -574,7 +575,7 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
                                   ),
                                 ),
                               ),
-                            ),
+                          ),
                           Positioned(
                             bottom: 4,
                             left: 4,
@@ -584,6 +585,22 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
                               color: Colors.white,
                             ),
                           ),
+                          if (photos[index].label.isNotEmpty &&
+                              photos[index].label != 'Unlabeled')
+                            Positioned(
+                              bottom: 24,
+                              right: 4,
+                              child: GestureDetector(
+                                onTap: () => TtsService.instance
+                                    .speak(photos[index].label),
+                                child: const CircleAvatar(
+                                  radius: 12,
+                                  backgroundColor: Colors.black54,
+                                  child: Icon(Icons.volume_up,
+                                      size: 14, color: Colors.white),
+                                ),
+                              ),
+                            ),
                           Positioned(
                             bottom: 4,
                             right: 4,

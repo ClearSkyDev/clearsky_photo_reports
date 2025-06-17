@@ -6,6 +6,7 @@ import 'package:image/image.dart' as img;
 import 'package:path/path.dart' as p;
 
 import '../models/photo_entry.dart';
+import '../services/tts_service.dart';
 
 class PhotoDetailScreen extends StatefulWidget {
   final PhotoEntry entry;
@@ -28,10 +29,14 @@ class _PhotoDetailScreenState extends State<PhotoDetailScreen> {
       penColor: _penColor,
       exportBackgroundColor: Colors.transparent,
     );
+    if (TtsService.instance.settings.handsFree) {
+      TtsService.instance.speak(widget.entry.label);
+    }
   }
 
   @override
   void dispose() {
+    TtsService.instance.stop();
     _controller.dispose();
     super.dispose();
   }
@@ -123,6 +128,18 @@ class _PhotoDetailScreenState extends State<PhotoDetailScreen> {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Photo Detail'), actions: [
+        IconButton(
+          icon: const Icon(Icons.volume_up),
+          onPressed: () => TtsService.instance.speak(widget.entry.label),
+        ),
+        IconButton(
+          icon: const Icon(Icons.pause),
+          onPressed: () => TtsService.instance.pause(),
+        ),
+        IconButton(
+          icon: const Icon(Icons.stop),
+          onPressed: () => TtsService.instance.stop(),
+        ),
         _buildToolbar(),
       ]),
       body: Center(
