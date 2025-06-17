@@ -7,6 +7,7 @@ import 'models/inspector_user.dart';
 import 'main_nav_scaffold.dart';
 import 'screens/login_screen.dart';
 import 'screens/report_history_screen.dart';
+import 'screens/inspector_dashboard_screen.dart';
 import 'screens/manage_team_screen.dart';
 
 import 'screens/home_screen.dart';
@@ -114,6 +115,7 @@ class _ClearSkyAppState extends State<ClearSkyApp> {
               ),
             ),
         '/history': (context) => const ReportHistoryScreen(),
+        '/inspections': (context) => const InspectorDashboardScreen(),
         '/settings': (context) => const ReportSettingsScreen(),
         '/theme': (context) => const ReportThemeScreen(),
         '/templates': (context) => const TemplateManagerScreen(),
