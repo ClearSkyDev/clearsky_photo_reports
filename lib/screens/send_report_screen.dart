@@ -18,6 +18,8 @@ import '../utils/summary_utils.dart';
 import '../services/ai_summary_service.dart';
 import '../models/report_collaborator.dart';
 import '../models/inspector_profile.dart';
+import '../models/partner.dart';
+import '../services/partner_service.dart';
 import 'package:flutter/services.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -85,6 +87,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
   String? _publicId;
   bool? _auditPassed;
   List<PhotoAuditIssue> _auditIssues = [];
+  Partner? _partner;
 
   List<PhotoEntry> _gpsPhotos() {
     final result = <PhotoEntry>[];
@@ -132,6 +135,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
   Future<void> _initialize() async {
     _signature = widget.signature ?? await SignatureStorage.load();
     _profile = await ProfileStorage.load();
+    _partner = await PartnerService().getByCode(widget.metadata.partnerCode);
     await _saveReport();
   }
 
@@ -228,6 +232,8 @@ class _SendReportScreenState extends State<SendReportScreen> {
         'lastSentAt': widget.metadata.lastSentAt!.toIso8601String(),
       if (widget.metadata.lastSendMethod != null)
         'lastSendMethod': widget.metadata.lastSendMethod,
+      if (widget.metadata.partnerCode != null)
+        'partnerCode': widget.metadata.partnerCode,
     };
 
     final prefs = await SharedPreferences.getInstance();
@@ -282,6 +288,8 @@ class _SendReportScreenState extends State<SendReportScreen> {
       theme: theme,
       templateId: widget.template?.id,
       clientEmail: _emailController.text.isNotEmpty ? _emailController.text : null,
+      partnerId: _partner?.id,
+      referralDate: _partner != null ? DateTime.now() : null,
       signatureRequested: false,
       signatureStatus: 'none',
       lastAuditPassed: null,
@@ -352,6 +360,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
       'clientName': widget.metadata.clientName,
       'perilType': widget.metadata.perilType.name,
       'damagePercent': damagePercent,
+      if (_partner != null) 'partnerId': _partner!.id,
     });
 
     setState(() {
@@ -421,6 +430,8 @@ class _SendReportScreenState extends State<SendReportScreen> {
         'lastSentAt': widget.metadata.lastSentAt!.toIso8601String(),
       if (widget.metadata.lastSendMethod != null)
         'lastSendMethod': widget.metadata.lastSendMethod,
+      if (widget.metadata.partnerCode != null)
+        'partnerCode': widget.metadata.partnerCode,
     };
 
     final prefs = await SharedPreferences.getInstance();
@@ -455,6 +466,8 @@ class _SendReportScreenState extends State<SendReportScreen> {
       theme: theme,
       templateId: widget.template?.id,
       clientEmail: _emailController.text.isNotEmpty ? _emailController.text : null,
+      partnerId: _partner?.id,
+      referralDate: _partner != null ? DateTime.now() : null,
       lastAuditPassed: null,
       lastAuditIssues: null,
       signatureRequested: false,

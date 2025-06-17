@@ -28,6 +28,7 @@ class _MetadataScreenState extends State<MetadataScreen> {
   final TextEditingController _inspectorNameController = TextEditingController();
   final TextEditingController _reportIdController = TextEditingController();
   final TextEditingController _weatherNotesController = TextEditingController();
+  final TextEditingController _partnerCodeController = TextEditingController();
   DateTime _inspectionDate = DateTime.now();
   PerilType _selectedPeril = PerilType.wind;
   InspectionType _selectedType = InspectionType.residentialRoof;
@@ -49,6 +50,7 @@ class _MetadataScreenState extends State<MetadataScreen> {
       _inspectorNameController.text = meta.inspectorName ?? '';
       _reportIdController.text = meta.reportId ?? '';
       _weatherNotesController.text = meta.weatherNotes ?? '';
+      _partnerCodeController.text = meta.partnerCode ?? '';
       _selectedRole = meta.inspectorRole;
     } else {
       _loadProfile();
@@ -135,6 +137,9 @@ class _MetadataScreenState extends State<MetadataScreen> {
             : null,
         weatherNotes: _weatherNotesController.text.isNotEmpty
             ? _weatherNotesController.text
+            : null,
+        partnerCode: _partnerCodeController.text.isNotEmpty
+            ? _partnerCodeController.text
             : null,
       );
       final template = defaultChecklists.firstWhere(
@@ -289,6 +294,10 @@ class _MetadataScreenState extends State<MetadataScreen> {
               TextFormField(
                 controller: _weatherNotesController,
                 decoration: const InputDecoration(labelText: 'Weather Notes'),
+              ),
+              TextFormField(
+                controller: _partnerCodeController,
+                decoration: const InputDecoration(labelText: 'Referral Code'),
               ),
               const SizedBox(height: 20),
               ElevatedButton(
