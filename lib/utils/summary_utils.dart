@@ -45,3 +45,29 @@ String _listSentence(Iterable<String> items) {
   final last = list.removeLast();
   return '${list.join(', ')} and $last';
 }
+
+/// Generate short summaries for each inspection section based on the
+/// photos collected. The returned map is keyed by "Structure - Section" and
+/// the value is a single paragraph describing that section.
+Map<String, String> generateSectionSummaries(SavedReport report) {
+  final summaries = <String, String>{};
+  for (final struct in report.structures) {
+    for (final entry in struct.sectionPhotos.entries) {
+      final photos = entry.value;
+      if (photos.isEmpty) continue;
+      final damages = <String>{};
+      for (final photo in photos) {
+        if (photo.damageType.isNotEmpty && photo.damageType != 'Unknown') {
+          damages.add(photo.damageType);
+        }
+      }
+      final damageText = damages.isNotEmpty
+          ? 'Damage types observed: ${_listSentence(damages)}.'
+          : 'No notable damage found.';
+      final key = '${struct.name} - ${entry.key}';
+      summaries[key] =
+          '${photos.length} photos collected. $damageText';
+    }
+  }
+  return summaries;
+}
