@@ -21,6 +21,7 @@ import '../utils/change_history.dart';
 import '../models/report_change.dart';
 import '../services/speech_service.dart';
 import '../services/tts_service.dart';
+import '../utils/comment_template_store.dart';
 
 class PhotoUploadScreen extends StatefulWidget {
   final InspectionMetadata metadata;
@@ -59,6 +60,7 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
   void initState() {
     super.initState();
     _metadata = widget.metadata;
+    _metadata.startTimestamp ??= DateTime.now();
     final sections =
         widget.template?.sections ?? sectionsForType(widget.metadata.inspectionType);
     _structures.add(
@@ -75,9 +77,15 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
     final List<XFile> selected = await _picker.pickMultiImage();
     if (selected.isNotEmpty) {
       final position = await _getPosition();
+      if (_metadata.startLatitude == null && position != null) {
+        _metadata
+          ..startLatitude = position.latitude
+          ..startLongitude = position.longitude;
+      }
       setState(() {
         final index = structure ?? _currentStructure;
         final target = _structures[index].sectionPhotos[section]!;
+        _metadata.startTimestamp ??= DateTime.now();
         for (var xfile in selected) {
           final entry = PhotoEntry(
             url: xfile.path,
@@ -159,6 +167,21 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
       });
     } else if (use == false) {
       await _dictate(controller, field);
+    }
+  }
+
+  Future<void> _recordVoiceNote(PhotoEntry entry) async {
+    final scaffold = ScaffoldMessenger.of(context);
+    scaffold.showSnackBar(const SnackBar(content: Text('Recording...')));
+    final text = await SpeechService.instance.record(
+        fieldType: 'voice_note', reportId: _metadata.reportId ?? '');
+    scaffold.hideCurrentSnackBar();
+    if (text != null) {
+      setState(() {
+        entry
+          ..note = text
+          ..transcript = text;
+      });
     }
   }
 
@@ -246,6 +269,11 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
             ? ''
             : entry.label);
     final noteController = TextEditingController(text: entry.note);
+    late List<String> templates;
+    CommentTemplateStore.loadTemplates().then((t) {
+      templates = t;
+      if (mounted) setState(() {});
+    });
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
@@ -277,6 +305,18 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
                 ),
               ),
             ),
+            const SizedBox(height: 8),
+            if (templates.isNotEmpty)
+              DropdownButtonFormField<String>(
+                items: templates
+                    .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                    .toList(),
+                onChanged: (val) {
+                  if (val != null) noteController.text = val;
+                },
+                decoration:
+                    const InputDecoration(labelText: 'Insert Template'),
+              ),
             const SizedBox(height: 8),
             Wrap(
               spacing: 4,
@@ -611,6 +651,23 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
                                   backgroundColor: Colors.black54,
                                   child: Icon(Icons.volume_up,
                                       size: 14, color: Colors.white),
+                                ),
+                              ),
+                            ),
+                          ),
+                          Positioned(
+                            top: 4,
+                            right: 4,
+                            child: GestureDetector(
+                              onTap: () => _recordVoiceNote(photos[index]),
+                              child: const Semantics(
+                                label: 'Record note',
+                                button: true,
+                                child: CircleAvatar(
+                                  radius: 12,
+                                  backgroundColor: Colors.black54,
+                                  child:
+                                      Icon(Icons.mic, size: 14, color: Colors.white),
                                 ),
                               ),
                             ),

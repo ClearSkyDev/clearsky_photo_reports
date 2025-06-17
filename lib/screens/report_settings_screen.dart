@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../utils/sync_preferences.dart';
 import '../models/tts_settings.dart';
 import '../services/tts_service.dart';
+import 'comment_template_screen.dart';
 
 class ReportSettings {
   final String companyName;
@@ -123,11 +124,11 @@ class _ReportSettingsScreenState extends State<ReportSettingsScreen> {
   };
   String _selectedColor = 'Blue';
   static const Map<String, String> _templates = {
-    'Legacy Style': 'legacy',
-    'Clean & Simple': 'clean',
-    'Modern + Colored Section Headers': 'modern',
+    'Standard': 'standard',
+    'Side-by-Side': 'side',
+    'Dark Report': 'dark',
   };
-  String _selectedTemplate = 'legacy';
+  String _selectedTemplate = 'standard';
 
   @override
   void initState() {
@@ -171,7 +172,7 @@ class _ReportSettingsScreenState extends State<ReportSettingsScreen> {
         _selectedTemplate = _templates.entries
                 .firstWhere(
                     (e) => e.value == settings.template,
-                    orElse: () => const MapEntry('Legacy Style', 'legacy'))
+                    orElse: () => const MapEntry('Standard', 'standard'))
                 .key;
       });
     }
@@ -395,6 +396,15 @@ class _ReportSettingsScreenState extends State<ReportSettingsScreen> {
                   ),
                 ),
               ],
+            ),
+            ListTile(
+              title: const Text('Comment Templates'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (_) => const CommentTemplateScreen()),
+              ),
             ),
             const SizedBox(height: 20),
             ElevatedButton(

@@ -16,6 +16,10 @@ class InspectionMetadata {
   final DateTime? lastSentAt;
   final String? lastSendMethod;
   final String? partnerCode;
+  DateTime? startTimestamp;
+  double? startLatitude;
+  double? startLongitude;
+  DateTime? endTimestamp;
 
   InspectionMetadata({
     required this.clientName,
@@ -32,6 +36,10 @@ class InspectionMetadata {
     this.lastSentAt,
     this.lastSendMethod,
     this.partnerCode,
+    this.startTimestamp,
+    this.startLatitude,
+    this.startLongitude,
+    this.endTimestamp,
   });
 
   factory InspectionMetadata.fromMap(Map<String, dynamic> map) {
@@ -80,6 +88,10 @@ class InspectionMetadata {
       lastSentAt: parseDate(map['lastSentAt']),
       lastSendMethod: map['lastSendMethod'] as String?,
       partnerCode: map['partnerCode'] as String?,
+      startTimestamp: parseDate(map['startTimestamp']),
+      startLatitude: (map['startLatitude'] as num?)?.toDouble(),
+      startLongitude: (map['startLongitude'] as num?)?.toDouble(),
+      endTimestamp: parseDate(map['endTimestamp']),
     );
   }
 }

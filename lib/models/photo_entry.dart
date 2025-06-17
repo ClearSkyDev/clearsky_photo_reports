@@ -8,6 +8,8 @@ class PhotoEntry {
   String damageType;
   bool damageLoading;
   String note;
+  String? voicePath;
+  String? transcript;
   SourceType sourceType;
   String? captureDevice;
   final DateTime capturedAt;
@@ -25,6 +27,8 @@ class PhotoEntry {
     this.damageType = 'Unknown',
     this.damageLoading = false,
     this.note = '',
+    this.voicePath,
+    this.transcript,
     this.sourceType = SourceType.camera,
     this.captureDevice,
   }) : capturedAt = capturedAt ?? DateTime.now();
