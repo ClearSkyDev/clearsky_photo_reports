@@ -9,6 +9,7 @@ import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 /// Sends the generated report to [email]. On mobile platforms the PDF is
 /// attached using `flutter_email_sender`. On web a blob download is triggered
@@ -48,5 +49,50 @@ Future<void> sendReportByEmail(
     await FlutterEmailSender.send(mail);
   } catch (_) {
     await Share.shareXFiles([XFile(file.path)], subject: subject, text: message);
+  }
+}
+
+Future<String> _uploadPdf(Uint8List pdfBytes) async {
+  final storage = FirebaseStorage.instance;
+  final ref = storage
+      .ref()
+      .child('email_reports/${DateTime.now().millisecondsSinceEpoch}.pdf');
+  await ref.putData(pdfBytes, SettableMetadata(contentType: 'application/pdf'));
+  return ref.getDownloadURL();
+}
+
+/// Sends the report via email with either an attachment or a cloud link.
+Future<void> sendReportEmail(
+  String email,
+  Uint8List pdfBytes, {
+  String subject = 'Roof Inspection Report',
+  String message = '',
+  String signature = '',
+  bool attachPdf = true,
+}) async {
+  final fullMessage = [message, if (signature.isNotEmpty) signature].join('\n\n');
+  if (attachPdf) {
+    await sendReportByEmail(email, pdfBytes, subject: subject, message: fullMessage);
+    return;
+  }
+  final url = await _uploadPdf(pdfBytes);
+  final body = [message, 'Download: $url', if (signature.isNotEmpty) signature]
+      .join('\n\n');
+  if (kIsWeb) {
+    final mailto =
+        'mailto:$email?subject=${Uri.encodeComponent(subject)}&body=${Uri.encodeComponent(body)}';
+    html.AnchorElement(href: mailto)..click();
+    return;
+  }
+  final mail = Email(
+    body: body,
+    subject: subject,
+    recipients: [email],
+    isHTML: false,
+  );
+  try {
+    await FlutterEmailSender.send(mail);
+  } catch (_) {
+    await Share.share(body, subject: subject);
   }
 }

@@ -15,6 +15,9 @@ class ReportSettings {
   final bool autoLegalBackup;
   final String footerText;
   final String template;
+  final String emailMessage;
+  final String emailSignature;
+  final bool attachPdf;
 
   ReportSettings({
     required this.companyName,
@@ -26,6 +29,9 @@ class ReportSettings {
     this.autoLegalBackup = false,
     required this.footerText,
     required this.template,
+    this.emailMessage = '',
+    this.emailSignature = '',
+    this.attachPdf = true,
   });
 
   Map<String, dynamic> toMap() {
@@ -39,6 +45,9 @@ class ReportSettings {
       'autoLegalBackup': autoLegalBackup,
       'footerText': footerText,
       'template': template,
+      'emailMessage': emailMessage,
+      'emailSignature': emailSignature,
+      'attachPdf': attachPdf,
     };
   }
 
@@ -55,6 +64,9 @@ class ReportSettings {
       autoLegalBackup: map['autoLegalBackup'] as bool? ?? false,
       footerText: map['footerText'] ?? '',
       template: map['template'] ?? 'legacy',
+      emailMessage: map['emailMessage'] ?? '',
+      emailSignature: map['emailSignature'] ?? '',
+      attachPdf: map['attachPdf'] as bool? ?? true,
     );
   }
 }
@@ -70,12 +82,15 @@ class _ReportSettingsScreenState extends State<ReportSettingsScreen> {
   final TextEditingController _companyController = TextEditingController();
   final TextEditingController _taglineController = TextEditingController();
   final TextEditingController _footerController = TextEditingController();
+  final TextEditingController _emailMessageController = TextEditingController();
+  final TextEditingController _signatureController = TextEditingController();
   final ImagePicker _picker = ImagePicker();
   String? _logoPath;
   bool _includeDisclaimer = true;
   bool _showGpsData = true;
   bool _autoLegalBackup = false;
   bool _cloudSyncEnabled = true;
+  bool _attachPdf = true;
 
   static const Map<String, MaterialColor> _colors = {
     'Blue': Colors.blue,
@@ -126,6 +141,9 @@ class _ReportSettingsScreenState extends State<ReportSettingsScreen> {
         _includeDisclaimer = settings.includeDisclaimer;
         _showGpsData = settings.showGpsData;
         _autoLegalBackup = settings.autoLegalBackup;
+        _emailMessageController.text = settings.emailMessage;
+        _signatureController.text = settings.emailSignature;
+        _attachPdf = settings.attachPdf;
         _selectedTemplate = _templates.entries
                 .firstWhere(
                     (e) => e.value == settings.template,
@@ -147,6 +165,9 @@ class _ReportSettingsScreenState extends State<ReportSettingsScreen> {
       autoLegalBackup: _autoLegalBackup,
       footerText: _footerController.text.trim(),
       template: _templates[_selectedTemplate]!,
+      emailMessage: _emailMessageController.text.trim(),
+      emailSignature: _signatureController.text.trim(),
+      attachPdf: _attachPdf,
     );
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('report_settings', jsonEncode(settings.toMap()));
@@ -263,6 +284,26 @@ class _ReportSettingsScreenState extends State<ReportSettingsScreen> {
                   _cloudSyncEnabled = val;
                 });
               },
+            ),
+            SwitchListTile(
+              title: const Text('Attach PDF to Email'),
+              value: _attachPdf,
+              onChanged: (val) {
+                setState(() {
+                  _attachPdf = val;
+                });
+              },
+            ),
+            TextField(
+              controller: _emailMessageController,
+              decoration:
+                  const InputDecoration(labelText: 'Default Email Message'),
+              maxLines: 3,
+            ),
+            TextField(
+              controller: _signatureController,
+              decoration: const InputDecoration(labelText: 'Email Signature'),
+              maxLines: 3,
             ),
             TextField(
               controller: _footerController,
