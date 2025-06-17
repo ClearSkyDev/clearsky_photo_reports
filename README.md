@@ -54,7 +54,7 @@ Each report has a dedicated message thread stored under `reports/{id}/messages`.
 
 ## Secure Client Dashboard
 
-Authenticated clients can access a full dashboard built with Flutter Web. Login supports regular email/password credentials or magic links sent via Firebase Auth. The dashboard provides tabs for Reports, Messages, Invoices and Settings. Clients can view finalized reports as PDFs, download ZIP archives, join message threads and pay outstanding invoices. All activity is logged to the `clientActivity` collection for visibility. Example Firestore rules are provided in `firestore_client.rules` which ensure clients only access documents matching their email address.
+Authenticated clients can access a full dashboard built with Flutter Web. Login supports either a short email + PIN or magic links sent via Firebase Auth. Inspectors assign the client email to a report from the **Send Report** screen which also emails an invite link to the portal. The dashboard provides tabs for Reports, Messages, Invoices and Settings. Clients can view finalized reports in read-only mode, download ZIP archives and join message threads. All activity is logged to the `clientActivity` collection for visibility and Firestore rules in `firestore_client.rules` ensure each client only reads documents tied to their email address.
 
 Run the client portal with:
 
