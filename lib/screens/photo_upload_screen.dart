@@ -10,6 +10,7 @@ import '../models/checklist.dart';
 import '../models/report_template.dart';
 import '../utils/label_suggestion.dart';
 import '../utils/damage_classification.dart';
+import '../utils/photo_prompts.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'report_preview_screen.dart';
@@ -35,6 +36,8 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
   bool _autoLabeling = false;
   int _autoLabelRemaining = 0;
   int _autoLabelTotal = 0;
+
+  String? _promptSection;
 
   final List<InspectedStructure> _structures = [];
   int _currentStructure = 0;
@@ -62,6 +65,7 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
         sectionPhotos: {for (var s in sections) s: []},
       ),
     );
+    _updatePrompt();
   }
 
 
@@ -100,6 +104,7 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
           });
         }
       });
+      _updatePrompt();
     }
   }
 
@@ -122,6 +127,7 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
       final target = _structures[idx].sectionPhotos[section]!;
       target.removeAt(index);
     });
+    _updatePrompt();
   }
 
   void _addStructure(String name) {
@@ -137,6 +143,33 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
       );
       _currentStructure = _structures.length - 1;
     });
+    _updatePrompt();
+  }
+
+  void _updatePrompt() {
+    final next = nextRequiredSection(
+        _metadata.inspectorRole, _structures[_currentStructure].sectionPhotos);
+    setState(() => _promptSection = next);
+  }
+
+  Widget _buildPromptBanner() {
+    if (_promptSection == null) return const SizedBox.shrink();
+    final remaining = remainingCount(
+        _metadata.inspectorRole,
+        _promptSection!,
+        _structures[_currentStructure].sectionPhotos);
+    return Card(
+      color: Colors.amber.shade100,
+      child: ListTile(
+        leading: const Icon(Icons.camera_alt),
+        title: Text('Next photo: \$_promptSection'),
+        subtitle: Text('$remaining photo(s) needed'),
+        trailing: TextButton(
+          onPressed: () => _pickImages(_promptSection!),
+          child: const Text('Open Camera'),
+        ),
+      ),
+    );
   }
 
   void _showAddStructureDialog() {
@@ -564,6 +597,8 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
   Widget build(BuildContext context) {
     final List<Widget> items = [];
 
+    items.add(_buildPromptBanner());
+
     items.add(
       Padding(
         padding: const EdgeInsets.symmetric(vertical: 12),
@@ -620,7 +655,10 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
             Expanded(
               child: DropdownButton<int>(
                 value: _currentStructure,
-                onChanged: (val) => setState(() => _currentStructure = val!),
+                onChanged: (val) {
+                  setState(() => _currentStructure = val!);
+                  _updatePrompt();
+                },
                 items: [
                   for (int i = 0; i < _structures.length; i++)
                     DropdownMenuItem(

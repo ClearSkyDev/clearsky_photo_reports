@@ -100,3 +100,7 @@ Administrators can review a history of actions such as logins, invoice updates a
 ## On-Site AI Chat Assistant
 
 Inspectors can access a contextual AI helper during roof inspections. Tapping the floating **Ask AI** button opens a chat drawer that suggests next photos, reviews checklist progress and answers insurance related questions. Conversations are saved under each report and can be exported for supervisor review.
+
+## AI-Guided Photo Prompts
+
+During photo capture the app now displays a banner suggesting the next required section based on the inspector's role. The banner updates after each photo and includes a button to open the camera directly. Required photo counts differ for ladder assists, adjusters and contractors, so prompts reflect what is still missing for the current report.
