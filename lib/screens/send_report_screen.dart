@@ -30,6 +30,7 @@ import 'change_history_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import '../models/report_theme.dart';
+import 'report_settings_screen.dart' show ReportSettings;
 import '../utils/photo_audit.dart';
 import 'manage_collaborators_screen.dart';
 import '../utils/permission_utils.dart';
@@ -661,6 +662,42 @@ class _SendReportScreenState extends State<SendReportScreen> {
     }
   }
 
+  Future<void> _exportLegal() async {
+    if (_savedReport == null || _exporting) return;
+    if (_profile?.role != InspectorRole.admin) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Admin only')));
+      return;
+    }
+    setState(() => _exporting = true);
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const AlertDialog(
+        content: SizedBox(
+          height: 60,
+          child: Center(
+            child: CircularProgressIndicator(),
+          ),
+        ),
+      ),
+    );
+    try {
+      final file = await exportLegalCopy(_savedReport!, userId: _profile?.id);
+      if (mounted) {
+        setState(() => _exportedFile = file);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Legal copy exported')),
+        );
+      }
+    } finally {
+      if (mounted && Navigator.of(context).canPop()) {
+        Navigator.of(context).pop();
+      }
+      if (mounted) setState(() => _exporting = false);
+    }
+  }
+
   Future<void> _runAudit() async {
     if (_savedReport == null) return;
     final result = await photoAudit(_savedReport!);
@@ -823,6 +860,16 @@ class _SendReportScreenState extends State<SendReportScreen> {
 
     if (_savedReport != null) {
       LocalReportStore.instance.saveSnapshot(_savedReport!);
+      final prefs = await SharedPreferences.getInstance();
+      final raw = prefs.getString('report_settings');
+      if (raw != null) {
+        final map = jsonDecode(raw) as Map<String, dynamic>;
+        final settings = ReportSettings.fromMap(map);
+        if (settings.autoLegalBackup) {
+          await exportLegalCopy(_savedReport!,
+              userId: _profile?.id, auto: true);
+        }
+      }
     }
 
     if (mounted) {
@@ -952,6 +999,16 @@ class _SendReportScreenState extends State<SendReportScreen> {
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
                         : const Text('Download ZIP')),
+                if (_profile?.role == InspectorRole.admin)
+                  ElevatedButton(
+                      onPressed: _exporting ? null : _exportLegal,
+                      child: _exporting
+                          ? const SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : const Text('Export Legal Copy')),
               if (_exportedFile != null)
                 ElevatedButton(
                     onPressed: _shareReport,
