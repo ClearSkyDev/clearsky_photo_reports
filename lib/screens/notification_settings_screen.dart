@@ -83,6 +83,51 @@ class _NotificationSettingsScreenState
               _prefs = _prefs.copyWith(aiSummary: val);
             }),
           ),
+          SwitchListTile(
+            title: const Text('Weekly Snapshot Email'),
+            value: _prefs.weeklySnapshot,
+            onChanged: (val) => setState(() {
+              _prefs = _prefs.copyWith(weeklySnapshot: val);
+            }),
+          ),
+          if (_prefs.weeklySnapshot)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                children: [
+                  DropdownButton<int>(
+                    value: _prefs.snapshotDay,
+                    items: const [
+                      DropdownMenuItem(value: 1, child: Text('Mon')),
+                      DropdownMenuItem(value: 2, child: Text('Tue')),
+                      DropdownMenuItem(value: 3, child: Text('Wed')),
+                      DropdownMenuItem(value: 4, child: Text('Thu')),
+                      DropdownMenuItem(value: 5, child: Text('Fri')),
+                      DropdownMenuItem(value: 6, child: Text('Sat')),
+                      DropdownMenuItem(value: 0, child: Text('Sun')),
+                    ],
+                    onChanged: (val) => setState(() {
+                      if (val != null) {
+                        _prefs = _prefs.copyWith(snapshotDay: val);
+                      }
+                    }),
+                  ),
+                  const SizedBox(width: 12),
+                  DropdownButton<int>(
+                    value: _prefs.snapshotHour,
+                    items: [
+                      for (int h = 0; h < 24; h++)
+                        DropdownMenuItem(value: h, child: Text('$h:00')),
+                    ],
+                    onChanged: (val) => setState(() {
+                      if (val != null) {
+                        _prefs = _prefs.copyWith(snapshotHour: val);
+                      }
+                    }),
+                  ),
+                ],
+              ),
+            ),
           const SizedBox(height: 12),
           Padding(
             padding: const EdgeInsets.all(16),

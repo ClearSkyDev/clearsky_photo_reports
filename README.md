@@ -60,6 +60,10 @@ Run the client portal with:
 flutter run -d chrome -t lib/client_portal_main.dart
 ```
 
+## Weekly Snapshot Emails
+
+Clients may opt in to a weekly email summarizing finalized reports from the previous week. The snapshot lists property addresses, invoice totals and damage notes with links to view each report or download attachments. Preferences are stored in the `clientPreferences` collection and a Firebase Cloud Function sends the messages on the configured day and hour. Administrators can trigger a send manually and all emails are logged under `snapshotEmails`.
+
 ## Report Map View
 
 Reports with saved GPS coordinates appear on an interactive map available from the dashboard. Pins are colored based on report status and can be filtered by inspector, status or date. Tap a pin to see a quick summary and open the full report.
