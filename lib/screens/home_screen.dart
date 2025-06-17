@@ -103,6 +103,11 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               const SizedBox(height: 12),
               ElevatedButton(
+                onPressed: () => Navigator.pushNamed(context, '/inspections'),
+                child: const Text('My Inspections'),
+              ),
+              const SizedBox(height: 12),
+              ElevatedButton(
                 onPressed: () => Navigator.pushNamed(context, '/settings'),
                 child: const Text('Report Settings'),
               ),
