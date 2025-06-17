@@ -171,6 +171,7 @@ class OfflineSyncService {
 
     final saved = SavedReport(
       id: draft.id,
+      version: draft.version,
       userId: draft.userId,
       inspectionMetadata: draft.inspectionMetadata,
       structures: structs,

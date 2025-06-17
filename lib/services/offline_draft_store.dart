@@ -18,6 +18,7 @@ class OfflineDraftStore {
         : DateTime.now().millisecondsSinceEpoch.toString();
     final local = SavedReport(
       id: id,
+      version: report.version,
       userId: report.userId,
       inspectionMetadata: report.inspectionMetadata,
       structures: report.structures,

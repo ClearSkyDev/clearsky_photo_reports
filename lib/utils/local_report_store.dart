@@ -75,6 +75,7 @@ class LocalReportStore {
 
     final saved = SavedReport(
       id: id,
+      version: report.version,
       userId: report.userId,
       inspectionMetadata: report.inspectionMetadata,
       structures: updatedStructs,
