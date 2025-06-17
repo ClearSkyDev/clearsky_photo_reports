@@ -9,6 +9,7 @@ import '../models/checklist_template.dart';
 import 'photo_upload_screen.dart';
 import '../models/report_template.dart';
 import '../utils/template_store.dart';
+import '../utils/quick_report_preferences.dart';
 
 class MetadataScreen extends StatefulWidget {
   final InspectionMetadata? initialMetadata;
@@ -35,10 +36,14 @@ class _MetadataScreenState extends State<MetadataScreen> {
   InspectorReportRole _selectedRole = InspectorReportRole.ladder_assist;
   List<ReportTemplate> _templates = [];
   ReportTemplate? _selectedTemplate;
+  bool _quickEnabled = false;
 
   @override
   void initState() {
     super.initState();
+    QuickReportPreferences.isEnabled().then((v) {
+      if (mounted) setState(() => _quickEnabled = v);
+    });
     if (widget.initialMetadata != null) {
       final meta = widget.initialMetadata!;
       _clientNameController.text = meta.clientName;
@@ -173,6 +178,14 @@ class _MetadataScreenState extends State<MetadataScreen> {
           key: _formKey,
           child: ListView(
             children: [
+              SwitchListTile(
+                title: const Text('Quick Report Mode'),
+                value: _quickEnabled,
+                onChanged: (v) {
+                  setState(() => _quickEnabled = v);
+                  QuickReportPreferences.setEnabled(v);
+                },
+              ),
               if (_templates.isNotEmpty)
                 DropdownButtonFormField<String>(
                   value: _selectedTemplate?.id,
@@ -303,6 +316,13 @@ class _MetadataScreenState extends State<MetadataScreen> {
                 decoration: const InputDecoration(labelText: 'Referral Code'),
               ),
               const SizedBox(height: 20),
+              if (_quickEnabled) ...[
+                ElevatedButton(
+                  onPressed: () => Navigator.pushNamed(context, '/quickReport'),
+                  child: const Text('Start Quick Report'),
+                ),
+                const SizedBox(height: 20),
+              ],
               ElevatedButton(
                 onPressed: _continue,
                 child: const Text('Continue to Photo Upload'),

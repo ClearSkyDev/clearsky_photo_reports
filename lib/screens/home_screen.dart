@@ -1,9 +1,30 @@
 import 'package:flutter/material.dart';
 import '../utils/profile_storage.dart';
 import '../models/inspector_profile.dart';
+import '../utils/quick_report_preferences.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  bool _quickEnabled = false;
+
+  @override
+  void initState() {
+    super.initState();
+    QuickReportPreferences.isEnabled().then((v) {
+      if (mounted) setState(() => _quickEnabled = v);
+    });
+  }
+
+  void _toggleQuick(bool val) {
+    setState(() => _quickEnabled = val);
+    QuickReportPreferences.setEnabled(val);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,6 +44,18 @@ class HomeScreen extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              SwitchListTile(
+                title: const Text('Quick Report Mode'),
+                value: _quickEnabled,
+                onChanged: _toggleQuick,
+              ),
+              if (_quickEnabled) ...[
+                ElevatedButton(
+                  onPressed: () => Navigator.pushNamed(context, '/quickReport'),
+                  child: const Text('Start Quick Report'),
+                ),
+                const SizedBox(height: 12),
+              ],
               ElevatedButton(
                 onPressed: () => Navigator.pushNamed(context, '/metadata'),
                 child: const Text('Upload Photos'),
