@@ -117,3 +117,7 @@ During photo capture the app now displays a banner suggesting the next required 
 ## Referral Partner Dashboard
 
 Referral partners can log in to view all properties they referred. The dashboard lists each property status and link to the public report. Basic metrics like total referrals, completion rate and average turnaround are shown at the top.
+
+## AI Feedback System
+
+All AI-generated captions and report summaries are stored alongside any manual edits. Each correction is saved with a timestamp in the new `ai_feedback` collection so the model can learn from common mistakes. Users may disable learning from the AI Learning screen which also lets them review or clear their personal edit history.
