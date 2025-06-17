@@ -14,7 +14,10 @@ import 'screens/report_screen.dart';
 import 'screens/metadata_screen.dart';
 import 'screens/sectioned_photo_upload_screen.dart';
 import 'screens/drone_media_upload_screen.dart';
+import 'screens/guided_capture_screen.dart';
 import 'screens/report_settings_screen.dart';
+import 'models/inspection_metadata.dart';
+import 'models/inspection_type.dart';
 import 'screens/report_theme_screen.dart';
 import 'screens/profile_screen.dart';
 import 'screens/template_manager_screen.dart';
@@ -101,6 +104,15 @@ class _ClearSkyAppState extends State<ClearSkyApp> {
         '/metadata': (context) => const MetadataScreen(),
         '/sectionedUpload': (context) => const SectionedPhotoUploadScreen(),
         '/droneMedia': (context) => const DroneMediaUploadScreen(),
+        '/guidedCapture': (context) => GuidedCaptureScreen(
+              metadata: InspectionMetadata(
+                clientName: '',
+                propertyAddress: '',
+                inspectionDate: DateTime.now(),
+                perilType: PerilType.hail,
+                inspectionType: InspectionType.hail,
+              ),
+            ),
         '/history': (context) => const ReportHistoryScreen(),
         '/settings': (context) => const ReportSettingsScreen(),
         '/theme': (context) => const ReportThemeScreen(),
