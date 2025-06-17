@@ -8,9 +8,12 @@ import {
   Image,
   Button,
   TouchableOpacity,
+  Modal,
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import * as ImagePicker from 'expo-image-picker';
+import PhotoAnnotationScreen from './PhotoAnnotationScreen';
+import AnnotatedImage from './AnnotatedImage';
 
 // Mock AI label suggestions per inspection section
 const mockAISuggestions = {
@@ -47,6 +50,12 @@ const generateAISuggestion = (sectionPrefix) => {
   return suggestions[Math.floor(Math.random() * suggestions.length)];
 };
 
+// Very simple AI annotation generator placeholder
+const generateAIAnnotations = () => [
+  { type: 'circle', x: 150, y: 150, r: 40 },
+  { type: 'arrow', startX: 20, startY: 20, endX: 80, endY: 80 },
+];
+
 // Simple tag recommendations per section type
 const tagSuggestions = {
   Slopes: ['shingle', 'tile', 'metal'],
@@ -78,6 +87,7 @@ export default function ClearSkyPhotoIntakeScreen() {
     Object.fromEntries(inspectionSections.map((s) => [s, false]))
   );
   const [autoChecklist, setAutoChecklist] = useState(true);
+  const [editingPhoto, setEditingPhoto] = useState(null);
 
   const handlePhotoUpload = async (section) => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -90,6 +100,8 @@ export default function ClearSkyPhotoIntakeScreen() {
       const newPhoto = {
         uri: result.assets[0].uri,
         label: generateAISuggestion(section),
+        annotations: generateAIAnnotations(),
+        showAnnotated: false,
       };
 
       setPhotoData((prevData) => {
@@ -112,10 +124,30 @@ export default function ClearSkyPhotoIntakeScreen() {
     });
   };
 
+  const handleSaveAnnotations = (section, index, annotations) => {
+    setPhotoData((prevData) => {
+      const updatedSection = [...prevData[section]];
+      updatedSection[index].annotations = annotations;
+      updatedSection[index].showAnnotated = true;
+      return { ...prevData, [section]: updatedSection };
+    });
+    setEditingPhoto(null);
+  };
+
   const progress = Object.values(checklist).filter(Boolean).length;
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <View style={{ flex: 1 }}>
+      <Modal visible={!!editingPhoto} animationType="slide">
+        {editingPhoto && (
+          <PhotoAnnotationScreen
+            photo={photoData[editingPhoto.section][editingPhoto.index]}
+            onSave={(ann) => handleSaveAnnotations(editingPhoto.section, editingPhoto.index, ann)}
+            onClose={() => setEditingPhoto(null)}
+          />
+        )}
+      </Modal>
+      <ScrollView contentContainerStyle={styles.container}>
       <Picker
         selectedValue={selectedSection}
         onValueChange={(val) => setSelectedSection(val)}
@@ -133,11 +165,18 @@ export default function ClearSkyPhotoIntakeScreen() {
 
         {photoData[selectedSection]?.map((item, index) => (
           <View key={index} style={{ marginTop: 10 }}>
-            <Image
-              source={{ uri: item.uri }}
-              style={{ width: 200, height: 200, borderRadius: 6 }}
-              resizeMode="cover"
-            />
+            {item.showAnnotated && item.annotations.length ? (
+              <AnnotatedImage
+                photo={item}
+                style={{ width: 200, height: 200, borderRadius: 6 }}
+              />
+            ) : (
+              <Image
+                source={{ uri: item.uri }}
+                style={{ width: 200, height: 200, borderRadius: 6 }}
+                resizeMode="cover"
+              />
+            )}
 
             <TextInput
               value={item.label}
@@ -163,6 +202,21 @@ export default function ClearSkyPhotoIntakeScreen() {
                 </TouchableOpacity>
               ))}
             </View>
+            <View style={{ flexDirection: 'row', marginTop: 4 }}>
+              <Button title="Annotate" onPress={() => setEditingPhoto({ section: selectedSection, index })} />
+              {item.annotations.length > 0 && (
+                <Button
+                  title={item.showAnnotated ? 'Original' : 'Marked Up'}
+                  onPress={() => {
+                    setPhotoData((prev) => {
+                      const updated = [...prev[selectedSection]];
+                      updated[index].showAnnotated = !updated[index].showAnnotated;
+                      return { ...prev, [selectedSection]: updated };
+                    });
+                  }}
+                />
+              )}
+            </View>
           </View>
         ))}
       </View>
@@ -179,7 +233,8 @@ export default function ClearSkyPhotoIntakeScreen() {
           />
         </View>
       </View>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 }
 

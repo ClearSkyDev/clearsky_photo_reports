@@ -49,6 +49,33 @@ export default function generateReportHTML(
     }
   });
 
+  const renderAnnotations = (ann) => {
+    if (!ann || !ann.length) return '';
+    const shapes = ann
+      .map((a) => {
+        if (a.type === 'arrow') {
+          const head = 10;
+          const angle = Math.atan2(a.endY - a.startY, a.endX - a.startX);
+          const x1 = a.endX - head * Math.cos(angle - Math.PI / 6);
+          const y1 = a.endY - head * Math.sin(angle - Math.PI / 6);
+          const x2 = a.endX - head * Math.cos(angle + Math.PI / 6);
+          const y2 = a.endY - head * Math.sin(angle + Math.PI / 6);
+          return `<line x1="${a.startX}" y1="${a.startY}" x2="${a.endX}" y2="${a.endY}" stroke="red" stroke-width="2" />`+
+                 `<line x1="${a.endX}" y1="${a.endY}" x2="${x1}" y2="${y1}" stroke="red" stroke-width="2" />`+
+                 `<line x1="${a.endX}" y1="${a.endY}" x2="${x2}" y2="${y2}" stroke="red" stroke-width="2" />`;
+        }
+        if (a.type === 'circle') {
+          return `<circle cx="${a.x}" cy="${a.y}" r="${a.r}" stroke="red" stroke-width="2" fill="none" />`;
+        }
+        if (a.type === 'label') {
+          return `<text x="${a.x}" y="${a.y}" fill="red" stroke="red" font-size="16">${a.text}</text>`;
+        }
+        return '';
+      })
+      .join('');
+    return `<svg viewBox="0 0 300 300" style="position:absolute;top:0;left:0;width:100%;height:100%;">${shapes}</svg>`;
+  };
+
   return `
   <!DOCTYPE html>
   <html>
@@ -92,7 +119,10 @@ export default function generateReportHTML(
               .map(
                 (p) => `
               <div class="photo-item">
-                <img src="${p.imageUri}" alt="Photo" style="width: 100%; aspect-ratio: 1 / 1; object-fit: cover; border-radius: 6px;" />
+                <div style="position:relative;">
+                  <img src="${p.imageUri}" alt="Photo" style="width: 100%; aspect-ratio: 1 / 1; object-fit: cover; border-radius: 6px;" />
+                  ${renderAnnotations(p.annotations)}
+                </div>
                 <div class="caption">${p.userLabel}</div>
               </div>
             `
