@@ -94,8 +94,11 @@ class _ReportSettingsScreenState extends State<ReportSettingsScreen> {
   bool _cloudSyncEnabled = true;
   bool _attachPdf = true;
   final TextEditingController _ttsLangController = TextEditingController();
+  final TextEditingController _ttsVoiceController = TextEditingController();
+  final TextEditingController _brandingController = TextEditingController();
   double _ttsRate = 0.5;
   String _ttsLanguage = 'en-US';
+  String _ttsVoice = '';
   bool _handsFree = false;
 
   @override
@@ -106,6 +109,8 @@ class _ReportSettingsScreenState extends State<ReportSettingsScreen> {
     _emailMessageController.dispose();
     _signatureController.dispose();
     _ttsLangController.dispose();
+    _ttsVoiceController.dispose();
+    _brandingController.dispose();
     super.dispose();
   }
 
@@ -128,6 +133,7 @@ class _ReportSettingsScreenState extends State<ReportSettingsScreen> {
   void initState() {
     super.initState();
     _ttsLangController.text = _ttsLanguage;
+    _ttsVoiceController.text = _ttsVoice;
     _loadSettings();
   }
 
@@ -177,6 +183,9 @@ class _ReportSettingsScreenState extends State<ReportSettingsScreen> {
         _ttsRate = tts.rate;
         _ttsLanguage = tts.language;
         _ttsLangController.text = tts.language;
+        _ttsVoice = tts.voice;
+        _ttsVoiceController.text = tts.voice;
+        _brandingController.text = tts.brandingMessage;
         _handsFree = tts.handsFree;
       });
     }
@@ -205,6 +214,8 @@ class _ReportSettingsScreenState extends State<ReportSettingsScreen> {
       language: _ttsLanguage,
       rate: _ttsRate,
       handsFree: _handsFree,
+      voice: _ttsVoiceController.text.trim(),
+      brandingMessage: _brandingController.text.trim(),
     );
     await prefs.setString('tts_settings', jsonEncode(tts.toMap()));
     await TtsService.instance.saveSettings(tts);
@@ -360,6 +371,15 @@ class _ReportSettingsScreenState extends State<ReportSettingsScreen> {
               decoration: const InputDecoration(labelText: 'Language Code'),
               controller: _ttsLangController,
               onChanged: (v) => _ttsLanguage = v,
+            ),
+            TextField(
+              decoration: const InputDecoration(labelText: 'Voice Name'),
+              controller: _ttsVoiceController,
+              onChanged: (v) => _ttsVoice = v,
+            ),
+            TextField(
+              decoration: const InputDecoration(labelText: 'Branding Message'),
+              controller: _brandingController,
             ),
             Row(
               children: [

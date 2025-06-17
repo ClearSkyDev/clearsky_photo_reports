@@ -21,10 +21,12 @@ import '../models/inspector_profile.dart';
 import '../models/partner.dart';
 import '../services/partner_service.dart';
 import 'package:flutter/services.dart';
+import '../services/tts_service.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
 import '../utils/share_utils.dart';
 import '../utils/email_utils.dart';
 import 'inspection_checklist_screen.dart';
@@ -82,6 +84,8 @@ class _SendReportScreenState extends State<SendReportScreen> {
   Uint8List? _signature;
   bool _signatureLocked = false;
   File? _exportedFile;
+  File? _audioFile;
+  String? _audioUrl;
   bool _finalized = false;
   bool _requestSignature = false;
   String? _publicId;
@@ -741,6 +745,62 @@ class _SendReportScreenState extends State<SendReportScreen> {
     }
   }
 
+  Future<void> _exportAudio() async {
+    if (_savedReport == null || _exporting) return;
+    setState(() => _exporting = true);
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const AlertDialog(
+        content: SizedBox(
+          height: 60,
+          child: Center(child: CircularProgressIndicator()),
+        ),
+      ),
+    );
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final map = prefs.getString('report_settings');
+      ReportSettings? settings;
+      if (map != null) {
+        settings = ReportSettings.fromMap(jsonDecode(map));
+      }
+      final intro = TtsService.instance.settings.brandingMessage.isNotEmpty
+          ? TtsService.instance.settings.brandingMessage
+          :
+              'This report is provided by ${settings?.companyName ?? 'ClearSky'}.'
+              ' ${settings?.tagline ?? ''}';
+      final outro = 'Thank you for choosing ${settings?.companyName ?? 'ClearSky'}.';
+      final file = await TtsService.instance.exportSummary(
+          _summaryTextController.text, intro, outro);
+      if (mounted) {
+        setState(() => _audioFile = file);
+        try {
+          _audioUrl = await uploadAudioFile(file);
+        } catch (_) {
+          _audioUrl = null;
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Audio exported')),
+        );
+      }
+    } finally {
+      if (mounted && Navigator.of(context).canPop()) {
+        Navigator.of(context).pop();
+      }
+      if (mounted) setState(() => _exporting = false);
+    }
+  }
+
+  Future<void> _shareAudio() async {
+    if (_audioFile == null) return;
+    if (_audioUrl != null) {
+      await Share.share('Listen: $_audioUrl');
+      return;
+    }
+    await shareReportFile(_audioFile!, subject: 'Inspection Summary');
+  }
+
   Future<void> _runAudit() async {
     if (_savedReport == null) return;
     final result = await photoAudit(_savedReport!);
@@ -1187,6 +1247,16 @@ class _SendReportScreenState extends State<SendReportScreen> {
               onPressed: _autoGenerateSummary,
               child: const Text('Auto-Generate'),
             ),
+            const SizedBox(height: 8),
+            ElevatedButton(
+              onPressed: _exportAudio,
+              child: const Text('Export Audio Summary'),
+            ),
+            if (_audioFile != null)
+              ElevatedButton(
+                onPressed: _shareAudio,
+                child: const Text('Share Audio'),
+              ),
             const SizedBox(height: 12),
             TextField(
               controller: _emailController,

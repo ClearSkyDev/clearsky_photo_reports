@@ -1,6 +1,9 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/tts_settings.dart';
@@ -25,6 +28,9 @@ class TtsService {
   Future<void> _apply() async {
     await _tts.setLanguage(settings.language);
     await _tts.setSpeechRate(settings.rate);
+    if (settings.voice.isNotEmpty) {
+      await _tts.setVoice({'name': settings.voice, 'locale': settings.language});
+    }
   }
 
   Future<void> saveSettings(TtsSettings newSettings) async {
@@ -38,6 +44,21 @@ class TtsService {
     if (text.trim().isEmpty) return;
     await _tts.stop();
     await _tts.speak(text);
+  }
+
+  Future<File> exportSummary(String text, String intro, String outro) async {
+    final full = [intro, text, outro].join(' ');
+    Directory? dir;
+    try {
+      dir = await getDownloadsDirectory();
+    } catch (_) {
+      dir = await getApplicationDocumentsDirectory();
+    }
+    dir ??= await getApplicationDocumentsDirectory();
+    final path = p.join(
+        dir.path, 'summary_${DateTime.now().millisecondsSinceEpoch}.mp3');
+    await _tts.synthesizeToFile(full, path);
+    return File(path);
   }
 
   Future<void> stop() => _tts.stop();

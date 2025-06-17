@@ -61,6 +61,16 @@ Future<String> _uploadPdf(Uint8List pdfBytes) async {
   return ref.getDownloadURL();
 }
 
+Future<String> uploadAudioFile(File audioFile) async {
+  final bytes = await audioFile.readAsBytes();
+  final storage = FirebaseStorage.instance;
+  final ref = storage
+      .ref()
+      .child('audio_summaries/${DateTime.now().millisecondsSinceEpoch}.mp3');
+  await ref.putData(bytes, SettableMetadata(contentType: 'audio/mpeg'));
+  return ref.getDownloadURL();
+}
+
 /// Sends the report via email with either an attachment or a cloud link.
 Future<void> sendReportEmail(
   String email,
