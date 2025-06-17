@@ -17,6 +17,7 @@
     "react": "^19.1.0",
     "react-native": "^0.79.3",
     "react-native-signature-canvas": "^4.7.4",
-    "react-native-webview": "13.13.5"
+    "react-native-webview": "13.13.5",
+    "@react-native-picker/picker": "^2.4.10"
   }
 }
