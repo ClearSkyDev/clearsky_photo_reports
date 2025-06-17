@@ -24,6 +24,7 @@ class Invoice {
   final List<InvoiceLineItem> items;
   final double amount;
   final DateTime dueDate;
+  final DateTime createdAt;
   final String? paymentUrl;
   final String? clientEmail;
   final bool isPaid;
@@ -38,7 +39,9 @@ class Invoice {
     this.paymentUrl,
     this.clientEmail,
     this.isPaid = false,
-  }) : amount = amount ??
+    DateTime? createdAt,
+  })  : createdAt = createdAt ?? DateTime.now(),
+        amount = amount ??
             items.fold(0, (double s, item) => s + item.amount);
 
   Map<String, dynamic> toMap() {
@@ -51,6 +54,7 @@ class Invoice {
       if (paymentUrl != null) 'paymentUrl': paymentUrl,
       if (clientEmail != null) 'clientEmail': clientEmail,
       'isPaid': isPaid,
+      'createdAt': createdAt.toIso8601String(),
     };
   }
 
@@ -70,6 +74,9 @@ class Invoice {
       paymentUrl: map['paymentUrl'] as String?,
       clientEmail: map['clientEmail'] as String?,
       isPaid: map['isPaid'] as bool? ?? false,
+      createdAt: map['createdAt'] is String
+          ? DateTime.tryParse(map['createdAt']) ?? DateTime.now()
+          : (map['createdAt'] as DateTime? ?? DateTime.now()),
     );
   }
 }

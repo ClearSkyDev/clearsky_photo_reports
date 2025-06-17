@@ -19,6 +19,8 @@ class _AnalyticsDashboardScreenState extends State<AnalyticsDashboardScreen> {
   bool _loading = true;
   final TextEditingController _inspectorController = TextEditingController();
   final TextEditingController _zipController = TextEditingController();
+  final TextEditingController _clientController = TextEditingController();
+  String? _perilFilter;
   DateTimeRange? _range;
 
   @override
@@ -46,6 +48,16 @@ class _AnalyticsDashboardScreenState extends State<AnalyticsDashboardScreen> {
       if (_zipController.text.isNotEmpty && m.zipCode != _zipController.text) {
         return false;
       }
+      if (_clientController.text.isNotEmpty &&
+          (m.clientName == null ||
+              !m.clientName!
+                  .toLowerCase()
+                  .contains(_clientController.text.toLowerCase()))) {
+        return false;
+      }
+      if (_perilFilter != null && m.perilType != _perilFilter) {
+        return false;
+      }
       if (_range != null) {
         if (m.createdAt.isBefore(_range!.start) ||
             m.createdAt.isAfter(_range!.end)) {
@@ -71,6 +83,19 @@ class _AnalyticsDashboardScreenState extends State<AnalyticsDashboardScreen> {
     if (_filtered.isEmpty) return 0;
     final total = _filtered.map((m) => m.photoCount).reduce((a, b) => a + b);
     return total / _filtered.length;
+  }
+
+  double get _avgDamagePercent {
+    if (_filtered.isEmpty) return 0;
+    final total = _filtered.map((m) => m.damagePercent).reduce((a, b) => a + b);
+    return total / _filtered.length;
+  }
+
+  double get _avgInvoiceAmount {
+    final amounts =
+        _filtered.where((m) => m.invoiceAmount != null).map((m) => m.invoiceAmount!).toList();
+    if (amounts.isEmpty) return 0;
+    return amounts.reduce((a, b) => a + b) / amounts.length;
   }
 
   Map<DateTime, int> get _perDay {
@@ -111,7 +136,19 @@ class _AnalyticsDashboardScreenState extends State<AnalyticsDashboardScreen> {
 
   Future<void> _exportCsv() async {
     final rows = <List<dynamic>>[
-      ['id', 'inspectorId', 'createdAt', 'finalizedAt', 'photoCount', 'status', 'zipCode']
+      [
+        'id',
+        'inspectorId',
+        'createdAt',
+        'finalizedAt',
+        'photoCount',
+        'status',
+        'zipCode',
+        'clientName',
+        'perilType',
+        'damagePercent',
+        'invoiceAmount'
+      ]
     ];
     for (final m in _filtered) {
       rows.add([
@@ -121,7 +158,11 @@ class _AnalyticsDashboardScreenState extends State<AnalyticsDashboardScreen> {
         m.finalizedAt?.toIso8601String() ?? '',
         m.photoCount,
         m.status,
-        m.zipCode ?? ''
+        m.zipCode ?? '',
+        m.clientName ?? '',
+        m.perilType ?? '',
+        m.damagePercent.toStringAsFixed(2),
+        m.invoiceAmount?.toStringAsFixed(2) ?? ''
       ]);
     }
     final csv = const ListToCsvConverter().convert(rows);
@@ -147,6 +188,21 @@ class _AnalyticsDashboardScreenState extends State<AnalyticsDashboardScreen> {
         .reduce((a, b) => a.value >= b.value ? a : b)
         .key;
     return 'Most reports by $mostInspected. Average duration ${_avgDuration.toStringAsFixed(1)} mins.';
+  }
+
+  List<String> _alerts() {
+    final alerts = <String>[];
+    final perDay = _perDay;
+    if (perDay.isNotEmpty) {
+      final values = perDay.values.toList();
+      final avg = values.reduce((a, b) => a + b) / values.length;
+      final today = DateTime.now();
+      final key = DateTime(today.year, today.month, today.day);
+      if (perDay[key] != null && perDay[key]! > avg * 1.5) {
+        alerts.add('Activity spike today');
+      }
+    }
+    return alerts;
   }
 
   @override
@@ -195,6 +251,34 @@ class _AnalyticsDashboardScreenState extends State<AnalyticsDashboardScreen> {
                   ),
                 ],
               ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _clientController,
+                      decoration:
+                          const InputDecoration(labelText: 'Client'),
+                      onChanged: (_) => setState(() {}),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: DropdownButton<String>(
+                      value: _perilFilter,
+                      hint: const Text('Claim Type'),
+                      isExpanded: true,
+                      items: const [
+                        DropdownMenuItem(value: 'wind', child: Text('Wind')),
+                        DropdownMenuItem(value: 'hail', child: Text('Hail')),
+                        DropdownMenuItem(value: 'fire', child: Text('Fire')),
+                        DropdownMenuItem(value: 'other', child: Text('Other')),
+                      ],
+                      onChanged: (v) => setState(() => _perilFilter = v),
+                    ),
+                  ),
+                ],
+              ),
               const SizedBox(height: 16),
               Wrap(
                 spacing: 16,
@@ -202,6 +286,8 @@ class _AnalyticsDashboardScreenState extends State<AnalyticsDashboardScreen> {
                   _kpiTile('Total Reports', '$_totalReports'),
                   _kpiTile('Avg Duration', '${_avgDuration.toStringAsFixed(1)}m'),
                   _kpiTile('Avg Photos', '${_avgPhotos.toStringAsFixed(1)}'),
+                  _kpiTile('Avg Damage %', '${_avgDamagePercent.toStringAsFixed(1)}'),
+                  _kpiTile('Avg Invoice', '\$${_avgInvoiceAmount.toStringAsFixed(2)}'),
                 ],
               ),
               const SizedBox(height: 16),
@@ -250,6 +336,15 @@ class _AnalyticsDashboardScreenState extends State<AnalyticsDashboardScreen> {
                 ),
               ),
               const SizedBox(height: 16),
+              if (_alerts().isNotEmpty)
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    for (var a in _alerts())
+                      Text('⚠️ $a', style: const TextStyle(color: Colors.red)),
+                  ],
+                ),
+              const SizedBox(height: 8),
               Text(_generateInsights()),
               const SizedBox(height: 16),
               Row(

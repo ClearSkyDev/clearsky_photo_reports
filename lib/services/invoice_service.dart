@@ -7,7 +7,14 @@ class InvoiceService {
 
   Future<String> createInvoice(Invoice invoice) async {
     final doc = _collection.doc();
-    await doc.set(invoice.toMap());
+    await doc.set({
+      ...invoice.toMap(),
+      'createdAt': FieldValue.serverTimestamp(),
+    });
+    await FirebaseFirestore.instance
+        .collection('metrics')
+        .doc(invoice.reportId)
+        .set({'invoiceAmount': invoice.amount}, SetOptions(merge: true));
     return doc.id;
   }
 
