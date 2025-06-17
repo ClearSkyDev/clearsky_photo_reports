@@ -332,6 +332,7 @@ Future<String> _generateHtml(SavedReport report) async {
   }
   buffer.writeln('<p><strong>Peril Type:</strong> ${meta.perilType.name}</p>');
   buffer.writeln('<p><strong>Inspection Type:</strong> ${meta.inspectionType.name}</p>');
+  buffer.writeln('<p><strong>Inspector Role:</strong> ${meta.inspectorRole.name.replaceAll('_', ' ')}</p>');
   if (meta.inspectorName != null) {
     buffer.writeln('<p><strong>Inspector Name:</strong> ${meta.inspectorName}</p>');
   }
@@ -524,6 +525,7 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
                 pw.Text('Insurance Carrier: ${meta.insuranceCarrier}'),
               pw.Text('Peril Type: ${meta.perilType.name}'),
               pw.Text('Inspection Type: ${meta.inspectionType.name}'),
+              pw.Text('Inspector Role: ${meta.inspectorRole.name.replaceAll('_', ' ')}'),
               if (meta.inspectorName != null)
                 pw.Text('Inspector Name: ${meta.inspectorName}'),
               pw.SizedBox(height: 20),
@@ -591,6 +593,7 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
             pw.Text('Insurance Carrier: ${meta.insuranceCarrier}'),
           pw.Text('Peril Type: ${meta.perilType.name}'),
           pw.Text('Inspection Type: ${meta.inspectionType.name}'),
+          pw.Text('Inspector Role: ${meta.inspectorRole.name.replaceAll('_', ' ')}'),
           if (meta.inspectorName != null)
             pw.Text('Inspector Name: ${meta.inspectorName}'),
           pw.SizedBox(height: 20),

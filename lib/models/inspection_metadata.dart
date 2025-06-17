@@ -9,6 +9,7 @@ class InspectionMetadata {
   final PerilType perilType;
   final InspectionType inspectionType;
   final String? inspectorName;
+  final InspectorReportRole inspectorRole;
   final String? reportId;
   final String? weatherNotes;
 
@@ -20,6 +21,7 @@ class InspectionMetadata {
     required this.perilType,
     required this.inspectionType,
     this.inspectorName,
+    this.inspectorRole = InspectorReportRole.ladder_assist,
     this.reportId,
     this.weatherNotes,
   });
@@ -39,6 +41,13 @@ class InspectionMetadata {
       return InspectionType.residentialRoof;
     }
 
+    InspectorReportRole parseRole(String? value) {
+      for (final role in InspectorReportRole.values) {
+        if (role.name == value) return role;
+      }
+      return InspectorReportRole.ladder_assist;
+    }
+
     return InspectionMetadata(
       clientName: map['clientName'] ?? '',
       propertyAddress: map['propertyAddress'] ?? '',
@@ -49,6 +58,7 @@ class InspectionMetadata {
       perilType: parsePeril(map['perilType'] as String?),
       inspectionType: parseType(map['inspectionType'] as String?),
       inspectorName: map['inspectorName'] as String?,
+      inspectorRole: parseRole(map['inspectorRole'] as String?),
       reportId: map['reportId'] as String?,
       weatherNotes: map['weatherNotes'] as String?,
     );
@@ -56,3 +66,5 @@ class InspectionMetadata {
 }
 
 enum PerilType { wind, hail, fire, other }
+
+enum InspectorReportRole { ladder_assist, adjuster, contractor }

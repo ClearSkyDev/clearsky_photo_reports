@@ -227,6 +227,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
         'insuranceCarrier': _metadata.insuranceCarrier,
       'perilType': _metadata.perilType.name,
       'inspectionType': _metadata.inspectionType.name,
+      'inspectorRole': _metadata.inspectorRole.name,
       if (_metadata.inspectorName != null)
         'inspectorName': _metadata.inspectorName,
     };
@@ -294,6 +295,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
     }
     buffer.writeln('<tr><td><strong>Peril Type:</strong></td><td>${_metadata.perilType.name}</td></tr>');
     buffer.writeln('<tr><td><strong>Inspection Type:</strong></td><td>${_metadata.inspectionType.name}</td></tr>');
+    buffer.writeln('<tr><td><strong>Inspector Role:</strong></td><td>${_metadata.inspectorRole.name.replaceAll('_', ' ')}</td></tr>');
     if (_metadata.inspectorName != null) {
       buffer.writeln('<tr><td><strong>Inspector Name:</strong></td><td>${_metadata.inspectorName}</td></tr>');
     }
@@ -570,6 +572,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
                   pw.Text('Insurance Carrier: ${_metadata.insuranceCarrier}'),
                 pw.Text('Peril Type: ${_metadata.perilType.name}'),
                 pw.Text('Inspection Type: ${_metadata.inspectionType.name}'),
+                pw.Text('Inspector Role: ${_metadata.inspectorRole.name.replaceAll('_', ' ')}'),
                 if (_metadata.inspectorName != null)
                   pw.Text('Inspector Name: ${_metadata.inspectorName}'),
                 pw.SizedBox(height: 20),
@@ -646,6 +649,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
               pw.Text('Insurance Carrier: ${_metadata.insuranceCarrier}'),
             pw.Text('Peril Type: ${_metadata.perilType.name}'),
             pw.Text('Inspection Type: ${_metadata.inspectionType.name}'),
+            pw.Text('Inspector Role: ${_metadata.inspectorRole.name.replaceAll('_', ' ')}'),
             if (_metadata.inspectorName != null)
               pw.Text('Inspector Name: ${_metadata.inspectorName}'),
             pw.SizedBox(height: 20),
@@ -852,6 +856,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
                   Text('Insurance Carrier: ${_metadata.insuranceCarrier}'),
                 Text('Peril Type: ${_metadata.perilType.name}'),
                 Text('Inspection Type: ${_metadata.inspectionType.name}'),
+                Text('Inspector Role: ${_metadata.inspectorRole.name.replaceAll('_', ' ')}'),
                 if (_metadata.inspectorName != null)
                   Text('Inspector Name: ${_metadata.inspectorName}'),
               ],

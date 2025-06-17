@@ -31,6 +31,7 @@ class _MetadataScreenState extends State<MetadataScreen> {
   DateTime _inspectionDate = DateTime.now();
   PerilType _selectedPeril = PerilType.wind;
   InspectionType _selectedType = InspectionType.residentialRoof;
+  InspectorReportRole _selectedRole = InspectorReportRole.ladder_assist;
   List<ReportTemplate> _templates = [];
   ReportTemplate? _selectedTemplate;
 
@@ -48,6 +49,7 @@ class _MetadataScreenState extends State<MetadataScreen> {
       _inspectorNameController.text = meta.inspectorName ?? '';
       _reportIdController.text = meta.reportId ?? '';
       _weatherNotesController.text = meta.weatherNotes ?? '';
+      _selectedRole = meta.inspectorRole;
     } else {
       _loadProfile();
     }
@@ -127,6 +129,7 @@ class _MetadataScreenState extends State<MetadataScreen> {
         inspectorName: _inspectorNameController.text.isNotEmpty
             ? _inspectorNameController.text
             : null,
+        inspectorRole: _selectedRole,
         reportId: _reportIdController.text.isNotEmpty
             ? _reportIdController.text
             : null,
@@ -248,6 +251,26 @@ class _MetadataScreenState extends State<MetadataScreen> {
                   if (value != null) {
                     setState(() {
                       _selectedPeril = value;
+                    });
+                  }
+                },
+              ),
+              DropdownButtonFormField<InspectorReportRole>(
+                value: _selectedRole,
+                decoration:
+                    const InputDecoration(labelText: 'Your Role'),
+                items: InspectorReportRole.values
+                    .map(
+                      (r) => DropdownMenuItem(
+                        value: r,
+                        child: Text(r.name.replaceAll('_', ' ')),
+                      ),
+                    )
+                    .toList(),
+                onChanged: (value) {
+                  if (value != null) {
+                    setState(() {
+                      _selectedRole = value;
                     });
                   }
                 },
