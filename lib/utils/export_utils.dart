@@ -754,3 +754,51 @@ Future<File?> exportCsv(SavedReport report) async {
   await file.writeAsBytes(bytes, flush: true);
   return file;
 }
+
+/// Generates a simple PDF cover sheet with a QR code linking to the
+/// public report portal. The PDF includes the ClearSky logo and basic
+/// report details.
+Future<Uint8List> generateQrCoverSheet({
+  required String url,
+  required String propertyAddress,
+  required String clientName,
+  DateTime? inspectionDate,
+}) async {
+  final pdf = pw.Document();
+  final logoData = await rootBundle.load('assets/images/clearsky_logo.png');
+  final logoBytes = logoData.buffer.asUint8List();
+
+  pdf.addPage(
+    pw.Page(
+      build: (context) => pw.Center(
+        child: pw.Column(
+          mainAxisSize: pw.MainAxisSize.min,
+          children: [
+            pw.Image(pw.MemoryImage(logoBytes), width: 140),
+            pw.SizedBox(height: 20),
+            pw.Text('Scan to View Report',
+                style: pw.TextStyle(
+                    fontSize: 18, fontWeight: pw.FontWeight.bold)),
+            pw.SizedBox(height: 20),
+            pw.BarcodeWidget(
+              barcode: pw.Barcode.qrCode(),
+              data: url,
+              width: 200,
+              height: 200,
+            ),
+            pw.SizedBox(height: 20),
+            pw.Text(propertyAddress),
+            pw.Text(clientName),
+            if (inspectionDate != null)
+              pw.Text(
+                  'Inspection Date: ${inspectionDate.toLocal().toString().split(' ')[0]}'),
+            pw.SizedBox(height: 20),
+            pw.Text(url, style: const pw.TextStyle(fontSize: 12)),
+          ],
+        ),
+      ),
+    ),
+  );
+
+  return pdf.save();
+}

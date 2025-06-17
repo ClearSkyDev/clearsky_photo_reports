@@ -23,6 +23,7 @@ import '../services/partner_service.dart';
 import 'package:flutter/services.dart';
 import '../services/tts_service.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:printing/printing.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
@@ -611,6 +612,18 @@ class _SendReportScreenState extends State<SendReportScreen> {
     if (_publicId == null) return;
     final uri = Uri.parse(_publicUrl);
     launchUrl(uri, mode: LaunchMode.externalApplication);
+  }
+
+  Future<void> _printCoverSheet() async {
+    if (_publicId == null) return;
+    final m = widget.metadata;
+    final pdf = await generateQrCoverSheet(
+      url: _publicUrl,
+      propertyAddress: m.propertyAddress,
+      clientName: m.clientName,
+      inspectionDate: m.inspectionDate,
+    );
+    await Printing.layoutPdf(onLayout: (_) => pdf);
   }
 
   Future<void> _autoGenerateSummary() async {
@@ -1537,6 +1550,11 @@ class _SendReportScreenState extends State<SendReportScreen> {
                             icon: const Icon(Icons.open_in_browser),
                           ),
                         ],
+                      ),
+                      const SizedBox(height: 8),
+                      ElevatedButton(
+                        onPressed: _printCoverSheet,
+                        child: const Text('Print QR Cover Sheet'),
                       )
                     ],
                   ),
