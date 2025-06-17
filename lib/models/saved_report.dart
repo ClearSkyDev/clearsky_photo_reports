@@ -8,6 +8,7 @@ import 'report_snapshot.dart';
 import 'report_collaborator.dart';
 import 'homeowner_signature.dart';
 import 'photo_entry.dart' show SourceType;
+import 'ai_summary.dart';
 
 class SavedReport {
   final String id;
@@ -17,6 +18,8 @@ class SavedReport {
   final String? summary;
   /// Paragraph summarizing the overall findings.
   final String? summaryText;
+  /// Draft AI-generated summary review information.
+  final AiSummaryReview? aiSummary;
   /// Either a download URL or base64 encoded PNG of the inspector signature.
   final String? signature;
   /// Random ID used for public sharing of the report.
@@ -49,6 +52,7 @@ class SavedReport {
     required this.structures,
     this.summary,
     this.summaryText,
+    this.aiSummary,
     this.signature,
     this.publicReportId,
     this.publicViewLink,
@@ -81,6 +85,7 @@ class SavedReport {
       if (userId != null) 'userId': userId,
       if (summary != null) 'summary': summary,
       if (summaryText != null) 'summaryText': summaryText,
+      if (aiSummary != null) 'aiSummary': aiSummary!.toMap(),
       if (signature != null) 'signature': signature,
       if (publicReportId != null) 'publicReportId': publicReportId,
       if (publicViewLink != null) 'publicViewLink': publicViewLink,
@@ -125,6 +130,10 @@ class SavedReport {
       structures: structs,
       summary: map['summary'] as String?,
       summaryText: map['summaryText'] as String?,
+      aiSummary: map['aiSummary'] != null
+          ? AiSummaryReview.fromMap(
+              Map<String, dynamic>.from(map['aiSummary']))
+          : null,
       signature: map['signature'] as String?,
       publicReportId: map['publicReportId'] as String?,
       publicViewLink: map['publicViewLink'] as String?,

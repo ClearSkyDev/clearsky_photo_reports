@@ -77,10 +77,16 @@ class _PublicReportScreenState extends State<PublicReportScreen> {
           const SizedBox(height: 4),
           Text('Client: ${meta.clientName}'),
           const SizedBox(height: 12),
-          if (report.summaryText != null && report.summaryText!.isNotEmpty) ...[
+          if ((report.aiSummary?.status == 'approved' ||
+                  report.aiSummary?.status == 'edited') &&
+              report.summaryText != null &&
+              report.summaryText!.isNotEmpty) ...[
             const Text('Summary of Findings',
                 style: TextStyle(fontWeight: FontWeight.bold)),
             Text(report.summaryText!),
+            if (report.aiSummary?.editor != null)
+              Text('Reviewed by ${report.aiSummary!.editor} on ${report.aiSummary!.editedAt?.toLocal().toString().split(' ')[0]}',
+                  style: const TextStyle(fontSize: 12)),
             const SizedBox(height: 12),
           ],
           for (final struct in report.structures) ...[

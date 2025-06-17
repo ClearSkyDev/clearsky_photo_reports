@@ -109,6 +109,7 @@ class OfflineSyncService {
       structures: structs,
       summary: draft.summary,
       summaryText: draft.summaryText,
+      aiSummary: draft.aiSummary,
       signature: signatureUrl,
       templateId: draft.templateId,
       createdAt: draft.createdAt,

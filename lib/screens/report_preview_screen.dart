@@ -28,6 +28,8 @@ import '../utils/export_utils.dart';
 import '../utils/share_utils.dart';
 import 'photo_map_screen.dart';
 import '../services/ai_summary_service.dart';
+import '../models/ai_summary.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import '../models/inspected_structure.dart';
 
@@ -70,6 +72,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
   late final TextEditingController _homeownerSummaryController;
   bool _editingSummaries = true;
   bool _loadingSummary = false;
+  AiSummaryReview? _aiSummary;
   Uint8List? _signature;
   String _template = 'legacy';
   bool _showGps = true;
@@ -84,10 +87,17 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
     _summaryController = TextEditingController(text: widget.summary ?? '');
     _adjusterSummaryController = TextEditingController();
     _homeownerSummaryController = TextEditingController();
+    _aiSummary = widget.savedReport?.aiSummary;
+    if (_aiSummary != null) {
+      _adjusterSummaryController.text = _aiSummary!.content;
+      _editingSummaries = false;
+    }
     _signature = widget.signature;
     inspectionChecklist.markComplete('Report Previewed');
     _loadTemplate();
-    _generateSummary();
+    if (_aiSummary == null || _aiSummary!.status == 'rejected') {
+      _generateSummary();
+    }
   }
 
   Future<void> _loadTemplate() async {
@@ -236,6 +246,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
       final service = AiSummaryService(apiKey: key);
       final result = await service.generateSummary(report);
       setState(() {
+        _aiSummary = AiSummaryReview(content: result.adjuster, status: 'draft');
         _adjusterSummaryController.text = result.adjuster;
         _homeownerSummaryController.text = result.homeowner;
       });
@@ -294,8 +305,11 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
     }
     buffer.writeln('</table>');
 
-    if (_adjusterSummaryController.text.isNotEmpty ||
-        _homeownerSummaryController.text.isNotEmpty) {
+    final showAiSummary = _aiSummary != null &&
+        (_aiSummary!.status == 'approved' || _aiSummary!.status == 'edited');
+    if (showAiSummary &&
+        (_adjusterSummaryController.text.isNotEmpty ||
+            _homeownerSummaryController.text.isNotEmpty)) {
       buffer.writeln(
           '<div style="border:1px solid #ccc;padding:8px;margin-top:20px;">');
       buffer.writeln('<strong>Inspection Summary</strong><br>');
@@ -306,6 +320,11 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
       if (_homeownerSummaryController.text.isNotEmpty) {
         buffer.writeln(
             '<p><em>For Homeowner:</em> ${_homeownerSummaryController.text}</p>');
+      }
+      if (_aiSummary!.editor != null) {
+        final ts = _aiSummary!.editedAt?.toLocal().toString().split(' ').first;
+        buffer.writeln(
+            '<p><em>Reviewed by ${_aiSummary!.editor} on $ts</em></p>');
       }
       buffer.writeln('</div>');
     }
@@ -554,8 +573,10 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
                 if (_metadata.inspectorName != null)
                   pw.Text('Inspector Name: ${_metadata.inspectorName}'),
                 pw.SizedBox(height: 20),
-                if (_adjusterSummaryController.text.isNotEmpty ||
-                    _homeownerSummaryController.text.isNotEmpty)
+                if ((_aiSummary?.status == 'approved' ||
+                        _aiSummary?.status == 'edited') &&
+                    (_adjusterSummaryController.text.isNotEmpty ||
+                        _homeownerSummaryController.text.isNotEmpty))
                   pw.Container(
                     width: double.infinity,
                     padding: const pw.EdgeInsets.all(8),
@@ -573,7 +594,14 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
                         if (_homeownerSummaryController.text.isNotEmpty) ...[
                           pw.SizedBox(height: 4),
                           pw.Text('For Homeowner: ${_homeownerSummaryController.text}'),
-                        ]
+                        ],
+                        if (_aiSummary?.editor != null)
+                          pw.Padding(
+                            padding: const pw.EdgeInsets.only(top: 4),
+                            child: pw.Text(
+                                'Reviewed by ${_aiSummary!.editor} on ${_aiSummary!.editedAt?.toLocal().toString().split(' ')[0]}',
+                                style: const pw.TextStyle(fontSize: 10)),
+                          )
                       ],
                     ),
                   ),
@@ -879,10 +907,41 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
                     ElevatedButton(
                       onPressed: () {
                         setState(() {
-                          _editingSummaries = !_editingSummaries;
+                          _editingSummaries = true;
                         });
                       },
-                      child: Text(_editingSummaries ? 'Done' : 'Edit'),
+                      child: const Text('Edit'),
+                    ),
+                    const SizedBox(width: 8),
+                    ElevatedButton(
+                      onPressed: () {
+                        final user = FirebaseAuth.instance.currentUser;
+                        setState(() {
+                          _aiSummary = AiSummaryReview(
+                            status: 'approved',
+                            content: _adjusterSummaryController.text,
+                            editor: user?.email,
+                            editedAt: DateTime.now(),
+                          );
+                          _editingSummaries = false;
+                        });
+                      },
+                      child: const Text('Approve'),
+                    ),
+                    const SizedBox(width: 8),
+                    ElevatedButton(
+                      onPressed: () {
+                        final user = FirebaseAuth.instance.currentUser;
+                        setState(() {
+                          _aiSummary = AiSummaryReview(
+                            status: 'rejected',
+                            content: _adjusterSummaryController.text,
+                            editor: user?.email,
+                            editedAt: DateTime.now(),
+                          );
+                        });
+                      },
+                      child: const Text('Reject'),
                     ),
                   ],
                 )
