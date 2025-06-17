@@ -45,28 +45,42 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   child: Chip(label: Text('Offline')),
                 );
               }
-              return Stack(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.sync),
-                    tooltip: 'Sync Now',
-                    onPressed: OfflineSyncService.instance.syncDrafts,
-                  ),
-                  if (OfflineSyncService.instance.pendingCount > 0)
-                    Positioned(
-                      right: 4,
-                      top: 4,
-                      child: CircleAvatar(
-                        radius: 8,
-                        backgroundColor: Colors.red,
-                        child: Text(
-                          '${OfflineSyncService.instance.pendingCount}',
-                          style:
-                              const TextStyle(fontSize: 10, color: Colors.white),
-                        ),
+              return ValueListenableBuilder<double>(
+                valueListenable: OfflineSyncService.instance.progress,
+                builder: (context, progress, __) {
+                  return Stack(
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.sync),
+                        tooltip: 'Sync Now',
+                        onPressed: OfflineSyncService.instance.syncDrafts,
                       ),
-                    ),
-                ],
+                      if (progress > 0 && progress < 1)
+                        const Positioned(
+                          right: 4,
+                          top: 4,
+                          child: SizedBox(
+                            height: 16,
+                            width: 16,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                        )
+                      else if (OfflineSyncService.instance.pendingCount > 0)
+                        Positioned(
+                          right: 4,
+                          top: 4,
+                          child: CircleAvatar(
+                            radius: 8,
+                            backgroundColor: Colors.red,
+                            child: Text(
+                              '${OfflineSyncService.instance.pendingCount}',
+                              style: const TextStyle(fontSize: 10, color: Colors.white),
+                            ),
+                          ),
+                        ),
+                    ],
+                  );
+                },
               );
             },
           ),
@@ -102,6 +116,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ElevatedButton(
               onPressed: () => Navigator.pushNamed(context, '/invoices'),
               child: const Text('Unpaid Invoices'),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.pushNamed(context, '/syncHistory'),
+              child: const Text('Sync History'),
             ),
             if (widget.user.role == UserRole.admin)
               ElevatedButton(
