@@ -90,3 +90,7 @@ For scenarios where Firebase is not available, reports can be stored locally usi
 ## Offline Mode
 
 When connectivity is lost the app now stores draft reports in a local Hive database. A small "Offline" badge appears in the dashboard and all Firebase calls are skipped. Once a connection is detected a sync button uploads any pending drafts and clears the local storage.
+
+## Admin Audit Logs
+
+Administrators can review a history of actions such as logins, invoice updates and report changes. The **Audit Logs** screen provides search and filtering by user, action, date or target ID and exports the results to CSV for external analysis.
