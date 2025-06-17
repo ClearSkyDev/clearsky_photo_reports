@@ -148,5 +148,9 @@ Generate narrated slideshow videos from report photos. Each slide's caption is v
 
 Reports can include additional PDF, DOCX or CSV files. Use the **Attach 3rd-Party Reports** section in the Send Report screen to upload documents or provide a link. Attachments are stored with the report and appear as download links in exported HTML and emails.
 
+## Multi-Property Report Builder
+
+Inspectors can now add multiple properties within a single inspection. Each property has its own optional address and full photo section workflow. Tabs keep the capture process organized and exports combine all properties into one report. When more than one property is present a table of contents is generated.
+
 
 

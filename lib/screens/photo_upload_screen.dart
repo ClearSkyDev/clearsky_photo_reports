@@ -77,7 +77,8 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
         widget.template?.sections ?? sectionsForType(widget.metadata.inspectionType);
     _structures.add(
       InspectedStructure(
-        name: 'Main Structure',
+        name: 'Main Property',
+        address: widget.metadata.propertyAddress,
         sectionPhotos: {for (var s in sections) s: []},
       ),
     );
@@ -209,12 +210,13 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
     _updatePrompt();
   }
 
-  void _addStructure(String name) {
+  void _addStructure(String name, String address) {
     if (name.isEmpty) return;
     setState(() {
       _structures.add(
         InspectedStructure(
             name: name,
+            address: address.isNotEmpty ? address : null,
             sectionPhotos: {
               for (var s in widget.template?.sections ??
                   sectionsForType(widget.metadata.inspectionType)) s: []
@@ -252,14 +254,24 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
   }
 
   void _showAddStructureDialog() {
-    final controller = TextEditingController();
+    final nameController = TextEditingController();
+    final addressController = TextEditingController();
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Add Structure'),
-        content: TextField(
-          controller: controller,
-          decoration: const InputDecoration(labelText: 'Structure Name'),
+        title: const Text('Add Property'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: nameController,
+              decoration: const InputDecoration(labelText: 'Property Name'),
+            ),
+            TextField(
+              controller: addressController,
+              decoration: const InputDecoration(labelText: 'Address (optional)'),
+            ),
+          ],
         ),
         actions: [
           TextButton(
@@ -268,7 +280,7 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
           ),
           TextButton(
             onPressed: () {
-              _addStructure(controller.text.trim());
+              _addStructure(nameController.text.trim(), addressController.text.trim());
               Navigator.pop(context);
             },
             child: const Text('Add'),

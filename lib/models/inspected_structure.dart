@@ -2,13 +2,15 @@ import 'saved_report.dart' show ReportPhotoEntry;
 
 class InspectedStructure {
   final String name;
+  final String? address;
   final Map<String, List<ReportPhotoEntry>> sectionPhotos;
 
-  InspectedStructure({required this.name, required this.sectionPhotos});
+  InspectedStructure({required this.name, this.address, required this.sectionPhotos});
 
   Map<String, dynamic> toMap() {
     return {
       'name': name,
+      if (address != null) 'address': address,
       'sectionPhotos': {
         for (var entry in sectionPhotos.entries)
           entry.key: entry.value.map((p) => p.toMap()).toList(),
@@ -27,6 +29,7 @@ class InspectedStructure {
     });
     return InspectedStructure(
       name: map['name'] as String? ?? '',
+      address: map['address'] as String?,
       sectionPhotos: sections,
     );
   }

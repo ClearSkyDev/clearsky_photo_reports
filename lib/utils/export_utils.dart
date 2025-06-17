@@ -365,13 +365,27 @@ Future<String> _generateHtml(SavedReport report) async {
     }
     buffer.writeln('</ul>');
   }
-    for (final struct in report.structures) {
+
+  if (report.structures.length > 1) {
+    buffer.writeln('<h2>Table of Contents</h2><ul>');
+    for (int i = 0; i < report.structures.length; i++) {
+      buffer.writeln(
+          '<li><a href="#prop${i + 1}">${report.structures[i].name}</a></li>');
+    }
+    buffer.writeln('</ul>');
+  }
+
+    for (int i = 0; i < report.structures.length; i++) {
+      final struct = report.structures[i];
       if (report.structures.length > 1) {
-        buffer.writeln('<h2>${struct.name}</h2>');
+        buffer.writeln('<h2 id="prop${i + 1}">${struct.name}</h2>');
+        if (struct.address != null && struct.address!.isNotEmpty) {
+          buffer.writeln('<p><strong>Address:</strong> ${struct.address}</p>');
+        }
       }
       for (final section
           in sectionsForType(meta.inspectionType)) {
-      final photos = struct.sectionPhotos[section] ?? [];
+        final photos = struct.sectionPhotos[section] ?? [];
       if (photos.isEmpty) continue;
       if (report.structures.length > 1) buffer.writeln('<h3>$section</h3>');
       else buffer.writeln('<h2>$section</h2>');
@@ -478,9 +492,13 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
 
   Future<List<pw.Widget>> buildSections() async {
     final widgets = <pw.Widget>[];
-    for (final struct in report.structures) {
+    for (int i = 0; i < report.structures.length; i++) {
+      final struct = report.structures[i];
       if (report.structures.length > 1) {
-        widgets.add(_pdfSectionHeader(struct.name));
+        widgets.add(_pdfSectionHeader('${i + 1}. ${struct.name}'));
+        if (struct.address != null && struct.address!.isNotEmpty) {
+          widgets.add(pw.Text(struct.address!));
+        }
         widgets.add(pw.SizedBox(height: 10));
       }
       for (final section in sectionsForType(meta.inspectionType)) {
@@ -598,6 +616,18 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
           pw.Header(level: 0, text: 'ClearSky Photo Report'),
           pw.Text('Client Name: ${meta.clientName}'),
           pw.Text('Property Address: ${meta.propertyAddress}'),
+          if (report.structures.length > 1) ...[
+            pw.SizedBox(height: 10),
+            pw.Header(level: 1, text: 'Table of Contents'),
+            pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: [
+                for (int i = 0; i < report.structures.length; i++)
+                  pw.Text('${i + 1}. ${report.structures[i].name}'),
+              ],
+            ),
+            pw.SizedBox(height: 20),
+          ],
           pw.Text(
               'Inspection Date: ${meta.inspectionDate.toLocal().toString().split(' ')[0]}'),
           if (meta.insuranceCarrier != null)
