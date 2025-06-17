@@ -78,13 +78,17 @@ class _PhotoDetailScreenState extends State<PhotoDetailScreen> {
     if (!_markupMode) {
       return IconButton(
         icon: const Icon(Icons.brush),
+        tooltip: 'Start Markup',
         onPressed: () => setState(() => _markupMode = true),
       );
     }
+    const colorNames = ['red', 'green', 'yellow', 'blue'];
+    final colors = [Colors.red, Colors.green, Colors.yellow, Colors.blue];
     return Row(
       children: [
         IconButton(
           icon: const Icon(Icons.close),
+          tooltip: 'Cancel Markup',
           onPressed: () {
             setState(() {
               _markupMode = false;
@@ -94,25 +98,31 @@ class _PhotoDetailScreenState extends State<PhotoDetailScreen> {
         ),
         IconButton(
           icon: const Icon(Icons.delete),
+          tooltip: 'Clear Markup',
           onPressed: _controller.clear,
         ),
         IconButton(
           icon: const Icon(Icons.save),
+          tooltip: 'Save Markup',
           onPressed: _saveMarkup,
         ),
         const SizedBox(width: 8),
-        for (final c in [Colors.red, Colors.green, Colors.yellow, Colors.blue])
+        for (int i = 0; i < 4; i++)
           GestureDetector(
-            onTap: () => _setColor(c),
-            child: Container(
-              margin: const EdgeInsets.symmetric(horizontal: 4),
-              width: 24,
-              height: 24,
-              decoration: BoxDecoration(
-                color: c,
+            onTap: () => _setColor(colors[i]),
+            child: Semantics(
+              label: 'Select ${colorNames[i]} pen color',
+              button: true,
+              child: Container(
+                margin: const EdgeInsets.symmetric(horizontal: 4),
+                width: 24,
+                height: 24,
+                decoration: BoxDecoration(
+                color: colors[i],
                 shape: BoxShape.circle,
                 border: Border.all(
-                    color: _penColor == c ? Colors.white : Colors.black),
+                    color: _penColor == colors[i] ? Colors.white : Colors.black),
+                ),
               ),
             ),
           ),
@@ -130,14 +140,17 @@ class _PhotoDetailScreenState extends State<PhotoDetailScreen> {
       appBar: AppBar(title: const Text('Photo Detail'), actions: [
         IconButton(
           icon: const Icon(Icons.volume_up),
+          tooltip: 'Speak Label',
           onPressed: () => TtsService.instance.speak(widget.entry.label),
         ),
         IconButton(
           icon: const Icon(Icons.pause),
+          tooltip: 'Pause Speech',
           onPressed: () => TtsService.instance.pause(),
         ),
         IconButton(
           icon: const Icon(Icons.stop),
+          tooltip: 'Stop Speech',
           onPressed: () => TtsService.instance.stop(),
         ),
         _buildToolbar(),

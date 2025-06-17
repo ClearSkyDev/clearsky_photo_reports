@@ -128,6 +128,7 @@ class _ReportSearchScreenState extends State<ReportSearchScreen> {
                 hintText: 'Search reports',
                 prefixIcon: IconButton(
                   icon: const Icon(Icons.search),
+                  tooltip: 'Search',
                   onPressed: _search,
                 ),
               ),

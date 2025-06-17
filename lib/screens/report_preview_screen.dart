@@ -206,6 +206,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
           border: const OutlineInputBorder(),
           suffixIcon: IconButton(
             icon: const Icon(Icons.mic),
+            tooltip: 'Dictate ${label.toLowerCase()}',
             onPressed: () => _dictate(controller, label.toLowerCase()),
           ),
         ),
@@ -1002,6 +1003,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
                       border: const OutlineInputBorder(),
                       suffixIcon: IconButton(
                         icon: const Icon(Icons.mic),
+                        tooltip: 'Dictate summary',
                         onPressed: () => _dictate(_summaryController, 'summary'),
                       ),
                     ),

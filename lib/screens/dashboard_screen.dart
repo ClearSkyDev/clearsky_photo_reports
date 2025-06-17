@@ -49,6 +49,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 children: [
                   IconButton(
                     icon: const Icon(Icons.sync),
+                    tooltip: 'Sync Now',
                     onPressed: OfflineSyncService.instance.syncDrafts,
                   ),
                   if (OfflineSyncService.instance.pendingCount > 0)
@@ -71,6 +72,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
           IconButton(
             icon: const Icon(Icons.logout),
+            tooltip: 'Logout',
             onPressed: () => AuthService().signOut(),
           ),
         ],

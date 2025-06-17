@@ -75,6 +75,7 @@ class _AiChatDrawerState extends State<AiChatDrawer> {
                   ),
                   IconButton(
                     icon: const Icon(Icons.send),
+                    tooltip: 'Send',
                     onPressed: _loading ? null : _send,
                   )
                 ],

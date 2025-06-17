@@ -177,6 +177,7 @@ class _MessageThreadScreenState extends State<MessageThreadScreen> {
       children: [
         IconButton(
           icon: const Icon(Icons.attach_file),
+          tooltip: 'Attach File',
           onPressed: _pickAttachment,
         ),
         Expanded(
@@ -187,6 +188,7 @@ class _MessageThreadScreenState extends State<MessageThreadScreen> {
         ),
         IconButton(
           icon: const Icon(Icons.send),
+          tooltip: 'Send Message',
           onPressed: _sendMessage,
         ),
       ],

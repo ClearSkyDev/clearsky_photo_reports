@@ -247,6 +247,7 @@ class _AnalyticsDashboardScreenState extends State<AnalyticsDashboardScreen> {
                   ),
                   IconButton(
                     onPressed: _pickRange,
+                    tooltip: 'Select Date Range',
                     icon: const Icon(Icons.date_range),
                   ),
                 ],

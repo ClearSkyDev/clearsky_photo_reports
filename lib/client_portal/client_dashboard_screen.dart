@@ -86,6 +86,7 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
                 subtitle: Text(r.inspectionMetadata['clientName'] ?? ''),
                 trailing: IconButton(
                   icon: const Icon(Icons.download),
+                  tooltip: 'Download',
                   onPressed: () async {
                     await ClientActivityService().log('download_zip', reportId: r.id);
                     await exportFinalZip(r);

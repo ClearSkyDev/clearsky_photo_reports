@@ -209,11 +209,14 @@ class _MetadataScreenState extends State<MetadataScreen> {
               ),
               GestureDetector(
                 onTap: _pickDate,
-                child: AbsorbPointer(
-                  child: TextFormField(
-                    decoration:
-                        const InputDecoration(labelText: 'Inspection Date'),
-                    controller: TextEditingController(
+                child: Semantics(
+                  label: 'Select inspection date',
+                  button: true,
+                  child: AbsorbPointer(
+                    child: TextFormField(
+                      decoration:
+                          const InputDecoration(labelText: 'Inspection Date'),
+                      controller: TextEditingController(
                       text: _inspectionDate.toLocal().toString().split(' ')[0],
                     ),
                   ),

@@ -82,6 +82,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                       ),
                       IconButton(
                         icon: const Icon(Icons.delete),
+                        tooltip: 'Remove Item',
                         onPressed: () => setState(() => _items.removeAt(i)),
                       )
                     ],

@@ -36,8 +36,10 @@ import 'services/offline_sync_service.dart';
 import 'services/notification_service.dart';
 import 'services/changelog_service.dart';
 import 'services/tts_service.dart';
+import 'services/accessibility_service.dart';
 import 'models/checklist.dart';
 import 'screens/changelog_screen.dart';
+import 'screens/accessibility_settings_screen.dart';
 import 'app_theme.dart';
 
 Future<void> main() async {
@@ -49,18 +51,48 @@ Future<void> main() async {
   await NotificationService.instance.init();
   await ChangelogService.instance.init();
   await TtsService.instance.init();
+  await AccessibilityService.instance.init();
   await inspectionChecklist.loadSaved();
   runApp(const ClearSkyApp());
 }
 
-class ClearSkyApp extends StatelessWidget {
+class ClearSkyApp extends StatefulWidget {
   const ClearSkyApp({super.key});
+
+  @override
+  State<ClearSkyApp> createState() => _ClearSkyAppState();
+}
+
+class _ClearSkyAppState extends State<ClearSkyApp> {
+  @override
+  void initState() {
+    super.initState();
+    AccessibilityService.instance.addListener(_onUpdate);
+  }
+
+  void _onUpdate() => setState(() {});
+
+  @override
+  void dispose() {
+    AccessibilityService.instance.removeListener(_onUpdate);
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'ClearSky Photo Reports',
-      theme: AppTheme.build(),
+      theme: AppTheme.build(highContrast: AccessibilityService.instance.settings.highContrast),
+      builder: (context, child) {
+        final s = AccessibilityService.instance.settings;
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(
+            textScaleFactor: s.textScale,
+            disableAnimations: s.reducedMotion,
+          ),
+          child: child!,
+        );
+      },
       routes: {
         '/home': (context) => const HomeScreen(),
         '/report': (context) => const ReportScreen(),
@@ -83,6 +115,7 @@ class ClearSkyApp extends StatelessWidget {
         '/notifications': (context) => const NotificationSettingsScreen(),
         '/learning': (context) => const LearningSettingsScreen(),
         '/changelog': (context) => const ChangelogScreen(),
+        '/accessibility': (context) => const AccessibilitySettingsScreen(),
       },
       onGenerateRoute: (settings) {
         final name = settings.name ?? '';

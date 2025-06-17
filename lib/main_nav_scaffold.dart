@@ -6,6 +6,7 @@ import 'screens/dashboard_screen.dart';
 import 'screens/sectioned_photo_upload_screen.dart';
 import 'screens/report_screen.dart';
 import 'screens/report_settings_screen.dart';
+import 'services/accessibility_service.dart';
 
 class MainNavScaffold extends StatefulWidget {
   final InspectorUser user;
@@ -26,7 +27,9 @@ class _MainNavScaffoldState extends State<MainNavScaffold> {
   ];
 
   void _onItemTapped(int i) {
-    HapticFeedback.selectionClick();
+    if (AccessibilityService.instance.settings.haptics) {
+      HapticFeedback.selectionClick();
+    }
     setState(() => _index = i);
   }
 

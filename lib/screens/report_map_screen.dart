@@ -188,10 +188,14 @@ class _ReportMapScreenState extends State<ReportMapScreen> {
                                   ),
                                 );
                               },
-                              child: Icon(
-                                Icons.location_on,
-                                color: r.isFinalized ? Colors.green : Colors.orange,
-                                size: 40,
+                              child: Semantics(
+                                label: 'Report location',
+                                button: true,
+                                child: Icon(
+                                  Icons.location_on,
+                                  color: r.isFinalized ? Colors.green : Colors.orange,
+                                  size: 40,
+                                ),
                               ),
                             ),
                           ),

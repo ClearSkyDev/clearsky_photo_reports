@@ -141,6 +141,7 @@ class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
           const SizedBox(width: 4),
           IconButton(
             icon: const Icon(Icons.chat),
+            tooltip: 'Open Messages',
             onPressed: () {
               Navigator.push(
                 context,

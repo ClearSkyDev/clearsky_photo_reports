@@ -204,13 +204,17 @@ class _SectionedPhotoUploadScreenState extends State<SectionedPhotoUploadScreen>
                           right: 4,
                           child: GestureDetector(
                             onTap: () => onRemove(index),
-                            child: const CircleAvatar(
-                              radius: 12,
-                              backgroundColor: Colors.black54,
-                              child: Icon(
-                                Icons.close,
-                                size: 14,
-                                color: Colors.white,
+                            child: const Semantics(
+                              label: 'Remove photo',
+                              button: true,
+                              child: CircleAvatar(
+                                radius: 12,
+                                backgroundColor: Colors.black54,
+                                child: Icon(
+                                  Icons.close,
+                                  size: 14,
+                                  color: Colors.white,
+                                ),
                               ),
                             ),
                           ),
@@ -253,12 +257,16 @@ class _SectionedPhotoUploadScreenState extends State<SectionedPhotoUploadScreen>
                                     onTap: () => _openMap(
                                         photos[index].latitude!,
                                         photos[index].longitude!),
-                                    child: Text(
-                                      '${photos[index].latitude!.toStringAsFixed(4)}, ${photos[index].longitude!.toStringAsFixed(4)}',
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 10,
-                                        decoration: TextDecoration.underline,
+                                    child: Semantics(
+                                      label: 'Open in maps',
+                                      button: true,
+                                      child: Text(
+                                        '${photos[index].latitude!.toStringAsFixed(4)}, ${photos[index].longitude!.toStringAsFixed(4)}',
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 10,
+                                          decoration: TextDecoration.underline,
+                                        ),
                                       ),
                                     ),
                                   ),

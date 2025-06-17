@@ -88,6 +88,11 @@ class HomeScreen extends StatelessWidget {
                 onPressed: () => Navigator.pushNamed(context, '/learning'),
                 child: const Text('AI Learning'),
               ),
+              const SizedBox(height: 12),
+              ElevatedButton(
+                onPressed: () => Navigator.pushNamed(context, '/accessibility'),
+                child: const Text('Accessibility Settings'),
+              ),
           ],
         ),
       ),

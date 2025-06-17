@@ -66,6 +66,7 @@ class _DroneMediaUploadScreenState extends State<DroneMediaUploadScreen> {
                 ),
                 IconButton(
                   icon: const Icon(Icons.add_a_photo),
+                  tooltip: 'Add Photos',
                   onPressed: _pick,
                 )
               ],

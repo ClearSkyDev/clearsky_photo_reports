@@ -118,10 +118,12 @@ class _AdminAuditLogScreenState extends State<AdminAuditLogScreen> {
                 ),
                 IconButton(
                   icon: const Icon(Icons.date_range),
+                  tooltip: 'Select Date Range',
                   onPressed: _pickRange,
                 ),
                 IconButton(
                   icon: const Icon(Icons.download),
+                  tooltip: 'Export CSV',
                   onPressed: _exportCsv,
                 ),
               ],
