@@ -12,18 +12,22 @@ import '../models/saved_report.dart';
 import '../models/inspected_structure.dart';
 import 'offline_draft_store.dart';
 import '../utils/sync_preferences.dart';
+import 'sync_history_service.dart';
+import '../models/sync_log_entry.dart';
 
 class OfflineSyncService {
   OfflineSyncService._();
   static final OfflineSyncService instance = OfflineSyncService._();
 
   final ValueNotifier<bool> online = ValueNotifier(true);
+  final ValueNotifier<double> progress = ValueNotifier(0);
   StreamSubscription<ConnectivityResult>? _connSub;
   Timer? _timer;
 
   Future<void> init() async {
     await Hive.initFlutter();
     await OfflineDraftStore.instance.init();
+    await SyncHistoryService.instance.init();
     final initial = await Connectivity().checkConnectivity();
     online.value = initial != ConnectivityResult.none;
     // Perform an initial sync on startup
@@ -56,17 +60,43 @@ class OfflineSyncService {
     if (!online.value) return;
     if (!await SyncPreferences.isCloudSyncEnabled()) return;
     final drafts = OfflineDraftStore.instance.loadReports();
-    for (final draft in drafts) {
+    if (drafts.isEmpty) return;
+    progress.value = 0;
+    for (var i = 0; i < drafts.length; i++) {
+      final draft = drafts[i];
       try {
         await _uploadDraft(draft);
         await OfflineDraftStore.instance.delete(draft.id);
-      } catch (_) {}
+        await SyncHistoryService.instance.addEntry(SyncLogEntry(
+          reportId: draft.id,
+          success: true,
+          message: 'Synced successfully',
+        ));
+      } catch (e) {
+        await SyncHistoryService.instance.addEntry(SyncLogEntry(
+          reportId: draft.id,
+          success: false,
+          message: e.toString(),
+        ));
+      }
+      progress.value = (i + 1) / drafts.length;
     }
   }
 
   Future<void> _uploadDraft(SavedReport draft) async {
     final firestore = FirebaseFirestore.instance;
     final storage = FirebaseStorage.instance;
+
+    final existing = await firestore.collection('reports').doc(draft.id).get();
+    if (existing.exists) {
+      final data = existing.data();
+      if (data != null && data['lastEditedAt'] != null && draft.lastEditedAt != null) {
+        final remote = DateTime.fromMillisecondsSinceEpoch(data['lastEditedAt']);
+        if (remote.isAfter(draft.lastEditedAt!)) {
+          throw Exception('Conflict detected: remote version newer');
+        }
+      }
+    }
 
     final structs = <InspectedStructure>[];
     for (final struct in draft.structures) {
