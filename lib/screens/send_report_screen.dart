@@ -36,7 +36,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import '../models/report_theme.dart';
 import 'report_settings_screen.dart' show ReportSettings;
-import '../utils/photo_audit.dart';
+import '../utils/ai_quality_check.dart';
 import 'manage_collaborators_screen.dart';
 import '../utils/permission_utils.dart';
 import 'package:geolocator/geolocator.dart';
@@ -98,6 +98,12 @@ class _SendReportScreenState extends State<SendReportScreen> {
   List<PhotoAuditIssue> _auditIssues = [];
   Partner? _partner;
   final List<ReportAttachment> _attachments = [];
+
+  Future<void> _maybeRunQualityCheck() async {
+    if (_auditPassed == null) {
+      await _runQualityCheck();
+    }
+  }
   String? _jobCost;
 
   List<PhotoEntry> _gpsPhotos() {
@@ -696,6 +702,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
 
   Future<void> _exportCsv() async {
     if (_savedReport == null || _exporting) return;
+    await _maybeRunQualityCheck();
     if (!canEditReport(_savedReport!, _profile)) {
       ScaffoldMessenger.of(context)
           .showSnackBar(const SnackBar(content: Text('Permission denied')));
@@ -730,6 +737,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
 
   Future<void> _exportZip() async {
     if (_savedReport == null || _exporting) return;
+    await _maybeRunQualityCheck();
     if (!canEditReport(_savedReport!, _profile)) {
       ScaffoldMessenger.of(context)
           .showSnackBar(const SnackBar(content: Text('Permission denied')));
@@ -774,6 +782,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
 
   Future<void> _exportLegal() async {
     if (_savedReport == null || _exporting) return;
+    await _maybeRunQualityCheck();
     if (_profile?.role != InspectorRole.admin) {
       ScaffoldMessenger.of(context)
           .showSnackBar(const SnackBar(content: Text('Admin only')));
@@ -810,6 +819,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
 
   Future<void> _exportAudio() async {
     if (_savedReport == null || _exporting) return;
+    await _maybeRunQualityCheck();
     setState(() => _exporting = true);
     showDialog(
       context: context,
@@ -907,9 +917,9 @@ class _SendReportScreenState extends State<SendReportScreen> {
     }
   }
 
-  Future<void> _runAudit() async {
+  Future<void> _runQualityCheck() async {
     if (_savedReport == null) return;
-    final result = await photoAudit(_savedReport!);
+    final result = await aiQualityCheck(_savedReport!);
     if (_docId != null) {
       try {
         await FirebaseFirestore.instance.collection('reports').doc(_docId).update({
@@ -931,7 +941,8 @@ class _SendReportScreenState extends State<SendReportScreen> {
       context: context,
       builder: (_) {
         return AlertDialog(
-          title: Text(_auditPassed! ? 'Audit Passed' : 'Audit Issues'),
+          title:
+              Text(_auditPassed! ? 'Quality Check Passed' : 'Quality Check Issues'),
           content: _auditPassed!
               ? const Text('No issues found.')
               : SizedBox(
@@ -945,7 +956,15 @@ class _SendReportScreenState extends State<SendReportScreen> {
                         leading: Image.network(issue.photo.photoUrl,
                             width: 56, height: 56, fit: BoxFit.cover),
                         title: Text(issue.issue),
-                        subtitle: Text('${issue.structure} - ${issue.section}'),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('${issue.structure} - ${issue.section}'),
+                            if (issue.suggestion != null)
+                              Text('Suggestion: ${issue.suggestion!}',
+                                  style: const TextStyle(fontSize: 12)),
+                          ],
+                        ),
                       );
                     },
                   ),
@@ -963,6 +982,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
 
   Future<void> _shareReport() async {
     if (_exportedFile == null) return;
+    await _maybeRunQualityCheck();
     final m = widget.metadata;
     final subject = 'Roof Inspection Report for ${m.clientName}';
     final inspector = m.inspectorName != null ? ' by ${m.inspectorName}' : '';
@@ -1085,6 +1105,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
   Future<void> _sendEmail(
       String to, String subject, String body, String signature, bool attachPdf) async {
     if (to.isEmpty || _savedReport == null) return;
+    await _maybeRunQualityCheck();
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -1464,8 +1485,8 @@ class _SendReportScreenState extends State<SendReportScreen> {
                     onPressed: _shareReport,
                     child: const Text('Share Report')),
               ElevatedButton(
-                  onPressed: _runAudit,
-                  child: const Text('Run Audit')),
+                  onPressed: _runQualityCheck,
+                  child: const Text('Run AI Quality Check')),
               ],
             ),
             if (_gpsPhotos().isNotEmpty)
