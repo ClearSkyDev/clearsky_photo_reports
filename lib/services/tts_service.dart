@@ -61,6 +61,14 @@ class TtsService {
     return File(path);
   }
 
+  Future<File> synthesizeClip(String text, {String? name}) async {
+    Directory dir = await getTemporaryDirectory();
+    final fileName = name ?? 'tts_${DateTime.now().millisecondsSinceEpoch}.mp3';
+    final path = p.join(dir.path, fileName);
+    await _tts.synthesizeToFile(text, path);
+    return File(path);
+  }
+
   Future<void> stop() => _tts.stop();
   Future<void> pause() => _tts.pause();
 }
