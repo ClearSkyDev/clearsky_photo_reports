@@ -49,6 +49,7 @@ class SavedReport {
   final List<ReportCollaborator> collaborators;
   final String? lastEditedBy;
   final DateTime? lastEditedAt;
+  final String? jobCost;
   final String? partnerId;
   final DateTime? referralDate;
   final double? latitude;
@@ -88,6 +89,7 @@ class SavedReport {
     this.collaborators = const [],
     this.lastEditedBy,
     this.lastEditedAt,
+    this.jobCost,
     this.partnerId,
     this.referralDate,
     this.latitude,
@@ -135,6 +137,7 @@ class SavedReport {
       if (lastEditedBy != null) 'lastEditedBy': lastEditedBy,
       if (lastEditedAt != null)
         'lastEditedAt': lastEditedAt!.millisecondsSinceEpoch,
+      if (jobCost != null) 'jobCost': jobCost,
       if (partnerId != null) 'partnerId': partnerId,
       if (referralDate != null)
         'referralDate': referralDate!.millisecondsSinceEpoch,
@@ -225,6 +228,7 @@ class SavedReport {
       lastEditedAt: map['lastEditedAt'] != null
           ? DateTime.fromMillisecondsSinceEpoch(map['lastEditedAt'])
           : null,
+      jobCost: map['jobCost'] as String?,
       partnerId: map['partnerId'] as String?,
       referralDate: map['referralDate'] != null
           ? DateTime.fromMillisecondsSinceEpoch(map['referralDate'])
@@ -248,6 +252,8 @@ class ReportPhotoEntry {
   final double? longitude;
   final String damageType;
   final String note;
+  final String? voicePath;
+  final String? transcript;
   final SourceType sourceType;
   final String? captureDevice;
 
@@ -259,6 +265,8 @@ class ReportPhotoEntry {
     this.longitude,
     this.damageType = 'Unknown',
     this.note = '',
+    this.voicePath,
+    this.transcript,
     this.sourceType = SourceType.camera,
     this.captureDevice,
   });
@@ -272,6 +280,8 @@ class ReportPhotoEntry {
       if (longitude != null) 'longitude': longitude,
       'damageType': damageType,
       if (note.isNotEmpty) 'note': note,
+      if (voicePath != null) 'voicePath': voicePath,
+      if (transcript != null) 'transcript': transcript,
       'sourceType': sourceType.name,
       if (captureDevice != null) 'captureDevice': captureDevice,
     };
@@ -288,6 +298,8 @@ class ReportPhotoEntry {
       longitude: (map['longitude'] as num?)?.toDouble(),
       damageType: map['damageType'] as String? ?? 'Unknown',
       note: map['note'] as String? ?? '',
+      voicePath: map['voicePath'] as String?,
+      transcript: map['transcript'] as String?,
       sourceType: SourceType.values.firstWhere(
           (e) => e.name == map['sourceType'],
           orElse: () => SourceType.camera),

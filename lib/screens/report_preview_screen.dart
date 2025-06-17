@@ -72,6 +72,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
   late final TextEditingController _summaryController;
   late final TextEditingController _adjusterSummaryController;
   late final TextEditingController _homeownerSummaryController;
+  late final TextEditingController _jobCostController;
   bool _editingSummaries = true;
   bool _loadingSummary = false;
   AiSummaryReview? _aiSummary;
@@ -91,6 +92,8 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
     _summaryController = TextEditingController(text: widget.summary ?? '');
     _adjusterSummaryController = TextEditingController();
     _homeownerSummaryController = TextEditingController();
+    _jobCostController = TextEditingController(
+        text: widget.savedReport?.jobCost ?? '');
     _aiSummary = widget.savedReport?.aiSummary;
     if (_aiSummary != null) {
       _adjusterSummaryController.text = _aiSummary!.content;
@@ -129,6 +132,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
     _summaryController.dispose();
     _adjusterSummaryController.dispose();
     _homeownerSummaryController.dispose();
+    _jobCostController.dispose();
     super.dispose();
   }
   String _metadataFileName(String ext) {
@@ -296,13 +300,13 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
     final color = '#${_theme.primaryColor.toRadixString(16).padLeft(8, '0').substring(2)}';
     String style;
     switch (_template) {
-      case 'modern':
+      case 'side':
         style =
-            'h2 { background:$color; padding:4px; }';
+            '.photo{width:48%;margin:1%;display:inline-block;}';
         break;
-      case 'clean':
+      case 'dark':
         style =
-            'h2 { border-bottom:1px solid $color; }';
+            'body{background:#333;color:#eee;} a{color:$color;}';
         break;
       default:
         style =
@@ -372,6 +376,10 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
           '<div style="border:1px solid #ccc;padding:8px;margin-top:20px;">');
       buffer.writeln('<strong>Inspector Notes / Summary</strong><br>');
       buffer.writeln('<p>${_summaryController.text}</p>');
+      if (_jobCostController.text.isNotEmpty) {
+        buffer.writeln('<p><strong>Estimated Job Cost:</strong> \
+${_jobCostController.text}</p>');
+      }
       buffer.writeln('</div>');
     }
 
@@ -414,7 +422,8 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
             final label = photo.label.isNotEmpty ? photo.label : 'Unlabeled';
             final damage =
                 photo.damageType.isNotEmpty ? photo.damageType : 'Unknown';
-            buffer.writeln('<div style="width:300px;margin:5px;text-align:center;">');
+            final containerClass = _template == 'side' ? 'class="photo"' : 'style="width:300px;margin:5px;text-align:center;"';
+            buffer.writeln('<div $containerClass>');
             buffer.writeln('<img src="${photo.url}" width="300" height="300" style="object-fit:cover;"><br>');
             final ts = photo.capturedAt.toLocal().toString().split('.').first;
             String gps = '';
@@ -434,8 +443,18 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
 
     buffer.writeln(
         '<p style="text-align: center; margin-top: 40px;">$_contactInfo</p>');
+    String footer = _disclaimerText;
+    if (_metadata.startLatitude != null && _metadata.startTimestamp != null) {
+      final dur = _metadata.endTimestamp != null
+          ? _metadata.endTimestamp!.difference(_metadata.startTimestamp!)
+          : DateTime.now().difference(_metadata.startTimestamp!);
+      footer +=
+          '<br>GPS: ${_metadata.startLatitude!.toStringAsFixed(4)}, ${_metadata.startLongitude!.toStringAsFixed(4)}';
+      footer +=
+          '<br>Inspection Duration: ${dur.inMinutes} minutes';
+    }
     buffer.writeln(
-        '<footer style="text-align:center;margin-top:20px;font-size:12px;color:#666;">$_disclaimerText</footer>');
+        '<footer style="text-align:center;margin-top:20px;font-size:12px;color:#666;">$footer</footer>');
     buffer.writeln('</body></html>');
 
     return buffer.toString();
@@ -699,6 +718,8 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
                                 fontWeight: pw.FontWeight.bold)),
                         pw.SizedBox(height: 4),
                         pw.Text(_summaryController.text),
+                        if (_jobCostController.text.isNotEmpty)
+                          pw.Text('Estimated Job Cost: ${_jobCostController.text}'),
                       ],
                     ),
                   ),
@@ -1009,6 +1030,14 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
                     ),
                   maxLines: 3,
                 ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
+            child: TextField(
+              controller: _jobCostController,
+              decoration:
+                  const InputDecoration(labelText: 'Estimated Job Cost'),
+            ),
           ),
           Padding(
             padding: const EdgeInsets.all(16.0),

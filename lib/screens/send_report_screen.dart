@@ -98,6 +98,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
   List<PhotoAuditIssue> _auditIssues = [];
   Partner? _partner;
   final List<ReportAttachment> _attachments = [];
+  String? _jobCost;
 
   List<PhotoEntry> _gpsPhotos() {
     final result = <PhotoEntry>[];
@@ -244,6 +245,13 @@ class _SendReportScreenState extends State<SendReportScreen> {
         'lastSendMethod': widget.metadata.lastSendMethod,
       if (widget.metadata.partnerCode != null)
         'partnerCode': widget.metadata.partnerCode,
+      if (widget.metadata.startTimestamp != null)
+        'startTimestamp': widget.metadata.startTimestamp!.toIso8601String(),
+      if (widget.metadata.startLatitude != null)
+        'startLatitude': widget.metadata.startLatitude,
+      if (widget.metadata.startLongitude != null)
+        'startLongitude': widget.metadata.startLongitude,
+      'endTimestamp': DateTime.now().toIso8601String(),
     };
 
     final prefs = await SharedPreferences.getInstance();
@@ -344,6 +352,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
       lastEditedAt: DateTime.now(),
       latitude: latitude,
       longitude: longitude,
+      jobCost: _jobCost,
       attachments: uploadedAttachments,
       searchIndex: {
         'address': widget.metadata.propertyAddress,
@@ -470,6 +479,13 @@ class _SendReportScreenState extends State<SendReportScreen> {
         'lastSendMethod': widget.metadata.lastSendMethod,
       if (widget.metadata.partnerCode != null)
         'partnerCode': widget.metadata.partnerCode,
+      if (widget.metadata.startTimestamp != null)
+        'startTimestamp': widget.metadata.startTimestamp!.toIso8601String(),
+      if (widget.metadata.startLatitude != null)
+        'startLatitude': widget.metadata.startLatitude,
+      if (widget.metadata.startLongitude != null)
+        'startLongitude': widget.metadata.startLongitude,
+      'endTimestamp': DateTime.now().toIso8601String(),
     };
 
     final prefs = await SharedPreferences.getInstance();
@@ -527,6 +543,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
       lastEditedAt: DateTime.now(),
       latitude: latitude,
       longitude: longitude,
+      jobCost: _jobCost,
       attachments: savedAttachments,
       localOnly: true,
     );
@@ -1347,6 +1364,11 @@ class _SendReportScreenState extends State<SendReportScreen> {
               decoration: const InputDecoration(
                   labelText: 'Summary of Findings'),
               maxLines: 3,
+            ),
+            TextField(
+              decoration:
+                  const InputDecoration(labelText: 'Estimated Job Cost'),
+              onChanged: (v) => _jobCost = v,
             ),
             const SizedBox(height: 8),
             ElevatedButton(
