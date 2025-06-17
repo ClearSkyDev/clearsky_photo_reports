@@ -74,6 +74,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
   bool _loadingSummary = false;
   AiSummaryReview? _aiSummary;
   Uint8List? _signature;
+  late InspectorReportRole _selectedRole;
   String _template = 'legacy';
   bool _showGps = true;
   ReportTheme _theme = ReportTheme.defaultTheme;
@@ -84,6 +85,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
   void initState() {
     super.initState();
     _metadata = widget.metadata;
+    _selectedRole = _metadata.inspectorRole;
     _summaryController = TextEditingController(text: widget.summary ?? '');
     _adjusterSummaryController = TextEditingController();
     _homeownerSummaryController = TextEditingController();
@@ -256,6 +258,26 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
     } finally {
       if (mounted) setState(() => _loadingSummary = false);
     }
+  }
+
+  Future<void> _regenerateWithRole() async {
+    if (_selectedRole != _metadata.inspectorRole) {
+      setState(() {
+        _metadata = InspectionMetadata(
+          clientName: _metadata.clientName,
+          propertyAddress: _metadata.propertyAddress,
+          inspectionDate: _metadata.inspectionDate,
+          insuranceCarrier: _metadata.insuranceCarrier,
+          perilType: _metadata.perilType,
+          inspectionType: _metadata.inspectionType,
+          inspectorName: _metadata.inspectorName,
+          inspectorRole: _selectedRole,
+          reportId: _metadata.reportId,
+          weatherNotes: _metadata.weatherNotes,
+        );
+      });
+    }
+    await _generateSummary();
   }
 
   // Generate the HTML string for the report preview
@@ -863,7 +885,43 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
                   Text('Insurance Carrier: ${_metadata.insuranceCarrier}'),
                 Text('Peril Type: ${_metadata.perilType.name}'),
                 Text('Inspection Type: ${_metadata.inspectionType.name}'),
-                Text('Inspector Role: ${_metadata.inspectorRole.name.replaceAll('_', ' ')}'),
+                Row(
+                  children: [
+                    const Text('Inspector Role: '),
+                    DropdownButton<InspectorReportRole>(
+                      value: _selectedRole,
+                      items: InspectorReportRole.values
+                          .map(
+                            (r) => DropdownMenuItem(
+                              value: r,
+                              child: Text(r.name.replaceAll('_', ' ')),
+                            ),
+                          )
+                          .toList(),
+                      onChanged: widget.readOnly
+                          ? null
+                          : (val) {
+                              if (val != null) {
+                                setState(() {
+                                  _selectedRole = val;
+                                  _metadata = InspectionMetadata(
+                                    clientName: _metadata.clientName,
+                                    propertyAddress: _metadata.propertyAddress,
+                                    inspectionDate: _metadata.inspectionDate,
+                                    insuranceCarrier: _metadata.insuranceCarrier,
+                                    perilType: _metadata.perilType,
+                                    inspectionType: _metadata.inspectionType,
+                                    inspectorName: _metadata.inspectorName,
+                                    inspectorRole: val,
+                                    reportId: _metadata.reportId,
+                                    weatherNotes: _metadata.weatherNotes,
+                                  );
+                                });
+                              }
+                            },
+                    ),
+                  ],
+                ),
                 if (_metadata.inspectorName != null)
                   Text('Inspector Name: ${_metadata.inspectorName}'),
               ],
@@ -914,6 +972,12 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
                     ElevatedButton(
                       onPressed: _loadingSummary ? null : _generateSummary,
                       child: const Text('Regenerate'),
+                    ),
+                    const SizedBox(width: 8),
+                    ElevatedButton(
+                      onPressed:
+                          _loadingSummary ? null : _regenerateWithRole,
+                      child: const Text('Regenerate Summary with Different Role'),
                     ),
                     const SizedBox(width: 8),
                     ElevatedButton(
