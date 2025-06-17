@@ -36,6 +36,32 @@ class AiSummaryService {
       }
     }
 
+    final roleName =
+        report.inspectionMetadata['inspectorRole'] as String? ?? 'ladder_assist';
+
+    String prompt;
+    if (roleName == 'ladder_assist') {
+      prompt =
+          'You are a third-party roof inspector. Your job is to document findings only.\n'
+          'Do not mention recommendations, causes, or coverage.\n'
+          'Simply describe the condition and any observable damage.\n\n'
+          'Here are the findings: ${jsonEncode(sectionData)}';
+    } else if (roleName == 'adjuster') {
+      prompt =
+          'You are an insurance adjuster. Based on the observed damage and inspection findings, '\n'
+          'summarize the condition and note whether the damage is consistent with covered perils (like hail/wind).\n'
+          'Lean into claim decision logic, but remain factual.\n\n'
+          'Findings: ${jsonEncode(sectionData)}';
+    } else if (roleName == 'contractor') {
+      prompt =
+          'You are a roofing contractor writing a report for a homeowner or claims submission.\n'
+          'Use your summary to justify why repair or replacement may be needed based on the damage observed.\n\n'
+          'Be persuasive but factual.\n\n'
+          'Inspection Results: ${jsonEncode(sectionData)}';
+    } else {
+      prompt = 'Summarize these findings: ${jsonEncode(sectionData)}';
+    }
+
     final messages = [
       {
         'role': 'system',
@@ -43,11 +69,7 @@ class AiSummaryService {
       },
       {
         'role': 'user',
-        'content':
-            'Create two short paragraphs summarizing these inspection findings. '
-                'First, a technical version for an insurance adjuster. Second, '
-                'a simple version for the homeowner. Use the provided sections, labels, notes and damage tags. '
-                'Data:\n${jsonEncode(sectionData)}'
+        'content': prompt
       }
     ];
 
@@ -70,10 +92,9 @@ class AiSummaryService {
     final choices = data['choices'] as List<dynamic>? ?? [];
     final content =
         choices.isNotEmpty ? choices.first['message']['content'] as String : '';
-    final parts = content.split(RegExp(r'\n\n+'));
-    final adjuster = parts.isNotEmpty ? parts.first.trim() : '';
-    final homeowner = parts.length > 1 ? parts[1].trim() : '';
 
-    return AiSummary(adjuster: adjuster, homeowner: homeowner);
+    final summary = content.trim();
+
+    return AiSummary(adjuster: summary, homeowner: summary);
   }
 }
