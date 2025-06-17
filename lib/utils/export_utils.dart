@@ -16,6 +16,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:shared_preferences/shared_preferences.dart';
+import '../services/invoice_service.dart';
+import '../utils/invoice_pdf.dart';
 
 import '../models/report_theme.dart';
 
@@ -193,6 +195,111 @@ Future<File?> exportFinalZip(SavedReport report,
     });
   } catch (_) {}
 
+  return file;
+}
+
+/// Export a legal copy of [report] including metadata, summary,
+/// invoice and labeled photos. If running on web or [auto] is true,
+/// the ZIP is uploaded to Firebase Storage and a Firestore record is
+/// created with the download link.
+Future<File?> exportLegalCopy(SavedReport report,
+    {String? userId, bool auto = false}) async {
+  final meta = InspectionMetadata.fromMap(report.inspectionMetadata);
+  final clientSlug = _slugify(meta.clientName);
+  final date = meta.inspectionDate.toLocal().toString().split(' ')[0];
+  final fileName = '${clientSlug}_${date}_legal.zip';
+
+  final pdfBytes = await _generatePdf(report);
+
+  final archive = Archive();
+  archive.addFile(ArchiveFile('report.pdf', pdfBytes.length, pdfBytes));
+
+  final metaJson = jsonEncode(report.toMap());
+  archive.addFile(
+      ArchiveFile('metadata.json', metaJson.length, utf8.encode(metaJson)));
+
+  if (report.summaryText != null && report.summaryText!.isNotEmpty) {
+    final bytes = utf8.encode(report.summaryText!);
+    archive.addFile(ArchiveFile('summary.txt', bytes.length, bytes));
+  }
+  if (report.summary != null && report.summary!.isNotEmpty) {
+    final bytes = utf8.encode(report.summary!);
+    archive.addFile(ArchiveFile('notes.txt', bytes.length, bytes));
+  }
+
+  final invoice = await InvoiceService().fetchInvoiceForReport(report.id);
+  if (invoice != null) {
+    final invPdf = await generateInvoicePdf(invoice);
+    archive.addFile(ArchiveFile('invoice.pdf', invPdf.length, invPdf));
+  }
+
+  for (final struct in report.structures) {
+    for (final entry in struct.sectionPhotos.entries) {
+      final photos = entry.value.where((p) => p.label.isNotEmpty).toList();
+      if (photos.isEmpty) continue;
+      final sectionFolder =
+          '${struct.name}_${entry.key}'.replaceAll(RegExp(r'\s+'), '');
+      for (final photo in photos) {
+        try {
+          Uint8List bytes;
+          if (photo.photoUrl.startsWith('http')) {
+            final resp = await http.get(Uri.parse(photo.photoUrl));
+            if (resp.statusCode != 200) continue;
+            bytes = resp.bodyBytes;
+          } else {
+            final file = File(photo.photoUrl);
+            if (!await file.exists()) continue;
+            bytes = await file.readAsBytes();
+          }
+          final label = photo.label.replaceAll(RegExp(r'[^A-Za-z0-9_-]'), '_');
+          final ext = p.extension(photo.photoUrl);
+          final name = 'photos/$sectionFolder/$label$ext';
+          archive.addFile(ArchiveFile(name, bytes.length, bytes));
+        } catch (_) {}
+      }
+    }
+  }
+
+  final zipData = ZipEncoder().encode(archive)!;
+
+  Future<void> logExport(String url) async {
+    try {
+      await FirebaseFirestore.instance.collection('legalCopies').add({
+        'reportId': report.id,
+        if (userId != null) 'userId': userId,
+        'timestamp': Timestamp.now(),
+        'url': url,
+      });
+    } catch (_) {}
+  }
+
+  if (kIsWeb || auto) {
+    final storage = FirebaseStorage.instance;
+    final ref = storage.ref().child('legal_copies/${report.id}/$fileName');
+    await ref.putData(Uint8List.fromList(zipData),
+        SettableMetadata(contentType: 'application/zip'));
+    final url = await ref.getDownloadURL();
+    await logExport(url);
+    if (kIsWeb && !auto) {
+      html.AnchorElement(href: url)
+        ..target = '_blank'
+        ..click();
+    }
+    return null;
+  }
+
+  Directory? dir;
+  try {
+    dir = await getDownloadsDirectory();
+  } catch (_) {
+    dir = await getApplicationDocumentsDirectory();
+  }
+  dir ??= await getApplicationDocumentsDirectory();
+
+  final path = p.join(dir.path, fileName);
+  final file = File(path);
+  await file.writeAsBytes(zipData, flush: true);
+  await logExport(file.path);
   return file;
 }
 

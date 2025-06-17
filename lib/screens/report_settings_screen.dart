@@ -11,6 +11,7 @@ class ReportSettings {
   final int primaryColor;
   final bool includeDisclaimer;
   final bool showGpsData;
+  final bool autoLegalBackup;
   final String footerText;
   final String template;
 
@@ -21,6 +22,7 @@ class ReportSettings {
     required this.primaryColor,
     required this.includeDisclaimer,
     required this.showGpsData,
+    this.autoLegalBackup = false,
     required this.footerText,
     required this.template,
   });
@@ -33,6 +35,7 @@ class ReportSettings {
       'primaryColor': primaryColor,
       'includeDisclaimer': includeDisclaimer,
       'showGpsData': showGpsData,
+      'autoLegalBackup': autoLegalBackup,
       'footerText': footerText,
       'template': template,
     };
@@ -48,6 +51,7 @@ class ReportSettings {
           : int.tryParse(map['primaryColor']?.toString() ?? '') ?? 0xff2196f3,
       includeDisclaimer: map['includeDisclaimer'] as bool? ?? true,
       showGpsData: map['showGpsData'] as bool? ?? true,
+      autoLegalBackup: map['autoLegalBackup'] as bool? ?? false,
       footerText: map['footerText'] ?? '',
       template: map['template'] ?? 'legacy',
     );
@@ -69,6 +73,7 @@ class _ReportSettingsScreenState extends State<ReportSettingsScreen> {
   String? _logoPath;
   bool _includeDisclaimer = true;
   bool _showGpsData = true;
+  bool _autoLegalBackup = false;
 
   static const Map<String, MaterialColor> _colors = {
     'Blue': Colors.blue,
@@ -118,6 +123,7 @@ class _ReportSettingsScreenState extends State<ReportSettingsScreen> {
                 .key;
         _includeDisclaimer = settings.includeDisclaimer;
         _showGpsData = settings.showGpsData;
+        _autoLegalBackup = settings.autoLegalBackup;
         _selectedTemplate = _templates.entries
                 .firstWhere(
                     (e) => e.value == settings.template,
@@ -135,6 +141,7 @@ class _ReportSettingsScreenState extends State<ReportSettingsScreen> {
       primaryColor: _colors[_selectedColor]!.value,
       includeDisclaimer: _includeDisclaimer,
       showGpsData: _showGpsData,
+      autoLegalBackup: _autoLegalBackup,
       footerText: _footerController.text.trim(),
       template: _templates[_selectedTemplate]!,
     );
@@ -232,6 +239,15 @@ class _ReportSettingsScreenState extends State<ReportSettingsScreen> {
               onChanged: (val) {
                 setState(() {
                   _showGpsData = val;
+                });
+              },
+            ),
+            SwitchListTile(
+              title: const Text('Auto Backup Legal Copy'),
+              value: _autoLegalBackup,
+              onChanged: (val) {
+                setState(() {
+                  _autoLegalBackup = val;
                 });
               },
             ),

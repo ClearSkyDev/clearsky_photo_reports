@@ -32,4 +32,15 @@ class InvoiceService {
   Future<void> markPaid(String id) {
     return _collection.doc(id).update({'isPaid': true});
   }
+
+  Future<Invoice?> fetchInvoiceForReport(String reportId) async {
+    final snap = await _collection
+        .where('reportId', isEqualTo: reportId)
+        .orderBy('createdAt', descending: true)
+        .limit(1)
+        .get();
+    if (snap.docs.isEmpty) return null;
+    final doc = snap.docs.first;
+    return Invoice.fromMap(doc.data(), doc.id);
+  }
 }
