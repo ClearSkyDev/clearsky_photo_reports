@@ -6,6 +6,7 @@ import 'firebase_options.dart';
 import 'client_portal/client_login_screen.dart';
 import 'client_portal/client_dashboard_screen.dart';
 import 'services/auth_service.dart';
+import 'app_theme.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,7 +23,7 @@ class ClientPortalApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'ClearSky Client Portal',
-      theme: ThemeData(primarySwatch: Colors.blueGrey),
+      theme: AppTheme.build(),
       home: const _AuthGate(),
     );
   }
