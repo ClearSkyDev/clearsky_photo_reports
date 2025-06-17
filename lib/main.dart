@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 import 'firebase_options.dart';
 import 'models/inspector_user.dart';
-import 'screens/dashboard_screen.dart';
+import 'main_nav_scaffold.dart';
 import 'screens/login_screen.dart';
 import 'screens/report_history_screen.dart';
 import 'screens/manage_team_screen.dart';
@@ -38,6 +38,7 @@ import 'services/changelog_service.dart';
 import 'services/tts_service.dart';
 import 'models/checklist.dart';
 import 'screens/changelog_screen.dart';
+import 'app_theme.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -59,10 +60,7 @@ class ClearSkyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'ClearSky Photo Reports',
-      theme: ThemeData(
-        primarySwatch: Colors.blueGrey,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
+      theme: AppTheme.build(),
       routes: {
         '/home': (context) => const HomeScreen(),
         '/report': (context) => const ReportScreen(),
@@ -137,7 +135,7 @@ class AuthGate extends StatelessWidget {
             if (user.role == UserRole.partner) {
               return PartnerDashboardScreen(partnerId: user.uid);
             }
-            return DashboardScreen(user: user);
+            return MainNavScaffold(user: user);
           },
         );
       },

@@ -18,67 +18,32 @@ class HomeScreen extends StatelessWidget {
         ),
       ),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blueAccent,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ElevatedButton(
+                onPressed: () => Navigator.pushNamed(context, '/metadata'),
+                child: const Text('Upload Photos'),
               ),
-              onPressed: () => Navigator.pushNamed(context, '/metadata'),
-              child: const Text('Upload Photos'),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blueAccent,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
+              const SizedBox(height: 12),
+              ElevatedButton(
+                onPressed: () => Navigator.pushNamed(context, '/sectionedUpload'),
+                child: const Text('Roof Intake Flow'),
               ),
-              onPressed: () => Navigator.pushNamed(context, '/sectionedUpload'),
-              child: const Text('Roof Intake Flow'),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blueAccent,
-                foregroundColor: Colors.white,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
+              const SizedBox(height: 12),
+              ElevatedButton(
+                onPressed: () => Navigator.pushNamed(context, '/droneMedia'),
+                child: const Text('Drone Media Upload'),
               ),
-              onPressed: () => Navigator.pushNamed(context, '/droneMedia'),
-              child: const Text('Drone Media Upload'),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blueAccent,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
+              const SizedBox(height: 12),
+              ElevatedButton(
+                onPressed: () => Navigator.pushNamed(context, '/report'),
+                child: const Text('Generate Report'),
               ),
-              onPressed: () => Navigator.pushNamed(context, '/report'),
-              child: const Text('Generate Report'),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blueAccent,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
+              const SizedBox(height: 12),
+              ElevatedButton(
               onPressed: () async {
                 final profile = await ProfileStorage.load();
                 String? name;
@@ -97,68 +62,32 @@ class HomeScreen extends StatelessWidget {
                 }
               },
               child: const Text('View History'),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blueAccent,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
               ),
-              onPressed: () => Navigator.pushNamed(context, '/settings'),
-              child: const Text('Report Settings'),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blueAccent,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
+              const SizedBox(height: 12),
+              ElevatedButton(
+                onPressed: () => Navigator.pushNamed(context, '/settings'),
+                child: const Text('Report Settings'),
               ),
-              onPressed: () => Navigator.pushNamed(context, '/templates'),
-              child: const Text('Manage Templates'),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blueAccent,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
+              const SizedBox(height: 12),
+              ElevatedButton(
+                onPressed: () => Navigator.pushNamed(context, '/templates'),
+                child: const Text('Manage Templates'),
               ),
-              onPressed: () => Navigator.pushNamed(context, '/profile'),
-              child: const Text('Profile'),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blueAccent,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
+              const SizedBox(height: 12),
+              ElevatedButton(
+                onPressed: () => Navigator.pushNamed(context, '/profile'),
+                child: const Text('Profile'),
               ),
-              onPressed: () => Navigator.pushNamed(context, '/theme'),
-              child: const Text('Report Theme'),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blueAccent,
-                foregroundColor: Colors.white,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
+              const SizedBox(height: 12),
+              ElevatedButton(
+                onPressed: () => Navigator.pushNamed(context, '/theme'),
+                child: const Text('Report Theme'),
               ),
-              onPressed: () => Navigator.pushNamed(context, '/learning'),
-              child: const Text('AI Learning'),
-            ),
+              const SizedBox(height: 12),
+              ElevatedButton(
+                onPressed: () => Navigator.pushNamed(context, '/learning'),
+                child: const Text('AI Learning'),
+              ),
           ],
         ),
       ),
