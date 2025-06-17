@@ -67,6 +67,11 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               const SizedBox(height: 12),
               ElevatedButton(
+                onPressed: () => Navigator.pushNamed(context, '/guidedCapture'),
+                child: const Text('Guided Capture Mode'),
+              ),
+              const SizedBox(height: 12),
+              ElevatedButton(
                 onPressed: () => Navigator.pushNamed(context, '/droneMedia'),
                 child: const Text('Drone Media Upload'),
               ),
