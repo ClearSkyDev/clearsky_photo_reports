@@ -18,6 +18,7 @@ import 'package:printing/printing.dart';
 import 'send_report_screen.dart';
 import 'report_preview_webview.dart';
 import 'report_settings_screen.dart' show ReportSettings;
+import '../utils/label_utils.dart';
 import '../models/report_theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:path/path.dart' as p;
@@ -397,24 +398,43 @@ ${_jobCostController.text}</p>');
     buffer.writeln('</ul>');
 
     if (widget.structures != null) {
+      const establishing = ['Address Photo', 'Front of House'];
+      const ordered = [
+        'Front Elevation & Accessories',
+        'Right Elevation & Accessories',
+        'Back Elevation & Accessories',
+        'Left Elevation & Accessories',
+        'Roof Edge',
+        'Roof Slopes - Front',
+        'Roof Slopes - Right',
+        'Roof Slopes - Back',
+        'Roof Slopes - Left',
+      ];
+
       for (final struct in widget.structures!) {
         if (widget.structures!.length > 1) {
           buffer.writeln('<h2>${struct.name}</h2>');
         }
-        for (var section
-            in widget.template?.sections ?? sectionsForType(_metadata.inspectionType)) {
-          final photos = struct.sectionPhotos[section] ?? [];
-          if (photos.isEmpty) continue;
-          if (widget.structures!.length > 1) {
-            buffer.writeln('<h3>$section</h3>');
-          } else {
-            buffer.writeln('<h2>$section</h2>');
+
+        final estPhotos = <PhotoEntry>[];
+        for (final sec in establishing) {
+          estPhotos.addAll(struct.sectionPhotos[sec] ?? []);
+        }
+        if (estPhotos.isNotEmpty) {
+          buffer.writeln('<h3>Establishing Shots</h3>');
+          final issues = collectIssues(estPhotos);
+          if (issues.isNotEmpty) {
+            buffer.writeln('<ul>');
+            for (final i in issues) {
+              buffer.writeln('<li>$i</li>');
+            }
+            buffer.writeln('</ul>');
           }
           buffer.writeln('<div style="display:flex;flex-wrap:wrap;">');
-          for (var photo in photos) {
+          for (var photo in estPhotos) {
             final label = photo.label.isNotEmpty ? photo.label : 'Unlabeled';
-            final damage =
-                photo.damageType.isNotEmpty ? photo.damageType : 'Unknown';
+            final damage = formatDamageLabel(photo.damageType, _metadata.inspectorRole);
+            final caption = damage.isNotEmpty ? '$label - $damage' : label;
             final containerClass = _template == 'side' ? 'class="photo"' : 'style="width:300px;margin:5px;text-align:center;"';
             buffer.writeln('<div $containerClass>');
             buffer.writeln('<img src="${photo.url}" width="300" height="300" style="object-fit:cover;"><br>');
@@ -423,10 +443,82 @@ ${_jobCostController.text}</p>');
             if (_showGps && photo.latitude != null && photo.longitude != null) {
               gps = '<br><a href="https://www.google.com/maps/search/?api=1&query=${photo.latitude},${photo.longitude}">${photo.latitude!.toStringAsFixed(4)}, ${photo.longitude!.toStringAsFixed(4)}</a>';
             }
-            final note = photo.note.isNotEmpty
-                ? '<br><em>${photo.note}</em>'
-                : '';
-            buffer.writeln('<span>$label - $damage<br>$ts$gps$note</span>');
+            final note = photo.note.isNotEmpty ? '<br><em>${photo.note}</em>' : '';
+            buffer.writeln('<span>$caption<br>$ts$gps$note</span>');
+            buffer.writeln('</div>');
+          }
+          buffer.writeln('</div>');
+        }
+
+        final otherSections = <String>{
+          ...ordered,
+          ...struct.sectionPhotos.keys
+        };
+
+        for (final section in ordered) {
+          if (!otherSections.contains(section)) continue;
+          final photos = struct.sectionPhotos[section] ?? [];
+          if (photos.isEmpty) continue;
+          final label = section.replaceAll(' & Accessories', '');
+          buffer.writeln('<h3>$label</h3>');
+          final issues = collectIssues(photos);
+          if (issues.isNotEmpty) {
+            buffer.writeln('<ul>');
+            for (final i in issues) {
+              buffer.writeln('<li>$i</li>');
+            }
+            buffer.writeln('</ul>');
+          }
+          buffer.writeln('<div style="display:flex;flex-wrap:wrap;">');
+          for (var photo in photos) {
+            final labelText = photo.label.isNotEmpty ? photo.label : 'Unlabeled';
+            final damage = formatDamageLabel(photo.damageType, _metadata.inspectorRole);
+            final caption = damage.isNotEmpty ? '$labelText - $damage' : labelText;
+            final containerClass = _template == 'side' ? 'class="photo"' : 'style="width:300px;margin:5px;text-align:center;"';
+            buffer.writeln('<div $containerClass>');
+            buffer.writeln('<img src="${photo.url}" width="300" height="300" style="object-fit:cover;"><br>');
+            final ts = photo.capturedAt.toLocal().toString().split('.').first;
+            String gps = '';
+            if (_showGps && photo.latitude != null && photo.longitude != null) {
+              gps = '<br><a href="https://www.google.com/maps/search/?api=1&query=${photo.latitude},${photo.longitude}">${photo.latitude!.toStringAsFixed(4)}, ${photo.longitude!.toStringAsFixed(4)}</a>';
+            }
+            final note = photo.note.isNotEmpty ? '<br><em>${photo.note}</em>' : '';
+            buffer.writeln('<span>$caption<br>$ts$gps$note</span>');
+            buffer.writeln('</div>');
+          }
+          buffer.writeln('</div>');
+        }
+
+        for (final entry in struct.sectionPhotos.entries) {
+          if (ordered.contains(entry.key) || establishing.contains(entry.key)) {
+            continue;
+          }
+          final photos = entry.value;
+          if (photos.isEmpty) continue;
+          buffer.writeln('<h3>${entry.key}</h3>');
+          final issues = collectIssues(photos);
+          if (issues.isNotEmpty) {
+            buffer.writeln('<ul>');
+            for (final i in issues) {
+              buffer.writeln('<li>$i</li>');
+            }
+            buffer.writeln('</ul>');
+          }
+          buffer.writeln('<div style="display:flex;flex-wrap:wrap;">');
+          for (var photo in photos) {
+            final labelText = photo.label.isNotEmpty ? photo.label : 'Unlabeled';
+            final damage = formatDamageLabel(photo.damageType, _metadata.inspectorRole);
+            final caption = damage.isNotEmpty ? '$labelText - $damage' : labelText;
+            final containerClass = _template == 'side' ? 'class="photo"' : 'style="width:300px;margin:5px;text-align:center;"';
+            buffer.writeln('<div $containerClass>');
+            buffer.writeln('<img src="${photo.url}" width="300" height="300" style="object-fit:cover;"><br>');
+            final ts = photo.capturedAt.toLocal().toString().split('.').first;
+            String gps = '';
+            if (_showGps && photo.latitude != null && photo.longitude != null) {
+              gps = '<br><a href="https://www.google.com/maps/search/?api=1&query=${photo.latitude},${photo.longitude}">${photo.latitude!.toStringAsFixed(4)}, ${photo.longitude!.toStringAsFixed(4)}</a>';
+            }
+            final note = photo.note.isNotEmpty ? '<br><em>${photo.note}</em>' : '';
+            buffer.writeln('<span>$caption<br>$ts$gps$note</span>');
             buffer.writeln('</div>');
           }
           buffer.writeln('</div>');
@@ -538,6 +630,17 @@ ${_jobCostController.text}</p>');
   Future<List<pw.Widget>> _buildPdfWidgets() async {
     final List<pw.Widget> widgets = [];
 
+    List<String> collectIssues(List<PhotoEntry> photos) {
+      final issues = <String>{};
+      for (final p in photos) {
+        if (p.note.isNotEmpty) issues.add(p.note);
+        if (p.damageType.isNotEmpty && p.damageType != 'Unknown') {
+          issues.add(formatDamageLabel(p.damageType, _metadata.inspectorRole));
+        }
+      }
+      return issues.toList();
+    }
+
     Future<pw.Widget> buildWrap(List<PhotoEntry> photos) async {
       final items = <pw.Widget>[];
       for (var photo in photos) {
@@ -546,7 +649,8 @@ ${_jobCostController.text}</p>');
         final bytes = imageData.buffer.asUint8List();
         final label = photo.label.isNotEmpty ? photo.label : 'Unlabeled';
         final damage =
-            photo.damageType.isNotEmpty ? photo.damageType : 'Unknown';
+            formatDamageLabel(photo.damageType, _metadata.inspectorRole);
+        final caption = damage.isNotEmpty ? '$label - $damage' : label;
 
         items.add(
           pw.Container(
@@ -556,7 +660,7 @@ ${_jobCostController.text}</p>');
                 pw.Image(pw.MemoryImage(bytes),
                     width: 150, height: 150, fit: pw.BoxFit.cover),
                 pw.SizedBox(height: 4),
-                pw.Text('$label - $damage',
+                pw.Text(caption,
                     textAlign: pw.TextAlign.center,
                     style: const pw.TextStyle(fontSize: 12)),
                 pw.Text(
@@ -594,17 +698,90 @@ ${_jobCostController.text}</p>');
     }
 
     if (widget.structures != null) {
+      const establishing = ['Address Photo', 'Front of House'];
+      const ordered = [
+        'Front Elevation & Accessories',
+        'Right Elevation & Accessories',
+        'Back Elevation & Accessories',
+        'Left Elevation & Accessories',
+        'Roof Edge',
+        'Roof Slopes - Front',
+        'Roof Slopes - Right',
+        'Roof Slopes - Back',
+        'Roof Slopes - Left',
+      ];
+
       for (final struct in widget.structures!) {
         if (widget.structures!.length > 1) {
           widgets.add(_pdfSectionHeader(struct.name));
           widgets.add(pw.SizedBox(height: 10));
         }
-        for (var section
-            in widget.template?.sections ?? sectionsForType(_metadata.inspectionType)) {
+
+        final estPhotos = <PhotoEntry>[];
+        for (final sec in establishing) {
+          estPhotos.addAll(struct.sectionPhotos[sec] ?? []);
+        }
+        if (estPhotos.isNotEmpty) {
+          widgets.add(_pdfSectionHeader('Establishing Shots'));
+          final issues = collectIssues(estPhotos);
+          if (issues.isNotEmpty) {
+            widgets.add(pw.Column(
+                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                children: [
+                  pw.Text('Noted Issues:',
+                      style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                  ...issues.map((e) => pw.Bullet(text: e)),
+                ]));
+            widgets.add(pw.SizedBox(height: 8));
+          }
+          widgets.add(await buildWrap(estPhotos));
+          widgets.add(pw.SizedBox(height: 20));
+        }
+
+        final otherSections = <String>{
+          ...ordered,
+          ...struct.sectionPhotos.keys
+        };
+
+        for (final section in ordered) {
+          if (!otherSections.contains(section)) continue;
           final photos = struct.sectionPhotos[section] ?? [];
           if (photos.isEmpty) continue;
-          widgets.add(_pdfSectionHeader(section));
-          widgets.add(pw.SizedBox(height: 8));
+          final label = section.replaceAll(' & Accessories', '');
+          widgets.add(_pdfSectionHeader(label));
+          final issues = collectIssues(photos);
+          if (issues.isNotEmpty) {
+            widgets.add(pw.Column(
+                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                children: [
+                  pw.Text('Noted Issues:',
+                      style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                  ...issues.map((e) => pw.Bullet(text: e)),
+                ]));
+            widgets.add(pw.SizedBox(height: 8));
+          }
+          widgets.add(await buildWrap(photos));
+          widgets.add(pw.SizedBox(height: 20));
+        }
+
+        for (final entry in struct.sectionPhotos.entries) {
+          if (ordered.contains(entry.key) || establishing.contains(entry.key)) {
+            continue;
+          }
+          final photos = entry.value;
+          if (photos.isEmpty) continue;
+          widgets.add(_pdfSectionHeader(entry.key));
+          final issues = collectIssues(photos);
+          if (issues.isNotEmpty) {
+            widgets.add(pw.Column(
+                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                children: [
+                  pw.Text('Noted Issues:',
+                      style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                  ...issues.map((e) => pw.Bullet(text: e)),
+                ]));
+            widgets.add(pw.SizedBox(height: 8));
+          }
           widgets.add(await buildWrap(photos));
           widgets.add(pw.SizedBox(height: 20));
         }
