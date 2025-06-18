@@ -31,6 +31,25 @@ class ClearSkyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final routes = <String, WidgetBuilder>{
+      '/': (context) {
+        const bool showClientPortal = false; // toggle for demo
+        if (showClientPortal) return const ClientPortalMain();
+        return MainNavScaffold(
+          user: InspectorUser(uid: 'demo', role: UserRole.inspector),
+        );
+      },
+      '/upload': (context) => const PhotoUploadScreen(),
+      '/preview': (context) => const ReportPreviewScreen(),
+      '/signature': (context) => const ClientSignatureScreen(),
+      '/checklist': (context) => const InspectionChecklistScreen(),
+      '/analytics': (context) => const AnalyticsDashboardScreen(allMetrics: []), // Replace with real
+      '/audit': (context) => const AdminAuditLogScreen(logs: []), // Replace with real
+      '/clientDashboard': (context) => const ClientDashboardScreen(),
+      '/clientReport': (context) => const ClientReportScreen(),
+      '/clientPortal': (context) => const ClientPortalMain(),
+    };
+
     return MaterialApp(
       title: 'ClearSky Photo Reports',
       debugShowCheckedModeBanner: false,
@@ -38,24 +57,7 @@ class ClearSkyApp extends StatelessWidget {
       darkTheme: AppTheme.darkTheme,
       themeMode: ThemeMode.system,
       initialRoute: '/',
-      routes: {
-        '/': (context) {
-          const bool showClientPortal = false; // toggle for demo
-          if (showClientPortal) return const ClientPortalMain();
-          return MainNavScaffold(
-            user: InspectorUser(uid: 'demo', role: UserRole.inspector),
-          );
-        },
-        '/upload': (context) => const PhotoUploadScreen(),
-        '/preview': (context) => const ReportPreviewScreen(),
-        '/signature': (context) => const ClientSignatureScreen(),
-        '/checklist': (context) => const InspectionChecklistScreen(),
-        '/analytics': (context) => const AnalyticsDashboardScreen(allMetrics: []), // Replace with real
-        '/audit': (context) => const AdminAuditLogScreen(logs: []), // Replace with real
-        '/clientDashboard': (context) => const ClientDashboardScreen(),
-        '/clientReport': (context) => const ClientReportScreen(),
-        '/clientPortal': (context) => const ClientPortalMain(),
-      },
+      routes: routes,
     );
   }
 }
