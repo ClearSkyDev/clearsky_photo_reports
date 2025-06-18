@@ -16,6 +16,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:share_plus/share_plus.dart';
 import '../services/invoice_service.dart';
 import '../utils/invoice_pdf.dart';
 
@@ -25,6 +26,70 @@ import '../models/inspection_metadata.dart';
 import '../models/inspection_type.dart';
 import '../models/inspection_sections.dart';
 import '../models/saved_report.dart';
+import '../models/photo_entry.dart';
+
+Future<void> generateAndDownloadPdf(
+  List<PhotoEntry> photos,
+  String summary,
+) async {
+  // Placeholder implementation using simple PDF with summary text
+  final pdf = pw.Document();
+  pdf.addPage(
+    pw.Page(
+      build: (context) => pw.Column(
+        children: [
+          pw.Text(summary),
+          pw.SizedBox(height: 20),
+          for (final p in photos)
+            pw.Text(p.label, style: const pw.TextStyle(fontSize: 10)),
+        ],
+      ),
+    ),
+  );
+  final bytes = await pdf.save();
+  if (kIsWeb) {
+    final blob = html.Blob([bytes]);
+    final url = html.Url.createObjectUrlFromBlob(blob);
+    final anchor = html.AnchorElement(href: url)
+      ..setAttribute('download', 'report.pdf')
+      ..click();
+    html.Url.revokeObjectUrl(url);
+  } else {
+    final dir = await getTemporaryDirectory();
+    final file = File(p.join(dir.path, 'report.pdf'));
+    await file.writeAsBytes(bytes, flush: true);
+    await SharePlus.instance.shareXFiles([XFile(file.path)]);
+  }
+}
+
+Future<void> generateAndDownloadHtml(
+  List<PhotoEntry> photos,
+  String summary,
+) async {
+  final buffer = StringBuffer()
+    ..writeln('<html><body>')
+    ..writeln('<p>$summary</p>');
+  for (final p in photos) {
+    buffer.writeln('<p>${p.label}</p>');
+    buffer.writeln('<img src="${p.url}" width="300">');
+  }
+  buffer.writeln('</body></html>');
+  final htmlStr = buffer.toString();
+  final bytes = utf8.encode(htmlStr);
+  if (kIsWeb) {
+    final blob = html.Blob([bytes], 'text/html');
+    final url = html.Url.createObjectUrlFromBlob(blob);
+    final anchor = html.AnchorElement(href: url)
+      ..setAttribute('download', 'report.html')
+      ..click();
+    html.Url.revokeObjectUrl(url);
+  } else {
+    final dir = await getTemporaryDirectory();
+    final file = File(p.join(dir.path, 'report.html'));
+    await file.writeAsBytes(bytes, flush: true);
+    await SharePlus.instance.shareXFiles([XFile(file.path)]);
+  }
+}
 
 const String _contactInfo =
     'ClearSky Roof Inspectors | www.clearskyroof.com | (555) 123-4567';

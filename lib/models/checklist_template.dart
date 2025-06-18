@@ -1,7 +1,10 @@
 import 'inspection_type.dart';
-import 'inspection_metadata.dart';
 import 'inspection_sections.dart';
 import 'checklist_field_type.dart';
+
+enum PerilType { wind, hail, fire, flood }
+
+enum InspectorReportRole { ladder_assist, adjuster, contractor }
 
 class ChecklistItemTemplate {
   final String title;

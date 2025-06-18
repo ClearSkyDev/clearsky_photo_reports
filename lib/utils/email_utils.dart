@@ -50,7 +50,8 @@ Future<void> sendReportByEmail(
   try {
     await FlutterEmailSender.send(mail);
   } catch (_) {
-    await Share.shareXFiles([XFile(file.path)], subject: subject, text: message);
+    await SharePlus.instance
+        .shareXFiles([XFile(file.path)], subject: subject, text: message);
   }
 }
 
@@ -120,6 +121,6 @@ Future<void> sendReportEmail(
   try {
     await FlutterEmailSender.send(mail);
   } catch (_) {
-    await Share.share(body, subject: subject);
+    await SharePlus.instance.share(body, subject: subject);
   }
 }

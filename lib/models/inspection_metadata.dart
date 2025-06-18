@@ -1,24 +1,31 @@
+import 'inspection_type.dart';
+import 'checklist_template.dart' show PerilType, InspectorReportRole;
+
 class InspectionMetadata {
   String clientName;
   String propertyAddress;
   DateTime inspectionDate;
-  String inspectorName;
-  String inspectorRole; // e.g., Ladder Assist, Adjuster, Contractor
-  String insuranceCarrier;
-  String claimNumber;
-  String jobId;
-  bool isFinalized;
+  String? insuranceCarrier;
+  PerilType perilType;
+  InspectionType inspectionType;
+  String? inspectorName;
+  InspectorReportRole inspectorRole;
+  String? reportId;
+  String? weatherNotes;
+  String? partnerCode;
 
   InspectionMetadata({
     required this.clientName,
     required this.propertyAddress,
     required this.inspectionDate,
-    required this.inspectorName,
+    this.insuranceCarrier,
+    required this.perilType,
+    required this.inspectionType,
+    this.inspectorName,
     required this.inspectorRole,
-    this.insuranceCarrier = '',
-    this.claimNumber = '',
-    this.jobId = '',
-    this.isFinalized = false,
+    this.reportId,
+    this.weatherNotes,
+    this.partnerCode,
   });
 
   // Convert to Map (for saving to JSON, Firestore, etc.)
@@ -27,12 +34,14 @@ class InspectionMetadata {
       'clientName': clientName,
       'propertyAddress': propertyAddress,
       'inspectionDate': inspectionDate.toIso8601String(),
-      'inspectorName': inspectorName,
-      'inspectorRole': inspectorRole,
-      'insuranceCarrier': insuranceCarrier,
-      'claimNumber': claimNumber,
-      'jobId': jobId,
-      'isFinalized': isFinalized,
+      if (inspectorName != null) 'inspectorName': inspectorName,
+      'inspectorRole': inspectorRole.name,
+      if (insuranceCarrier != null) 'insuranceCarrier': insuranceCarrier,
+      'perilType': perilType.name,
+      'inspectionType': inspectionType.name,
+      if (reportId != null) 'reportId': reportId,
+      if (weatherNotes != null) 'weatherNotes': weatherNotes,
+      if (partnerCode != null) 'partnerCode': partnerCode,
     };
   }
 
@@ -42,12 +51,16 @@ class InspectionMetadata {
       clientName: map['clientName'] ?? '',
       propertyAddress: map['propertyAddress'] ?? '',
       inspectionDate: DateTime.parse(map['inspectionDate']),
-      inspectorName: map['inspectorName'] ?? '',
-      inspectorRole: map['inspectorRole'] ?? '',
-      insuranceCarrier: map['insuranceCarrier'] ?? '',
-      claimNumber: map['claimNumber'] ?? '',
-      jobId: map['jobId'] ?? '',
-      isFinalized: map['isFinalized'] ?? false,
+      insuranceCarrier: map['insuranceCarrier'],
+      perilType: PerilType.values.byName(map['perilType'] ?? 'wind'),
+      inspectionType:
+          InspectionType.values.byName(map['inspectionType'] ?? 'residentialRoof'),
+      inspectorName: map['inspectorName'],
+      inspectorRole:
+          InspectorReportRole.values.byName(map['inspectorRole'] ?? 'ladder_assist'),
+      reportId: map['reportId'],
+      weatherNotes: map['weatherNotes'],
+      partnerCode: map['partnerCode'],
     );
   }
 }
