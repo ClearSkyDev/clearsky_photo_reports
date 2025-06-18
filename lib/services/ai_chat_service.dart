@@ -67,7 +67,7 @@ class AiChatService {
         .orderBy('createdAt')
         .get();
     return snap.docs
-        .map((d) => ChatMessage.fromMap(d.data(), d.id))
+        .map<ChatMessage>((d) => ChatMessage.fromMap(d.data(), d.id))
         .toList();
   }
 }

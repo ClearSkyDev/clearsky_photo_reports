@@ -52,7 +52,7 @@ class ClearSkyApp extends StatelessWidget {
               inspectionDate: DateTime.now(),
               perilType: PerilType.wind,
               inspectionType: InspectionType.residentialRoof,
-              inspectorRole: InspectorReportRole.ladder_assist,
+              inspectorRoles: {InspectorReportRole.ladder_assist},
             ),
           ),
       '/signature': (context) => const ClientSignatureScreen(),
