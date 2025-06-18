@@ -1150,6 +1150,16 @@ ${_jobCostController.text}</p>');
                 style: TextStyle(color: Colors.white),
               ),
             ),
+          if (widget.savedReport?.wasOffline == true)
+            Container(
+              width: double.infinity,
+              color: Colors.yellow,
+              padding: const EdgeInsets.all(8),
+              child: const Text(
+                '⚠️ Draft Created Offline — Please verify all data before submission',
+                textAlign: TextAlign.center,
+              ),
+            ),
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(

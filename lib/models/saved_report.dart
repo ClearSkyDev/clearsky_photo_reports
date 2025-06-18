@@ -56,6 +56,8 @@ class SavedReport {
   final double? longitude;
   final Map<String, dynamic>? searchIndex;
   final bool localOnly;
+  /// Indicates this report was initially created while offline.
+  final bool wasOffline;
 
   SavedReport({
     this.id = '',
@@ -96,6 +98,7 @@ class SavedReport {
     this.longitude,
     this.searchIndex,
     this.localOnly = false,
+    this.wasOffline = false,
   }) : createdAt = createdAt ?? DateTime.now();
 
   Map<String, dynamic> toMap() {
@@ -146,6 +149,7 @@ class SavedReport {
       if (searchIndex != null) 'searchIndex': searchIndex,
       'version': version,
       if (localOnly) 'localOnly': true,
+      if (wasOffline) 'wasOffline': true,
     };
   }
 
@@ -240,6 +244,7 @@ class SavedReport {
           : null,
       version: map['version'] as int? ?? 1,
       localOnly: map['localOnly'] as bool? ?? false,
+      wasOffline: map['wasOffline'] as bool? ?? false,
     );
   }
 }

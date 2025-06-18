@@ -552,6 +552,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
       jobCost: _jobCost,
       attachments: savedAttachments,
       localOnly: true,
+      wasOffline: true,
     );
 
     await OfflineSyncService.instance.saveDraft(saved);

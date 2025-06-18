@@ -48,6 +48,7 @@ class OfflineDraftStore {
       longitude: report.longitude,
       searchIndex: report.searchIndex,
       localOnly: true,
+      wasOffline: true,
     );
     await _box.put(id, local.toMap());
   }

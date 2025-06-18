@@ -199,6 +199,7 @@ class OfflineSyncService {
       longitude: draft.longitude,
       searchIndex: draft.searchIndex,
       attachments: uploadedAttachments,
+      wasOffline: draft.wasOffline,
     );
 
     await firestore.collection('reports').doc(draft.id).set(saved.toMap());

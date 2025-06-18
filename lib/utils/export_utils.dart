@@ -717,6 +717,15 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
               pw.Text(_contactInfo,
                   style: const pw.TextStyle(fontSize: 9),
                   textAlign: pw.TextAlign.center),
+              if (report.wasOffline)
+                pw.Padding(
+                  padding: const pw.EdgeInsets.only(top: 2),
+                  child: pw.Text(
+                    '⚠️ Draft Created Offline — Please verify all data before submission',
+                    style: const pw.TextStyle(fontSize: 9, color: PdfColors.orange),
+                    textAlign: pw.TextAlign.center,
+                  ),
+                ),
             ],
           ),
         ),
@@ -815,6 +824,15 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
               pw.Text(_contactInfo,
                   style: const pw.TextStyle(fontSize: 9),
                   textAlign: pw.TextAlign.center),
+              if (report.wasOffline)
+                pw.Padding(
+                  padding: const pw.EdgeInsets.only(top: 2),
+                  child: pw.Text(
+                    '⚠️ Draft Created Offline — Please verify all data before submission',
+                    style: const pw.TextStyle(fontSize: 9, color: PdfColors.orange),
+                    textAlign: pw.TextAlign.center,
+                  ),
+                ),
             ],
           ),
         ),
