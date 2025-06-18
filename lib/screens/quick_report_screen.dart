@@ -10,6 +10,8 @@ import '../models/inspected_structure.dart';
 import '../utils/summary_utils.dart';
 import '../utils/export_utils.dart';
 import '../utils/share_utils.dart';
+import '../utils/export_log.dart';
+import '../models/export_log_entry.dart';
 
 class QuickReportScreen extends StatefulWidget {
   const QuickReportScreen({super.key});
@@ -123,6 +125,11 @@ class _QuickReportScreenState extends State<QuickReportScreen> {
     final file = File(p.join(dir.path, 'quick_report.pdf'));
     await file.writeAsBytes(pdfBytes);
     await shareReportFile(file, subject: 'Quick Report');
+    await ExportLog.addEntry(ExportLogEntry(
+      reportName: _addressController.text,
+      type: 'pdf',
+      wasOffline: false,
+    ));
     setState(() => _exporting = false);
   }
 
