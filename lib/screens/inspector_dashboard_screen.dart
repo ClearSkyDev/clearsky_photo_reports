@@ -120,7 +120,11 @@ class _InspectorDashboardScreenState extends State<InspectorDashboardScreen> {
                             ))
                         .toList();
                   });
-                  structs.add(InspectedStructure(name: s.name, sectionPhotos: map));
+                  structs.add(InspectedStructure(
+                    name: s.name,
+                    sectionPhotos: map,
+                    slopeTestSquare: Map.from(s.slopeTestSquare),
+                  ));
                 }
                 Navigator.push(
                   context,
@@ -156,7 +160,11 @@ class _InspectorDashboardScreenState extends State<InspectorDashboardScreen> {
                             ))
                         .toList();
                   });
-                  structs.add(InspectedStructure(name: s.name, sectionPhotos: map));
+                  structs.add(InspectedStructure(
+                    name: s.name,
+                    sectionPhotos: map,
+                    slopeTestSquare: Map.from(s.slopeTestSquare),
+                  ));
                 }
                 Navigator.push(
                   context,
@@ -192,7 +200,11 @@ class _InspectorDashboardScreenState extends State<InspectorDashboardScreen> {
                             ))
                         .toList();
                   });
-                  structs.add(InspectedStructure(name: s.name, sectionPhotos: map));
+                  structs.add(InspectedStructure(
+                    name: s.name,
+                    sectionPhotos: map,
+                    slopeTestSquare: Map.from(s.slopeTestSquare),
+                  ));
                 }
                 Navigator.push(
                   context,

@@ -478,7 +478,8 @@ ${_jobCostController.text}</p>');
           if (photos.isEmpty) continue;
           final label = section.replaceAll(' & Accessories', '');
           buffer.writeln('<h3>$label</h3>');
-          final issues = collectIssues(photos);
+          final missing = struct.slopeTestSquare[section] == false;
+          final issues = collectIssues(photos, missingTestSquare: missing);
           if (issues.isNotEmpty) {
             buffer.writeln('<ul>');
             for (final i in issues) {
@@ -513,7 +514,8 @@ ${_jobCostController.text}</p>');
           final photos = entry.value;
           if (photos.isEmpty) continue;
           buffer.writeln('<h3>${entry.key}</h3>');
-          final issues = collectIssues(photos);
+          final missing = struct.slopeTestSquare[section] == false;
+          final issues = collectIssues(photos, missingTestSquare: missing);
           if (issues.isNotEmpty) {
             buffer.writeln('<ul>');
             for (final i in issues) {
@@ -652,13 +654,16 @@ ${_jobCostController.text}</p>');
   Future<List<pw.Widget>> _buildPdfWidgets() async {
     final List<pw.Widget> widgets = [];
 
-    List<String> collectIssues(List<PhotoEntry> photos) {
+    List<String> collectIssues(List<PhotoEntry> photos, {bool missingTestSquare = false}) {
       final issues = <String>{};
       for (final p in photos) {
         if (p.note.isNotEmpty) issues.add(p.note);
         if (p.damageType.isNotEmpty && p.damageType != 'Unknown') {
           issues.add(formatDamageLabel(p.damageType, _metadata.inspectorRoles));
         }
+      }
+      if (missingTestSquare) {
+        issues.add('No test square photo included for this slope');
       }
       return issues.toList();
     }

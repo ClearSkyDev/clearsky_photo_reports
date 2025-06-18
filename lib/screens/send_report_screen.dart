@@ -214,7 +214,11 @@ class _SendReportScreenState extends State<SendReportScreen> {
             uploadedSections[entry.key] = uploaded;
           }
         }
-        structs.add(InspectedStructure(name: struct.name, sectionPhotos: uploadedSections));
+        structs.add(InspectedStructure(
+          name: struct.name,
+          sectionPhotos: uploadedSections,
+          slopeTestSquare: Map.from(struct.slopeTestSquare),
+        ));
       }
     }
 
@@ -458,7 +462,11 @@ class _SendReportScreenState extends State<SendReportScreen> {
               .toList();
           sections[entry.key] = list;
         }
-        structs.add(InspectedStructure(name: struct.name, sectionPhotos: sections));
+        structs.add(InspectedStructure(
+          name: struct.name,
+          sectionPhotos: sections,
+          slopeTestSquare: Map.from(struct.slopeTestSquare),
+        ));
       }
     }
 

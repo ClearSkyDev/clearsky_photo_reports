@@ -505,13 +505,17 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
   }
   final pdf = pw.Document();
 
-  List<String> collectIssues(List<ReportPhotoEntry> photos) {
+  List<String> collectIssues(List<ReportPhotoEntry> photos,
+      {bool missingTestSquare = false}) {
     final issues = <String>{};
     for (final p in photos) {
       if (p.note.isNotEmpty) issues.add(p.note);
       if (p.damageType.isNotEmpty && p.damageType != 'Unknown') {
         issues.add(formatDamageLabel(p.damageType, meta.inspectorRoles));
       }
+    }
+    if (missingTestSquare) {
+      issues.add('No test square photo included for this slope');
     }
     return issues.toList();
   }
@@ -626,7 +630,8 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
         if (photos.isEmpty) continue;
         final label = section.replaceAll(' & Accessories', '');
         widgets.add(_pdfSectionHeader(label));
-        final issues = collectIssues(photos);
+        final missing = struct.slopeTestSquare[section] == false;
+        final issues = collectIssues(photos, missingTestSquare: missing);
         if (issues.isNotEmpty) {
           widgets.add(pw.Column(
               crossAxisAlignment: pw.CrossAxisAlignment.start,
@@ -648,7 +653,8 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
         final photos = entry.value;
         if (photos.isEmpty) continue;
         widgets.add(_pdfSectionHeader(entry.key));
-        final issues = collectIssues(photos);
+        final missing = struct.slopeTestSquare[entry.key] == false;
+        final issues = collectIssues(photos, missingTestSquare: missing);
         if (issues.isNotEmpty) {
           widgets.add(pw.Column(
               crossAxisAlignment: pw.CrossAxisAlignment.start,

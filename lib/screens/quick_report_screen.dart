@@ -34,6 +34,7 @@ class _QuickReportScreenState extends State<QuickReportScreen> {
   String? _summary;
   bool _loadingSummary = false;
   bool _exporting = false;
+  bool _includeTestSquare = true;
 
   @override
   void dispose() {
@@ -77,7 +78,8 @@ class _QuickReportScreenState extends State<QuickReportScreen> {
         sectionPhotos: {
       for (var i = 0; i < _labels.length; i++)
         _labels[i]: _photos[i] != null ? [_photos[i]!] : []
-    });
+    },
+        slopeTestSquare: {'Roof Slopes': _includeTestSquare});
     final metadata = {
       'clientName': '',
       'propertyAddress': _addressController.text,
@@ -101,12 +103,14 @@ class _QuickReportScreenState extends State<QuickReportScreen> {
   Future<void> _export() async {
     setState(() => _exporting = true);
     final struct = InspectedStructure(
-        name: 'Main Structure',
-        address: _addressController.text,
-        sectionPhotos: {
-      for (var i = 0; i < _labels.length; i++)
-        _labels[i]: _photos[i] != null ? [_photos[i]!] : []
-    });
+      name: 'Main Structure',
+      address: _addressController.text,
+      sectionPhotos: {
+        for (var i = 0; i < _labels.length; i++)
+          _labels[i]: _photos[i] != null ? [_photos[i]!] : []
+      },
+      slopeTestSquare: {'Roof Slopes': _includeTestSquare},
+    );
     final metadata = {
       'clientName': '',
       'propertyAddress': _addressController.text,
@@ -156,6 +160,12 @@ class _QuickReportScreenState extends State<QuickReportScreen> {
             Padding(
               padding: const EdgeInsets.all(8),
               child: Image.file(File(photo.photoUrl), height: 200),
+            ),
+          if (label == 'Roof Slopes')
+            SwitchListTile(
+              title: const Text('Include Test Square?'),
+              value: _includeTestSquare,
+              onChanged: (v) => setState(() => _includeTestSquare = v),
             ),
           const Spacer(),
           ElevatedButton(

@@ -220,7 +220,11 @@ class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
                     ))
                 .toList();
           });
-          structs.add(InspectedStructure(name: s.name, sectionPhotos: sections));
+          structs.add(InspectedStructure(
+            name: s.name,
+            sectionPhotos: sections,
+            slopeTestSquare: Map.from(s.slopeTestSquare),
+          ));
         }
         Navigator.push(
           context,
