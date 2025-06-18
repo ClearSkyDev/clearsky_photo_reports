@@ -8,10 +8,12 @@ void main() {
       version: 3,
       inspectionMetadata: const {},
       structures: const [],
+      wasOffline: true,
     );
     final map = report.toMap();
     final copy = SavedReport.fromMap(map, report.id);
     expect(copy.version, 3);
     expect(copy.id, 'r1');
+    expect(copy.wasOffline, isTrue);
   });
 }
