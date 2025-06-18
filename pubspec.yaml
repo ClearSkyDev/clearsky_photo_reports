@@ -33,3 +33,4 @@ flutter:
     - assets/images/clearsky_logo.png
 fl_chart: ^0.64.0
 signature: ^5.4.1
+google_fonts: ^6.1.0
