@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../utils/profile_storage.dart';
-import '../models/inspector_profile.dart';
 
 import '../models/inspection_metadata.dart';
 import '../models/inspection_type.dart';

@@ -4,7 +4,6 @@ import 'package:latlong2/latlong.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../models/saved_report.dart';
-import '../models/inspected_structure.dart';
 import '../models/inspection_metadata.dart';
 import 'report_preview_screen.dart';
 

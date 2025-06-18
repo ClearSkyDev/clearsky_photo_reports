@@ -1,5 +1,4 @@
 import 'inspection_type.dart';
-import 'inspection_sections.dart';
 import 'checklist_field_type.dart';
 
 enum PerilType { wind, hail, fire, flood }
