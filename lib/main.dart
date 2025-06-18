@@ -13,6 +13,9 @@ import 'screens/admin_audit_log_screen.dart';
 import 'client_portal/client_report_screen.dart';
 import 'client_portal/client_dashboard_screen.dart';
 import 'models/inspector_user.dart';
+import 'models/inspection_metadata.dart';
+import 'models/inspection_type.dart';
+import 'models/checklist_template.dart';
 
 import 'main_nav_scaffold.dart';
 import 'client_portal_main.dart';
@@ -40,7 +43,16 @@ class ClearSkyApp extends StatelessWidget {
         );
       },
       '/upload': (context) => const PhotoUploadScreen(),
-      '/preview': (context) => const ReportPreviewScreen(),
+      '/preview': (context) => ReportPreviewScreen(
+            metadata: InspectionMetadata(
+              clientName: 'Demo Client',
+              propertyAddress: '123 Demo St',
+              inspectionDate: DateTime.now(),
+              perilType: PerilType.wind,
+              inspectionType: InspectionType.residentialRoof,
+              inspectorRole: InspectorReportRole.ladder_assist,
+            ),
+          ),
       '/signature': (context) => const ClientSignatureScreen(),
       '/checklist': (context) => const InspectionChecklistScreen(),
       '/analytics': (context) => const AnalyticsDashboardScreen(allMetrics: []), // Replace with real

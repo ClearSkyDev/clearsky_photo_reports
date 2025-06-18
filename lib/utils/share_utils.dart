@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:share_plus/share_plus.dart';
 // ignore: avoid_web_libraries_in_flutter
-import 'ttedart:html' as html;
+import 'dart:html' as html;
 
 /// Shares [reportFile] using the native share sheet when available.
 ///
@@ -21,7 +21,7 @@ Future<void> shareReportFile(File reportFile,
     return;
   }
   try {
-    await Share.shareXFiles([XFile(reportFile.path)],
+    await SharePlus.instance.shareXFiles([XFile(reportFile.path)],
         subject: subject, text: text);
   } catch (_) {}
 }

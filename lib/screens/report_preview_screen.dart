@@ -9,7 +9,6 @@ import '../models/inspection_metadata.dart';
 import '../models/inspection_type.dart';
 import '../models/inspection_sections.dart';
 import '../models/saved_report.dart';
-import '../models/inspected_structure.dart';
 import '../models/checklist.dart';
 import '../models/report_template.dart';
 import 'dart:html' as html; // for HTML download (web only)

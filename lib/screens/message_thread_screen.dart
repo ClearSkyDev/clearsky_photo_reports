@@ -133,7 +133,7 @@ class _MessageThreadScreenState extends State<MessageThreadScreen> {
       buffer.writeln('$ts ${msg.senderId}: ${msg.text}');
       if (msg.attachmentUrl != null) buffer.writeln(msg.attachmentUrl);
     }
-    await Share.share(buffer.toString());
+    await SharePlus.instance.share(buffer.toString());
   }
 
   Widget _buildMessageBubble(ReportMessage msg) {
