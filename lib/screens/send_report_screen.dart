@@ -1409,6 +1409,11 @@ class _SendReportScreenState extends State<SendReportScreen> {
             ),
             const SizedBox(height: 8),
             ElevatedButton(
+              onPressed: _autoGenerateSummary,
+              child: const Text('Regenerate Summary'),
+            ),
+            const SizedBox(height: 8),
+            ElevatedButton(
               onPressed: _exportAudio,
               child: const Text('Export Audio Summary'),
             ),
