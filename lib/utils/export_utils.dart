@@ -642,7 +642,7 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
               pw.Container(height: 1, width: double.infinity, color: PdfColors.black),
               pw.SizedBox(height: 8),
               pw.Text('Inspector Signature'),
-              pw.Text('${meta.inspectorName!} – $dateStr'),
+              pw.Text('${meta.inspectorName} – $dateStr'),
             ],
           ),
           if (report.homeownerSignature != null && !report.homeownerSignature!.declined) ...[

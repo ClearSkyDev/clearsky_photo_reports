@@ -371,7 +371,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
         else 'inspectorName': widget.metadata.inspectorName,
         if (profile?.name != null)
           'inspectorName_lc': profile!.name.toLowerCase()
-        else 'inspectorName_lc': widget.metadata.inspectorName!.toLowerCase(),
+        else 'inspectorName_lc': widget.metadata.inspectorName.toLowerCase(),
         'type': widget.metadata.inspectionType.name,
         'type_lc': widget.metadata.inspectionType.name.toLowerCase(),
         'labels': labels.toList(),

@@ -775,7 +775,7 @@ ${_jobCostController.text}</p>');
                   pw.Image(pw.MemoryImage(_signature!), height: 80)
                 else
                   pw.Container(height: 1, width: double.infinity, color: PdfColors.black),
-                pw.Text('${_metadata.inspectorName!} – $dateStr'),
+                pw.Text('${_metadata.inspectorName} – $dateStr'),
               ],
             ),
           ],
