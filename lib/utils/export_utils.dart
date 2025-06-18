@@ -95,7 +95,7 @@ Future<void> generateAndDownloadHtml(
 const String _contactInfo =
     'ClearSky Roof Inspectors | www.clearskyroof.com | (555) 123-4567';
 const String _disclaimerText =
-    'This report is for informational purposes only and is not a warranty.';
+    '⚠️ AI-Assisted Report Disclaimer\nThis report was created using AI-assisted tools provided by ClearSky. The information within was input by the inspector and is their sole responsibility. ClearSky does not assume responsibility for any incorrect, incomplete, or misleading information submitted by users. Final coverage decisions should always be made by licensed professionals or carriers.';
 const String _coverDisclaimer =
     'This report is a professional opinion based on visual inspection only.';
 
@@ -481,7 +481,7 @@ Future<String> _generateHtml(SavedReport report) async {
   buffer
     ..writeln('<p style="text-align: center; margin-top: 40px;">$_contactInfo</p>')
     ..writeln(
-        '<footer style="text-align:center;margin-top:20px;font-size:12px;color:#666;">$_disclaimerText</footer>')
+        '<footer style="background:#eee;padding:10px;margin-top:20px;font-size:12px;text-align:center;">$_disclaimerText</footer>')
     ..writeln('</body></html>');
 
   return buffer.toString();
@@ -704,8 +704,22 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
   pdf
     ..addPage(
       pw.Page(
-        footer: (context) =>
-            pw.Text(_contactInfo, textAlign: pw.TextAlign.center),
+        footer: (context) => pw.Container(
+          color: PdfColors.grey300,
+          padding: const pw.EdgeInsets.all(6),
+          child: pw.Column(
+            mainAxisSize: pw.MainAxisSize.min,
+            children: [
+              pw.Text(_disclaimerText,
+                  style: const pw.TextStyle(fontSize: 9),
+                  textAlign: pw.TextAlign.center),
+              pw.SizedBox(height: 2),
+              pw.Text(_contactInfo,
+                  style: const pw.TextStyle(fontSize: 9),
+                  textAlign: pw.TextAlign.center),
+            ],
+          ),
+        ),
         build: (context) => pw.Center(
           child: pw.Column(
             mainAxisAlignment: pw.MainAxisAlignment.center,
@@ -788,8 +802,22 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
     )
     ..addPage(
       pw.MultiPage(
-        footer: (context) =>
-            pw.Text(_contactInfo, textAlign: pw.TextAlign.center),
+        footer: (context) => pw.Container(
+          color: PdfColors.grey300,
+          padding: const pw.EdgeInsets.all(6),
+          child: pw.Column(
+            mainAxisSize: pw.MainAxisSize.min,
+            children: [
+              pw.Text(_disclaimerText,
+                  style: const pw.TextStyle(fontSize: 9),
+                  textAlign: pw.TextAlign.center),
+              pw.SizedBox(height: 2),
+              pw.Text(_contactInfo,
+                  style: const pw.TextStyle(fontSize: 9),
+                  textAlign: pw.TextAlign.center),
+            ],
+          ),
+        ),
         build: (context) => [
           pw.Header(level: 0, text: 'ClearSky Photo Report'),
           pw.Text('Client Name: ${meta.clientName}'),

@@ -48,6 +48,7 @@ import '../services/auth_service.dart';
 import '../services/audit_log_service.dart';
 import '../models/report_attachment.dart';
 import 'package:file_picker/file_picker.dart';
+import '../widgets/ai_disclaimer_banner.dart';
 
 /// If Firebase is not desired:
 /// - Use `path_provider` and `shared_preferences` or `hive` to save report JSON locally
@@ -1494,6 +1495,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
                   child: const Text('Run AI Quality Check')),
               ],
             ),
+            const AiDisclaimerBanner(),
             if (_gpsPhotos().isNotEmpty)
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 12),
