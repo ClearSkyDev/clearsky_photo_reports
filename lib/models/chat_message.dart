@@ -1,31 +1,87 @@
-import "package:cloud_firestore/cloud_firestore.dart";
-class ChatMessage {
-  final String id;
-  final String role; // 'user' or 'assistant'
-  final String text;
-  final DateTime createdAt;
+import 'package:flutter/material.dart';
 
-  ChatMessage({
-    required this.id,
-    required this.role,
+class ChatMessage extends StatelessWidget {
+  final String text;
+  final String sender;
+  final bool isMe;
+  final DateTime timestamp;
+  final String? imageUrl;
+
+  const ChatMessage({
+    super.key,
     required this.text,
-    required this.createdAt,
+    required this.sender,
+    required this.isMe,
+    required this.timestamp,
+    this.imageUrl,
   });
 
-  factory ChatMessage.fromMap(Map<String, dynamic> map, String id) {
-    return ChatMessage(
-      id: id,
-      role: map['role'] ?? 'assistant',
-      text: map['text'] ?? '',
-      createdAt: map['createdAt'] is Timestamp
-          ? (map['createdAt'] as Timestamp).toDate()
-          : DateTime.tryParse(map['createdAt'] ?? '') ?? DateTime.now(),
+  @override
+  Widget build(BuildContext context) {
+    final bubbleColor = isMe ? Colors.blue[600] : Colors.grey[300];
+    final textColor = isMe ? Colors.white : Colors.black87;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+      child: Align(
+        alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
+        child: Column(
+          crossAxisAlignment: isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+          children: [
+            if (sender.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 2),
+                child: Text(
+                  sender,
+                  style: const TextStyle(fontSize: 12, color: Colors.black54),
+                ),
+              ),
+            Container(
+              constraints: const BoxConstraints(maxWidth: 280),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: bubbleColor,
+                borderRadius: BorderRadius.only(
+                  topLeft: const Radius.circular(12),
+                  topRight: const Radius.circular(12),
+                  bottomLeft: Radius.circular(isMe ? 12 : 0),
+                  bottomRight: Radius.circular(isMe ? 0 : 12),
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment:
+                    isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                children: [
+                  if (imageUrl != null && imageUrl!.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: Image.network(
+                        imageUrl!,
+                        width: 200,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  Text(
+                    text,
+                    style: TextStyle(fontSize: 16, color: textColor),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    _formatTime(timestamp),
+                    style: TextStyle(fontSize: 11, color: textColor.withOpacity(0.7)),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
-  Map<String, dynamic> toMap() => {
-        'role': role,
-        'text': text,
-        'createdAt': createdAt.toIso8601String(),
-      };
+  String _formatTime(DateTime dt) {
+    final hour = dt.hour.toString().padLeft(2, '0');
+    final min = dt.minute.toString().padLeft(2, '0');
+    return '$hour:$min';
+  }
 }

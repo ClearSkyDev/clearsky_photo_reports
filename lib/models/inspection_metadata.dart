@@ -1,101 +1,53 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'inspection_type.dart';
-
 class InspectionMetadata {
-  final String clientName;
-  final String propertyAddress;
-  final DateTime inspectionDate;
-  final String? insuranceCarrier;
-  final PerilType perilType;
-  final InspectionType inspectionType;
-  final String? inspectorName;
-  final InspectorReportRole inspectorRole;
-  final String? reportId;
-  final String? weatherNotes;
-  final String? lastSentTo;
-  final DateTime? lastSentAt;
-  final String? lastSendMethod;
-  final String? partnerCode;
-  DateTime? startTimestamp;
-  double? startLatitude;
-  double? startLongitude;
-  DateTime? endTimestamp;
+  String clientName;
+  String propertyAddress;
+  DateTime inspectionDate;
+  String inspectorName;
+  String inspectorRole; // e.g., Ladder Assist, Adjuster, Contractor
+  String insuranceCarrier;
+  String claimNumber;
+  String jobId;
+  bool isFinalized;
 
   InspectionMetadata({
     required this.clientName,
     required this.propertyAddress,
     required this.inspectionDate,
-    this.insuranceCarrier,
-    required this.perilType,
-    required this.inspectionType,
-    this.inspectorName,
-    this.inspectorRole = InspectorReportRole.ladder_assist,
-    this.reportId,
-    this.weatherNotes,
-    this.lastSentTo,
-    this.lastSentAt,
-    this.lastSendMethod,
-    this.partnerCode,
-    this.startTimestamp,
-    this.startLatitude,
-    this.startLongitude,
-    this.endTimestamp,
+    required this.inspectorName,
+    required this.inspectorRole,
+    this.insuranceCarrier = '',
+    this.claimNumber = '',
+    this.jobId = '',
+    this.isFinalized = false,
   });
 
+  // Convert to Map (for saving to JSON, Firestore, etc.)
+  Map<String, dynamic> toMap() {
+    return {
+      'clientName': clientName,
+      'propertyAddress': propertyAddress,
+      'inspectionDate': inspectionDate.toIso8601String(),
+      'inspectorName': inspectorName,
+      'inspectorRole': inspectorRole,
+      'insuranceCarrier': insuranceCarrier,
+      'claimNumber': claimNumber,
+      'jobId': jobId,
+      'isFinalized': isFinalized,
+    };
+  }
+
+  // Load from Map
   factory InspectionMetadata.fromMap(Map<String, dynamic> map) {
-    PerilType parsePeril(String? value) {
-      for (final type in PerilType.values) {
-        if (type.name == value) return type;
-      }
-      return PerilType.wind;
-    }
-
-    InspectionType parseType(String? value) {
-      for (final type in InspectionType.values) {
-        if (type.name == value) return type;
-      }
-      return InspectionType.residentialRoof;
-    }
-
-    InspectorReportRole parseRole(String? value) {
-      for (final role in InspectorReportRole.values) {
-        if (role.name == value) return role;
-      }
-      return InspectorReportRole.ladder_assist;
-    }
-
-    DateTime? parseDate(dynamic value) {
-      if (value is Timestamp) return value.toDate();
-      if (value is int) return DateTime.fromMillisecondsSinceEpoch(value);
-      if (value is String) return DateTime.tryParse(value);
-      return null;
-    }
-
     return InspectionMetadata(
       clientName: map['clientName'] ?? '',
       propertyAddress: map['propertyAddress'] ?? '',
-      inspectionDate: map['inspectionDate'] is Timestamp
-          ? (map['inspectionDate'] as Timestamp).toDate()
-          : DateTime.tryParse(map['inspectionDate'] ?? '') ?? DateTime.now(),
-      insuranceCarrier: map['insuranceCarrier'] as String?,
-      perilType: parsePeril(map['perilType'] as String?),
-      inspectionType: parseType(map['inspectionType'] as String?),
-      inspectorName: map['inspectorName'] as String?,
-      inspectorRole: parseRole(map['inspectorRole'] as String?),
-      reportId: map['reportId'] as String?,
-      weatherNotes: map['weatherNotes'] as String?,
-      lastSentTo: map['lastSentTo'] as String?,
-      lastSentAt: parseDate(map['lastSentAt']),
-      lastSendMethod: map['lastSendMethod'] as String?,
-      partnerCode: map['partnerCode'] as String?,
-      startTimestamp: parseDate(map['startTimestamp']),
-      startLatitude: (map['startLatitude'] as num?)?.toDouble(),
-      startLongitude: (map['startLongitude'] as num?)?.toDouble(),
-      endTimestamp: parseDate(map['endTimestamp']),
+      inspectionDate: DateTime.parse(map['inspectionDate']),
+      inspectorName: map['inspectorName'] ?? '',
+      inspectorRole: map['inspectorRole'] ?? '',
+      insuranceCarrier: map['insuranceCarrier'] ?? '',
+      claimNumber: map['claimNumber'] ?? '',
+      jobId: map['jobId'] ?? '',
+      isFinalized: map['isFinalized'] ?? false,
     );
   }
 }
-
-enum PerilType { wind, hail, fire, other }
-
-enum InspectorReportRole { ladder_assist, adjuster, contractor }

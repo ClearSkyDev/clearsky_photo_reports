@@ -1,373 +1,188 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:csv/csv.dart';
-import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:pdf/widgets.dart' as pw;
-import 'package:printing/printing.dart';
-
+import 'package:fl_chart/fl_chart.dart';
 import '../models/report_metrics.dart';
 
 class AnalyticsDashboardScreen extends StatefulWidget {
-  const AnalyticsDashboardScreen({super.key});
+  final List<ReportMetrics> allMetrics;
+
+  const AnalyticsDashboardScreen({super.key, required this.allMetrics});
 
   @override
   State<AnalyticsDashboardScreen> createState() => _AnalyticsDashboardScreenState();
 }
 
 class _AnalyticsDashboardScreenState extends State<AnalyticsDashboardScreen> {
-  List<ReportMetrics> _metrics = [];
-  bool _loading = true;
-  final TextEditingController _inspectorController = TextEditingController();
-  final TextEditingController _zipController = TextEditingController();
-  final TextEditingController _clientController = TextEditingController();
-  String? _perilFilter;
-  DateTimeRange? _range;
+  String _selectedRange = 'Last 30 Days';
 
-  @override
-  void initState() {
-    super.initState();
-    _load();
-  }
-
-  Future<void> _load() async {
-    final snap = await FirebaseFirestore.instance.collection('metrics').get();
-    _metrics = snap.docs
-        .map((d) => ReportMetrics.fromMap(d.id, d.data()))
-        .toList();
-    setState(() => _loading = false);
-  }
-
-  List<ReportMetrics> get _filtered {
-    return _metrics.where((m) {
-      if (_inspectorController.text.isNotEmpty &&
-          !m.inspectorId
-              .toLowerCase()
-              .contains(_inspectorController.text.toLowerCase())) {
-        return false;
-      }
-      if (_zipController.text.isNotEmpty && m.zipCode != _zipController.text) {
-        return false;
-      }
-      if (_clientController.text.isNotEmpty &&
-          (m.clientName == null ||
-              !m.clientName!
-                  .toLowerCase()
-                  .contains(_clientController.text.toLowerCase()))) {
-        return false;
-      }
-      if (_perilFilter != null && m.perilType != _perilFilter) {
-        return false;
-      }
-      if (_range != null) {
-        if (m.createdAt.isBefore(_range!.start) ||
-            m.createdAt.isAfter(_range!.end)) {
-          return false;
-        }
-      }
-      return true;
-    }).toList();
-  }
-
-  int get _totalReports => _filtered.length;
-
-  double get _avgDuration {
-    final durations = _filtered
-        .where((m) => m.finalizedAt != null && m.finalizedAt!.isAfter(m.createdAt))
-        .map((m) => m.finalizedAt!.difference(m.createdAt).inMinutes)
-        .toList();
-    if (durations.isEmpty) return 0;
-    return durations.reduce((a, b) => a + b) / durations.length;
-  }
-
-  double get _avgPhotos {
-    if (_filtered.isEmpty) return 0;
-    final total = _filtered.map((m) => m.photoCount).reduce((a, b) => a + b);
-    return total / _filtered.length;
-  }
-
-  double get _avgDamagePercent {
-    if (_filtered.isEmpty) return 0;
-    final total = _filtered.map((m) => m.damagePercent).reduce((a, b) => a + b);
-    return total / _filtered.length;
-  }
-
-  double get _avgInvoiceAmount {
-    final amounts =
-        _filtered.where((m) => m.invoiceAmount != null).map((m) => m.invoiceAmount!).toList();
-    if (amounts.isEmpty) return 0;
-    return amounts.reduce((a, b) => a + b) / amounts.length;
-  }
-
-  Map<DateTime, int> get _perDay {
-    final map = <DateTime, int>{};
-    for (final m in _filtered) {
-      final day = DateTime(m.createdAt.year, m.createdAt.month, m.createdAt.day);
-      map[day] = (map[day] ?? 0) + 1;
-    }
-    return map;
-  }
-
-  Map<String, int> get _perInspector {
-    final map = <String, int>{};
-    for (final m in _filtered) {
-      map[m.inspectorId] = (map[m.inspectorId] ?? 0) + 1;
-    }
-    return map;
-  }
-
-  Map<String, int> get _statusCounts {
-    final map = <String, int>{};
-    for (final m in _filtered) {
-      map[m.status] = (map[m.status] ?? 0) + 1;
-    }
-    return map;
-  }
-
-  Future<void> _pickRange() async {
+  List<ReportMetrics> get _filteredMetrics {
     final now = DateTime.now();
-    final range = await showDateRangePicker(
-      context: context,
-      firstDate: DateTime(2000),
-      lastDate: DateTime(now.year + 1),
-      initialDateRange: _range,
-    );
-    if (range != null) setState(() => _range = range);
-  }
-
-  Future<void> _exportCsv() async {
-    final rows = <List<dynamic>>[
-      [
-        'id',
-        'inspectorId',
-        'createdAt',
-        'finalizedAt',
-        'photoCount',
-        'status',
-        'zipCode',
-        'clientName',
-        'perilType',
-        'damagePercent',
-        'invoiceAmount'
-      ]
-    ];
-    for (final m in _filtered) {
-      rows.add([
-        m.id,
-        m.inspectorId,
-        m.createdAt.toIso8601String(),
-        m.finalizedAt?.toIso8601String() ?? '',
-        m.photoCount,
-        m.status,
-        m.zipCode ?? '',
-        m.clientName ?? '',
-        m.perilType ?? '',
-        m.damagePercent.toStringAsFixed(2),
-        m.invoiceAmount?.toStringAsFixed(2) ?? ''
-      ]);
+    if (_selectedRange == 'Last 7 Days') {
+      return widget.allMetrics.where((m) => m.createdAt.isAfter(now.subtract(const Duration(days: 7)))).toList();
+    } else if (_selectedRange == 'Last 30 Days') {
+      return widget.allMetrics.where((m) => m.createdAt.isAfter(now.subtract(const Duration(days: 30)))).toList();
     }
-    final csv = const ListToCsvConverter().convert(rows);
-    await Printing.sharePdf(bytes: pw.Document().save(), filename: 'dummy.pdf');
-    await Printing.share(csv); // share as text
-  }
-
-  Future<void> _exportPdf() async {
-    final doc = pw.Document();
-    doc.addPage(
-      pw.Page(
-        build: (context) => pw.Center(
-          child: pw.Text('Analytics Export - Total $_totalReports reports'),
-        ),
-      ),
-    );
-    await Printing.layoutPdf(onLayout: (_) async => doc.save());
-  }
-
-  String _generateInsights() {
-    if (_filtered.isEmpty) return 'No data';
-    final mostInspected = _perInspector.entries
-        .reduce((a, b) => a.value >= b.value ? a : b)
-        .key;
-    return 'Most reports by $mostInspected. Average duration ${_avgDuration.toStringAsFixed(1)} mins.';
-  }
-
-  List<String> _alerts() {
-    final alerts = <String>[];
-    final perDay = _perDay;
-    if (perDay.isNotEmpty) {
-      final values = perDay.values.toList();
-      final avg = values.reduce((a, b) => a + b) / values.length;
-      final today = DateTime.now();
-      final key = DateTime(today.year, today.month, today.day);
-      if (perDay[key] != null && perDay[key]! > avg * 1.5) {
-        alerts.add('Activity spike today');
-      }
-    }
-    return alerts;
+    return widget.allMetrics;
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_loading) {
-      return const Scaffold(
-          appBar: AppBar(title: Text('Analytics')),
-          body: Center(child: CircularProgressIndicator()));
-    }
+    final totalReports = _filteredMetrics.length;
+    final totalPhotos = _filteredMetrics.fold<int>(0, (sum, m) => sum + m.totalPhotos);
+    final avgPhotos = totalReports > 0 ? (totalPhotos / totalReports).toStringAsFixed(1) : '0';
+    final totalExports = _filteredMetrics.where((m) => m.exportedToPdf || m.exportedToHtml).length;
+    final totalDuration = _filteredMetrics.fold<Duration>(Duration.zero, (sum, m) => sum + m.inspectionDuration);
+    final avgDuration = totalReports > 0 ? _formatDuration(totalDuration ~/ totalReports) : 'N/A';
 
-    final perDay = _perDay.entries.toList()
-      ..sort((a, b) => a.key.compareTo(b.key));
-    final perInspector = _perInspector;
-    final statusCounts = _statusCounts;
+    final roleCounts = {
+      'Ladder Assist': _filteredMetrics.where((m) => m.inspectorRole == 'Ladder Assist').length,
+      'Adjuster': _filteredMetrics.where((m) => m.inspectorRole == 'Adjuster').length,
+      'Contractor': _filteredMetrics.where((m) => m.inspectorRole == 'Contractor').length,
+    };
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Analytics')),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _inspectorController,
-                      decoration:
-                          const InputDecoration(labelText: 'Inspector'),
-                      onChanged: (_) => setState(() {}),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: TextField(
-                      controller: _zipController,
-                      decoration:
-                          const InputDecoration(labelText: 'Zip Code'),
-                      onChanged: (_) => setState(() {}),
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: _pickRange,
-                    tooltip: 'Select Date Range',
-                    icon: const Icon(Icons.date_range),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _clientController,
-                      decoration:
-                          const InputDecoration(labelText: 'Client'),
-                      onChanged: (_) => setState(() {}),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: DropdownButton<String>(
-                      value: _perilFilter,
-                      hint: const Text('Claim Type'),
-                      isExpanded: true,
-                      items: const [
-                        DropdownMenuItem(value: 'wind', child: Text('Wind')),
-                        DropdownMenuItem(value: 'hail', child: Text('Hail')),
-                        DropdownMenuItem(value: 'fire', child: Text('Fire')),
-                        DropdownMenuItem(value: 'other', child: Text('Other')),
-                      ],
-                      onChanged: (v) => setState(() => _perilFilter = v),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              Wrap(
-                spacing: 16,
-                children: [
-                  _kpiTile('Total Reports', '$_totalReports'),
-                  _kpiTile('Avg Duration', '${_avgDuration.toStringAsFixed(1)}m'),
-                  _kpiTile('Avg Photos', '${_avgPhotos.toStringAsFixed(1)}'),
-                  _kpiTile('Avg Damage %', '${_avgDamagePercent.toStringAsFixed(1)}'),
-                  _kpiTile('Avg Invoice', '\$${_avgInvoiceAmount.toStringAsFixed(2)}'),
-                ],
-              ),
-              const SizedBox(height: 16),
-              SizedBox(
-                height: 200,
-                child: LineChart(
-                  LineChartData(
-                    lineBarsData: [
-                      LineChartBarData(
-                        spots: [
-                          for (var e in perDay)
-                            FlSpot(e.key.millisecondsSinceEpoch.toDouble(),
-                                e.value.toDouble())
-                        ],
-                      )
-                    ],
-                    titlesData: FlTitlesData(show: false),
-                    borderData: FlBorderData(show: false),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              SizedBox(
-                height: 200,
-                child: BarChart(
-                  BarChartData(
-                    barGroups: [
-                      for (var e in perInspector.entries)
-                        BarChartGroupData(x: perInspector.keys.toList().indexOf(e.key), barRods: [BarChartRodData(toY: e.value.toDouble())])
-                    ],
-                    titlesData: FlTitlesData(show: false),
-                    borderData: FlBorderData(show: false),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              SizedBox(
-                height: 200,
-                child: PieChart(
-                  PieChartData(
-                    sections: [
-                      for (var e in statusCounts.entries)
-                        PieChartSectionData(value: e.value.toDouble(), title: e.key)
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              if (_alerts().isNotEmpty)
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    for (var a in _alerts())
-                      Text('⚠️ $a', style: const TextStyle(color: Colors.red)),
-                  ],
-                ),
-              const SizedBox(height: 8),
-              Text(_generateInsights()),
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  ElevatedButton(onPressed: _exportCsv, child: const Text('Export CSV')),
-                  const SizedBox(width: 8),
-                  ElevatedButton(onPressed: _exportPdf, child: const Text('Export PDF')),
-                ],
-              )
+      appBar: AppBar(
+        title: const Text('Analytics Dashboard'),
+        actions: [
+          PopupMenuButton<String>(
+            onSelected: (val) => setState(() => _selectedRange = val),
+            itemBuilder: (_) => const [
+              PopupMenuItem(value: 'Last 7 Days', child: Text('Last 7 Days')),
+              PopupMenuItem(value: 'Last 30 Days', child: Text('Last 30 Days')),
+              PopupMenuItem(value: 'All Time', child: Text('All Time')),
             ],
+            icon: const Icon(Icons.filter_alt),
           ),
+          IconButton(
+            onPressed: () => _exportAsPDF(_filteredMetrics),
+            icon: const Icon(Icons.picture_as_pdf),
+            tooltip: 'Export PDF',
+          ),
+          IconButton(
+            onPressed: () => _exportAsCSV(_filteredMetrics),
+            icon: const Icon(Icons.table_chart),
+            tooltip: 'Export CSV',
+          ),
+        ],
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          Text(
+            _selectedRange,
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+          ),
+          const SizedBox(height: 8),
+          _metricTile('📊 Total Reports', totalReports.toString()),
+          _metricTile('📷 Avg Photos per Report', avgPhotos),
+          _metricTile('🕒 Avg Duration', avgDuration),
+          _metricTile('📤 Reports Exported', totalExports.toString()),
+          const SizedBox(height: 24),
+          const Text('🔧 Role Breakdown', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          _buildPieChart(roleCounts, totalReports),
+          const SizedBox(height: 24),
+          const Text('📈 Weekly Activity', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 8),
+          _buildBarChart(),
+        ],
+      ),
+    );
+  }
+
+  Widget _metricTile(String label, String value) {
+    return Card(
+      child: ListTile(
+        title: Text(label),
+        trailing: Text(value, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+      ),
+    );
+  }
+
+  Widget _buildPieChart(Map<String, int> counts, int total) {
+    final pieSections = counts.entries.map((e) {
+      final percentage = total > 0 ? (e.value / total) * 100 : 0;
+      return PieChartSectionData(
+        color: e.key == 'Ladder Assist' ? Colors.blue : e.key == 'Adjuster' ? Colors.green : Colors.orange,
+        value: e.value.toDouble(),
+        title: '${percentage.toStringAsFixed(1)}%',
+        radius: 50,
+      );
+    }).toList();
+
+    return SizedBox(
+      height: 200,
+      child: PieChart(
+        PieChartData(
+          sections: pieSections,
+          centerSpaceRadius: 40,
+          sectionsSpace: 2,
         ),
       ),
     );
   }
 
-  Widget _kpiTile(String label, String value) {
-    return Column(
-      children: [
-        Text(value, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-        Text(label),
-      ],
+  Widget _buildBarChart() {
+    final today = DateTime.now();
+    final last7Days = List.generate(7, (i) => today.subtract(Duration(days: 6 - i)));
+    final reportCounts = Map.fromEntries(last7Days.map((d) {
+      final count = _filteredMetrics.where((m) =>
+              m.createdAt.year == d.year &&
+              m.createdAt.month == d.month &&
+              m.createdAt.day == d.day)
+          .length;
+      return MapEntry(d, count);
+    }));
+
+    return SizedBox(
+      height: 220,
+      child: BarChart(
+        BarChartData(
+          alignment: BarChartAlignment.spaceAround,
+          barTouchData: BarTouchData(enabled: false),
+          titlesData: FlTitlesData(
+            bottomTitles: AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: true,
+                reservedSize: 30,
+                getTitlesWidget: (value, meta) {
+                  final index = value.toInt();
+                  if (index < 0 || index >= reportCounts.length) return const Text('');
+                  final day = reportCounts.keys.elementAt(index);
+                  return Text('${day.month}/${day.day}', style: const TextStyle(fontSize: 11));
+                },
+              ),
+            ),
+            leftTitles: AxisTitles(
+              sideTitles: SideTitles(showTitles: true, reservedSize: 30),
+            ),
+          ),
+          barGroups: List.generate(reportCounts.length, (index) {
+            final day = reportCounts.keys.elementAt(index);
+            final count = reportCounts[day]!;
+            return BarChartGroupData(
+              x: index,
+              barRods: [
+                BarChartRodData(toY: count.toDouble(), color: Colors.blueAccent, width: 16),
+              ],
+            );
+          }),
+        ),
+      ),
+    );
+  }
+
+  String _formatDuration(Duration d) => '${d.inMinutes} min';
+
+  void _exportAsPDF(List<ReportMetrics> metrics) {
+    // TODO: Implement real PDF export
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Exported as PDF (stubbed).')),
+    );
+  }
+
+  void _exportAsCSV(List<ReportMetrics> metrics) {
+    // TODO: Implement real CSV export
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Exported as CSV (stubbed).')),
     );
   }
 }

@@ -1,53 +1,26 @@
 name: clearsky_photo_reports
 description: A photo inspection app for ClearSky Roof Inspectors.
 publish_to: 'none'
-
 version: 1.0.0+1
 
 environment:
-  sdk: ">=2.19.0 <4.0.0"
+  sdk: ">=3.0.0 <4.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
-
   cupertino_icons: ^1.0.6
   image_picker: ^1.0.7
-  reorderables: ^0.6.0
+  http: ^1.1.0
   pdf: ^3.10.4
   printing: ^5.12.0
   path_provider: ^2.1.2
-  shared_preferences: ^2.2.2
-  path: ^1.8.3
-  archive: ^3.3.3
-  share_plus: ^7.2.1
-  webview_flutter: ^4.13.0
-  firebase_core: ^2.0.0
-  cloud_firestore: ^4.0.0
-  firebase_storage: ^11.0.0
-  firebase_auth: ^4.0.0
-  signature: ^5.3.0
-  geolocator: ^11.0.0
-  geocoding: ^2.2.0
-  http: ^0.13.7
-  url_launcher: ^6.3.1
-  flutter_email_sender: ^7.0.0
-  qr_flutter: ^4.1.0
-  flutter_map: ^6.1.0
-  latlong2: ^0.9.0
-  image: ^4.0.17
-  fl_chart: ^0.64.0
-  csv: ^5.0.2
-  speech_to_text: ^6.3.0
-  flutter_tts: ^3.8.5
-  ffmpeg_kit_flutter: ^5.1.0
-  file_picker: ^6.1.1
-  hive: ^2.2.3
-  hive_flutter: ^1.1.0
-  connectivity_plus: ^5.0.2
-  firebase_messaging: ^14.6.5
-  flutter_local_notifications: ^17.1.2
-  google_fonts: ^6.1.0
+
+  # Firebase (only if needed — comment out if not using these yet)
+  firebase_core: ^2.25.0
+  firebase_storage: ^11.5.1
+  firebase_auth: ^4.15.0
+  firebase_messaging: ^14.7.6
 
 dev_dependencies:
   flutter_test:
@@ -55,10 +28,8 @@ dev_dependencies:
   flutter_lints: ^3.0.1
 
 flutter:
-
   uses-material-design: true
-
   assets:
     - assets/images/clearsky_logo.png
-    - assets/changelog.json
-
+fl_chart: ^0.64.0
+signature: ^5.4.1

@@ -1,102 +1,116 @@
-import 'dart:convert';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import '../models/saved_report.dart';
-import '../models/inspection_metadata.dart';
-import '../utils/export_utils.dart';
-import '../screens/message_thread_screen.dart';
-import '../services/client_activity_service.dart';
-import 'package:printing/printing.dart';
+import '../models/photo_entry.dart';
+import '../utils/export_utils.dart'; // Your export functions
+import '../widgets/clearsky_header.dart'; // Optional: logo + title widget
 
-class ClientReportScreen extends StatefulWidget {
-  final String reportId;
-  const ClientReportScreen({super.key, required this.reportId});
+class ClientReportScreen extends StatelessWidget {
+  final String clientName;
+  final String propertyAddress;
+  final List<PhotoEntry> photos;
+  final String summaryText;
+  final List<String> attachments; // file paths or URLs
 
-  @override
-  State<ClientReportScreen> createState() => _ClientReportScreenState();
-}
-
-class _ClientReportScreenState extends State<ClientReportScreen> {
-  late Future<SavedReport?> _futureReport;
-  @override
-  void initState() {
-    super.initState();
-    _futureReport = _load();
-  }
-
-  Future<SavedReport?> _load() async {
-    final doc = await FirebaseFirestore.instance.collection('reports').doc(widget.reportId).get();
-    if (!doc.exists) return null;
-    return SavedReport.fromMap(doc.data()!, doc.id);
-  }
-
-  Widget _buildBody(SavedReport report) {
-    final meta = InspectionMetadata.fromMap(report.inspectionMetadata);
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('Roof Inspection Report', style: Theme.of(context).textTheme.headline6),
-          const SizedBox(height: 8),
-          Text(meta.propertyAddress),
-          const SizedBox(height: 4),
-          Text('Client: ${meta.clientName}'),
-          const SizedBox(height: 12),
-          if (report.summaryText != null && report.summaryText!.isNotEmpty) ...[
-            const Text('Summary of Findings', style: TextStyle(fontWeight: FontWeight.bold)),
-            Text(report.summaryText!),
-            const SizedBox(height: 12),
-          ],
-          ElevatedButton(
-            onPressed: () async {
-              await ClientActivityService().log('view_pdf', reportId: report.id);
-              final pdf = await generatePdf(report);
-              await Printing.layoutPdf(onLayout: (_) => pdf);
-            },
-            child: const Text('View PDF'),
-          ),
-          const SizedBox(height: 8),
-          ElevatedButton(
-            onPressed: () async {
-              await ClientActivityService().log('download_zip', reportId: report.id);
-              await exportFinalZip(report);
-            },
-            child: const Text('Download ZIP'),
-          ),
-          const SizedBox(height: 8),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => MessageThreadScreen(reportId: report.id),
-                ),
-              );
-            },
-            child: const Text('Open Messages'),
-          ),
-        ],
-      ),
-    );
-  }
+  const ClientReportScreen({
+    super.key,
+    required this.clientName,
+    required this.propertyAddress,
+    required this.photos,
+    required this.summaryText,
+    this.attachments = const [],
+  });
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Report')),
-      body: FutureBuilder<SavedReport?>(
-        future: _futureReport,
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            }
-            return const Center(child: Text('Report not found'));
-          }
-          return _buildBody(snapshot.data!);
-        },
+      appBar: AppBar(
+        title: const Text('Inspection Report'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.picture_as_pdf),
+            onPressed: () async {
+              await generateAndDownloadPdf(photos, summaryText);
+            },
+            tooltip: 'Download PDF',
+          ),
+          IconButton(
+            icon: const Icon(Icons.language),
+            onPressed: () async {
+              await generateAndDownloadHtml(photos, summaryText);
+            },
+            tooltip: 'Download HTML',
+          ),
+        ],
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const ClearSkyHeader(), // Optional: your branded widget
+            const SizedBox(height: 12),
+            Text(
+              'Client: $clientName\nAddress: $propertyAddress',
+              style: Theme.of(context).textTheme.subtitle1,
+            ),
+            const SizedBox(height: 24),
+            const Text(
+              'Summary',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            Text(summaryText, style: const TextStyle(fontSize: 16)),
+            const SizedBox(height: 24),
+            const Text(
+              'Photos',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: photos.length,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 8,
+                mainAxisSpacing: 8,
+              ),
+              itemBuilder: (context, index) {
+                final photo = photos[index];
+                return Column(
+                  children: [
+                    Expanded(
+                      child: Image.network(photo.url, fit: BoxFit.cover),
+                    ),
+                    Text(
+                      photo.label,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(fontSize: 14),
+                    ),
+                  ],
+                );
+              },
+            ),
+            const SizedBox(height: 24),
+            if (attachments.isNotEmpty)
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Supporting Documents',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  for (final file in attachments)
+                    ListTile(
+                      leading: const Icon(Icons.attachment),
+                      title: Text(file.split('/').last),
+                      onTap: () {
+                        // Open link or viewer
+                      },
+                    ),
+                ],
+              ),
+          ],
+        ),
       ),
     );
   }

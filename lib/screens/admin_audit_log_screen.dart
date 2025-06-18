@@ -1,158 +1,68 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:csv/csv.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
-import '../models/audit_log_entry.dart';
-import '../services/audit_log_service.dart';
+class AuditLogEntry {
+  final DateTime timestamp;
+  final String user;
+  final String action;
+  final String target;
+  final String? extraInfo;
 
-class AdminAuditLogScreen extends StatefulWidget {
-  const AdminAuditLogScreen({super.key});
-
-  @override
-  State<AdminAuditLogScreen> createState() => _AdminAuditLogScreenState();
+  AuditLogEntry({
+    required this.timestamp,
+    required this.user,
+    required this.action,
+    required this.target,
+    this.extraInfo,
+  });
 }
 
-class _AdminAuditLogScreenState extends State<AdminAuditLogScreen> {
-  final _userController = TextEditingController();
-  final _actionController = TextEditingController();
-  final _targetController = TextEditingController();
-  DateTimeRange? _range;
-  List<AuditLogEntry> _logs = [];
-  bool _loading = true;
+class AdminAuditLogScreen extends StatelessWidget {
+  final List<AuditLogEntry> logs;
 
-  @override
-  void initState() {
-    super.initState();
-    _load();
-  }
-
-  Future<void> _pickRange() async {
-    final now = DateTime.now();
-    final range = await showDateRangePicker(
-      context: context,
-      firstDate: DateTime(now.year - 1),
-      lastDate: DateTime(now.year + 1),
-      initialDateRange: _range,
-    );
-    if (range != null) {
-      setState(() => _range = range);
-      _load();
-    }
-  }
-
-  Future<void> _load() async {
-    setState(() => _loading = true);
-    _logs = await AuditLogService().fetchLogs(
-      userId: _userController.text.trim().isEmpty
-          ? null
-          : _userController.text.trim(),
-      action: _actionController.text.trim().isEmpty
-          ? null
-          : _actionController.text.trim(),
-      targetId: _targetController.text.trim().isEmpty
-          ? null
-          : _targetController.text.trim(),
-      range: _range,
-    );
-    setState(() => _loading = false);
-  }
-
-  Future<void> _exportCsv() async {
-    final rows = [
-      ['userId', 'action', 'targetId', 'targetType', 'notes', 'timestamp']
-    ];
-    for (final l in _logs) {
-      rows.add([
-        l.userId,
-        l.action,
-        l.targetId ?? '',
-        l.targetType ?? '',
-        l.notes ?? '',
-        l.timestamp.toIso8601String()
-      ]);
-    }
-    final csv = const ListToCsvConverter().convert(rows);
-    await Clipboard.setData(ClipboardData(text: csv));
-    if (context.mounted) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('CSV copied to clipboard')));
-    }
-  }
+  const AdminAuditLogScreen({
+    super.key,
+    required this.logs,
+  });
 
   @override
   Widget build(BuildContext context) {
+    logs.sort((a, b) => b.timestamp.compareTo(a.timestamp)); // Most recent first
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Admin Audit Logs')),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _userController,
-                    decoration: const InputDecoration(labelText: 'User ID'),
-                    onChanged: (_) => _load(),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: TextField(
-                    controller: _actionController,
-                    decoration: const InputDecoration(labelText: 'Action'),
-                    onChanged: (_) => _load(),
-                  ),
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _targetController,
-                    decoration: const InputDecoration(labelText: 'Target ID'),
-                    onChanged: (_) => _load(),
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.date_range),
-                  tooltip: 'Select Date Range',
-                  onPressed: _pickRange,
-                ),
-                IconButton(
-                  icon: const Icon(Icons.download),
-                  tooltip: 'Export CSV',
-                  onPressed: _exportCsv,
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Expanded(
-              child: _loading
-                  ? const Center(child: CircularProgressIndicator())
-                  : ListView.builder(
-                      itemCount: _logs.length,
-                      itemBuilder: (c, i) {
-                        final log = _logs[i];
-                        final isSensitive = log.action.contains('delete') ||
-                            log.action.contains('login') ||
-                            log.action.contains('export');
-                        return ListTile(
-                          leading: isSensitive
-                              ? const Icon(Icons.warning, color: Colors.red)
-                              : null,
-                          title: Text(log.action),
-                          subtitle: Text(
-                              '${log.userId} • ${log.targetId ?? ''} • ${log.timestamp.toLocal()}'),
-                        );
-                      },
+      appBar: AppBar(title: const Text('Audit Log')),
+      body: logs.isEmpty
+          ? const Center(child: Text('No audit entries found.'))
+          : ListView.builder(
+              padding: const EdgeInsets.all(12),
+              itemCount: logs.length,
+              itemBuilder: (context, index) {
+                final log = logs[index];
+                return Card(
+                  child: ListTile(
+                    title: Text('${log.user} ${log.action}'),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Target: ${log.target}'),
+                        if (log.extraInfo != null)
+                          Text('Details: ${log.extraInfo!}', style: const TextStyle(fontSize: 13)),
+                        Text(
+                          _formatTime(log.timestamp),
+                          style: const TextStyle(color: Colors.grey, fontSize: 12),
+                        ),
+                      ],
                     ),
+                    leading: const Icon(Icons.history),
+                  ),
+                );
+              },
             ),
-          ],
-        ),
-      ),
     );
+  }
+
+  String _formatTime(DateTime dt) {
+    final date = '${dt.year}-${dt.month.toString().padLeft(2, '0')}-${dt.day.toString().padLeft(2, '0')}';
+    final time = '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
+    return '$date $time';
   }
 }

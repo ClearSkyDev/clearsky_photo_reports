@@ -1,14 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import '../models/saved_report.dart';
-import '../models/invoice.dart';
-import '../services/client_activity_service.dart';
-import '../utils/export_utils.dart';
-import '../screens/message_thread_screen.dart';
-import '../services/invoice_service.dart';
-import 'client_report_screen.dart';
-import 'package:url_launcher/url_launcher.dart';
+import '../models/inspection_report.dart';
+import 'report_preview_screen.dart';
 
 class ClientDashboardScreen extends StatefulWidget {
   const ClientDashboardScreen({super.key});
@@ -18,185 +10,147 @@ class ClientDashboardScreen extends StatefulWidget {
 }
 
 class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
-  String get _email => FirebaseAuth.instance.currentUser?.email ?? '';
+  final List<InspectionReport> _allReports = [
+    InspectionReport(
+      jobName: 'Johnson Residence',
+      address: '123 Main St, Dallas TX',
+      date: DateTime(2025, 6, 15),
+      synced: true,
+    ),
+    InspectionReport(
+      jobName: 'Smith Roof Claim',
+      address: '44 Elm St, Austin TX',
+      date: DateTime(2025, 6, 10),
+      synced: false,
+    ),
+  ];
 
-  Future<List<SavedReport>> _loadReports() async {
-    final snap = await FirebaseFirestore.instance
-        .collection('reports')
-        .where('clientEmail', isEqualTo: _email)
-        .where('isFinalized', isEqualTo: true)
-        .get();
-    return snap.docs.map((d) => SavedReport.fromMap(d.data(), d.id)).toList();
+  String _searchQuery = '';
+  String _filter = 'All';
+
+  List<InspectionReport> get _filteredReports {
+    return _allReports.where((report) {
+      final matchesSearch = report.jobName.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+          report.address.toLowerCase().contains(_searchQuery.toLowerCase());
+
+      final matchesFilter = _filter == 'All' ||
+          (_filter == 'Synced' && report.synced) ||
+          (_filter == 'Unsynced' && !report.synced);
+
+      return matchesSearch && matchesFilter;
+    }).toList();
   }
 
-  Future<List<Invoice>> _loadInvoices() async {
-    final snap = await FirebaseFirestore.instance
-        .collection('invoices')
-        .where('clientEmail', isEqualTo: _email)
-        .get();
-    return snap.docs.map((d) => Invoice.fromMap(d.data(), d.id)).toList();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 4,
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Client Portal'),
-          bottom: const TabBar(
-            tabs: [
-              Tab(text: 'Reports'),
-              Tab(text: 'Messages'),
-              Tab(text: 'Invoices'),
-              Tab(text: 'Settings'),
-            ],
-          ),
-        ),
-        body: TabBarView(
-          children: [
-            _buildReports(),
-            _buildMessages(),
-            _buildInvoices(),
-            _buildSettings(),
-          ],
-        ),
+  void _openReport(InspectionReport report) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ReportPreviewScreen(photos: report.photos),
       ),
     );
   }
 
-  Widget _buildReports() {
-    return FutureBuilder<List<SavedReport>>(
-      future: _loadReports(),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return const Center(child: CircularProgressIndicator());
-        }
-        final reports = snapshot.data!;
-        if (reports.isEmpty) {
-          return const Center(child: Text('No reports'));
-        }
-        return ListView.builder(
-          itemCount: reports.length,
-          itemBuilder: (c, i) {
-            final r = reports[i];
-            return Card(
-              child: ListTile(
-                title: Text(r.inspectionMetadata['propertyAddress'] ?? ''),
-                subtitle: Text(r.inspectionMetadata['clientName'] ?? ''),
-                trailing: IconButton(
-                  icon: const Icon(Icons.download),
-                  tooltip: 'Download',
-                  onPressed: () async {
-                    await ClientActivityService().log('download_zip', reportId: r.id);
-                    await exportFinalZip(r);
-                  },
-                ),
-                onTap: () async {
-                  await ClientActivityService().log('view_report', reportId: r.id);
-                  if (!mounted) return;
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => ClientReportScreen(reportId: r.id),
-                    ),
-                  );
-                },
-              ),
-            );
-          },
-        );
-      },
+  void _deleteReport(int index) {
+    setState(() {
+      _allReports.removeAt(index);
+    });
+  }
+
+  void _syncReport(InspectionReport report) {
+    setState(() {
+      report.synced = true;
+    });
+  }
+
+  void _createNewInspection() {
+    // TODO: Navigate to inspection setup screen
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('New Inspection button tapped')),
     );
   }
 
-  Widget _buildMessages() {
-    return FutureBuilder<List<SavedReport>>(
-      future: _loadReports(),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return const Center(child: CircularProgressIndicator());
-        }
-        final reports = snapshot.data!;
-        if (reports.isEmpty) {
-          return const Center(child: Text('No messages'));
-        }
-        return ListView(
-          children: [
-            for (final r in reports)
-              Card(
-                child: ListTile(
-                  title: Text(r.inspectionMetadata['propertyAddress'] ?? ''),
-                  onTap: () async {
-                    await ClientActivityService().log('open_thread', reportId: r.id);
-                    if (!mounted) return;
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => MessageThreadScreen(reportId: r.id),
-                      ),
-                    );
-                  },
-                ),
-              )
-          ],
-        );
-      },
-    );
-  }
-
-  Widget _buildInvoices() {
-    return FutureBuilder<List<Invoice>>(
-      future: _loadInvoices(),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return const Center(child: CircularProgressIndicator());
-        }
-        final invoices = snapshot.data!;
-        if (invoices.isEmpty) {
-          return const Center(child: Text('No invoices'));
-        }
-        return ListView.builder(
-          itemCount: invoices.length,
-          itemBuilder: (c, i) {
-            final inv = invoices[i];
-            return Card(
-              child: ListTile(
-                title: Text(inv.clientName),
-                subtitle: Text(inv.dueDate.toLocal().toString().split(' ')[0]),
-                trailing: inv.paymentUrl != null
-                    ? TextButton(
-                        onPressed: () async {
-                          await ClientActivityService().log('pay_invoice', reportId: inv.reportId);
-                          launchUrl(Uri.parse(inv.paymentUrl!));
-                        },
-                        child: const Text('Pay'),
-                      )
-                    : null,
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
-
-  Widget _buildSettings() {
-    final user = FirebaseAuth.instance.currentUser;
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          if (user != null) Text(user.email ?? ''),
-          const SizedBox(height: 8),
-          ElevatedButton(
-            onPressed: () async {
-              await ClientActivityService().log('sign_out');
-              await FirebaseAuth.instance.signOut();
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('My Inspections'),
+        actions: [
+          PopupMenuButton<String>(
+            onSelected: (value) {
+              setState(() => _filter = value);
             },
-            child: const Text('Sign Out'),
-          ),
+            itemBuilder: (context) => const [
+              PopupMenuItem(value: 'All', child: Text('All')),
+              PopupMenuItem(value: 'Synced', child: Text('Synced Only')),
+              PopupMenuItem(value: 'Unsynced', child: Text('Unsynced Only')),
+            ],
+            icon: const Icon(Icons.filter_list),
+          )
         ],
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(50),
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              onChanged: (value) => setState(() => _searchQuery = value),
+              decoration: InputDecoration(
+                hintText: 'Search by job name or address',
+                prefixIcon: const Icon(Icons.search),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                filled: true,
+                fillColor: Colors.white,
+              ),
+            ),
+          ),
+        ),
+      ),
+      body: _filteredReports.isEmpty
+          ? const Center(child: Text('No inspections found.'))
+          : ListView.builder(
+              itemCount: _filteredReports.length,
+              itemBuilder: (context, index) {
+                final report = _filteredReports[index];
+                return Card(
+                  margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  child: ListTile(
+                    title: Text(report.jobName),
+                    subtitle: Text(
+                      '${report.address}\n${report.date.toLocal().toString().split(' ')[0]}',
+                    ),
+                    isThreeLine: true,
+                    trailing: PopupMenuButton<String>(
+                      onSelected: (value) {
+                        switch (value) {
+                          case 'View':
+                            _openReport(report);
+                            break;
+                          case 'Delete':
+                            final i = _allReports.indexOf(report);
+                            _deleteReport(i);
+                            break;
+                          case 'Sync':
+                            _syncReport(report);
+                            break;
+                        }
+                      },
+                      itemBuilder: (context) => const [
+                        PopupMenuItem(value: 'View', child: Text('View Report')),
+                        PopupMenuItem(value: 'Sync', child: Text('Sync to Cloud')),
+                        PopupMenuItem(value: 'Delete', child: Text('Delete')),
+                      ],
+                    ),
+                    leading: Icon(
+                      report.synced ? Icons.cloud_done : Icons.cloud_upload,
+                      color: report.synced ? Colors.green : Colors.grey,
+                    ),
+                  ),
+                );
+              },
+            ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: _createNewInspection,
+        icon: const Icon(Icons.add),
+        label: const Text('New Inspection'),
       ),
     );
   }

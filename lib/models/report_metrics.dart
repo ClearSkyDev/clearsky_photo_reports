@@ -1,65 +1,67 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
 class ReportMetrics {
-  final String id;
-  final String inspectorId;
+  final String reportId;
+  final int totalPhotos;
+  final int annotatedPhotos;
+  final int labeledPhotos;
+  final int autoLabeledPhotos;
+  final int customLabeledPhotos;
+  final int checklistItemsCompleted;
+  final Duration inspectionDuration;
+  final bool wasOffline;
+  final bool exportedToPdf;
+  final bool exportedToHtml;
   final DateTime createdAt;
-  final DateTime? finalizedAt;
-  final int photoCount;
-  final String status; // draft or finalized
-  final String? zipCode;
-  final String? clientName;
-  final String? perilType;
-  final double damagePercent;
-  final double? invoiceAmount;
+  final DateTime lastUpdated;
 
   ReportMetrics({
-    required this.id,
-    required this.inspectorId,
+    required this.reportId,
+    required this.totalPhotos,
+    required this.annotatedPhotos,
+    required this.labeledPhotos,
+    required this.autoLabeledPhotos,
+    required this.customLabeledPhotos,
+    required this.checklistItemsCompleted,
+    required this.inspectionDuration,
+    required this.wasOffline,
+    required this.exportedToPdf,
+    required this.exportedToHtml,
     required this.createdAt,
-    this.finalizedAt,
-    required this.photoCount,
-    required this.status,
-    this.zipCode,
-    this.clientName,
-    this.perilType,
-    this.damagePercent = 0,
-    this.invoiceAmount,
+    required this.lastUpdated,
   });
 
-  Map<String, dynamic> toMap() => {
-        'inspectorId': inspectorId,
-        'createdAt': createdAt.millisecondsSinceEpoch,
-        if (finalizedAt != null)
-          'finalizedAt': finalizedAt!.millisecondsSinceEpoch,
-        'photoCount': photoCount,
-        'status': status,
-        if (zipCode != null) 'zipCode': zipCode,
-        if (clientName != null) 'clientName': clientName,
-        if (perilType != null) 'perilType': perilType,
-        'damagePercent': damagePercent,
-        if (invoiceAmount != null) 'invoiceAmount': invoiceAmount,
-      };
+  Map<String, dynamic> toMap() {
+    return {
+      'reportId': reportId,
+      'totalPhotos': totalPhotos,
+      'annotatedPhotos': annotatedPhotos,
+      'labeledPhotos': labeledPhotos,
+      'autoLabeledPhotos': autoLabeledPhotos,
+      'customLabeledPhotos': customLabeledPhotos,
+      'checklistItemsCompleted': checklistItemsCompleted,
+      'inspectionDuration': inspectionDuration.inSeconds,
+      'wasOffline': wasOffline,
+      'exportedToPdf': exportedToPdf,
+      'exportedToHtml': exportedToHtml,
+      'createdAt': createdAt.toIso8601String(),
+      'lastUpdated': lastUpdated.toIso8601String(),
+    };
+  }
 
-  factory ReportMetrics.fromMap(String id, Map<String, dynamic> map) {
+  factory ReportMetrics.fromMap(Map<String, dynamic> map) {
     return ReportMetrics(
-      id: id,
-      inspectorId: map['inspectorId'] as String? ?? '',
-      createdAt: map['createdAt'] is Timestamp
-          ? (map['createdAt'] as Timestamp).toDate()
-          : DateTime.fromMillisecondsSinceEpoch(map['createdAt'] ?? 0),
-      finalizedAt: map['finalizedAt'] is Timestamp
-          ? (map['finalizedAt'] as Timestamp).toDate()
-          : map['finalizedAt'] != null
-              ? DateTime.fromMillisecondsSinceEpoch(map['finalizedAt'])
-              : null,
-      photoCount: map['photoCount'] as int? ?? 0,
-      status: map['status'] as String? ?? 'draft',
-      zipCode: map['zipCode'] as String?,
-      clientName: map['clientName'] as String?,
-      perilType: map['perilType'] as String?,
-      damagePercent: (map['damagePercent'] as num?)?.toDouble() ?? 0,
-      invoiceAmount: (map['invoiceAmount'] as num?)?.toDouble(),
+      reportId: map['reportId'],
+      totalPhotos: map['totalPhotos'] ?? 0,
+      annotatedPhotos: map['annotatedPhotos'] ?? 0,
+      labeledPhotos: map['labeledPhotos'] ?? 0,
+      autoLabeledPhotos: map['autoLabeledPhotos'] ?? 0,
+      customLabeledPhotos: map['customLabeledPhotos'] ?? 0,
+      checklistItemsCompleted: map['checklistItemsCompleted'] ?? 0,
+      inspectionDuration: Duration(seconds: map['inspectionDuration'] ?? 0),
+      wasOffline: map['wasOffline'] ?? false,
+      exportedToPdf: map['exportedToPdf'] ?? false,
+      exportedToHtml: map['exportedToHtml'] ?? false,
+      createdAt: DateTime.parse(map['createdAt']),
+      lastUpdated: DateTime.parse(map['lastUpdated']),
     );
   }
 }
