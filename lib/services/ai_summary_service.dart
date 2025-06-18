@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 import '../models/saved_report.dart';
+import '../models/checklist_template.dart' show InspectorReportRole;
 
 class AiSummary {
   final String adjuster;
@@ -36,23 +37,26 @@ class AiSummaryService {
       }
     }
 
-    final roleName =
-        report.inspectionMetadata['inspectorRole'] as String? ?? 'ladder_assist';
+    final roleList = (report.inspectionMetadata['inspectorRoles'] as List?) ??
+        ['ladder_assist'];
+    final roles = roleList
+        .map((e) => InspectorReportRole.values.byName(e as String))
+        .toSet();
 
     String prompt;
-    if (roleName == 'ladder_assist') {
+    if (roles.contains(InspectorReportRole.ladder_assist) && roles.length == 1) {
       prompt =
           'You are a third-party roof inspector. Your job is to document findings only.\n'
           'Do not mention recommendations, causes, or coverage.\n'
           'Simply describe the condition and any observable damage.\n\n'
           'Here are the findings: ${jsonEncode(sectionData)}';
-    } else if (roleName == 'adjuster') {
+    } else if (roles.contains(InspectorReportRole.adjuster) && roles.length == 1) {
       prompt =
           'You are an insurance adjuster. Based on the observed damage and inspection findings, '\n'
           'summarize the condition and note whether the damage is consistent with covered perils (like hail/wind).\n'
           'Lean into claim decision logic, but remain factual.\n\n'
           'Findings: ${jsonEncode(sectionData)}';
-    } else if (roleName == 'contractor') {
+    } else if (roles.contains(InspectorReportRole.contractor) && roles.length == 1) {
       prompt =
           'You are a roofing contractor writing a report for a homeowner or claims submission.\n'
           'Use your summary to justify why repair or replacement may be needed based on the damage observed.\n\n'

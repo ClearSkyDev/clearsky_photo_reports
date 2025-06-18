@@ -1,11 +1,18 @@
 import 'saved_report.dart' show ReportPhotoEntry;
+import 'interior_room.dart';
 
 class InspectedStructure {
   final String name;
   final String? address;
   final Map<String, List<ReportPhotoEntry>> sectionPhotos;
+  final List<InteriorRoom> interiorRooms;
 
-  InspectedStructure({required this.name, this.address, required this.sectionPhotos});
+  InspectedStructure({
+    required this.name,
+    this.address,
+    required this.sectionPhotos,
+    this.interiorRooms = const [],
+  });
 
   Map<String, dynamic> toMap() {
     return {
@@ -15,6 +22,8 @@ class InspectedStructure {
         for (var entry in sectionPhotos.entries)
           entry.key: entry.value.map((p) => p.toMap()).toList(),
       },
+      if (interiorRooms.isNotEmpty)
+        'interiorRooms': interiorRooms.map((r) => r.toMap()).toList(),
     };
   }
 
@@ -27,10 +36,16 @@ class InspectedStructure {
           .toList();
       sections[key] = list;
     });
+    final rooms = (map['interiorRooms'] as List?)
+            ?.map((e) =>
+                InteriorRoom.fromMap(Map<String, dynamic>.from(e)))
+            .toList() ??
+        [];
     return InspectedStructure(
       name: map['name'] as String? ?? '',
       address: map['address'] as String?,
       sectionPhotos: sections,
+      interiorRooms: rooms,
     );
   }
 }

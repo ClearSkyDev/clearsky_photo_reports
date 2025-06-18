@@ -73,7 +73,7 @@ class _InspectorDashboardScreenState extends State<InspectorDashboardScreen> {
           return false;
         }
       }
-      if (_roleFilter != null && meta.inspectorRole != _roleFilter) return false;
+      if (_roleFilter != null && !meta.inspectorRoles.contains(_roleFilter)) return false;
       if (_statusFilter == 'draft' && r.isFinalized) return false;
       if (_statusFilter == 'final' && !r.isFinalized) return false;
       if (_statusFilter == 'shared' && r.publicViewLink == null) return false;

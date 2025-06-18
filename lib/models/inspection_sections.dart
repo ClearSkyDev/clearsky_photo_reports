@@ -13,6 +13,7 @@ const List<String> kInspectionSections = [
   'Roof Slopes - Right',
   'Roof Slopes - Back',
   'Roof Slopes - Left',
+  'Interior Damage',
 ];
 
 List<String> sectionsForType(InspectionType type) {

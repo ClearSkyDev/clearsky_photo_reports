@@ -5,9 +5,9 @@ import '../models/checklist_template.dart';
 /// Adjusters see the raw damage type label. Contractors and
 /// third-party inspectors see "Evidence of <Type> Damage". The word
 /// "Damage" is never shown alone.
-String formatDamageLabel(String damageType, InspectorReportRole role) {
+String formatDamageLabel(String damageType, Set<InspectorReportRole> roles) {
   if (damageType.isEmpty || damageType == 'Unknown') return '';
-  if (role == InspectorReportRole.adjuster) {
+  if (roles.contains(InspectorReportRole.adjuster)) {
     return damageType;
   }
   var base = damageType

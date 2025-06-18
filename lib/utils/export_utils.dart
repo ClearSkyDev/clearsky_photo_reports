@@ -397,7 +397,8 @@ Future<String> _generateHtml(SavedReport report) async {
   buffer.writeln('<p><strong>Insurance Carrier:</strong> ${meta.insuranceCarrier}</p>');
   buffer.writeln('<p><strong>Peril Type:</strong> ${meta.perilType.name}</p>');
   buffer.writeln('<p><strong>Inspection Type:</strong> ${meta.inspectionType.name}</p>');
-  buffer.writeln('<p><strong>Inspector Role:</strong> ${meta.inspectorRole.name.replaceAll('_', ' ')}</p>');
+  final roleText = meta.inspectorRoles.map((e) => e.name.replaceAll('_', ' ')).join(', ');
+  buffer.writeln('<p><strong>Inspector Role:</strong> $roleText</p>');
   buffer.writeln('<p><strong>Inspector Name:</strong> ${meta.inspectorName}</p>');
   final aiStatus = report.aiSummary?.status;
   final showSummary =
@@ -509,7 +510,7 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
     for (final p in photos) {
       if (p.note.isNotEmpty) issues.add(p.note);
       if (p.damageType.isNotEmpty && p.damageType != 'Unknown') {
-        issues.add(formatDamageLabel(p.damageType, meta.inspectorRole));
+        issues.add(formatDamageLabel(p.damageType, meta.inspectorRoles));
       }
     }
     return issues.toList();
@@ -523,7 +524,8 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
           if (!await file.exists()) continue;
           final bytes = await file.readAsBytes();
           final label = photo.label.isNotEmpty ? photo.label : 'Unlabeled';
-          final damage = formatDamageLabel(photo.damageType, meta.inspectorRole);
+          final damage =
+              formatDamageLabel(photo.damageType, meta.inspectorRoles);
           final caption = damage.isNotEmpty ? '$label - $damage' : label;
           items.add(
             pw.Container(
@@ -660,6 +662,33 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
         widgets.add(await buildWrap(photos));
         widgets.add(pw.SizedBox(height: 20));
       }
+
+      if (struct.interiorRooms.isNotEmpty) {
+        widgets.add(_pdfSectionHeader('Interior Damage'));
+        for (final room in struct.interiorRooms) {
+          final photos = room.photos;
+          if (photos.isEmpty) continue;
+          widgets.add(_pdfSectionHeader(room.name));
+          if (room.summary.isNotEmpty) {
+            widgets.add(pw.Text(room.summary));
+            widgets.add(pw.SizedBox(height: 8));
+          }
+          if (room.checklist.isNotEmpty) {
+            widgets.add(pw.Column(
+                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                children: [
+                  pw.Text('Checklist:',
+                      style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                  ...room.checklist.entries
+                      .where((e) => e.value)
+                      .map((e) => pw.Bullet(text: e.key)),
+                ]));
+            widgets.add(pw.SizedBox(height: 8));
+          }
+          widgets.add(await buildWrap(photos));
+          widgets.add(pw.SizedBox(height: 20));
+        }
+      }
     }
     return widgets;
   }
@@ -691,7 +720,7 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
                       color: PdfColor.fromInt(theme.primaryColor))),
               pw.SizedBox(height: 10),
               pw.Text(
-                  meta.inspectorRole == InspectorReportRole.adjuster
+                  meta.inspectorRoles.contains(InspectorReportRole.adjuster)
                       ? 'Prepared from Adjuster Perspective'
                       : 'Prepared by: Third-Party Inspector',
                   style: pw.TextStyle(
@@ -704,7 +733,7 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
               pw.Text('Insurance Carrier: ${meta.insuranceCarrier}'),
               pw.Text('Peril Type: ${meta.perilType.name}'),
               pw.Text('Inspection Type: ${meta.inspectionType.name}'),
-              pw.Text('Inspector Role: ${meta.inspectorRole.name.replaceAll('_', ' ')}'),
+              pw.Text('Inspector Role: ${meta.inspectorRoles.map((e) => e.name.replaceAll('_', ' ')).join(', ')}'),
               pw.Text('Inspector Name: ${meta.inspectorName}'),
               pw.SizedBox(height: 20),
               if ((aiStatus == 'approved' || aiStatus == 'edited') &&
@@ -782,7 +811,7 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
           pw.Text('Insurance Carrier: ${meta.insuranceCarrier}'),
           pw.Text('Peril Type: ${meta.perilType.name}'),
           pw.Text('Inspection Type: ${meta.inspectionType.name}'),
-          pw.Text('Inspector Role: ${meta.inspectorRole.name.replaceAll('_', ' ')}'),
+          pw.Text('Inspector Role: ${meta.inspectorRoles.map((e) => e.name.replaceAll('_', ' ')).join(', ')}'),
           pw.Text('Inspector Name: ${meta.inspectorName}'),
           pw.SizedBox(height: 20),
           ...widgets,

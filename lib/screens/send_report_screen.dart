@@ -236,7 +236,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
       'insuranceCarrier': widget.metadata.insuranceCarrier,
       'perilType': widget.metadata.perilType.name,
       'inspectionType': widget.metadata.inspectionType.name,
-      'inspectorRole': widget.metadata.inspectorRole.name,
+      'inspectorRoles': widget.metadata.inspectorRoles.map((e) => e.name).toList(),
       if (profile?.name != null)
         'inspectorName': profile!.name
       else 'inspectorName': widget.metadata.inspectorName,
@@ -468,7 +468,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
       'insuranceCarrier': widget.metadata.insuranceCarrier,
       'perilType': widget.metadata.perilType.name,
       'inspectionType': widget.metadata.inspectionType.name,
-      'inspectorRole': widget.metadata.inspectorRole.name,
+      'inspectorRoles': widget.metadata.inspectorRoles.map((e) => e.name).toList(),
       if (profile?.name != null)
         'inspectorName': profile!.name
       else 'inspectorName': widget.metadata.inspectorName,
@@ -628,7 +628,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
       'insuranceCarrier': widget.metadata.insuranceCarrier,
       'perilType': widget.metadata.perilType.name,
       'inspectionType': widget.metadata.inspectionType.name,
-      'inspectorRole': widget.metadata.inspectorRole.name,
+      'inspectorRoles': widget.metadata.inspectorRoles.map((e) => e.name).toList(),
       'inspectorName': widget.metadata.inspectorName,
       if (widget.metadata.reportId != null)
         'reportId': widget.metadata.reportId,

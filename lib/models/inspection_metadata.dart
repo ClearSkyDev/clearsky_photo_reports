@@ -9,7 +9,7 @@ class InspectionMetadata {
   PerilType perilType;
   InspectionType inspectionType;
   String? inspectorName;
-  InspectorReportRole inspectorRole;
+  Set<InspectorReportRole> inspectorRoles;
   String? reportId;
   String? weatherNotes;
   String? partnerCode;
@@ -22,11 +22,11 @@ class InspectionMetadata {
     required this.perilType,
     required this.inspectionType,
     this.inspectorName,
-    required this.inspectorRole,
+    required Set<InspectorReportRole> inspectorRoles,
     this.reportId,
     this.weatherNotes,
     this.partnerCode,
-  });
+  }) : inspectorRoles = inspectorRoles;
 
   // Convert to Map (for saving to JSON, Firestore, etc.)
   Map<String, dynamic> toMap() {
@@ -35,7 +35,7 @@ class InspectionMetadata {
       'propertyAddress': propertyAddress,
       'inspectionDate': inspectionDate.toIso8601String(),
       if (inspectorName != null) 'inspectorName': inspectorName,
-      'inspectorRole': inspectorRole.name,
+      'inspectorRoles': inspectorRoles.map((e) => e.name).toList(),
       if (insuranceCarrier != null) 'insuranceCarrier': insuranceCarrier,
       'perilType': perilType.name,
       'inspectionType': inspectionType.name,
@@ -47,6 +47,13 @@ class InspectionMetadata {
 
   // Load from Map
   factory InspectionMetadata.fromMap(Map<String, dynamic> map) {
+    final roles = (map['inspectorRoles'] as List?)
+            ?.map((e) => InspectorReportRole.values.byName(e))
+            .toSet() ??
+        {
+          InspectorReportRole
+              .ladder_assist,
+        };
     return InspectionMetadata(
       clientName: map['clientName'] ?? '',
       propertyAddress: map['propertyAddress'] ?? '',
@@ -56,8 +63,7 @@ class InspectionMetadata {
       inspectionType:
           InspectionType.values.byName(map['inspectionType'] ?? 'residentialRoof'),
       inspectorName: map['inspectorName'],
-      inspectorRole:
-          InspectorReportRole.values.byName(map['inspectorRole'] ?? 'ladder_assist'),
+      inspectorRoles: roles,
       reportId: map['reportId'],
       weatherNotes: map['weatherNotes'],
       partnerCode: map['partnerCode'],

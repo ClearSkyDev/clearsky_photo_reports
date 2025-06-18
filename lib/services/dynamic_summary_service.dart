@@ -12,11 +12,11 @@ import 'ai_summary_service.dart';
 class DynamicSummaryService {
   DynamicSummaryService({
     required this.aiService,
-    this.role = InspectorReportRole.ladder_assist,
-  });
+    Set<InspectorReportRole>? role,
+  }) : role = role ?? {InspectorReportRole.ladder_assist};
 
   final AiSummaryService aiService;
-  InspectorReportRole role;
+  Set<InspectorReportRole> role;
 
   final _controller = StreamController<String>.broadcast();
 
@@ -56,7 +56,7 @@ class DynamicSummaryService {
     final subReport = SavedReport(
       inspectionMetadata: {
         ...report.inspectionMetadata,
-        'inspectorRole': role.name,
+        'inspectorRoles': role.map((e) => e.name).toList(),
       },
       structures: [
         InspectedStructure(

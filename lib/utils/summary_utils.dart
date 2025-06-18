@@ -70,6 +70,22 @@ Map<String, String> generateSectionSummaries(SavedReport report) {
       summaries[key] =
           '${photos.length} photos collected. $damageText';
     }
+    for (final room in struct.interiorRooms) {
+      final photos = room.photos;
+      if (photos.isEmpty) continue;
+      final damages = <String>{};
+      for (final photo in photos) {
+        if (photo.damageType.isNotEmpty && photo.damageType != 'Unknown') {
+          damages.add(photo.damageType);
+        }
+      }
+      final damageText = damages.isNotEmpty
+          ? 'Damage types observed: ${_listSentence(damages)}.'
+          : 'No notable damage found.';
+      final key = '${struct.name} - Interior - ${room.name}';
+      summaries[key] =
+          '${photos.length} photos collected. $damageText';
+    }
   }
   return summaries;
 }
