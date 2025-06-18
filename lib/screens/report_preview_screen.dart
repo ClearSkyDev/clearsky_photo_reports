@@ -74,6 +74,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
   late final TextEditingController _adjusterSummaryController;
   late final TextEditingController _homeownerSummaryController;
   late final TextEditingController _jobCostController;
+  late final TextEditingController _titleController;
   bool _editingSummaries = true;
   bool _loadingSummary = false;
   AiSummaryReview? _aiSummary;
@@ -95,6 +96,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
     _homeownerSummaryController = TextEditingController();
     _jobCostController = TextEditingController(
         text: widget.savedReport?.jobCost ?? '');
+    _titleController = TextEditingController(text: _defaultReportTitle());
     _aiSummary = widget.savedReport?.aiSummary;
     if (_aiSummary != null) {
       _adjusterSummaryController.text = _aiSummary!.content;
@@ -134,8 +136,17 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
     _adjusterSummaryController.dispose();
     _homeownerSummaryController.dispose();
     _jobCostController.dispose();
+    _titleController.dispose();
     super.dispose();
   }
+
+  String _defaultReportTitle() {
+    final lastName = _metadata.clientName.trim().split(' ').last;
+    final date =
+        _metadata.inspectionDate.toLocal().toIso8601String().split('T')[0];
+    return '$lastName Roof - $date';
+  }
+
   String _metadataFileName(String ext) {
     String sanitize(String input) {
       return input
@@ -144,10 +155,9 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
           .replaceAll(RegExp(r'_+'), '_');
     }
 
-    final address = sanitize(_metadata.propertyAddress);
-    final date = sanitize(
-        _metadata.inspectionDate.toLocal().toIso8601String().split('T')[0]);
-    return '${address}_${date}_clearsky_report.$ext';
+    final title = sanitize(
+        _titleController.text.isNotEmpty ? _titleController.text : _defaultReportTitle());
+    return '$title.$ext';
   }
   void _updateLabel(int index, String value) {
     if (widget.photos == null) return;
@@ -1191,6 +1201,13 @@ ${_jobCostController.text}</p>');
                 ),
                 Text('Inspector Name: ${_metadata.inspectorName}'),
               ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: TextField(
+              controller: _titleController,
+              decoration: const InputDecoration(labelText: 'Report Title'),
             ),
           ),
           Padding(
