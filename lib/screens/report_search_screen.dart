@@ -96,7 +96,11 @@ class _ReportSearchScreenState extends State<ReportSearchScreen> {
                 ))
             .toList();
       });
-      structs.add(InspectedStructure(name: s.name, sectionPhotos: sections));
+      structs.add(InspectedStructure(
+        name: s.name,
+        sectionPhotos: sections,
+        slopeTestSquare: Map.from(s.slopeTestSquare),
+      ));
     }
     return ListTile(
       title: _highlight(meta.propertyAddress, q),

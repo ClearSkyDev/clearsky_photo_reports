@@ -72,7 +72,11 @@ class LocalReportStore {
         }
         map[entry.key] = list;
       }
-      updatedStructs.add(InspectedStructure(name: struct.name, sectionPhotos: map));
+      updatedStructs.add(InspectedStructure(
+        name: struct.name,
+        sectionPhotos: map,
+        slopeTestSquare: Map.from(struct.slopeTestSquare),
+      ));
     }
 
     final saved = SavedReport(

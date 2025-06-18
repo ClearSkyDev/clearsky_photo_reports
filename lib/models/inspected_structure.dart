@@ -5,14 +5,16 @@ class InspectedStructure {
   final String name;
   final String? address;
   final Map<String, List<ReportPhotoEntry>> sectionPhotos;
+  final Map<String, bool> slopeTestSquare;
   final List<InteriorRoom> interiorRooms;
 
   InspectedStructure({
     required this.name,
     this.address,
     required this.sectionPhotos,
+    Map<String, bool>? slopeTestSquare,
     this.interiorRooms = const [],
-  });
+  }) : slopeTestSquare = slopeTestSquare ?? const {};
 
   Map<String, dynamic> toMap() {
     return {
@@ -22,6 +24,7 @@ class InspectedStructure {
         for (var entry in sectionPhotos.entries)
           entry.key: entry.value.map((p) => p.toMap()).toList(),
       },
+      if (slopeTestSquare.isNotEmpty) 'slopeTestSquare': slopeTestSquare,
       if (interiorRooms.isNotEmpty)
         'interiorRooms': interiorRooms.map((r) => r.toMap()).toList(),
     };
@@ -41,10 +44,12 @@ class InspectedStructure {
                 InteriorRoom.fromMap(Map<String, dynamic>.from(e)))
             .toList() ??
         [];
+    final slopeFlags = Map<String, bool>.from(map['slopeTestSquare'] ?? {});
     return InspectedStructure(
       name: map['name'] as String? ?? '',
       address: map['address'] as String?,
       sectionPhotos: sections,
+      slopeTestSquare: slopeFlags,
       interiorRooms: rooms,
     );
   }

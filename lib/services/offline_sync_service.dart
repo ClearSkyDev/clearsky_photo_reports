@@ -131,7 +131,11 @@ class OfflineSyncService {
           sections[entry.key] = uploaded;
         }
       }
-      structs.add(InspectedStructure(name: struct.name, sectionPhotos: sections));
+      structs.add(InspectedStructure(
+        name: struct.name,
+        sectionPhotos: sections,
+        slopeTestSquare: Map.from(struct.slopeTestSquare),
+      ));
     }
 
     String? signatureUrl;
