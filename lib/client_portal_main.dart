@@ -23,7 +23,7 @@ class ClientPortalApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'ClearSky Client Portal',
-      theme: AppTheme.build(),
+      theme: AppTheme.lightTheme,
       home: const _AuthGate(),
     );
   }
