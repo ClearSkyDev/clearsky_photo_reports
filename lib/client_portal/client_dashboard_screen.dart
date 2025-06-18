@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/inspection_report.dart';
-import 'report_preview_screen.dart';
+import '../screens/report_preview_screen.dart';
 
 class ClientDashboardScreen extends StatefulWidget {
   const ClientDashboardScreen({super.key});
