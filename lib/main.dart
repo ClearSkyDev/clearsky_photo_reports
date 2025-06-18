@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
 import 'app_theme.dart';
+import 'services/theme_service.dart';
 import 'screens/home_screen.dart';
 import 'screens/photo_upload_screen.dart';
 import 'screens/report_preview_screen.dart';
@@ -25,6 +26,7 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  await ThemeService.instance.init();
 
   runApp(const ClearSkyApp());
 }
@@ -62,14 +64,19 @@ class ClearSkyApp extends StatelessWidget {
       '/clientPortal': (context) => const ClientPortalMain(),
     };
 
-    return MaterialApp(
-      title: 'ClearSky Photo Reports',
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
-      themeMode: ThemeMode.system,
-      initialRoute: '/',
-      routes: routes,
+    return AnimatedBuilder(
+      animation: ThemeService.instance,
+      builder: (context, _) {
+        return MaterialApp(
+          title: 'ClearSky Photo Reports',
+          debugShowCheckedModeBanner: false,
+          theme: ThemeService.instance.lightTheme,
+          darkTheme: AppTheme.darkTheme,
+          themeMode: ThemeService.instance.themeMode,
+          initialRoute: '/',
+          routes: routes,
+        );
+      },
     );
   }
 }
