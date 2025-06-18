@@ -18,6 +18,7 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:share_plus/share_plus.dart';
 import '../services/invoice_service.dart';
+import 'label_utils.dart';
 import '../utils/invoice_pdf.dart';
 
 import '../models/report_theme.dart';
@@ -503,27 +504,38 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
   }
   final pdf = pw.Document();
 
+  List<String> collectIssues(List<ReportPhotoEntry> photos) {
+    final issues = <String>{};
+    for (final p in photos) {
+      if (p.note.isNotEmpty) issues.add(p.note);
+      if (p.damageType.isNotEmpty && p.damageType != 'Unknown') {
+        issues.add(formatDamageLabel(p.damageType, meta.inspectorRole));
+      }
+    }
+    return issues.toList();
+  }
+
   Future<pw.Widget> buildWrap(List<ReportPhotoEntry> photos) async {
     final items = <pw.Widget>[];
-    for (final photo in photos) {
-      try {
-        final file = File(photo.photoUrl);
-        if (!await file.exists()) continue;
-        final bytes = await file.readAsBytes();
-        final label = photo.label.isNotEmpty ? photo.label : 'Unlabeled';
-        final damage =
-            photo.damageType.isNotEmpty ? photo.damageType : 'Unknown';
-        items.add(
-          pw.Container(
-            width: 150,
-            child: pw.Column(
-              children: [
-                pw.Image(pw.MemoryImage(bytes),
-                    width: 150, height: 150, fit: pw.BoxFit.cover),
-                pw.SizedBox(height: 4),
-                pw.Text('$label - $damage',
-                    textAlign: pw.TextAlign.center,
-                    style: const pw.TextStyle(fontSize: 12)),
+      for (final photo in photos) {
+        try {
+          final file = File(photo.photoUrl);
+          if (!await file.exists()) continue;
+          final bytes = await file.readAsBytes();
+          final label = photo.label.isNotEmpty ? photo.label : 'Unlabeled';
+          final damage = formatDamageLabel(photo.damageType, meta.inspectorRole);
+          final caption = damage.isNotEmpty ? '$label - $damage' : label;
+          items.add(
+            pw.Container(
+              width: 150,
+              child: pw.Column(
+                children: [
+                  pw.Image(pw.MemoryImage(bytes),
+                      width: 150, height: 150, fit: pw.BoxFit.cover),
+                  pw.SizedBox(height: 4),
+                  pw.Text(caption,
+                      textAlign: pw.TextAlign.center,
+                      style: const pw.TextStyle(fontSize: 12)),
                 pw.Text(
                     photo.timestamp?.toLocal().toString().split('.').first ?? '',
                     style: const pw.TextStyle(fontSize: 10)),
@@ -556,6 +568,19 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
   }
 
   Future<List<pw.Widget>> buildSections() async {
+    const establishing = ['Address Photo', 'Front of House'];
+    const ordered = [
+      'Front Elevation & Accessories',
+      'Right Elevation & Accessories',
+      'Back Elevation & Accessories',
+      'Left Elevation & Accessories',
+      'Roof Edge',
+      'Roof Slopes - Front',
+      'Roof Slopes - Right',
+      'Roof Slopes - Back',
+      'Roof Slopes - Left',
+    ];
+
     final widgets = <pw.Widget>[];
     for (int i = 0; i < report.structures.length; i++) {
       final struct = report.structures[i];
@@ -566,11 +591,72 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
         }
         widgets.add(pw.SizedBox(height: 10));
       }
-      for (final section in sectionsForType(meta.inspectionType)) {
+
+      final estPhotos = <ReportPhotoEntry>[];
+      for (final sec in establishing) {
+        estPhotos.addAll(struct.sectionPhotos[sec] ?? []);
+      }
+      if (estPhotos.isNotEmpty) {
+        widgets.add(_pdfSectionHeader('Establishing Shots'));
+        final issues = collectIssues(estPhotos);
+        if (issues.isNotEmpty) {
+          widgets.add(pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: [
+                pw.Text('Noted Issues:',
+                    style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                ...issues.map((e) => pw.Bullet(text: e)),
+              ]));
+          widgets.add(pw.SizedBox(height: 8));
+        }
+        widgets.add(await buildWrap(estPhotos));
+        widgets.add(pw.SizedBox(height: 20));
+      }
+
+      final otherSections = <String>{
+        ...ordered,
+        ...struct.sectionPhotos.keys
+      };
+
+      for (final section in ordered) {
+        if (!otherSections.contains(section)) continue;
         final photos = struct.sectionPhotos[section] ?? [];
         if (photos.isEmpty) continue;
-        widgets.add(_pdfSectionHeader(section));
-        widgets.add(pw.SizedBox(height: 8));
+        final label = section.replaceAll(' & Accessories', '');
+        widgets.add(_pdfSectionHeader(label));
+        final issues = collectIssues(photos);
+        if (issues.isNotEmpty) {
+          widgets.add(pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: [
+                pw.Text('Noted Issues:',
+                    style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                ...issues.map((e) => pw.Bullet(text: e)),
+              ]));
+          widgets.add(pw.SizedBox(height: 8));
+        }
+        widgets.add(await buildWrap(photos));
+        widgets.add(pw.SizedBox(height: 20));
+      }
+
+      for (final entry in struct.sectionPhotos.entries) {
+        if (ordered.contains(entry.key) || establishing.contains(entry.key)) {
+          continue;
+        }
+        final photos = entry.value;
+        if (photos.isEmpty) continue;
+        widgets.add(_pdfSectionHeader(entry.key));
+        final issues = collectIssues(photos);
+        if (issues.isNotEmpty) {
+          widgets.add(pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: [
+                pw.Text('Noted Issues:',
+                    style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                ...issues.map((e) => pw.Bullet(text: e)),
+              ]));
+          widgets.add(pw.SizedBox(height: 8));
+        }
         widgets.add(await buildWrap(photos));
         widgets.add(pw.SizedBox(height: 20));
       }
