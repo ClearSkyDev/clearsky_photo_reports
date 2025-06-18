@@ -111,6 +111,13 @@ or has been uploaded. Cloud sync can be disabled from the Report Settings screen
 via the *Enable Cloud Sync* toggle. When disabled, new reports remain on the
 device and the sync service ignores any drafts.
 
+## Export History
+
+Whenever a report is exported to PDF or HTML a local log entry is created using
+`shared_preferences`. The log records the report name, timestamp, export type
+and whether the export happened offline. The **Export History** screen lists the
+most recent exports for quick reference.
+
 ## Admin Audit Logs
 
 Administrators can review a history of actions such as logins, invoice updates and report changes. The **Audit Logs** screen provides search and filtering by user, action, date or target ID and exports the results to CSV for external analysis.
