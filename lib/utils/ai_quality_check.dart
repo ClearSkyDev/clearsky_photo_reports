@@ -69,7 +69,7 @@ Future<PhotoAuditResult> aiQualityCheck(SavedReport report) async {
               ))
           .toList();
     }
-    final missing = missingSections(meta.inspectorRole, map);
+    final missing = missingSections(meta.inspectorRoles, map);
     for (final section in missing) {
       issues.add(PhotoAuditIssue(
         structure: struct.name,

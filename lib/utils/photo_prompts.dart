@@ -19,35 +19,40 @@ const Map<InspectorReportRole, Map<String, int>> kRequiredPhotosByRole = {
 };
 
 List<String> missingSections(
-  InspectorReportRole role,
+  Set<InspectorReportRole> roles,
   Map<String, List<PhotoEntry>> sections,
 ) {
-  final req = kRequiredPhotosByRole[role];
-  if (req == null) return [];
-  final result = <String>[];
-  req.forEach((section, count) {
-    final taken = sections[section]?.length ?? 0;
-    if (taken < count) result.add(section);
-  });
-  return result;
+  final result = <String>{};
+  for (final role in roles) {
+    final req = kRequiredPhotosByRole[role];
+    if (req == null) continue;
+    req.forEach((section, count) {
+      final taken = sections[section]?.length ?? 0;
+      if (taken < count) result.add(section);
+    });
+  }
+  return result.toList();
 }
 
 String? nextRequiredSection(
-  InspectorReportRole role,
+  Set<InspectorReportRole> roles,
   Map<String, List<PhotoEntry>> sections,
 ) {
-  final missing = missingSections(role, sections);
+  final missing = missingSections(roles, sections);
   return missing.isNotEmpty ? missing.first : null;
 }
 
 int remainingCount(
-  InspectorReportRole role,
+  Set<InspectorReportRole> roles,
   String section,
   Map<String, List<PhotoEntry>> sections,
 ) {
-  final req = kRequiredPhotosByRole[role]?[section];
-  if (req == null) return 0;
+  int required = 0;
+  for (final role in roles) {
+    final req = kRequiredPhotosByRole[role]?[section];
+    if (req != null && req > required) required = req;
+  }
   final taken = sections[section]?.length ?? 0;
-  final remaining = req - taken;
+  final remaining = required - taken;
   return remaining > 0 ? remaining : 0;
 }

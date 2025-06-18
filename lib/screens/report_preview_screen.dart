@@ -77,7 +77,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
   bool _loadingSummary = false;
   AiSummaryReview? _aiSummary;
   Uint8List? _signature;
-  late InspectorReportRole _selectedRole;
+  late Set<InspectorReportRole> _selectedRole;
   String _template = 'legacy';
   bool _showGps = true;
   ReportTheme _theme = ReportTheme.defaultTheme;
@@ -88,7 +88,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
   void initState() {
     super.initState();
     _metadata = widget.metadata;
-    _selectedRole = _metadata.inspectorRole;
+    _selectedRole = Set.from(_metadata.inspectorRoles);
     _summaryController = TextEditingController(text: widget.summary ?? '');
     _adjusterSummaryController = TextEditingController();
     _homeownerSummaryController = TextEditingController();
@@ -241,7 +241,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
       'insuranceCarrier': _metadata.insuranceCarrier,
       'perilType': _metadata.perilType.name,
       'inspectionType': _metadata.inspectionType.name,
-      'inspectorRole': _metadata.inspectorRole.name,
+      'inspectorRoles': _metadata.inspectorRoles.map((e) => e.name).toList(),
       'inspectorName': _metadata.inspectorName,
     };
     final report = SavedReport(
@@ -272,7 +272,8 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
   }
 
   Future<void> _regenerateWithRole() async {
-    if (_selectedRole != _metadata.inspectorRole) {
+    if (_selectedRole.difference(_metadata.inspectorRoles).isNotEmpty ||
+        _metadata.inspectorRoles.difference(_selectedRole).isNotEmpty) {
       setState(() {
         _metadata = InspectionMetadata(
           clientName: _metadata.clientName,
@@ -282,7 +283,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
           perilType: _metadata.perilType,
           inspectionType: _metadata.inspectionType,
           inspectorName: _metadata.inspectorName,
-          inspectorRole: _selectedRole,
+          inspectorRoles: _selectedRole,
           reportId: _metadata.reportId,
           weatherNotes: _metadata.weatherNotes,
         );
@@ -318,7 +319,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
     buffer.writeln('<img src="$logo" alt="Logo" style="width:200px;">');
     buffer.writeln('<h1>Roof Inspection Report</h1>');
     final preparedLabel =
-        _metadata.inspectorRole == InspectorReportRole.adjuster
+        _metadata.inspectorRoles.contains(InspectorReportRole.adjuster)
             ? 'Prepared from Adjuster Perspective'
             : 'Prepared by: Third-Party Inspector';
     buffer.writeln(
@@ -331,7 +332,10 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
     buffer.writeln('<tr><td><strong>Insurance Carrier:</strong></td><td>${_metadata.insuranceCarrier}</td></tr>');
       buffer.writeln('<tr><td><strong>Peril Type:</strong></td><td>${_metadata.perilType.name}</td></tr>');
     buffer.writeln('<tr><td><strong>Inspection Type:</strong></td><td>${_metadata.inspectionType.name}</td></tr>');
-    buffer.writeln('<tr><td><strong>Inspector Role:</strong></td><td>${_metadata.inspectorRole.name.replaceAll('_', ' ')}</td></tr>');
+    final roleText = _metadata.inspectorRoles
+        .map((e) => e.name.replaceAll('_', ' '))
+        .join(', ');
+    buffer.writeln('<tr><td><strong>Inspector Role:</strong></td><td>$roleText</td></tr>');
     buffer.writeln('<tr><td><strong>Inspector Name:</strong></td><td>${_metadata.inspectorName}</td></tr>');
       if (_metadata.reportId != null) {
       buffer.writeln('<tr><td><strong>Report ID:</strong></td><td>${_metadata.reportId}</td></tr>');
@@ -433,7 +437,7 @@ ${_jobCostController.text}</p>');
           buffer.writeln('<div style="display:flex;flex-wrap:wrap;">');
           for (var photo in estPhotos) {
             final label = photo.label.isNotEmpty ? photo.label : 'Unlabeled';
-            final damage = formatDamageLabel(photo.damageType, _metadata.inspectorRole);
+            final damage = formatDamageLabel(photo.damageType, _metadata.inspectorRoles);
             final caption = damage.isNotEmpty ? '$label - $damage' : label;
             final containerClass = _template == 'side' ? 'class="photo"' : 'style="width:300px;margin:5px;text-align:center;"';
             buffer.writeln('<div $containerClass>');
@@ -472,7 +476,7 @@ ${_jobCostController.text}</p>');
           buffer.writeln('<div style="display:flex;flex-wrap:wrap;">');
           for (var photo in photos) {
             final labelText = photo.label.isNotEmpty ? photo.label : 'Unlabeled';
-            final damage = formatDamageLabel(photo.damageType, _metadata.inspectorRole);
+            final damage = formatDamageLabel(photo.damageType, _metadata.inspectorRoles);
             final caption = damage.isNotEmpty ? '$labelText - $damage' : labelText;
             final containerClass = _template == 'side' ? 'class="photo"' : 'style="width:300px;margin:5px;text-align:center;"';
             buffer.writeln('<div $containerClass>');
@@ -507,7 +511,7 @@ ${_jobCostController.text}</p>');
           buffer.writeln('<div style="display:flex;flex-wrap:wrap;">');
           for (var photo in photos) {
             final labelText = photo.label.isNotEmpty ? photo.label : 'Unlabeled';
-            final damage = formatDamageLabel(photo.damageType, _metadata.inspectorRole);
+            final damage = formatDamageLabel(photo.damageType, _metadata.inspectorRoles);
             final caption = damage.isNotEmpty ? '$labelText - $damage' : labelText;
             final containerClass = _template == 'side' ? 'class="photo"' : 'style="width:300px;margin:5px;text-align:center;"';
             buffer.writeln('<div $containerClass>');
@@ -635,7 +639,7 @@ ${_jobCostController.text}</p>');
       for (final p in photos) {
         if (p.note.isNotEmpty) issues.add(p.note);
         if (p.damageType.isNotEmpty && p.damageType != 'Unknown') {
-          issues.add(formatDamageLabel(p.damageType, _metadata.inspectorRole));
+          issues.add(formatDamageLabel(p.damageType, _metadata.inspectorRoles));
         }
       }
       return issues.toList();
@@ -649,7 +653,7 @@ ${_jobCostController.text}</p>');
         final bytes = imageData.buffer.asUint8List();
         final label = photo.label.isNotEmpty ? photo.label : 'Unlabeled';
         final damage =
-            formatDamageLabel(photo.damageType, _metadata.inspectorRole);
+            formatDamageLabel(photo.damageType, _metadata.inspectorRoles);
         final caption = damage.isNotEmpty ? '$label - $damage' : label;
 
         items.add(
@@ -822,7 +826,7 @@ ${_jobCostController.text}</p>');
                 ),
                 pw.SizedBox(height: 10),
                 pw.Text(
-                  _metadata.inspectorRole == InspectorReportRole.adjuster
+                  _metadata.inspectorRoles.contains(InspectorReportRole.adjuster)
                       ? 'Prepared from Adjuster Perspective'
                       : 'Prepared by: Third-Party Inspector',
                   style: pw.TextStyle(
@@ -837,7 +841,7 @@ ${_jobCostController.text}</p>');
                 pw.Text('Insurance Carrier: ${_metadata.insuranceCarrier}'),
                 pw.Text('Peril Type: ${_metadata.perilType.name}'),
                 pw.Text('Inspection Type: ${_metadata.inspectionType.name}'),
-                pw.Text('Inspector Role: ${_metadata.inspectorRole.name.replaceAll('_', ' ')}'),
+                pw.Text('Inspector Role: ${_metadata.inspectorRoles.map((e) => e.name.replaceAll('_', ' ')).join(', ')}'),
                 pw.Text('Inspector Name: ${_metadata.inspectorName}'),
                 pw.SizedBox(height: 20),
                 if ((_aiSummary?.status == 'approved' ||
@@ -914,7 +918,7 @@ ${_jobCostController.text}</p>');
             pw.Text('Insurance Carrier: ${_metadata.insuranceCarrier}'),
             pw.Text('Peril Type: ${_metadata.perilType.name}'),
             pw.Text('Inspection Type: ${_metadata.inspectionType.name}'),
-            pw.Text('Inspector Role: ${_metadata.inspectorRole.name.replaceAll('_', ' ')}'),
+            pw.Text('Inspector Role: ${_metadata.inspectorRoles.map((e) => e.name.replaceAll('_', ' ')).join(', ')}'),
             pw.Text('Inspector Name: ${_metadata.inspectorName}'),
             pw.SizedBox(height: 20),
             pw.Text('Inspection Checklist',
@@ -1121,37 +1125,38 @@ ${_jobCostController.text}</p>');
                 Row(
                   children: [
                     const Text('Inspector Role: '),
-                    DropdownButton<InspectorReportRole>(
-                      value: _selectedRole,
-                      items: InspectorReportRole.values
-                          .map(
-                            (r) => DropdownMenuItem(
-                              value: r,
-                              child: Text(r.name.replaceAll('_', ' ')),
-                            ),
-                          )
-                          .toList(),
-                      onChanged: widget.readOnly
-                          ? null
-                          : (val) {
-                              if (val != null) {
-                                setState(() {
-                                  _selectedRole = val;
-                                  _metadata = InspectionMetadata(
-                                    clientName: _metadata.clientName,
-                                    propertyAddress: _metadata.propertyAddress,
-                                    inspectionDate: _metadata.inspectionDate,
-                                    insuranceCarrier: _metadata.insuranceCarrier,
-                                    perilType: _metadata.perilType,
-                                    inspectionType: _metadata.inspectionType,
-                                    inspectorName: _metadata.inspectorName,
-                                    inspectorRole: val,
-                                    reportId: _metadata.reportId,
-                                    weatherNotes: _metadata.weatherNotes,
-                                  );
-                                });
-                              }
-                            },
+                    Wrap(
+                      spacing: 4,
+                      children: [
+                        for (final r in InspectorReportRole.values)
+                          FilterChip(
+                            selected: _selectedRole.contains(r),
+                            label: Text(r.name.replaceAll('_', ' ')),
+                            onSelected: widget.readOnly
+                                ? null
+                                : (val) {
+                                    setState(() {
+                                      if (val) {
+                                        _selectedRole.add(r);
+                                      } else {
+                                        _selectedRole.remove(r);
+                                      }
+                                      _metadata = InspectionMetadata(
+                                        clientName: _metadata.clientName,
+                                        propertyAddress: _metadata.propertyAddress,
+                                        inspectionDate: _metadata.inspectionDate,
+                                        insuranceCarrier: _metadata.insuranceCarrier,
+                                        perilType: _metadata.perilType,
+                                        inspectionType: _metadata.inspectionType,
+                                        inspectorName: _metadata.inspectorName,
+                                        inspectorRoles: _selectedRole,
+                                        reportId: _metadata.reportId,
+                                        weatherNotes: _metadata.weatherNotes,
+                                      );
+                                    });
+                                  },
+                          ),
+                      ],
                     ),
                   ],
                 ),

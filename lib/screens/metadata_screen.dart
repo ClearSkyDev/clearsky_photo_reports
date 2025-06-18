@@ -33,7 +33,7 @@ class _MetadataScreenState extends State<MetadataScreen> {
   DateTime _inspectionDate = DateTime.now();
   PerilType _selectedPeril = PerilType.wind;
   InspectionType _selectedType = InspectionType.residentialRoof;
-  InspectorReportRole _selectedRole = InspectorReportRole.ladder_assist;
+  Set<InspectorReportRole> _selectedRole = {InspectorReportRole.ladder_assist};
   List<ReportTemplate> _templates = [];
   ReportTemplate? _selectedTemplate;
   bool _quickEnabled = false;
@@ -56,7 +56,7 @@ class _MetadataScreenState extends State<MetadataScreen> {
       _reportIdController.text = meta.reportId ?? '';
       _weatherNotesController.text = meta.weatherNotes ?? '';
       _partnerCodeController.text = meta.partnerCode ?? '';
-      _selectedRole = meta.inspectorRole;
+      _selectedRole = Set.from(meta.inspectorRoles);
     } else {
       _loadProfile();
     }
@@ -136,7 +136,7 @@ class _MetadataScreenState extends State<MetadataScreen> {
         inspectorName: _inspectorNameController.text.isNotEmpty
             ? _inspectorNameController.text
             : null,
-        inspectorRole: _selectedRole,
+        inspectorRoles: _selectedRole,
         reportId: _reportIdController.text.isNotEmpty
             ? _reportIdController.text
             : null,
@@ -151,7 +151,7 @@ class _MetadataScreenState extends State<MetadataScreen> {
         (c) =>
             c.roofType == _selectedType &&
             c.claimType == _selectedPeril &&
-            c.role == _selectedRole,
+            _selectedRole.contains(c.role),
         orElse: () => defaultChecklists.first,
       );
       inspectionChecklist.loadTemplate(template);
@@ -279,25 +279,24 @@ class _MetadataScreenState extends State<MetadataScreen> {
                   }
                 },
               ),
-              DropdownButtonFormField<InspectorReportRole>(
-                value: _selectedRole,
-                decoration:
-                    const InputDecoration(labelText: 'Your Role'),
-                items: InspectorReportRole.values
-                    .map(
-                      (r) => DropdownMenuItem(
-                        value: r,
-                        child: Text(r.name.replaceAll('_', ' ')),
-                      ),
-                    )
-                    .toList(),
-                onChanged: (value) {
-                  if (value != null) {
-                    setState(() {
-                      _selectedRole = value;
-                    });
-                  }
-                },
+              Wrap(
+                spacing: 4,
+                children: [
+                  for (final r in InspectorReportRole.values)
+                    FilterChip(
+                      label: Text(r.name.replaceAll('_', ' ')),
+                      selected: _selectedRole.contains(r),
+                      onSelected: (val) {
+                        setState(() {
+                          if (val) {
+                            _selectedRole.add(r);
+                          } else {
+                            _selectedRole.remove(r);
+                          }
+                        });
+                      },
+                    ),
+                ],
               ),
               TextFormField(
                 controller: _inspectorNameController,
