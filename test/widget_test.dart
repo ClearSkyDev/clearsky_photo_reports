@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:clearsky_photo_reports/main.dart';
 import 'package:clearsky_photo_reports/screens/photo_upload_screen.dart';
 import 'package:clearsky_photo_reports/screens/client_signature_screen.dart';
-import 'package:clearsky_photo_reports/screens/checklist_screen.dart';
+import 'package:clearsky_photo_reports/screens/inspection_checklist_screen.dart';
 import 'package:clearsky_photo_reports/models/checklist_template.dart';
 
 void main() {
@@ -11,7 +11,7 @@ void main() {
       (WidgetTester tester) async {
     await tester.pumpWidget(const ClearSkyApp());
 
-    expect(find.text('ClearSky Home'), findsOneWidget);
+    expect(find.text('ClearSky Photo Reports'), findsOneWidget);
     expect(find.text('Upload Photos'), findsOneWidget);
     expect(find.text('Generate Report'), findsOneWidget);
   });
@@ -48,8 +48,8 @@ void main() {
       ],
     );
 
-    await tester.pumpWidget(MaterialApp(
-      home: Scaffold(body: ChecklistScreen()),
+    await tester.pumpWidget(const MaterialApp(
+      home: Scaffold(body: InspectionChecklistScreen()),
     ));
 
     // Simulate user interaction after adding template
@@ -59,10 +59,12 @@ void main() {
 
   testWidgets('Signature screen renders and captures data',
       (WidgetTester tester) async {
-    await tester.pumpWidget(const MaterialApp(home: ClientSignatureScreen()));
+    await tester.pumpWidget(
+      const MaterialApp(home: ClientSignatureScreen(reportId: 'r1')),
+    );
 
-    expect(find.text('Client Signature'), findsOneWidget);
-    expect(find.text('Finish & Attach'), findsOneWidget);
+    expect(find.text('Homeowner Signature'), findsOneWidget);
+    expect(find.text('Submit'), findsOneWidget);
 
     await tester.enterText(find.byType(TextField).first, 'John Doe');
 

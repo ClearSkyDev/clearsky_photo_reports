@@ -10,6 +10,9 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.6
+  google_fonts: ^6.1.0
+  signature: ^5.4.1
+  fl_chart: ^0.64.0
   image_picker: ^1.0.7
   http: ^1.1.0
   pdf: ^3.10.4
@@ -31,6 +34,3 @@ flutter:
   uses-material-design: true
   assets:
     - assets/images/clearsky_logo.png
-fl_chart: ^0.64.0
-signature: ^5.4.1
-google_fonts: ^6.1.0

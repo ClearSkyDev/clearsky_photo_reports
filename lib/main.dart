@@ -2,16 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
-import 'theme/app_theme.dart';
+import 'app_theme.dart';
 import 'screens/home_screen.dart';
 import 'screens/photo_upload_screen.dart';
 import 'screens/report_preview_screen.dart';
 import 'screens/client_signature_screen.dart';
-import 'screens/checklist_screen.dart';
+import 'screens/inspection_checklist_screen.dart';
 import 'screens/analytics_dashboard_screen.dart';
 import 'screens/admin_audit_log_screen.dart';
-import 'screens/client_report_screen.dart';
-import 'screens/client_dashboard_screen.dart';
+import 'client_portal/client_report_screen.dart';
+import 'client_portal/client_dashboard_screen.dart';
+import 'models/inspector_user.dart';
 
 import 'main_nav_scaffold.dart';
 import 'client_portal_main.dart';
@@ -38,11 +39,17 @@ class ClearSkyApp extends StatelessWidget {
       themeMode: ThemeMode.system,
       initialRoute: '/',
       routes: {
-        '/': (context) => const MainNavScaffold(), // Or ClientPortalMain() based on auth/role
+        '/': (context) {
+          const bool showClientPortal = false; // toggle for demo
+          if (showClientPortal) return const ClientPortalMain();
+          return MainNavScaffold(
+            user: InspectorUser(uid: 'demo', role: UserRole.inspector),
+          );
+        },
         '/upload': (context) => const PhotoUploadScreen(),
         '/preview': (context) => const ReportPreviewScreen(),
         '/signature': (context) => const ClientSignatureScreen(),
-        '/checklist': (context) => const ChecklistScreen(),
+        '/checklist': (context) => const InspectionChecklistScreen(),
         '/analytics': (context) => const AnalyticsDashboardScreen(allMetrics: []), // Replace with real
         '/audit': (context) => const AdminAuditLogScreen(logs: []), // Replace with real
         '/clientDashboard': (context) => const ClientDashboardScreen(),
