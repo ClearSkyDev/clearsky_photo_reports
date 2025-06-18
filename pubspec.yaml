@@ -38,3 +38,6 @@ flutter:
   uses-material-design: true
   assets:
     - assets/images/clearsky_logo.png
+# pubspec.yaml
+dependencies:
+  uuid: ^4.0.0
