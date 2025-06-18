@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../utils/profile_storage.dart';
 import '../models/inspector_profile.dart';
 import '../utils/quick_report_preferences.dart';
+import 'export_history_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -100,6 +101,18 @@ class _HomeScreenState extends State<HomeScreen> {
                 }
               },
               child: const Text('View History'),
+              ),
+              const SizedBox(height: 12),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const ExportHistoryScreen(),
+                    ),
+                  );
+                },
+                child: const Text('Export History'),
               ),
               const SizedBox(height: 12),
               ElevatedButton(

@@ -35,6 +35,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../widgets/ai_disclaimer_banner.dart';
 
 import '../models/inspected_structure.dart';
+import '../utils/export_log.dart';
+import '../models/export_log_entry.dart';
 
 class ReportPreviewScreen extends StatefulWidget {
   final List<PhotoEntry>? photos;
@@ -565,6 +567,11 @@ ${_jobCostController.text}</p>');
     final htmlContent = generateHtmlPreview();
     _saveHtmlFile(htmlContent);
     inspectionChecklist.markComplete('Report Exported');
+    ExportLog.addEntry(ExportLogEntry(
+      reportName: _metadata.propertyAddress,
+      type: 'html',
+      wasOffline: widget.savedReport?.wasOffline ?? false,
+    ));
   }
 
   void _saveHtmlFile(String htmlContent) {
@@ -1034,6 +1041,11 @@ ${_jobCostController.text}</p>');
       const SnackBar(content: Text('PDF exported')),
     );
     inspectionChecklist.markComplete('Report Exported');
+    ExportLog.addEntry(ExportLogEntry(
+      reportName: _metadata.propertyAddress,
+      type: 'pdf',
+      wasOffline: widget.savedReport?.wasOffline ?? false,
+    ));
   }
 
   Future<void> _exportZip() async {
