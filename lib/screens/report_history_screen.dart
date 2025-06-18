@@ -98,13 +98,7 @@ class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
         .collection('reports')
         .orderBy('createdAt', descending: true);
     String? inspector = widget.inspectorName;
-    if (inspector == null) {
-      final profile = await ProfileStorage.load();
-      if (profile != null && profile.role != InspectorRole.admin) {
-        inspector = profile.name;
-      }
-    }
-    if (inspector != null && inspector.isNotEmpty) {
+    if (inspector.isNotEmpty) {
       query =
           query.where('inspectionMetadata.inspectorName', isEqualTo: inspector);
     }
