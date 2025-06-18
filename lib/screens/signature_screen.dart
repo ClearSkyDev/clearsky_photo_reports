@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 
 import '../models/inspection_metadata.dart';
-import '../models/photo_entry.dart';
 import '../models/inspected_structure.dart';
 import '../models/checklist.dart';
 import '../models/report_template.dart';

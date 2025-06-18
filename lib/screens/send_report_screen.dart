@@ -233,15 +233,13 @@ class _SendReportScreenState extends State<SendReportScreen> {
       'propertyAddress': widget.metadata.propertyAddress,
       'inspectionDate':
           widget.metadata.inspectionDate.toIso8601String(),
-      if (widget.metadata.insuranceCarrier != null)
-        'insuranceCarrier': widget.metadata.insuranceCarrier,
+      'insuranceCarrier': widget.metadata.insuranceCarrier,
       'perilType': widget.metadata.perilType.name,
       'inspectionType': widget.metadata.inspectionType.name,
       'inspectorRole': widget.metadata.inspectorRole.name,
       if (profile?.name != null)
         'inspectorName': profile!.name
-      else if (widget.metadata.inspectorName != null)
-        'inspectorName': widget.metadata.inspectorName,
+      else 'inspectorName': widget.metadata.inspectorName,
       if (widget.metadata.reportId != null)
         'reportId': widget.metadata.reportId,
       if (widget.metadata.weatherNotes != null)
@@ -370,12 +368,10 @@ class _SendReportScreenState extends State<SendReportScreen> {
         'clientName_lc': widget.metadata.clientName.toLowerCase(),
         if (profile?.name != null)
           'inspectorName': profile!.name
-        else if (widget.metadata.inspectorName != null)
-          'inspectorName': widget.metadata.inspectorName,
+        else 'inspectorName': widget.metadata.inspectorName,
         if (profile?.name != null)
           'inspectorName_lc': profile!.name.toLowerCase()
-        else if (widget.metadata.inspectorName != null)
-          'inspectorName_lc': widget.metadata.inspectorName!.toLowerCase(),
+        else 'inspectorName_lc': widget.metadata.inspectorName!.toLowerCase(),
         'type': widget.metadata.inspectionType.name,
         'type_lc': widget.metadata.inspectionType.name.toLowerCase(),
         'labels': labels.toList(),
@@ -469,15 +465,13 @@ class _SendReportScreenState extends State<SendReportScreen> {
       'clientName': widget.metadata.clientName,
       'propertyAddress': widget.metadata.propertyAddress,
       'inspectionDate': widget.metadata.inspectionDate.toIso8601String(),
-      if (widget.metadata.insuranceCarrier != null)
-        'insuranceCarrier': widget.metadata.insuranceCarrier,
+      'insuranceCarrier': widget.metadata.insuranceCarrier,
       'perilType': widget.metadata.perilType.name,
       'inspectionType': widget.metadata.inspectionType.name,
       'inspectorRole': widget.metadata.inspectorRole.name,
       if (profile?.name != null)
         'inspectorName': profile!.name
-      else if (widget.metadata.inspectorName != null)
-        'inspectorName': widget.metadata.inspectorName,
+      else 'inspectorName': widget.metadata.inspectorName,
       if (widget.metadata.reportId != null)
         'reportId': widget.metadata.reportId,
       if (widget.metadata.weatherNotes != null)
@@ -631,13 +625,11 @@ class _SendReportScreenState extends State<SendReportScreen> {
       'clientName': widget.metadata.clientName,
       'propertyAddress': widget.metadata.propertyAddress,
       'inspectionDate': widget.metadata.inspectionDate.toIso8601String(),
-      if (widget.metadata.insuranceCarrier != null)
-        'insuranceCarrier': widget.metadata.insuranceCarrier,
+      'insuranceCarrier': widget.metadata.insuranceCarrier,
       'perilType': widget.metadata.perilType.name,
       'inspectionType': widget.metadata.inspectionType.name,
       'inspectorRole': widget.metadata.inspectorRole.name,
-      if (widget.metadata.inspectorName != null)
-        'inspectorName': widget.metadata.inspectorName,
+      'inspectorName': widget.metadata.inspectorName,
       if (widget.metadata.reportId != null)
         'reportId': widget.metadata.reportId,
       if (widget.metadata.weatherNotes != null)
@@ -1056,7 +1048,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
         text: 'Roof Inspection Report for ${m.clientName}');
     final inspector = m.inspectorName != null ? ' by ${m.inspectorName}' : '';
     String defaultMessage =
-        'Please find attached the roof inspection report for ${m.clientName}${inspector}.';
+        'Please find attached the roof inspection report for ${m.clientName}$inspector.';
     String signature = '';
     bool attachPdf = true;
     final prefs = await SharedPreferences.getInstance();
@@ -1369,7 +1361,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
                     Text('Date: ${m.inspectionDate.toLocal().toString().split(' ')[0]}'),
                     if (widget.summary != null && widget.summary!.isNotEmpty) ...[
                       const SizedBox(height: 8),
-                      Text('Inspector Notes / Summary:',
+                      const Text('Inspector Notes / Summary:',
                           style: TextStyle(fontWeight: FontWeight.bold)),
                       Text(widget.summary!),
                     ],

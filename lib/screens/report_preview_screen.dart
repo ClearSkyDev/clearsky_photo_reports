@@ -238,13 +238,11 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
       'clientName': _metadata.clientName,
       'propertyAddress': _metadata.propertyAddress,
       'inspectionDate': _metadata.inspectionDate.toIso8601String(),
-      if (_metadata.insuranceCarrier != null)
-        'insuranceCarrier': _metadata.insuranceCarrier,
+      'insuranceCarrier': _metadata.insuranceCarrier,
       'perilType': _metadata.perilType.name,
       'inspectionType': _metadata.inspectionType.name,
       'inspectorRole': _metadata.inspectorRole.name,
-      if (_metadata.inspectorName != null)
-        'inspectorName': _metadata.inspectorName,
+      'inspectorName': _metadata.inspectorName,
     };
     final report = SavedReport(
       inspectionMetadata: metaMap,
@@ -330,16 +328,12 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
     buffer.writeln('<tr><td><strong>Client Name:</strong></td><td>${_metadata.clientName}</td></tr>');
     buffer.writeln('<tr><td><strong>Property Address:</strong></td><td>${_metadata.propertyAddress}</td></tr>');
     buffer.writeln('<tr><td><strong>Inspection Date:</strong></td><td>${_metadata.inspectionDate.toLocal().toString().split(" ")[0]}</td></tr>');
-    if (_metadata.insuranceCarrier != null) {
-      buffer.writeln('<tr><td><strong>Insurance Carrier:</strong></td><td>${_metadata.insuranceCarrier}</td></tr>');
-    }
-    buffer.writeln('<tr><td><strong>Peril Type:</strong></td><td>${_metadata.perilType.name}</td></tr>');
+    buffer.writeln('<tr><td><strong>Insurance Carrier:</strong></td><td>${_metadata.insuranceCarrier}</td></tr>');
+      buffer.writeln('<tr><td><strong>Peril Type:</strong></td><td>${_metadata.perilType.name}</td></tr>');
     buffer.writeln('<tr><td><strong>Inspection Type:</strong></td><td>${_metadata.inspectionType.name}</td></tr>');
     buffer.writeln('<tr><td><strong>Inspector Role:</strong></td><td>${_metadata.inspectorRole.name.replaceAll('_', ' ')}</td></tr>');
-    if (_metadata.inspectorName != null) {
-      buffer.writeln('<tr><td><strong>Inspector Name:</strong></td><td>${_metadata.inspectorName}</td></tr>');
-    }
-    if (_metadata.reportId != null) {
+    buffer.writeln('<tr><td><strong>Inspector Name:</strong></td><td>${_metadata.inspectorName}</td></tr>');
+      if (_metadata.reportId != null) {
       buffer.writeln('<tr><td><strong>Report ID:</strong></td><td>${_metadata.reportId}</td></tr>');
     }
     if (_metadata.weatherNotes != null) {
@@ -664,13 +658,11 @@ ${_jobCostController.text}</p>');
                 pw.Text('Client Name: ${_metadata.clientName}'),
                 pw.Text('Property Address: ${_metadata.propertyAddress}'),
                 pw.Text('Inspection Date: ${_metadata.inspectionDate.toLocal().toString().split(' ')[0]}'),
-                if (_metadata.insuranceCarrier != null)
-                  pw.Text('Insurance Carrier: ${_metadata.insuranceCarrier}'),
+                pw.Text('Insurance Carrier: ${_metadata.insuranceCarrier}'),
                 pw.Text('Peril Type: ${_metadata.perilType.name}'),
                 pw.Text('Inspection Type: ${_metadata.inspectionType.name}'),
                 pw.Text('Inspector Role: ${_metadata.inspectorRole.name.replaceAll('_', ' ')}'),
-                if (_metadata.inspectorName != null)
-                  pw.Text('Inspector Name: ${_metadata.inspectorName}'),
+                pw.Text('Inspector Name: ${_metadata.inspectorName}'),
                 pw.SizedBox(height: 20),
                 if ((_aiSummary?.status == 'approved' ||
                         _aiSummary?.status == 'edited') &&
@@ -743,13 +735,11 @@ ${_jobCostController.text}</p>');
             pw.Text('Client Name: ${_metadata.clientName}'),
             pw.Text('Property Address: ${_metadata.propertyAddress}'),
             pw.Text('Inspection Date: ${_metadata.inspectionDate.toLocal().toString().split(' ')[0]}'),
-            if (_metadata.insuranceCarrier != null)
-              pw.Text('Insurance Carrier: ${_metadata.insuranceCarrier}'),
+            pw.Text('Insurance Carrier: ${_metadata.insuranceCarrier}'),
             pw.Text('Peril Type: ${_metadata.perilType.name}'),
             pw.Text('Inspection Type: ${_metadata.inspectionType.name}'),
             pw.Text('Inspector Role: ${_metadata.inspectorRole.name.replaceAll('_', ' ')}'),
-            if (_metadata.inspectorName != null)
-              pw.Text('Inspector Name: ${_metadata.inspectorName}'),
+            pw.Text('Inspector Name: ${_metadata.inspectorName}'),
             pw.SizedBox(height: 20),
             pw.Text('Inspection Checklist',
                 style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
@@ -785,8 +775,7 @@ ${_jobCostController.text}</p>');
                   pw.Image(pw.MemoryImage(_signature!), height: 80)
                 else
                   pw.Container(height: 1, width: double.infinity, color: PdfColors.black),
-                if (_metadata.inspectorName != null)
-                  pw.Text('${_metadata.inspectorName!} – $dateStr'),
+                pw.Text('${_metadata.inspectorName!} – $dateStr'),
               ],
             ),
           ],
@@ -892,7 +881,7 @@ ${_jobCostController.text}</p>');
           final label = photo.label.isNotEmpty ? photo.label : 'Unlabeled';
           final cleanLabel =
               label.replaceAll(RegExp(r'[^A-Za-z0-9_-]'), '_');
-          final name = '${sectionClean}_${cleanLabel}.jpg';
+          final name = '${sectionClean}_$cleanLabel.jpg';
           files[name] = bytes;
         } catch (_) {}
       }
@@ -950,8 +939,7 @@ ${_jobCostController.text}</p>');
                 Text('Client Name: ${_metadata.clientName}'),
                 Text('Property Address: ${_metadata.propertyAddress}'),
                 Text('Inspection Date: ${_metadata.inspectionDate.toLocal().toString().split(" ")[0]}'),
-                if (_metadata.insuranceCarrier != null)
-                  Text('Insurance Carrier: ${_metadata.insuranceCarrier}'),
+                Text('Insurance Carrier: ${_metadata.insuranceCarrier}'),
                 Text('Peril Type: ${_metadata.perilType.name}'),
                 Text('Inspection Type: ${_metadata.inspectionType.name}'),
                 Row(
@@ -991,8 +979,7 @@ ${_jobCostController.text}</p>');
                     ),
                   ],
                 ),
-                if (_metadata.inspectorName != null)
-                  Text('Inspector Name: ${_metadata.inspectorName}'),
+                Text('Inspector Name: ${_metadata.inspectorName}'),
               ],
             ),
           ),

@@ -70,7 +70,7 @@ class _PublicReportScreenState extends State<PublicReportScreen> {
         children: [
           Text(
             'Roof Inspection Report',
-            style: Theme.of(context).textTheme.headline6,
+            style: Theme.of(context).textTheme.titleLarge,
           ),
           const SizedBox(height: 8),
           Text(meta.propertyAddress),
@@ -140,8 +140,7 @@ class _PublicReportScreenState extends State<PublicReportScreen> {
           if (report.signatureStatus == 'declined' &&
               report.homeownerSignature != null) ...[
             const SizedBox(height: 8),
-            Text('Signature declined: ' +
-                (report.homeownerSignature!.declineReason ?? '')),
+            Text('Signature declined: ${report.homeownerSignature!.declineReason ?? ''}'),
           ],
           const SizedBox(height: 16),
           ElevatedButton(

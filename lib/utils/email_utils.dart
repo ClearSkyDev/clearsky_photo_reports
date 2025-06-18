@@ -32,7 +32,7 @@ Future<void> sendReportByEmail(
     html.Url.revokeObjectUrl(url);
     final mailto =
         'mailto:$email?subject=${Uri.encodeComponent(subject)}&body=${Uri.encodeComponent(message)}';
-    html.AnchorElement(href: mailto)..click();
+    html.AnchorElement(href: mailto).click();
     return;
   }
 
@@ -108,7 +108,7 @@ Future<void> sendReportEmail(
   if (kIsWeb) {
     final mailto =
         'mailto:$email?subject=${Uri.encodeComponent(subject)}&body=${Uri.encodeComponent(body)}';
-    html.AnchorElement(href: mailto)..click();
+    html.AnchorElement(href: mailto).click();
     return;
   }
   final mail = Email(

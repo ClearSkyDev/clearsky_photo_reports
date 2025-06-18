@@ -151,7 +151,7 @@ class _AnalyticsDashboardScreenState extends State<AnalyticsDashboardScreen> {
                 },
               ),
             ),
-            leftTitles: AxisTitles(
+            leftTitles: const AxisTitles(
               sideTitles: SideTitles(showTitles: true, reservedSize: 30),
             ),
           ),

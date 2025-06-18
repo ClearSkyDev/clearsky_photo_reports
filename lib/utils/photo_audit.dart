@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:image/image.dart' as img;
 
 import '../models/saved_report.dart';
-import '../models/inspection_sections.dart';
 
 class PhotoAuditIssue {
   final String structure;

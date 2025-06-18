@@ -219,10 +219,10 @@ class _SectionedPhotoUploadScreenState extends State<SectionedPhotoUploadScreen>
                             ),
                           ),
                         ),
-                        Positioned(
+                        const Positioned(
                           bottom: 4,
                           right: 4,
-                          child: const Icon(Icons.drag_handle, color: Colors.white),
+                          child: Icon(Icons.drag_handle, color: Colors.white),
                         ),
                         Positioned(
                           bottom: 4,

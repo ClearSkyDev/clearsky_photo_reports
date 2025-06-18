@@ -3,6 +3,7 @@
 /// Currently provides a placeholder [getLabelSuggestion] function that returns a
 /// fake label for a photo. In the future this will call an AI service such as
 /// OpenAI or a custom model.
+library;
 
 import 'dart:math';
 import 'dart:io';
@@ -41,13 +42,13 @@ Future<LabelSuggestion> getLabelSuggestion(
     // Ignore errors for now; bytes remain empty.
   }
 
-  final String _base64 = base64Encode(bytes); // ignore: unused_local_variable
+  final String base64 = base64Encode(bytes); // ignore: unused_local_variable
 
   await Future.delayed(const Duration(milliseconds: 300));
   final desc = _fakeDescriptions[Random().nextInt(_fakeDescriptions.length)];
   final confidence = Random().nextDouble() * 0.4 + 0.6; // 0.6 - 1.0
   return LabelSuggestion(
-    label: '$desc',
+    label: desc,
     caption: 'Detected in $sectionName',
     confidence: double.parse(confidence.toStringAsFixed(2)),
     reason: 'Placeholder AI analysis',

@@ -29,7 +29,7 @@ Future<String> getDamageType(
     }
   } catch (_) {}
 
-  final _base64 = base64Encode(bytes); // ignore: unused_local_variable
+  final base64 = base64Encode(bytes); // ignore: unused_local_variable
 
   await Future.delayed(const Duration(milliseconds: 300));
   return _fakeDamageTypes[Random().nextInt(_fakeDamageTypes.length)];

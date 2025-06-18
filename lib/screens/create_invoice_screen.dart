@@ -21,7 +21,9 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
 
   double get _total {
     double t = 0;
-    for (final item in _items) t += item.amount;
+    for (final item in _items) {
+      t += item.amount;
+    }
     return t;
   }
 
@@ -91,7 +93,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
               ),
             ),
             TextButton(onPressed: _addItem, child: const Text('Add Line Item')),
-            Text('Total: ' + _total.toStringAsFixed(2)),
+            Text('Total: ${_total.toStringAsFixed(2)}'),
             ElevatedButton(onPressed: _save, child: const Text('Save Invoice')),
           ],
         ),

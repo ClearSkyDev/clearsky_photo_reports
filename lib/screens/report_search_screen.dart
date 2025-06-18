@@ -38,10 +38,14 @@ class _ReportSearchScreenState extends State<ReportSearchScreen> {
       if (!match && (idx['type_lc'] ?? '').contains(q)) match = true;
       if (!match &&
           (idx['labels_lc'] as List<dynamic>? ?? [])
-              .any((e) => (e as String).contains(q))) match = true;
+              .any((e) => (e as String).contains(q))) {
+        match = true;
+      }
       if (!match &&
           (idx['damageTags_lc'] as List<dynamic>? ?? [])
-              .any((e) => (e as String).contains(q))) match = true;
+              .any((e) => (e as String).contains(q))) {
+        match = true;
+      }
       return match;
     }).toList();
     setState(() {

@@ -5,7 +5,6 @@ import '../models/inspection_metadata.dart';
 import '../models/inspection_sections.dart';
 import '../models/report_template.dart';
 import '../models/photo_source.dart';
-import '../utils/photo_prompts.dart';
 
 class GuidedCaptureScreen extends StatefulWidget {
   final InspectionMetadata metadata;

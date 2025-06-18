@@ -133,7 +133,7 @@ class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
     }
     return ListTile(
       leading: thumbUrl != null
-          ? Image.network(thumbUrl!, width: 56, height: 56, fit: BoxFit.cover)
+          ? Image.network(thumbUrl, width: 56, height: 56, fit: BoxFit.cover)
           : const Icon(Icons.description),
       title: Text(meta.propertyAddress),
       subtitle: Text(subtitle),

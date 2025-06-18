@@ -73,7 +73,7 @@ Future<File?> exportAsZip(SavedReport report) async {
         final cleanLabel =
             label.replaceAll(RegExp(r'[^A-Za-z0-9_-]'), '_');
         final ext = p.extension(file.path);
-        final name = 'photos/${section}_${cleanLabel}$ext';
+        final name = 'photos/${section}_$cleanLabel$ext';
         archive.addFile(ArchiveFile(name, bytes.length, bytes));
       } catch (_) {
         // ignore file errors
@@ -81,6 +81,7 @@ Future<File?> exportAsZip(SavedReport report) async {
       }
     }
   }
+  return null;
   }
 
   final zipData = ZipEncoder().encode(archive)!;
@@ -105,7 +106,7 @@ Future<File?> exportAsZip(SavedReport report) async {
 
   final filePath = p.join(dir.path, fileName);
   final file = File(filePath);
-  await file.writeAsBytes(zipData, flush: true);
+  await file.writeAsBytes(zipData, flush = true);
 
   final reportFile = File(filePath);
   return reportFile;
@@ -327,15 +328,11 @@ Future<String> _generateHtml(SavedReport report) async {
     ..writeln(
         '<strong>Inspection Date:</strong> ${meta.inspectionDate.toLocal().toString().split(' ')[0]}</p>');
 
-  if (meta.insuranceCarrier != null) {
-    buffer.writeln('<p><strong>Insurance Carrier:</strong> ${meta.insuranceCarrier}</p>');
-  }
+  buffer.writeln('<p><strong>Insurance Carrier:</strong> ${meta.insuranceCarrier}</p>');
   buffer.writeln('<p><strong>Peril Type:</strong> ${meta.perilType.name}</p>');
   buffer.writeln('<p><strong>Inspection Type:</strong> ${meta.inspectionType.name}</p>');
   buffer.writeln('<p><strong>Inspector Role:</strong> ${meta.inspectorRole.name.replaceAll('_', ' ')}</p>');
-  if (meta.inspectorName != null) {
-    buffer.writeln('<p><strong>Inspector Name:</strong> ${meta.inspectorName}</p>');
-  }
+  buffer.writeln('<p><strong>Inspector Name:</strong> ${meta.inspectorName}</p>');
   final aiStatus = report.aiSummary?.status;
   final showSummary =
       aiStatus == 'approved' || aiStatus == 'edited';
@@ -346,9 +343,9 @@ Future<String> _generateHtml(SavedReport report) async {
       ..writeln('<p>${report.summaryText}</p>');
     if (report.aiSummary?.editor != null) {
       final ts = report.aiSummary!.editedAt?.toLocal().toString().split(' ').first;
-      buffer..writeln('<p><em>Reviewed by ${report.aiSummary!.editor} on $ts</em></p>');
+      buffer.writeln('<p><em>Reviewed by ${report.aiSummary!.editor} on $ts</em></p>');
     }
-    buffer..writeln('</div>');
+    buffer.writeln('</div>');
   }
   if (report.summary != null && report.summary!.isNotEmpty) {
     buffer
@@ -387,8 +384,11 @@ Future<String> _generateHtml(SavedReport report) async {
           in sectionsForType(meta.inspectionType)) {
         final photos = struct.sectionPhotos[section] ?? [];
       if (photos.isEmpty) continue;
-      if (report.structures.length > 1) buffer.writeln('<h3>$section</h3>');
-      else buffer.writeln('<h2>$section</h2>');
+      if (report.structures.length > 1) {
+        buffer.writeln('<h3>$section</h3>');
+      } else {
+        buffer.writeln('<h2>$section</h2>');
+      }
       buffer.writeln('<div style="display:flex;flex-wrap:wrap;">');
       for (final photo in photos) {
         final label = photo.label.isNotEmpty ? photo.label : 'Unlabeled';
@@ -550,13 +550,11 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
               pw.Text('Property Address: ${meta.propertyAddress}'),
               pw.Text(
                   'Inspection Date: ${meta.inspectionDate.toLocal().toString().split(' ')[0]}'),
-              if (meta.insuranceCarrier != null)
-                pw.Text('Insurance Carrier: ${meta.insuranceCarrier}'),
+              pw.Text('Insurance Carrier: ${meta.insuranceCarrier}'),
               pw.Text('Peril Type: ${meta.perilType.name}'),
               pw.Text('Inspection Type: ${meta.inspectionType.name}'),
               pw.Text('Inspector Role: ${meta.inspectorRole.name.replaceAll('_', ' ')}'),
-              if (meta.inspectorName != null)
-                pw.Text('Inspector Name: ${meta.inspectorName}'),
+              pw.Text('Inspector Name: ${meta.inspectorName}'),
               pw.SizedBox(height: 20),
               if ((aiStatus == 'approved' || aiStatus == 'edited') &&
                   summaryText.isNotEmpty)
@@ -630,13 +628,11 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
           ],
           pw.Text(
               'Inspection Date: ${meta.inspectionDate.toLocal().toString().split(' ')[0]}'),
-          if (meta.insuranceCarrier != null)
-            pw.Text('Insurance Carrier: ${meta.insuranceCarrier}'),
+          pw.Text('Insurance Carrier: ${meta.insuranceCarrier}'),
           pw.Text('Peril Type: ${meta.perilType.name}'),
           pw.Text('Inspection Type: ${meta.inspectionType.name}'),
           pw.Text('Inspector Role: ${meta.inspectorRole.name.replaceAll('_', ' ')}'),
-          if (meta.inspectorName != null)
-            pw.Text('Inspector Name: ${meta.inspectorName}'),
+          pw.Text('Inspector Name: ${meta.inspectorName}'),
           pw.SizedBox(height: 20),
           ...widgets,
           pw.SizedBox(height: 40),
@@ -646,8 +642,7 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
               pw.Container(height: 1, width: double.infinity, color: PdfColors.black),
               pw.SizedBox(height: 8),
               pw.Text('Inspector Signature'),
-              if (meta.inspectorName != null)
-                pw.Text('${meta.inspectorName!} – $dateStr'),
+              pw.Text('${meta.inspectorName!} – $dateStr'),
             ],
           ),
           if (report.homeownerSignature != null && !report.homeownerSignature!.declined) ...[

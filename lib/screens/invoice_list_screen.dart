@@ -28,7 +28,7 @@ class InvoiceListScreen extends StatelessWidget {
               final inv = invoices[i];
               return ListTile(
                 title: Text(inv.clientName),
-                subtitle: Text('Due: ' + inv.dueDate.toLocal().toString().split(' ')[0]),
+                subtitle: Text('Due: ${inv.dueDate.toLocal().toString().split(' ')[0]}'),
                 trailing: Text(inv.amount.toStringAsFixed(2)),
                 onTap: inv.paymentUrl != null
                     ? () => launchUrl(Uri.parse(inv.paymentUrl!))

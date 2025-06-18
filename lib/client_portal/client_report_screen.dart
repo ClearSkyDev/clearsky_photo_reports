@@ -50,7 +50,7 @@ class ClientReportScreen extends StatelessWidget {
             const SizedBox(height: 12),
             Text(
               'Client: $clientName\nAddress: $propertyAddress',
-              style: Theme.of(context).textTheme.subtitle1,
+              style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 24),
             const Text(
