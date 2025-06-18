@@ -7,6 +7,7 @@ import '../utils/sync_preferences.dart';
 import '../models/tts_settings.dart';
 import '../services/tts_service.dart';
 import 'comment_template_screen.dart';
+import 'theme_settings_screen.dart';
 
 class ReportSettings {
   final String companyName;
@@ -396,6 +397,15 @@ class _ReportSettingsScreenState extends State<ReportSettingsScreen> {
                   ),
                 ),
               ],
+            ),
+            ListTile(
+              title: const Text('App Theme'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (_) => const ThemeSettingsScreen()),
+              ),
             ),
             ListTile(
               title: const Text('Comment Templates'),
