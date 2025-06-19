@@ -1,255 +1,168 @@
-import 'dart:io';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:file_picker/file_picker.dart';
-import 'package:share_plus/share_plus.dart';
+import 'package:intl/intl.dart';
 
-import '../models/report_message.dart';
-import '../services/auth_service.dart';
+class Message {
+  final String senderId;
+  final String senderName;
+  final String text;
+  final DateTime timestamp;
+  final bool isMe;
 
-/// Simple chat-style message thread between client and inspector.
-class MessageThreadScreen extends StatefulWidget {
-  final String reportId;
-  final bool inspectorView;
-  const MessageThreadScreen({
-    super.key,
-    required this.reportId,
-    this.inspectorView = false,
+  Message({
+    required this.senderId,
+    required this.senderName,
+    required this.text,
+    required this.timestamp,
+    required this.isMe,
   });
+}
+
+class MessageThreadScreen extends StatefulWidget {
+  final String threadTitle;
+  final String currentUserId;
+
+  const MessageThreadScreen({
+    Key? key,
+    required this.threadTitle,
+    required this.currentUserId,
+  }) : super(key: key);
 
   @override
-  State<MessageThreadScreen> createState() => _MessageThreadScreenState();
+  _MessageThreadScreenState createState() => _MessageThreadScreenState();
 }
 
 class _MessageThreadScreenState extends State<MessageThreadScreen> {
-  final TextEditingController _textController = TextEditingController();
+  final List<Message> _messages = [];
+  final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
-  late final String _currentUserId;
-  bool _resolved = false;
-  bool _muted = false;
 
-  CollectionReference<Map<String, dynamic>> get _messagesCollection =>
-      FirebaseFirestore.instance
-          .collection('reports')
-          .doc(widget.reportId)
-          .collection('messages');
+  void _sendMessage() {
+    final text = _controller.text.trim();
+    if (text.isEmpty) return;
 
-  @override
-  void initState() {
-    super.initState();
-    _currentUserId = AuthService()._auth.currentUser?.uid ?? '';
-    _loadThreadStatus();
-  }
-
-  Future<void> _loadThreadStatus() async {
-    final doc =
-        await FirebaseFirestore.instance.collection('reports').doc(widget.reportId).get();
-    final thread = doc.data()?['thread'] as Map<String, dynamic>?;
-    if (thread != null) {
-      setState(() {
-        _resolved = thread['resolved'] == true;
-        _muted = thread['muted'] == true;
-      });
-    }
-  }
-
-  Future<void> _markRead(QuerySnapshot<Map<String, dynamic>> snap) async {
-    for (final doc in snap.docs) {
-      final data = doc.data();
-      final readBy = data['readBy'] as List<dynamic>? ?? [];
-      if (!readBy.contains(_currentUserId)) {
-        doc.reference.update({
-          'readBy': FieldValue.arrayUnion([_currentUserId])
-        });
-      }
-    }
-  }
-
-  Future<void> _sendMessage({String? attachmentPath}) async {
-    final text = _textController.text.trim();
-    if (text.isEmpty && attachmentPath == null) return;
-    String? url;
-    if (attachmentPath != null) {
-      final file = File(attachmentPath);
-      final name = attachmentPath.split('/').last;
-      final ref = FirebaseStorage.instance
-          .ref()
-          .child('reportMessages/${widget.reportId}/$name');
-      final task = await ref.putFile(file);
-      url = await task.ref.getDownloadURL();
-    }
-    final msg = ReportMessage(
-      senderId: _currentUserId,
+    final newMessage = Message(
+      senderId: widget.currentUserId,
+      senderName: 'You',
       text: text,
-      attachmentUrl: url,
+      timestamp: DateTime.now(),
+      isMe: true,
     );
-    await _messagesCollection.add({
-      ...msg.toMap(),
-      'createdAt': FieldValue.serverTimestamp(),
+
+    setState(() {
+      _messages.insert(0, newMessage);
     });
-    _textController.clear();
-    _scrollController.animateTo(
-      _scrollController.position.maxScrollExtent + 80,
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeOut,
-    );
+
+    _controller.clear();
+
+    // Simulate a reply (remove or replace with real chat logic later)
+    Future.delayed(const Duration(milliseconds: 800), () {
+      setState(() {
+        _messages.insert(
+          0,
+          Message(
+            senderId: 'agent456',
+            senderName: 'Field Adjuster',
+            text: 'Got it. Thanks for the update.',
+            timestamp: DateTime.now(),
+            isMe: false,
+          ),
+        );
+      });
+    });
   }
 
-  Future<void> _pickAttachment() async {
-    final result = await FilePicker.platform.pickFiles(
-      allowMultiple: false,
-      type: FileType.custom,
-      allowedExtensions: ['jpg', 'jpeg', 'png', 'pdf'],
-    );
-    if (result != null && result.files.single.path != null) {
-      await _sendMessage(attachmentPath: result.files.single.path!);
-    }
-  }
+  Widget _buildMessageBubble(Message message) {
+    final isMine = message.isMe;
+    final bubbleColor = isMine ? Colors.blueGrey : Colors.grey[300];
+    final textColor = isMine ? Colors.white : Colors.black87;
+    final align = isMine ? CrossAxisAlignment.end : CrossAxisAlignment.start;
+    final margin = isMine
+        ? const EdgeInsets.only(left: 40, right: 8)
+        : const EdgeInsets.only(right: 40, left: 8);
 
-  Future<void> _resolveThread() async {
-    await FirebaseFirestore.instance
-        .collection('reports')
-        .doc(widget.reportId)
-        .set({'thread': {'resolved': true}}, SetOptions(merge: true));
-    setState(() => _resolved = true);
-  }
-
-  Future<void> _toggleMute() async {
-    await FirebaseFirestore.instance
-        .collection('reports')
-        .doc(widget.reportId)
-        .set({'thread': {'muted': !_muted}}, SetOptions(merge: true));
-    setState(() => _muted = !_muted);
-  }
-
-  Future<void> _exportThread() async {
-    final snap = await _messagesCollection.orderBy('createdAt').get();
-    final buffer = StringBuffer();
-    for (final doc in snap.docs) {
-      final msg = ReportMessage.fromMap(doc.data(), doc.id);
-      final ts = msg.createdAt.toLocal().toIso8601String();
-      buffer.writeln('$ts ${msg.senderId}: ${msg.text}');
-      if (msg.attachmentUrl != null) buffer.writeln(msg.attachmentUrl);
-    }
-    await SharePlus.instance.share(buffer.toString());
-  }
-
-  Widget _buildMessageBubble(ReportMessage msg) {
-    final isMe = msg.senderId == _currentUserId;
-    final align = isMe ? Alignment.centerRight : Alignment.centerLeft;
-    final color = isMe ? Colors.blueGrey : Colors.grey.shade300;
-    final textColor = isMe ? Colors.white : Colors.black87;
-    final content = <Widget>[Text(msg.text, style: TextStyle(color: textColor))];
-    if (msg.attachmentUrl != null) {
-      final url = msg.attachmentUrl!;
-      if (url.endsWith('.pdf')) {
-        content.add(const SizedBox(height: 4));
-        content.add(Icon(Icons.picture_as_pdf, color: textColor));
-      } else {
-        content.add(const SizedBox(height: 4));
-        content.add(Image.network(url, width: 160, height: 160));
-      }
-    }
-    return Align(
-      alignment: align,
-      child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-        padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: color,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: content),
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 6),
+      padding: margin,
+      child: Column(
+        crossAxisAlignment: align,
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            decoration: BoxDecoration(
+              color: bubbleColor,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Text(
+              message.text,
+              style: TextStyle(color: textColor, fontSize: 15),
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            DateFormat('h:mm a').format(message.timestamp),
+            style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildInput() {
-    if (_resolved) {
-      return const Padding(
-        padding: EdgeInsets.all(8.0),
-        child: Text('Thread resolved'),
-      );
-    }
-    return Row(
-      children: [
-        IconButton(
-          icon: const Icon(Icons.attach_file),
-          tooltip: 'Attach File',
-          onPressed: _pickAttachment,
-        ),
-        Expanded(
-          child: TextField(
-            controller: _textController,
-            decoration: const InputDecoration(hintText: 'Message'),
+  Widget _buildInputArea() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        border: Border(top: BorderSide(color: Colors.grey)),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: _controller,
+              textCapitalization: TextCapitalization.sentences,
+              decoration: const InputDecoration.collapsed(
+                hintText: 'Type a message...',
+              ),
+              onSubmitted: (_) => _sendMessage(),
+            ),
           ),
-        ),
-        IconButton(
-          icon: const Icon(Icons.send),
-          tooltip: 'Send Message',
-          onPressed: _sendMessage,
-        ),
-      ],
+          IconButton(
+            icon: const Icon(Icons.send, color: Colors.blueGrey),
+            onPressed: _sendMessage,
+          )
+        ],
+      ),
     );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    _scrollController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Messages'),
-        actions: widget.inspectorView
-            ? [
-                PopupMenuButton<String>(
-                  onSelected: (value) {
-                    if (value == 'resolve') _resolveThread();
-                    if (value == 'export') _exportThread();
-                    if (value == 'mute') _toggleMute();
-                  },
-                  itemBuilder: (_) => [
-                    PopupMenuItem(
-                      value: 'resolve',
-                      child: Text(_resolved ? 'Resolved' : 'Resolve'),
-                    ),
-                    const PopupMenuItem(
-                      value: 'export',
-                      child: Text('Export'),
-                    ),
-                    PopupMenuItem(
-                      value: 'mute',
-                      child: Text(_muted ? 'Unmute' : 'Mute'),
-                    ),
-                  ],
-                ),
-              ]
-            : null,
+        title: Text(widget.threadTitle),
       ),
       body: Column(
         children: [
           Expanded(
-            child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-              stream: _messagesCollection.orderBy('createdAt').snapshots(),
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  WidgetsBinding.instance.addPostFrameCallback((_) => _markRead(snapshot.data!));
-                  final msgs = snapshot.data!.docs
-                      .map((d) => ReportMessage.fromMap(d.data(), d.id))
-                      .toList();
-                  return ListView(
+            child: _messages.isEmpty
+                ? const Center(child: Text('No messages yet.'))
+                : ListView.builder(
                     controller: _scrollController,
-                    children: [for (final m in msgs) _buildMessageBubble(m)],
-                  );
-                }
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                return const Center(child: Text('No messages'));
-              },
-            ),
+                    reverse: true,
+                    itemCount: _messages.length,
+                    itemBuilder: (context, index) {
+                      return _buildMessageBubble(_messages[index]);
+                    },
+                  ),
           ),
-          _buildInput(),
+          _buildInputArea(),
         ],
       ),
     );

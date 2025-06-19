@@ -1,156 +1,104 @@
 import 'package:flutter/material.dart';
-import '../utils/profile_storage.dart';
-import '../models/inspector_profile.dart';
-import '../utils/quick_report_preferences.dart';
-import 'export_history_screen.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+import 'client_dashboard_screen.dart';
+import 'guided_capture_screen.dart';
+import 'analytics_dashboard_screen.dart';
 
-  @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
+import '../models/inspection_report.dart';
 
-class _HomeScreenState extends State<HomeScreen> {
-  bool _quickEnabled = false;
+class HomeScreen extends StatelessWidget {
+  final List<InspectionReport> allReports;
 
-  @override
-  void initState() {
-    super.initState();
-    QuickReportPreferences.isEnabled().then((v) {
-      if (mounted) setState(() => _quickEnabled = v);
-    });
-  }
-
-  void _toggleQuick(bool val) {
-    setState(() => _quickEnabled = val);
-    QuickReportPreferences.setEnabled(val);
-  }
+  const HomeScreen({Key? key, required this.allReports}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Row(
-          children: [
-            Image.asset('assets/images/clearsky_logo.png', height: 32),
-            const SizedBox(width: 8),
-            const Text('ClearSky Photo Reports'),
-          ],
-        ),
+        title: const Text('ClearSky Photo Reports'),
       ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SwitchListTile(
-                title: const Text('Quick Report Mode'),
-                value: _quickEnabled,
-                onChanged: _toggleQuick,
-              ),
-              if (_quickEnabled) ...[
-                ElevatedButton(
-                  onPressed: () => Navigator.pushNamed(context, '/quickReport'),
-                  child: const Text('Start Quick Report'),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          _HomeCard(
+            icon: Icons.camera_alt,
+            title: 'Start Guided Inspection',
+            subtitle: 'Step-by-step photo intake',
+            onTap: () async {
+              final result = await Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const GuidedCaptureScreen()),
+              );
+              // Optionally handle result here
+            },
+          ),
+          _HomeCard(
+            icon: Icons.dashboard_customize,
+            title: 'View All Reports',
+            subtitle: 'See synced and unsynced inspections',
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const ClientDashboardScreen(),
                 ),
-                const SizedBox(height: 12),
-              ],
-              ElevatedButton(
-                onPressed: () => Navigator.pushNamed(context, '/metadata'),
-                child: const Text('Upload Photos'),
-              ),
-              const SizedBox(height: 12),
-              ElevatedButton(
-                onPressed: () => Navigator.pushNamed(context, '/sectionedUpload'),
-                child: const Text('Roof Intake Flow'),
-              ),
-              const SizedBox(height: 12),
-              ElevatedButton(
-                onPressed: () => Navigator.pushNamed(context, '/guidedCapture'),
-                child: const Text('Guided Capture Mode'),
-              ),
-              const SizedBox(height: 12),
-              ElevatedButton(
-                onPressed: () => Navigator.pushNamed(context, '/droneMedia'),
-                child: const Text('Drone Media Upload'),
-              ),
-              const SizedBox(height: 12),
-              ElevatedButton(
-                onPressed: () => Navigator.pushNamed(context, '/report'),
-                child: const Text('Generate Report'),
-              ),
-              const SizedBox(height: 12),
-              ElevatedButton(
-              onPressed: () async {
-                final profile = await ProfileStorage.load();
-                String? name;
-                if (profile != null && profile.role != InspectorRole.admin) {
-                  name = profile.name;
-                }
-                if (context.mounted) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => ReportHistoryScreen(
-                        inspectorName: name,
-                      ),
-                    ),
-                  );
-                }
-              },
-              child: const Text('View History'),
-              ),
-              const SizedBox(height: 12),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const ExportHistoryScreen(),
-                    ),
-                  );
-                },
-                child: const Text('Export History'),
-              ),
-              const SizedBox(height: 12),
-              ElevatedButton(
-                onPressed: () => Navigator.pushNamed(context, '/inspections'),
-                child: const Text('My Inspections'),
-              ),
-              const SizedBox(height: 12),
-              ElevatedButton(
-                onPressed: () => Navigator.pushNamed(context, '/settings'),
-                child: const Text('Report Settings'),
-              ),
-              const SizedBox(height: 12),
-              ElevatedButton(
-                onPressed: () => Navigator.pushNamed(context, '/templates'),
-                child: const Text('Manage Templates'),
-              ),
-              const SizedBox(height: 12),
-              ElevatedButton(
-                onPressed: () => Navigator.pushNamed(context, '/profile'),
-                child: const Text('Profile'),
-              ),
-              const SizedBox(height: 12),
-              ElevatedButton(
-                onPressed: () => Navigator.pushNamed(context, '/theme'),
-                child: const Text('Report Theme'),
-              ),
-              const SizedBox(height: 12),
-              ElevatedButton(
-                onPressed: () => Navigator.pushNamed(context, '/learning'),
-                child: const Text('AI Learning'),
-              ),
-              const SizedBox(height: 12),
-              ElevatedButton(
-                onPressed: () => Navigator.pushNamed(context, '/accessibility'),
-                child: const Text('Accessibility Settings'),
-              ),
-          ],
-        ),
+              );
+            },
+          ),
+          _HomeCard(
+            icon: Icons.bar_chart,
+            title: 'Analytics',
+            subtitle: 'Sync status and progress tracking',
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => AnalyticsDashboardScreen(reports: allReports),
+                ),
+              );
+            },
+          ),
+          _HomeCard(
+            icon: Icons.settings,
+            title: 'Settings',
+            subtitle: 'Theme, sync, account (coming soon)',
+            onTap: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Settings not implemented yet.')),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _HomeCard extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final VoidCallback onTap;
+
+  const _HomeCard({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 16),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: ListTile(
+        contentPadding: const EdgeInsets.all(16),
+        leading: Icon(icon, size: 32, color: Colors.blueGrey),
+        title: Text(title, style: Theme.of(context).textTheme.subtitle1),
+        subtitle: Text(subtitle),
+        trailing: const Icon(Icons.arrow_forward_ios, size: 18),
+        onTap: onTap,
       ),
     );
   }
