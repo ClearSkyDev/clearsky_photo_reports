@@ -56,8 +56,8 @@ class _PhotoDetailScreenState extends State<PhotoDetailScreen> {
     img.compositeImage(baseImage, resizedOverlay);
 
     final dir = p.dirname(file.path);
-    final newPath = p.join(
-        dir, '${p.basenameWithoutExtension(file.path)}_marked.jpg');
+    final newPath =
+        p.join(dir, '${p.basenameWithoutExtension(file.path)}_marked.jpg');
     final newFile = File(newPath);
     await newFile.writeAsBytes(img.encodeJpg(baseImage));
     setState(() {
@@ -126,10 +126,11 @@ class _PhotoDetailScreenState extends State<PhotoDetailScreen> {
                 width: 24,
                 height: 24,
                 decoration: BoxDecoration(
-                color: colors[i],
-                shape: BoxShape.circle,
-                border: Border.all(
-                    color: _penColor == colors[i] ? Colors.white : Colors.black),
+                  color: colors[i],
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                      color:
+                          _penColor == colors[i] ? Colors.white : Colors.black),
                 ),
               ),
             ),
@@ -180,4 +181,3 @@ class _PhotoDetailScreenState extends State<PhotoDetailScreen> {
     );
   }
 }
-
