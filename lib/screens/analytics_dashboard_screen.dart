@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:charts_flutter/flutter.dart' as charts;
+import 'package:fl_chart/fl_chart.dart';
 
 import '../models/inspection_report.dart';
 
@@ -37,36 +37,57 @@ class AnalyticsDashboardScreen extends StatelessWidget {
                   Text('Total Inspections: $total', style: Theme.of(context).textTheme.titleLarge),
                   const SizedBox(height: 8),
                   Expanded(
-                    child: charts.PieChart(
-                      [
-                        charts.Series<ChartData, String>(
-                          id: 'ReportSyncPie',
-                          domainFn: (ChartData data, _) => data.label,
-                          measureFn: (ChartData data, _) => data.value,
-                          colorFn: (ChartData data, _) => charts.ColorUtil.fromDartColor(data.color),
-                          data: pieData,
-                          labelAccessorFn: (ChartData row, _) => '${row.label}: ${row.value}',
-                        )
-                      ],
-                      animate: true,
-                      defaultRenderer: charts.ArcRendererConfig(arcRendererDecorators: [
-                        charts.ArcLabelDecorator(labelPosition: charts.ArcLabelPosition.outside)
-                      ]),
+                    child: PieChart(
+                      PieChartData(
+                        sections: pieData
+                            .map((d) => PieChartSectionData(
+                                  value: d.value.toDouble(),
+                                  color: d.color,
+                                  title: '${d.label}: ${d.value}',
+                                  titleStyle: const TextStyle(fontSize: 14, color: Colors.white),
+                                ))
+                            .toList(),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 20),
                   Expanded(
-                    child: charts.BarChart(
-                      [
-                        charts.Series<ChartData, String>(
-                          id: 'ReportSyncBars',
-                          domainFn: (ChartData data, _) => data.label,
-                          measureFn: (ChartData data, _) => data.value,
-                          colorFn: (ChartData data, _) => charts.ColorUtil.fromDartColor(data.color),
-                          data: barData,
-                        )
-                      ],
-                      animate: true,
+                    child: BarChart(
+                      BarChartData(
+                        barGroups: [
+                          for (int i = 0; i < barData.length; i++)
+                            BarChartGroupData(
+                              x: i,
+                              barRods: [
+                                BarChartRodData(
+                                  toY: barData[i].value.toDouble(),
+                                  color: barData[i].color,
+                                  width: 20,
+                                  borderRadius: BorderRadius.zero,
+                                ),
+                              ],
+                            ),
+                        ],
+                        titlesData: FlTitlesData(
+                          bottomTitles: AxisTitles(
+                            sideTitles: SideTitles(
+                              showTitles: true,
+                              getTitlesWidget: (value, meta) {
+                                final idx = value.toInt();
+                                if (idx >= 0 && idx < barData.length) {
+                                  return Text(barData[idx].label);
+                                }
+                                return const SizedBox.shrink();
+                              },
+                            ),
+                          ),
+                          leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                          rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                          topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                        ),
+                        borderData: FlBorderData(show: false),
+                        gridData: const FlGridData(show: false),
+                      ),
                     ),
                   ),
                 ],
