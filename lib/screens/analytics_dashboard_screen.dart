@@ -34,7 +34,8 @@ class AnalyticsDashboardScreen extends StatelessWidget {
             : Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Text('Total Inspections: $total', style: Theme.of(context).textTheme.titleLarge),
+                  Text('Total Inspections: $total',
+                      style: Theme.of(context).textTheme.titleLarge),
                   const SizedBox(height: 8),
                   Expanded(
                     child: PieChart(
@@ -44,7 +45,8 @@ class AnalyticsDashboardScreen extends StatelessWidget {
                                   value: d.value.toDouble(),
                                   color: d.color,
                                   title: '${d.label}: ${d.value}',
-                                  titleStyle: const TextStyle(fontSize: 14, color: Colors.white),
+                                  titleStyle: const TextStyle(
+                                      fontSize: 14, color: Colors.white),
                                 ))
                             .toList(),
                       ),
@@ -81,9 +83,12 @@ class AnalyticsDashboardScreen extends StatelessWidget {
                               },
                             ),
                           ),
-                          leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                          rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                          topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                          leftTitles: const AxisTitles(
+                              sideTitles: SideTitles(showTitles: false)),
+                          rightTitles: const AxisTitles(
+                              sideTitles: SideTitles(showTitles: false)),
+                          topTitles: const AxisTitles(
+                              sideTitles: SideTitles(showTitles: false)),
                         ),
                         borderData: FlBorderData(show: false),
                         gridData: const FlGridData(show: false),
