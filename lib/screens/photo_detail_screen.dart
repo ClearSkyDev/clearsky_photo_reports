@@ -17,7 +17,7 @@ class PhotoDetailScreen extends StatefulWidget {
 }
 
 class _PhotoDetailScreenState extends State<PhotoDetailScreen> {
-  late final SignatureController _controller;
+  late SignatureController _controller;
   Color _penColor = Colors.red;
   bool _markupMode = false;
 
@@ -53,7 +53,7 @@ class _PhotoDetailScreenState extends State<PhotoDetailScreen> {
     if (baseImage == null || overlayImage == null) return;
     final resizedOverlay = img.copyResize(overlayImage,
         width: baseImage.width, height: baseImage.height);
-    img.drawImage(baseImage, resizedOverlay);
+    img.compositeImage(baseImage, resizedOverlay);
 
     final dir = p.dirname(file.path);
     final newPath = p.join(
@@ -64,13 +64,21 @@ class _PhotoDetailScreenState extends State<PhotoDetailScreen> {
       widget.entry.originalUrl ??= widget.entry.url;
       widget.entry.url = newFile.path;
     });
+    if (!mounted) return;
     Navigator.pop(context, true);
   }
 
   void _setColor(Color color) {
     setState(() {
       _penColor = color;
-      _controller.penColor = color;
+      final points = _controller.points;
+      _controller.dispose();
+      _controller = SignatureController(
+        points: points,
+        penStrokeWidth: 3,
+        penColor: _penColor,
+        exportBackgroundColor: Colors.transparent,
+      );
     });
   }
 

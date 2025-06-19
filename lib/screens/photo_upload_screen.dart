@@ -1,10 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import '../models/photo_entry.dart';
+import '../models/inspection_metadata.dart';
+import '../models/report_template.dart';
 import 'report_preview_screen.dart';
 
 class PhotoUploadScreen extends StatefulWidget {
-  const PhotoUploadScreen({super.key});
+  final InspectionMetadata metadata;
+  final ReportTemplate? template;
+  const PhotoUploadScreen({
+    super.key,
+    required this.metadata,
+    this.template,
+  });
 
   @override
   State<PhotoUploadScreen> createState() => _PhotoUploadScreenState();
