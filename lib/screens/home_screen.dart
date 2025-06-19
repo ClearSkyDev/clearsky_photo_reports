@@ -9,7 +9,7 @@ import '../models/inspection_report.dart';
 class HomeScreen extends StatelessWidget {
   final List<InspectionReport> allReports;
 
-  const HomeScreen({Key? key, required this.allReports}) : super(key: key);
+  const HomeScreen({super.key, required this.allReports});
 
   @override
   Widget build(BuildContext context) {
@@ -95,7 +95,7 @@ class _HomeCard extends StatelessWidget {
       child: ListTile(
         contentPadding: const EdgeInsets.all(16),
         leading: Icon(icon, size: 32, color: Colors.blueGrey),
-        title: Text(title, style: Theme.of(context).textTheme.subtitle1),
+        title: Text(title, style: Theme.of(context).textTheme.titleMedium),
         subtitle: Text(subtitle),
         trailing: const Icon(Icons.arrow_forward_ios, size: 18),
         onTap: onTap,

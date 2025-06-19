@@ -22,10 +22,10 @@ class MessageThreadScreen extends StatefulWidget {
   final String currentUserId;
 
   const MessageThreadScreen({
-    Key? key,
+    super.key,
     required this.threadTitle,
     required this.currentUserId,
-  }) : super(key: key);
+  });
 
   @override
   _MessageThreadScreenState createState() => _MessageThreadScreenState();

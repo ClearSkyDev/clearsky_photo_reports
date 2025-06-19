@@ -6,7 +6,7 @@ import '../models/inspection_report.dart';
 class ReportSearchScreen extends StatefulWidget {
   final List<InspectionReport> allReports;
 
-  const ReportSearchScreen({Key? key, required this.allReports}) : super(key: key);
+  const ReportSearchScreen({super.key, required this.allReports});
 
   @override
   _ReportSearchScreenState createState() => _ReportSearchScreenState();

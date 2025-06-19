@@ -18,7 +18,7 @@ class Invoice {
 }
 
 class InvoiceListScreen extends StatefulWidget {
-  const InvoiceListScreen({Key? key}) : super(key: key);
+  const InvoiceListScreen({super.key});
 
   @override
   _InvoiceListScreenState createState() => _InvoiceListScreenState();
@@ -105,8 +105,8 @@ class _InvoiceListScreenState extends State<InvoiceListScreen> {
           // final result = await Navigator.push(...CreateInvoiceScreen());
           // if (result is Invoice) setState(() => _invoices.add(result));
         },
-        child: const Icon(Icons.add),
         tooltip: 'New Invoice',
+        child: const Icon(Icons.add),
       ),
     );
   }
