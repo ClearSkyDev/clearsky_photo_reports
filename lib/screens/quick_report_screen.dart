@@ -86,7 +86,7 @@ class _QuickReportScreenState extends State<QuickReportScreen> {
       'inspectionDate': DateTime.now().toIso8601String(),
       'perilType': 'wind',
       'inspectionType': 'residentialRoof',
-      'inspectorRoles': ['ladder_assist'],
+      'inspectorRoles': ['ladderAssist'],
     };
     final report = SavedReport(
       inspectionMetadata: metadata,
@@ -117,7 +117,7 @@ class _QuickReportScreenState extends State<QuickReportScreen> {
       'inspectionDate': DateTime.now().toIso8601String(),
       'perilType': 'wind',
       'inspectionType': 'residentialRoof',
-      'inspectorRoles': ['ladder_assist'],
+      'inspectorRoles': ['ladderAssist'],
     };
     final report = SavedReport(
       inspectionMetadata: metadata,

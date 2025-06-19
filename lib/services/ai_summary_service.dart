@@ -37,14 +37,14 @@ class AiSummaryService {
       }
     }
 
-    final roleList = (report.inspectionMetadata['inspectorRoles'] as List?) ??
-        ['ladder_assist'];
+    final roleList =
+        (report.inspectionMetadata['inspectorRoles'] as List?) ?? ['ladderAssist'];
     final roles = roleList
         .map((e) => InspectorReportRole.values.byName(e as String))
         .toSet();
 
     String prompt;
-    if (roles.contains(InspectorReportRole.ladder_assist) && roles.length == 1) {
+    if (roles.contains(InspectorReportRole.ladderAssist) && roles.length == 1) {
       prompt =
           'You are a third-party roof inspector. Your job is to document findings only.\n'
           'Do not mention recommendations, causes, or coverage.\n'

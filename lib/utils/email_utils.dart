@@ -26,7 +26,7 @@ Future<void> sendReportByEmail(
   if (kIsWeb) {
     final blob = html.Blob([pdfBytes], 'application/pdf');
     final url = html.Url.createObjectUrlFromBlob(blob);
-    final anchor = html.AnchorElement(href: url)
+    html.AnchorElement(href: url)
       ..setAttribute('download', 'report.pdf')
       ..click();
     html.Url.revokeObjectUrl(url);
@@ -50,8 +50,7 @@ Future<void> sendReportByEmail(
   try {
     await FlutterEmailSender.send(mail);
   } catch (_) {
-    await SharePlus.instance
-        .shareXFiles([XFile(file.path)], subject: subject, text: message);
+    await Share.shareXFiles([XFile(file.path)], subject: subject, text: message);
   }
 }
 
@@ -121,6 +120,6 @@ Future<void> sendReportEmail(
   try {
     await FlutterEmailSender.send(mail);
   } catch (_) {
-    await SharePlus.instance.share(body, subject: subject);
+    await Share.share(body, subject: subject);
   }
 }

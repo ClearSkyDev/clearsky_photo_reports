@@ -11,8 +11,8 @@ String formatDamageLabel(String damageType, Set<InspectorReportRole> roles) {
     return damageType;
   }
   var base = damageType
-      .replaceAll(RegExp('(?i)evidence of'), '')
-      .replaceAll(RegExp('(?i)damage'), '')
+      .replaceAll(RegExp('evidence of', caseSensitive: false), '')
+      .replaceAll(RegExp('damage', caseSensitive: false), '')
       .trim();
   if (base.isEmpty) {
     return 'Evidence of Damage';

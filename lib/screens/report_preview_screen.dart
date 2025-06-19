@@ -581,7 +581,7 @@ ${_jobCostController.text}</p>');
     final blob = html.Blob([bytes]);
     final url = html.Url.createObjectUrlFromBlob(blob);
     final fileName = _metadataFileName('html');
-    final anchor = html.AnchorElement(href: url)
+    html.AnchorElement(href: url)
       ..setAttribute("download", fileName)
       ..click();
     html.Url.revokeObjectUrl(url);
@@ -1022,7 +1022,7 @@ ${_jobCostController.text}</p>');
     if (kIsWeb) {
       final blob = html.Blob([bytes], 'application/pdf');
       final url = html.Url.createObjectUrlFromBlob(blob);
-      final anchor = html.AnchorElement(href: url)
+      html.AnchorElement(href: url)
         ..setAttribute('download', fileName)
         ..click();
       html.Url.revokeObjectUrl(url);

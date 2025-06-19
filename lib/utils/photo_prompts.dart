@@ -3,7 +3,7 @@ import '../models/photo_entry.dart';
 
 /// Required photo counts for each inspection role by section.
 const Map<InspectorReportRole, Map<String, int>> kRequiredPhotosByRole = {
-  InspectorReportRole.ladder_assist: {
+  InspectorReportRole.ladderAssist: {
     'Front of House': 1,
     'Roof Edge': 1,
   },

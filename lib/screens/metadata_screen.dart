@@ -32,7 +32,7 @@ class _MetadataScreenState extends State<MetadataScreen> {
   DateTime _inspectionDate = DateTime.now();
   PerilType _selectedPeril = PerilType.wind;
   InspectionType _selectedType = InspectionType.residentialRoof;
-  Set<InspectorReportRole> _selectedRole = {InspectorReportRole.ladder_assist};
+  Set<InspectorReportRole> _selectedRole = {InspectorReportRole.ladderAssist};
   List<ReportTemplate> _templates = [];
   ReportTemplate? _selectedTemplate;
   bool _quickEnabled = false;

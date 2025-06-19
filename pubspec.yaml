@@ -34,6 +34,11 @@ dependencies:
   # Location & GPS
   geolocator: ^11.0.0
 
+  # Media & storage
+  image_picker: ^1.0.7
+  shared_preferences: ^2.2.2
+  http: ^1.2.1
+
   # Internationalization
   intl: ^0.18.1
 
