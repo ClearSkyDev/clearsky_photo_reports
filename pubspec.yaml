@@ -55,7 +55,7 @@ dependencies:
   flutter_tts: ^5.1.0
 
   # WebView
-  webview_flutter: ^4.7.0
+  webview_flutter: ^4.0.7
   webview_flutter_web: ^0.2.2+4
 
   # Connectivity

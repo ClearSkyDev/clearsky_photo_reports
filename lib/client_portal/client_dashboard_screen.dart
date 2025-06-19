@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/inspection_report.dart'; // Make sure this exists
-import 'inspection_detail_screen.dart';    // Placeholder for navigation
+import 'inspection_detail_screen.dart'; // Make sure this file exists and exports InspectionDetailScreen
 
 class ClientDashboardScreen extends StatefulWidget {
   const ClientDashboardScreen({super.key});
