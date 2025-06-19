@@ -1,165 +1,122 @@
 import 'package:flutter/material.dart';
+import 'dart:io';
 import 'package:image_picker/image_picker.dart';
-import '../models/photo_entry.dart';
-import '../models/inspection_metadata.dart';
-import '../models/inspection_sections.dart';
-import '../models/report_template.dart';
 
 class GuidedCaptureScreen extends StatefulWidget {
-  final InspectionMetadata metadata;
-  final ReportTemplate? template;
-  const GuidedCaptureScreen({super.key, required this.metadata, this.template});
+  const GuidedCaptureScreen({Key? key}) : super(key: key);
 
   @override
-  State<GuidedCaptureScreen> createState() => _GuidedCaptureScreenState();
+  _GuidedCaptureScreenState createState() => _GuidedCaptureScreenState();
 }
 
 class _GuidedCaptureScreenState extends State<GuidedCaptureScreen> {
-  late final List<String> _sections;
-  final ImagePicker _picker = ImagePicker();
-  late final Map<String, List<PhotoEntry>> _sectionPhotos;
-  int _current = 0;
-  bool _showPrompt = true;
+  final List<String> captureSteps = [
+    'Address Photo',
+    'Front of House',
+    'Front Elevation',
+    'Right Elevation',
+    'Back Elevation',
+    'Left Elevation',
+    'Roof Edge - Gutters',
+    'Front Slope',
+    'Right Slope',
+    'Back Slope',
+    'Left Slope',
+    'Interior Damage (if applicable)',
+    'Additional Structures',
+  ];
 
-  @override
-  void initState() {
-    super.initState();
-    _sections = widget.template?.sections ??
-        sectionsForType(widget.metadata.inspectionType);
-    _sectionPhotos = {for (var s in _sections) s: []};
-  }
+  int currentStep = 0;
+  final Map<String, File?> capturedPhotos = {};
+  final ImagePicker picker = ImagePicker();
 
-  Future<void> _pickImages() async {
-    final selected = await _picker.pickMultiImage();
-    if (selected.isEmpty) return;
-    final section = _sections[_current];
-    setState(() {
-      final target = _sectionPhotos[section]!;
-      for (final x in selected) {
-        target.add(PhotoEntry(
-          url: x.path,
-          capturedAt: DateTime.now(),
-          label: section,
-          sourceType: SourceType.camera,
-        ));
-      }
-      _showPrompt = false;
-    });
-  }
-
-  void _next() {
-    if (_current < _sections.length - 1) {
+  Future<void> _takePhoto() async {
+    final pickedFile = await picker.pickImage(source: ImageSource.camera);
+    if (pickedFile != null) {
       setState(() {
-        _current++;
-        _showPrompt = true;
+        capturedPhotos[captureSteps[currentStep]] = File(pickedFile.path);
       });
-    } else {
-      Navigator.pop(context, _sectionPhotos);
     }
   }
 
-  void _jumpTo(int index) {
-    setState(() {
-      _current = index;
-      _showPrompt = true;
-    });
+  void _nextStep() {
+    if (currentStep < captureSteps.length - 1) {
+      setState(() {
+        currentStep++;
+      });
+    } else {
+      _finishCapture();
+    }
+  }
+
+  void _prevStep() {
+    if (currentStep > 0) {
+      setState(() {
+        currentStep--;
+      });
+    }
+  }
+
+  void _finishCapture() {
+    // Navigate to review or return to dashboard
+    Navigator.pop(context, capturedPhotos);
   }
 
   @override
   Widget build(BuildContext context) {
-    final section = _sections[_current];
-    final completed =
-        _sectionPhotos.values.where((e) => e.isNotEmpty).length;
-    final progress = completed / _sections.length;
-    final prompt = widget.template?.photoPrompts[section];
+    final stepLabel = captureSteps[currentStep];
+    final photoFile = capturedPhotos[stepLabel];
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Guided Capture'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.list),
-            tooltip: 'Jump to Section',
-            onPressed: () async {
-              final choice = await showModalBottomSheet<int>(
-                context: context,
-                builder: (_) => ListView.builder(
-                  itemCount: _sections.length,
-                  itemBuilder: (_, i) => ListTile(
-                    title: Text(_sections[i]),
-                    trailing: _sectionPhotos[_sections[i]]!.isNotEmpty
-                        ? const Icon(Icons.check)
-                        : null,
-                    onTap: () => Navigator.pop(context, i),
-                  ),
-                ),
-              );
-              if (choice != null) _jumpTo(choice);
-            },
-          )
-        ],
+        title: const Text('Guided Photo Capture'),
       ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          LinearProgressIndicator(value: progress),
-          Padding(
-            padding: const EdgeInsets.all(8),
-            child: Text(
-              'Step ${_current + 1} of ${_sections.length}: $section',
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            Text(
+              'Step ${currentStep + 1} of ${captureSteps.length}',
+              style: Theme.of(context).textTheme.subtitle1,
             ),
-          ),
-          if (prompt != null && _showPrompt)
-            Dismissible(
-              key: ValueKey(section),
-              onDismissed: (_) => setState(() => _showPrompt = false),
-              child: Card(
-                margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                child: Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: Text(prompt),
-                ),
-              ),
+            const SizedBox(height: 8),
+            Text(
+              stepLabel,
+              style: Theme.of(context).textTheme.headline6,
             ),
-          Expanded(
-            child: GridView.builder(
-              padding: const EdgeInsets.all(8),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3,
-                crossAxisSpacing: 4,
-                mainAxisSpacing: 4,
-              ),
-              itemCount: _sectionPhotos[section]!.length,
-              itemBuilder: (_, i) => Image.network(
-                _sectionPhotos[section]![i].url,
-                fit: BoxFit.cover,
-              ),
+            const SizedBox(height: 16),
+            photoFile != null
+                ? Image.file(photoFile, height: 200)
+                : Container(
+                    height: 200,
+                    color: Colors.grey[200],
+                    child: const Center(child: Text('No photo taken yet')),
+                  ),
+            const SizedBox(height: 16),
+            ElevatedButton.icon(
+              icon: const Icon(Icons.camera_alt),
+              label: const Text('Capture Photo'),
+              onPressed: _takePhoto,
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8),
-            child: Row(
+            const Spacer(),
+            Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                TextButton(
-                  onPressed: _pickImages,
-                  child: const Text('Add Photo'),
-                ),
-                TextButton(
-                  onPressed: _next,
-                  child:
-                      Text(_current == _sections.length - 1 ? 'Finish' : 'Skip'),
-                ),
+                if (currentStep > 0)
+                  ElevatedButton(
+                    onPressed: _prevStep,
+                    child: const Text('Back'),
+                  ),
                 ElevatedButton(
-                  onPressed: _next,
-                  child: Text(
-                      _current == _sections.length - 1 ? 'Done' : 'Next'),
+                  onPressed: _nextStep,
+                  child: Text(currentStep == captureSteps.length - 1
+                      ? 'Finish'
+                      : 'Next'),
                 ),
               ],
-            ),
-          )
-        ],
+            )
+          ],
+        ),
       ),
     );
   }

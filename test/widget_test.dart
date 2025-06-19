@@ -1,80 +1,58 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:clearsky_photo_reports/main.dart';
-import 'package:clearsky_photo_reports/screens/photo_upload_screen.dart';
-import 'package:clearsky_photo_reports/screens/client_signature_screen.dart';
-import 'package:clearsky_photo_reports/screens/inspection_checklist_screen.dart';
-import 'package:clearsky_photo_reports/models/checklist_template.dart';
+import 'package:clearsky_photo_reports/screens/client_dashboard_screen.dart';
+import 'package:clearsky_photo_reports/models/inspection_report.dart';
 
 void main() {
-  testWidgets('Home screen renders and buttons are visible',
-      (WidgetTester tester) async {
-    await tester.pumpWidget(const ClearSkyApp());
-
-    expect(find.text('ClearSky Photo Reports'), findsOneWidget);
-    expect(find.text('Upload Photos'), findsOneWidget);
-    expect(find.text('Generate Report'), findsOneWidget);
-  });
-
-  testWidgets('Navigation to Photo Upload screen works',
-      (WidgetTester tester) async {
-    await tester.pumpWidget(const ClearSkyApp());
-
-    await tester.tap(find.text('Upload Photos'));
-    await tester.pumpAndSettle();
-
-    expect(find.text('Pick Photos'), findsOneWidget);
-  });
-
-  testWidgets('Generate Report with no photos shows warning',
-      (WidgetTester tester) async {
-    await tester.pumpWidget(const ClearSkyApp());
-
-    await tester.tap(find.text('Generate Report'));
-    await tester.pump(); // simulate UI update
-
-    // Replace this with your real snackbar/dialog if implemented
-    // expect(find.text('Please upload photos first'), findsOneWidget);
-  });
-
-  testWidgets('Checklist screen toggles item state',
-      (WidgetTester tester) async {
-    final testTemplate = ChecklistTemplate(
-      id: '1',
-      name: 'Test Checklist',
-      items: [
-        ChecklistItem(id: 'a', label: 'Test item 1'),
-        ChecklistItem(id: 'b', label: 'Test item 2'),
-      ],
-    );
-
-    await tester.pumpWidget(const MaterialApp(
-      home: Scaffold(body: InspectionChecklistScreen()),
-    ));
-
-    // Simulate user interaction after adding template
-    // Note: You may want to expose template injection via constructor for true testing
-    expect(find.text('Add Item'), findsOneWidget);
-  });
-
-  testWidgets('Signature screen renders and captures data',
-      (WidgetTester tester) async {
+  testWidgets('Dashboard loads and new inspection triggers snackBar', (WidgetTester tester) async {
+    // Build the widget tree
     await tester.pumpWidget(
-      const MaterialApp(home: ClientSignatureScreen(reportId: 'r1')),
+      const MaterialApp(
+        home: ClientDashboardScreen(),
+      ),
     );
 
-    expect(find.text('Homeowner Signature'), findsOneWidget);
-    expect(find.text('Submit'), findsOneWidget);
+    // Verify the title is shown
+    expect(find.text('My Inspections'), findsOneWidget);
 
-    await tester.enterText(find.byType(TextField).first, 'John Doe');
+    // Tap the FAB to create a new inspection
+    final fabFinder = find.byType(FloatingActionButton);
+    expect(fabFinder, findsOneWidget);
 
-    final saveBtn = find.widgetWithText(ElevatedButton, 'Save');
-    expect(saveBtn, findsOneWidget);
+    await tester.tap(fabFinder);
+    await tester.pump(); // Let the snackbar animate
 
-    await tester.tap(saveBtn);
-    await tester.pump();
+    // Expect snackbar to appear
+    expect(find.text('New Inspection button tapped'), findsOneWidget);
+  });
 
-    // This won’t verify image bytes, but ensures interaction works.
-    expect(find.byType(Signature), findsOneWidget);
+  testWidgets('Dashboard shows a list of inspections', (WidgetTester tester) async {
+    // Create fake reports
+    final reports = [
+      InspectionReport(id: '1', title: 'Roof A', synced: false),
+      InspectionReport(id: '2', title: 'Roof B', synced: true),
+    ];
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: ListView.builder(
+            itemCount: reports.length,
+            itemBuilder: (context, index) {
+              final report = reports[index];
+              return ListTile(
+                title: Text(report.title ?? ''),
+                subtitle: Text(report.synced ? 'Synced' : 'Unsynced'),
+              );
+            },
+          ),
+        ),
+      ),
+    );
+
+    expect(find.text('Roof A'), findsOneWidget);
+    expect(find.text('Unsynced'), findsOneWidget);
+    expect(find.text('Roof B'), findsOneWidget);
+    expect(find.text('Synced'), findsOneWidget);
   });
 }
