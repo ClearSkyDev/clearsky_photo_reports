@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'create_invoice_screen.dart';
 
 class Invoice {
   final String id;
