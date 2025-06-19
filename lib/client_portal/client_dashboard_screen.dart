@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import '../models/inspection_report.dart'; // Make sure this exists
-import 'inspection_detail_screen.dart'; // Make sure this file exists and exports InspectionDetailScreen
+import 'inspection_detail_screen.dart';
+import '../screens/inspection_checklist_screen.dart';
 
 class ClientDashboardScreen extends StatefulWidget {
   const ClientDashboardScreen({super.key});
 
   @override
-  _ClientDashboardScreenState createState() => _ClientDashboardScreenState();
+  ClientDashboardScreenState createState() => ClientDashboardScreenState();
 }
 
-class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
+class ClientDashboardScreenState extends State<ClientDashboardScreen> {
   final List<InspectionReport> _allReports = []; // Your reports list
   String _filter = 'All'; // Filter: All, Synced, Unsynced
 
@@ -35,9 +36,11 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
   }
 
   void _createNewInspection() {
-    // TODO: Navigate to inspection setup screen
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('New Inspection button tapped')),
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const InspectionChecklistScreen(),
+      ),
     );
   }
 
