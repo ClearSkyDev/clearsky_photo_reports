@@ -13,6 +13,7 @@ class AppTheme {
     scaffoldBackgroundColor: Colors.grey[900],
   );
 
+  // Build a high-contrast theme using the named constructor.
   static ThemeData highContrastTheme = ThemeData.highContrastLight().copyWith(
     textTheme: GoogleFonts.robotoMonoTextTheme(),
   );
