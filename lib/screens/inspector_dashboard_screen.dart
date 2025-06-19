@@ -5,6 +5,7 @@ import '../models/saved_report.dart';
 import '../models/inspection_metadata.dart';
 import '../models/inspected_structure.dart';
 import '../models/photo_entry.dart';
+import '../models/checklist_template.dart' show InspectorReportRole;
 import '../services/offline_draft_store.dart';
 import '../services/offline_sync_service.dart';
 import '../utils/profile_storage.dart';
@@ -40,7 +41,9 @@ class _InspectorDashboardScreenState extends State<InspectorDashboardScreen> {
       query = query.where('inspectionMetadata.inspectorName', isEqualTo: profile.name);
     }
     final snap = await query.get();
-    final remote = snap.docs.map((d) => SavedReport.fromMap(d.data(), d.id)).toList();
+    final remote = snap.docs
+        .map((d) => SavedReport.fromMap(d.data() as Map<String, dynamic>, d.id))
+        .toList();
     final local = OfflineDraftStore.instance.loadReports();
     return [...local, ...remote];
   }
@@ -122,7 +125,8 @@ class _InspectorDashboardScreenState extends State<InspectorDashboardScreen> {
                   });
                   structs.add(InspectedStructure(
                     name: s.name,
-                    sectionPhotos: map,
+                    sectionPhotos:
+                        map as Map<String, List<ReportPhotoEntry>>, // ignore: cast_nullable_to_non_nullable
                     slopeTestSquare: Map.from(s.slopeTestSquare),
                   ));
                 }
@@ -162,7 +166,8 @@ class _InspectorDashboardScreenState extends State<InspectorDashboardScreen> {
                   });
                   structs.add(InspectedStructure(
                     name: s.name,
-                    sectionPhotos: map,
+                    sectionPhotos:
+                        map as Map<String, List<ReportPhotoEntry>>, // ignore: cast_nullable_to_non_nullable
                     slopeTestSquare: Map.from(s.slopeTestSquare),
                   ));
                 }
@@ -202,7 +207,8 @@ class _InspectorDashboardScreenState extends State<InspectorDashboardScreen> {
                   });
                   structs.add(InspectedStructure(
                     name: s.name,
-                    sectionPhotos: map,
+                    sectionPhotos:
+                        map as Map<String, List<ReportPhotoEntry>>, // ignore: cast_nullable_to_non_nullable
                     slopeTestSquare: Map.from(s.slopeTestSquare),
                   ));
                 }
