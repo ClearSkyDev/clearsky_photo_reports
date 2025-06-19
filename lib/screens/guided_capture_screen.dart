@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 
 class GuidedCaptureScreen extends StatefulWidget {
-  const GuidedCaptureScreen({Key? key}) : super(key: key);
+  const GuidedCaptureScreen({super.key});
 
   @override
   _GuidedCaptureScreenState createState() => _GuidedCaptureScreenState();
@@ -77,12 +77,12 @@ class _GuidedCaptureScreenState extends State<GuidedCaptureScreen> {
           children: [
             Text(
               'Step ${currentStep + 1} of ${captureSteps.length}',
-              style: Theme.of(context).textTheme.subtitle1,
+              style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 8),
             Text(
               stepLabel,
-              style: Theme.of(context).textTheme.headline6,
+              style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 16),
             photoFile != null

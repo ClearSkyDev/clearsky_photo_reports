@@ -150,7 +150,7 @@ Future<File?> exportAsZip(SavedReport report) async {
   return null;
   }
 
-  final zipData = ZipEncoder().encode(archive)!;
+  final zipData = ZipEncoder().encode(archive);
 
   if (kIsWeb) {
     final blob = html.Blob([zipData], 'application/zip');
@@ -221,7 +221,7 @@ Future<File?> exportFinalZip(SavedReport report,
     }
   }
 
-  final zipData = ZipEncoder().encode(archive)!;
+  final zipData = ZipEncoder().encode(archive);
 
   if (kIsWeb) {
     final storage = FirebaseStorage.instance;
@@ -327,7 +327,7 @@ Future<File?> exportLegalCopy(SavedReport report,
     }
   }
 
-  final zipData = ZipEncoder().encode(archive)!;
+  final zipData = ZipEncoder().encode(archive);
 
   Future<void> logExport(String url) async {
     try {

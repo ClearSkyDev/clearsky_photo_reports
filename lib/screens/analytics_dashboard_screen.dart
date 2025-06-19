@@ -6,7 +6,7 @@ import '../models/inspection_report.dart';
 class AnalyticsDashboardScreen extends StatelessWidget {
   final List<InspectionReport> reports;
 
-  const AnalyticsDashboardScreen({Key? key, required this.reports}) : super(key: key);
+  const AnalyticsDashboardScreen({super.key, required this.reports});
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +34,7 @@ class AnalyticsDashboardScreen extends StatelessWidget {
             : Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Text('Total Inspections: $total', style: Theme.of(context).textTheme.headline6),
+                  Text('Total Inspections: $total', style: Theme.of(context).textTheme.titleLarge),
                   const SizedBox(height: 8),
                   Expanded(
                     child: charts.PieChart(

@@ -3,14 +3,14 @@ import '../models/inspection_report.dart'; // Make sure this exists
 import 'inspection_detail_screen.dart';    // Placeholder for navigation
 
 class ClientDashboardScreen extends StatefulWidget {
-  const ClientDashboardScreen({Key? key}) : super(key: key);
+  const ClientDashboardScreen({super.key});
 
   @override
   _ClientDashboardScreenState createState() => _ClientDashboardScreenState();
 }
 
 class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
-  List<InspectionReport> _allReports = []; // Your reports list
+  final List<InspectionReport> _allReports = []; // Your reports list
   String _filter = 'All'; // Filter: All, Synced, Unsynced
 
   void _openReport(InspectionReport report) {
@@ -37,7 +37,7 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
   void _createNewInspection() {
     // TODO: Navigate to inspection setup screen
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('New Inspection button tapped')),
+      const SnackBar(content: Text('New Inspection button tapped')),
     );
   }
 
@@ -99,8 +99,8 @@ class _ClientDashboardScreenState extends State<ClientDashboardScreen> {
             ),
       floatingActionButton: FloatingActionButton(
         onPressed: _createNewInspection,
-        child: const Icon(Icons.add),
         tooltip: 'New Inspection',
+        child: const Icon(Icons.add),
       ),
     );
   }
