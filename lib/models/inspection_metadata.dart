@@ -1,54 +1,72 @@
+import 'inspection_type.dart';
+import 'checklist_template.dart' show PerilType, InspectorReportRole;
+
 class InspectionMetadata {
-  // Send metadata
-  String? lastSendMethod;
-  String? lastSentTo;
-  DateTime? lastSentAt;
-
-  // Start-of-inspection metadata
-  DateTime? startTimestamp;
-  double? startLatitude;
-  double? startLongitude;
-
-  // Inspector roles (optional)
-  List<String> inspectorRoles;
+  String clientName;
+  String propertyAddress;
+  DateTime inspectionDate;
+  String? insuranceCarrier;
+  PerilType perilType;
+  InspectionType inspectionType;
+  String? inspectorName;
+  Set<InspectorReportRole> inspectorRoles;
+  String? reportId;
+  String? weatherNotes;
+  String? partnerCode;
 
   InspectionMetadata({
-    this.lastSendMethod,
-    this.lastSentTo,
-    this.lastSentAt,
-    this.startTimestamp,
-    this.startLatitude,
-    this.startLongitude,
-    List<String>? inspectorRoles,
-  }) : inspectorRoles = inspectorRoles ?? [];
+    required this.clientName,
+    required this.propertyAddress,
+    required this.inspectionDate,
+    this.insuranceCarrier,
+    required this.perilType,
+    required this.inspectionType,
+    this.inspectorName,
+    required Set<InspectorReportRole> inspectorRoles,
+    this.reportId,
+    this.weatherNotes,
+    this.partnerCode,
+  }) : inspectorRoles = inspectorRoles;
 
-  /// Convert to map (e.g., for storage or JSON)
+  // Convert to Map (for saving to JSON, Firestore, etc.)
   Map<String, dynamic> toMap() {
     return {
-      'lastSendMethod': lastSendMethod,
-      'lastSentTo': lastSentTo,
-      'lastSentAt': lastSentAt?.toIso8601String(),
-      'startTimestamp': startTimestamp?.toIso8601String(),
-      'startLatitude': startLatitude,
-      'startLongitude': startLongitude,
-      'inspectorRoles': inspectorRoles,
+      'clientName': clientName,
+      'propertyAddress': propertyAddress,
+      'inspectionDate': inspectionDate.toIso8601String(),
+      if (inspectorName != null) 'inspectorName': inspectorName,
+      'inspectorRoles': inspectorRoles.map((e) => e.name).toList(),
+      if (insuranceCarrier != null) 'insuranceCarrier': insuranceCarrier,
+      'perilType': perilType.name,
+      'inspectionType': inspectionType.name,
+      if (reportId != null) 'reportId': reportId,
+      if (weatherNotes != null) 'weatherNotes': weatherNotes,
+      if (partnerCode != null) 'partnerCode': partnerCode,
     };
   }
 
-  /// Construct from map (e.g., when loading saved data)
+  // Load from Map
   factory InspectionMetadata.fromMap(Map<String, dynamic> map) {
+    final roles = (map['inspectorRoles'] as List?)
+            ?.map((e) => InspectorReportRole.values.byName(e))
+            .toSet() ??
+        {
+          InspectorReportRole
+              .ladder_assist,
+        };
     return InspectionMetadata(
-      lastSendMethod: map['lastSendMethod'],
-      lastSentTo: map['lastSentTo'],
-      lastSentAt: map['lastSentAt'] != null
-          ? DateTime.tryParse(map['lastSentAt'])
-          : null,
-      startTimestamp: map['startTimestamp'] != null
-          ? DateTime.tryParse(map['startTimestamp'])
-          : null,
-      startLatitude: map['startLatitude']?.toDouble(),
-      startLongitude: map['startLongitude']?.toDouble(),
-      inspectorRoles: List<String>.from(map['inspectorRoles'] ?? []),
+      clientName: map['clientName'] ?? '',
+      propertyAddress: map['propertyAddress'] ?? '',
+      inspectionDate: DateTime.parse(map['inspectionDate']),
+      insuranceCarrier: map['insuranceCarrier'],
+      perilType: PerilType.values.byName(map['perilType'] ?? 'wind'),
+      inspectionType:
+          InspectionType.values.byName(map['inspectionType'] ?? 'residentialRoof'),
+      inspectorName: map['inspectorName'],
+      inspectorRoles: roles,
+      reportId: map['reportId'],
+      weatherNotes: map['weatherNotes'],
+      partnerCode: map['partnerCode'],
     );
   }
 }
