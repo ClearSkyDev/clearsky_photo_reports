@@ -51,7 +51,7 @@ Future<void> generateAndDownloadPdf(
   if (kIsWeb) {
     final blob = html.Blob([bytes]);
     final url = html.Url.createObjectUrlFromBlob(blob);
-    final anchor = html.AnchorElement(href: url)
+    html.AnchorElement(href: url)
       ..setAttribute('download', 'report.pdf')
       ..click();
     html.Url.revokeObjectUrl(url);
@@ -59,7 +59,7 @@ Future<void> generateAndDownloadPdf(
     final dir = await getTemporaryDirectory();
     final file = File(p.join(dir.path, 'report.pdf'));
     await file.writeAsBytes(bytes, flush: true);
-    await SharePlus.instance.shareXFiles([XFile(file.path)]);
+    await Share.shareXFiles([XFile(file.path)]);
   }
 }
 
@@ -80,7 +80,7 @@ Future<void> generateAndDownloadHtml(
   if (kIsWeb) {
     final blob = html.Blob([bytes], 'text/html');
     final url = html.Url.createObjectUrlFromBlob(blob);
-    final anchor = html.AnchorElement(href: url)
+    html.AnchorElement(href: url)
       ..setAttribute('download', 'report.html')
       ..click();
     html.Url.revokeObjectUrl(url);
@@ -88,7 +88,7 @@ Future<void> generateAndDownloadHtml(
     final dir = await getTemporaryDirectory();
     final file = File(p.join(dir.path, 'report.html'));
     await file.writeAsBytes(bytes, flush: true);
-    await SharePlus.instance.shareXFiles([XFile(file.path)]);
+    await Share.shareXFiles([XFile(file.path)]);
   }
 }
 
@@ -155,7 +155,7 @@ Future<File?> exportAsZip(SavedReport report) async {
   if (kIsWeb) {
     final blob = html.Blob([zipData], 'application/zip');
     final url = html.Url.createObjectUrlFromBlob(blob);
-    final anchor = html.AnchorElement(href: url)
+    html.AnchorElement(href: url)
       ..setAttribute('download', fileName)
       ..click();
     html.Url.revokeObjectUrl(url);
@@ -961,7 +961,7 @@ Future<File?> exportCsv(SavedReport report) async {
   if (kIsWeb) {
     final blob = html.Blob([bytes], 'text/csv');
     final url = html.Url.createObjectUrlFromBlob(blob);
-    final anchor = html.AnchorElement(href: url)
+    html.AnchorElement(href: url)
       ..setAttribute('download', fileName)
       ..click();
     html.Url.revokeObjectUrl(url);

@@ -21,7 +21,6 @@ class SignaturePad extends StatefulWidget {
 class _SignaturePadState extends State<SignaturePad> {
   late final SignatureController _controller;
   Uint8List? _signatureBytes;
-  File? _signatureFile;
 
   @override
   void initState() {
@@ -50,7 +49,6 @@ class _SignaturePadState extends State<SignaturePad> {
 
     setState(() {
       _signatureBytes = bytes;
-      _signatureFile = file;
     });
     widget.onSave?.call(bytes, file);
   }
@@ -59,7 +57,6 @@ class _SignaturePadState extends State<SignaturePad> {
     _controller.clear();
     setState(() {
       _signatureBytes = null;
-      _signatureFile = null;
     });
   }
 

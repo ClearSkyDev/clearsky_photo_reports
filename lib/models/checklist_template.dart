@@ -3,7 +3,7 @@ import 'checklist_field_type.dart';
 
 enum PerilType { wind, hail, fire, flood }
 
-enum InspectorReportRole { ladder_assist, adjuster, contractor }
+enum InspectorReportRole { ladderAssist, adjuster, contractor }
 
 class ChecklistItemTemplate {
   final String title;
@@ -37,7 +37,7 @@ const List<ChecklistTemplate> defaultChecklists = [
   ChecklistTemplate(
     roofType: InspectionType.residentialRoof,
     claimType: PerilType.wind,
-    role: InspectorReportRole.ladder_assist,
+    role: InspectorReportRole.ladderAssist,
     items: [
       ChecklistItemTemplate(title: 'Access Confirmed'),
       ChecklistItemTemplate(

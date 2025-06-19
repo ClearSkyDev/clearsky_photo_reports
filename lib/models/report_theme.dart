@@ -27,7 +27,7 @@ class ReportTheme {
       name: map['name'] ?? 'Default',
       primaryColor: map['primaryColor'] is int
           ? map['primaryColor'] as int
-          : int.tryParse(map['primaryColor']?.toString() ?? '') ?? Colors.blue.value,
+          : int.tryParse(map['primaryColor']?.toString() ?? '') ?? 0xff2196f3,
       fontFamily: map['fontFamily'] ?? 'Arial',
       logoPath: map['logoPath'] as String?,
     );

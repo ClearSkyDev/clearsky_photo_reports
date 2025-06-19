@@ -22,11 +22,11 @@ class InspectionMetadata {
     required this.perilType,
     required this.inspectionType,
     this.inspectorName,
-    required Set<InspectorReportRole> inspectorRoles,
+    required this.inspectorRoles,
     this.reportId,
     this.weatherNotes,
     this.partnerCode,
-  }) : inspectorRoles = inspectorRoles;
+  });
 
   // Convert to Map (for saving to JSON, Firestore, etc.)
   Map<String, dynamic> toMap() {
@@ -51,8 +51,7 @@ class InspectionMetadata {
             ?.map((e) => InspectorReportRole.values.byName(e))
             .toSet() ??
         {
-          InspectorReportRole
-              .ladder_assist,
+          InspectorReportRole.ladderAssist,
         };
     return InspectionMetadata(
       clientName: map['clientName'] ?? '',

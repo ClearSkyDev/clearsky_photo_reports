@@ -25,7 +25,7 @@ class HomeScreen extends StatelessWidget {
             title: 'Start Guided Inspection',
             subtitle: 'Step-by-step photo intake',
             onTap: () async {
-              final result = await Navigator.push(
+              await Navigator.push(
                 context,
                 MaterialPageRoute(builder: (_) => const GuidedCaptureScreen()),
               );

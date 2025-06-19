@@ -13,7 +13,7 @@ class DynamicSummaryService {
   DynamicSummaryService({
     required this.aiService,
     Set<InspectorReportRole>? role,
-  }) : role = role ?? {InspectorReportRole.ladder_assist};
+  }) : role = role ?? {InspectorReportRole.ladderAssist};
 
   final AiSummaryService aiService;
   Set<InspectorReportRole> role;

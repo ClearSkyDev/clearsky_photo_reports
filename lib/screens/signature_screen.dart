@@ -28,12 +28,10 @@ class SignatureScreen extends StatefulWidget {
 
 class _SignatureScreenState extends State<SignatureScreen> {
   Uint8List? _signatureBytes;
-  File? _signatureFile;
 
-  void _onSave(Uint8List bytes, File file) {
+  void _onSave(Uint8List bytes, File _) {
     setState(() {
       _signatureBytes = bytes;
-      _signatureFile = file;
     });
   }
 
