@@ -28,9 +28,9 @@ class NotificationService {
     if (_initialized) return;
     await _requestPermissions();
 
-    const androidSettings =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
-    const initSettings = InitializationSettings(android: androidSettings);
+    final androidSettings =
+        const AndroidInitializationSettings('@mipmap/ic_launcher');
+    final initSettings = InitializationSettings(android: androidSettings);
     await _local.initialize(initSettings);
 
     FirebaseMessaging.onBackgroundMessage(_backgroundHandler);
@@ -95,10 +95,11 @@ class NotificationService {
       DateTime.now().millisecondsSinceEpoch ~/ 1000,
       title,
       body,
-      const NotificationDetails(
+      NotificationDetails(
         android: AndroidNotificationDetails(
           'clearsky',
           'Alerts',
+          channelDescription: 'ClearSky notifications',
           importance: Importance.high,
           priority: Priority.high,
         ),
