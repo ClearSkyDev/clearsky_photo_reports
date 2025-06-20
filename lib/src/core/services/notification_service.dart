@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../firebase_options.dart';
@@ -19,19 +18,19 @@ class NotificationService {
   final FlutterLocalNotificationsPlugin _local =
       FlutterLocalNotificationsPlugin();
 
-  NotificationPreferences _prefs = const NotificationPreferences();
+  NotificationPreferences _prefs = NotificationPreferences();
 
   bool _initialized = false;
 
   /// Initialize FCM, request permissions and set up listeners.
   Future<void> init() async {
-    debugPrint('[NotificationService] init');
+    print('[NotificationService] init');
     if (_initialized) return;
     await _requestPermissions();
 
-    const androidSettings =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
-    const initSettings = InitializationSettings(android: androidSettings);
+    final androidSettings =
+        const AndroidInitializationSettings('@mipmap/ic_launcher');
+    final initSettings = InitializationSettings(android: androidSettings);
     await _local.initialize(initSettings);
 
     FirebaseMessaging.onBackgroundMessage(_backgroundHandler);
@@ -76,12 +75,12 @@ class NotificationService {
   }
 
   void _handleMessage(RemoteMessage message) {
-    debugPrint('[NotificationService] message received');
+    print('[NotificationService] message received');
     _showNotification(message);
   }
 
   void _showNotification(RemoteMessage message) {
-    debugPrint('[NotificationService] showNotification');
+    print('[NotificationService] showNotification');
     final type = message.data['type'] as String?;
     if (type == 'message' && !_prefs.newMessage) return;
     if (type == 'report' && !_prefs.reportFinalized) return;
@@ -96,10 +95,11 @@ class NotificationService {
       DateTime.now().millisecondsSinceEpoch ~/ 1000,
       title,
       body,
-      const NotificationDetails(
+      NotificationDetails(
         android: AndroidNotificationDetails(
           'clearsky',
           'Alerts',
+          channelDescription: 'ClearSky notifications',
           importance: Importance.high,
           priority: Priority.high,
         ),
