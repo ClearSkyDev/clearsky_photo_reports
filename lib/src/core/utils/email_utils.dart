@@ -2,7 +2,7 @@ import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 
 // Web imports
-import 'package:web/web.dart' as html show Blob, Url, AnchorElement;
+import 'package:web/web.dart' as html show Blob, BlobPart, Url, AnchorElement;
 
 // Mobile imports
 import 'dart:io';
@@ -24,15 +24,18 @@ Future<void> sendReportByEmail(
   List<String> attachmentPaths = const [],
 }) async {
   if (kIsWeb) {
-    final blob = html.Blob(<dynamic>[pdfBytes], 'application/pdf');
+    final blob = html.Blob(
+      [pdfBytes].cast<html.BlobPart>(),
+      'application/pdf',
+    );
     final url = html.Url.createObjectUrlFromBlob(blob);
-    html.HTMLAnchorElement(href: url)
+    html.AnchorElement(href: url)
       ..setAttribute('download', 'report.pdf')
       ..click();
     html.Url.revokeObjectUrl(url);
     final mailto =
         'mailto:$email?subject=${Uri.encodeComponent(subject)}&body=${Uri.encodeComponent(message)}';
-    html.HTMLAnchorElement(href: mailto).click();
+    html.AnchorElement(href: mailto).click();
     return;
   }
 
@@ -50,8 +53,13 @@ Future<void> sendReportByEmail(
   try {
     await FlutterEmailSender.send(mail);
   } catch (_) {
-    await Share.shareXFiles([XFile(file.path)],
-        subject: subject, text: message);
+    await SharePlus.instance.share(
+      ShareParams(
+        files: [XFile(file.path)],
+        subject: subject,
+        text: message,
+      ),
+    );
   }
 }
 
@@ -112,7 +120,7 @@ Future<void> sendReportEmail(
   if (kIsWeb) {
     final mailto =
         'mailto:$email?subject=${Uri.encodeComponent(subject)}&body=${Uri.encodeComponent(body)}';
-    html.HTMLAnchorElement(href: mailto).click();
+    html.AnchorElement(href: mailto).click();
     return;
   }
   final mail = Email(
@@ -124,6 +132,8 @@ Future<void> sendReportEmail(
   try {
     await FlutterEmailSender.send(mail);
   } catch (_) {
-    await Share.share(body, subject: subject);
+    await SharePlus.instance.share(
+      ShareParams(text: body, subject: subject),
+    );
   }
 }

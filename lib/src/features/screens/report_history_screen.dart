@@ -307,10 +307,10 @@ class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
                               });
                             }
                           },
-                          items: const [
-                            DropdownMenuItem(
+                          items: [
+                            const DropdownMenuItem(
                                 value: 'newest', child: Text('Newest')),
-                            DropdownMenuItem(
+                            const DropdownMenuItem(
                                 value: 'oldest', child: Text('Oldest')),
                           ],
                         ),
@@ -322,11 +322,11 @@ class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
                               setState(() => _statusFilter = val);
                             }
                           },
-                          items: const [
-                            DropdownMenuItem(value: 'all', child: Text('All')),
-                            DropdownMenuItem(
+                          items: [
+                            const DropdownMenuItem(value: 'all', child: Text('All')),
+                            const DropdownMenuItem(
                                 value: 'finalized', child: Text('Finalized')),
-                            DropdownMenuItem(
+                            const DropdownMenuItem(
                                 value: 'draft', child: Text('Draft')),
                           ],
                         ),

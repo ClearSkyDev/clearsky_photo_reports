@@ -30,6 +30,7 @@ class _AiChatDrawerState extends State<AiChatDrawer> {
 
   Future<void> _loadHistory() async {
     final history = await _service.loadMessages(widget.reportId);
+    if (!mounted) return;
     setState(() => _messages.addAll(history));
   }
 
@@ -44,6 +45,7 @@ class _AiChatDrawerState extends State<AiChatDrawer> {
     _controller.clear();
     final reply = await _service.sendMessage(
         reportId: widget.reportId, message: text, context: widget.context);
+    if (!mounted) return;
     setState(() {
       _messages.add(reply);
       _loading = false;

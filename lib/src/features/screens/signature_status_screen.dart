@@ -40,11 +40,11 @@ class _SignatureStatusScreenState extends State<SignatureStatusScreen> {
         children: [
           DropdownButton<String>(
             value: _filter,
-            items: const [
-              DropdownMenuItem(value: 'all', child: Text('All')),
-              DropdownMenuItem(value: 'pending', child: Text('Pending')),
-              DropdownMenuItem(value: 'signed', child: Text('Signed')),
-              DropdownMenuItem(value: 'declined', child: Text('Declined')),
+            items: [
+              const DropdownMenuItem(value: 'all', child: Text('All')),
+              const DropdownMenuItem(value: 'pending', child: Text('Pending')),
+              const DropdownMenuItem(value: 'signed', child: Text('Signed')),
+              const DropdownMenuItem(value: 'declined', child: Text('Declined')),
             ],
             onChanged: (val) {
               if (val == null) return;

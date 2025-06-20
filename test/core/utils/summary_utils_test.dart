@@ -1,7 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:clearsky_photo_reports/models/inspected_structure.dart';
-import 'package:clearsky_photo_reports/models/saved_report.dart';
-import 'package:clearsky_photo_reports/utils/summary_utils.dart';
+import 'package:clearsky_photo_reports/src/core/models/inspected_structure.dart';
+import 'package:clearsky_photo_reports/src/core/models/saved_report.dart'
+    show SavedReport, ReportPhotoEntry;
+import 'package:clearsky_photo_reports/src/core/utils/summary_utils.dart';
 
 void main() {
   test('section summaries include damage types', () {

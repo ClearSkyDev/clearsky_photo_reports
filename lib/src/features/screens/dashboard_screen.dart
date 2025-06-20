@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'dart:io';
+import 'dart:developer';
 
 import '../../core/models/inspector_user.dart';
 import '../../core/services/auth_service.dart';
@@ -20,7 +21,7 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
-    print('[DashboardScreen] build');
+    debugPrint('[DashboardScreen] build');
     final key = const String.fromEnvironment('OPENAI_API_KEY', defaultValue: '')
             .isNotEmpty
         ? const String.fromEnvironment('OPENAI_API_KEY')

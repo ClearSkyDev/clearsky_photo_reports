@@ -52,10 +52,10 @@ class _DroneMediaUploadScreenState extends State<DroneMediaUploadScreen> {
                 DropdownButton<SourceType>(
                   value: _type,
                   onChanged: (v) => setState(() => _type = v!),
-                  items: const [
-                    DropdownMenuItem(
+                  items: [
+                    const DropdownMenuItem(
                         value: SourceType.drone, child: Text('Drone')),
-                    DropdownMenuItem(
+                    const DropdownMenuItem(
                         value: SourceType.thermal, child: Text('Thermal')),
                   ],
                 ),

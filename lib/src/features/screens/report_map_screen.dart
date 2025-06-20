@@ -61,6 +61,7 @@ class _ReportMapScreenState extends State<ReportMapScreen> {
       lastDate: DateTime(now.year + 1),
       initialDateRange: _dateRange,
     );
+    if (!mounted) return;
     if (range != null) setState(() => _dateRange = range);
   }
 
@@ -114,11 +115,11 @@ class _ReportMapScreenState extends State<ReportMapScreen> {
                               setState(() => _statusFilter = val);
                             }
                           },
-                          items: const [
-                            DropdownMenuItem(value: 'all', child: Text('All')),
-                            DropdownMenuItem(
+                          items: [
+                            const DropdownMenuItem(value: 'all', child: Text('All')),
+                            const DropdownMenuItem(
                                 value: 'finalized', child: Text('Finalized')),
-                            DropdownMenuItem(
+                            const DropdownMenuItem(
                                 value: 'draft', child: Text('Draft')),
                           ],
                         ),

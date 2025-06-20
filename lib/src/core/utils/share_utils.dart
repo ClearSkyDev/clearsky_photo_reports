@@ -5,12 +5,19 @@ import 'package:share_plus/share_plus.dart';
 Future<void> shareReportFile(File reportFile,
     {String? subject, String? text}) async {
   try {
-    await Share.shareXFiles([XFile(reportFile.path)],
-        subject: subject, text: text);
+    await SharePlus.instance.share(
+      ShareParams(
+        files: [XFile(reportFile.path)],
+        subject: subject,
+        text: text,
+      ),
+    );
   } catch (_) {}
 }
 
 Future<void> shareFiles(List<String> filePaths, {String? text}) async {
   final files = filePaths.map((path) => XFile(path)).toList();
-  await Share.shareXFiles(files, text: text);
+  await SharePlus.instance.share(
+    ShareParams(files: files, text: text),
+  );
 }

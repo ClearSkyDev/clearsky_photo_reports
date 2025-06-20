@@ -65,10 +65,10 @@ class ClientDashboardScreenState extends State<ClientDashboardScreen> {
                 _filter = value;
               });
             },
-            itemBuilder: (context) => const [
-              PopupMenuItem(value: 'All', child: Text('All')),
-              PopupMenuItem(value: 'Synced', child: Text('Synced Only')),
-              PopupMenuItem(value: 'Unsynced', child: Text('Unsynced Only')),
+            itemBuilder: (context) => [
+              const PopupMenuItem(value: 'All', child: Text('All')),
+              const PopupMenuItem(value: 'Synced', child: Text('Synced Only')),
+              const PopupMenuItem(value: 'Unsynced', child: Text('Unsynced Only')),
             ],
           )
         ],
