@@ -1,99 +1,15 @@
 name: clearsky_photo_reports
-description: A powerful roof inspection report app for adjusters, contractors, and third-party services.
-publish_to: "none" # Remove this if you plan to publish the package
-
+description: A photo-based roof inspection app for insurance professionals and contractors.
 version: 1.0.0+1
 
 environment:
-  sdk: ">=3.2.0 <4.0.0"
+  sdk: ">=3.0.0 <4.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
 
-  cupertino_icons: ^1.0.6
-
-  # Core utilities
-  path_provider: ^2.1.2
-  share_plus: ^7.2.1
-  uuid: ^4.0.0
-  path: ^1.9.0
-  image: ^4.1.3
-
-  # UI & layout
-  qr_flutter: ^4.1.0
-  signature: ^5.5.0
-  reorderables: ^0.5.0
-  google_fonts: ^6.1.0
-
-  # Forms & state
-  provider: ^6.1.2
-  fl_chart: ^0.69.1
-
-  # Location & GPS
-  geolocator: ^11.0.0
-  geocoding: ^3.0.0
-
-  # Media & storage
-  image_picker: ^1.0.7
-  file_picker: ^6.1.1
-  shared_preferences: ^2.2.2
-  http: ^1.2.1
-
-  # Internationalization
-  intl: ^0.18.1
-
-  # Email & Sharing
-  flutter_email_sender: ^6.0.0
-  url_launcher: ^6.2.6
-
-  # PDF & Printing
-  pdf: ^3.11.3
-  printing: ^5.11.0
-
-  # Firebase
-  firebase_core: ^2.25.4
-  firebase_auth: ^4.17.8
-  cloud_firestore: ^4.15.6
-  firebase_storage: ^11.6.9
-  firebase_messaging: ^14.7.14
-
-  # Hive for local data
-  hive: ^2.2.3
-  hive_flutter: ^1.1.0
-
-  # Speech
-  speech_to_text: ^6.6.1
-  flutter_tts: ^5.1.0
-
-  # WebView
-  webview_flutter: ^4.0.7
-  webview_flutter_web: ^0.2.2+4
-
-  # Connectivity
-  connectivity_plus: ^6.0.3
-
-dev_dependencies:
-  flutter_test:
-    sdk: flutter
-  flutter_lints: ^4.0.0
-  hive_generator: ^2.0.1
-  build_runner: ^2.4.8
-
-flutter:
-  uses-material-design: true
-
-  assets:
-    - assets/
-    - assets/icons/
-    - assets/images/
-    - assets/fonts/
-    - assets/splash.png
-    - assets/app_icon.png
-dependencies:
-  flutter:
-    sdk: flutter
-  fl_chart: ^0.66.0
+fl_chart: ^0.66.0
   qr_flutter: ^4.1.0
   url_launcher: ^6.2.6
   geolocator: ^11.0.0
@@ -107,3 +23,41 @@ dependencies:
   firebase_storage: ^11.6.6
   shared_preferences: ^2.2.2
   google_fonts: ^6.2.1
+  cupertino_icons: ^1.0.6
+  provider: ^6.1.2
+  path_provider: ^2.1.2
+  share_plus: ^7.2.1
+  image_picker: ^1.0.7
+  file_picker: ^6.2.0
+  flutter_image_compress: ^2.2.0
+  pdf: ^3.10.4
+  printing: ^5.12.0
+  flutter_html: ^3.0.0-beta.2
+  uuid: ^4.1.0
+  intl: ^0.18.1
+  connectivity_plus: ^5.0.2
+  http: ^1.2.1
+  sqflite: ^2.3.2
+  path: ^1.9.0
+  collection: ^1.18.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/
+    - assets/icons/
+    - assets/fonts/
+    - assets/splash.png
+
+  fonts:
+    - family: Roboto
+      fonts:
+        - asset: assets/fonts/Roboto-Regular.ttf
+        - asset: assets/fonts/Roboto-Bold.ttf
+          weight: 700
