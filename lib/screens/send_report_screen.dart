@@ -40,6 +40,8 @@ import 'report_settings_screen.dart' show ReportSettings;
 import '../utils/ai_quality_check.dart';
 import 'manage_collaborators_screen.dart';
 import '../utils/permission_utils.dart';
+import '../utils/photo_audit.dart';
+import 'create_invoice_screen.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import '../services/offline_sync_service.dart';
@@ -114,8 +116,27 @@ class _SendReportScreenState extends State<SendReportScreen> {
       for (final struct in widget.structures!) {
         for (var photos in struct.sectionPhotos.values) {
           for (var p in photos) {
-            if (p.latitude != null && p.longitude != null) {
-              result.add(p);
+            final photo = p as dynamic;
+            final lat = photo.latitude as double?;
+            final lng = photo.longitude as double?;
+            if (lat != null && lng != null) {
+              result.add(PhotoEntry(
+                url: photo.photoUrl ?? photo.url,
+                capturedAt:
+                    photo.timestamp ?? photo.capturedAt ?? DateTime.now(),
+                label: photo.label ?? '',
+                caption: photo.caption ?? '',
+                latitude: lat,
+                longitude: lng,
+                note: photo.note ?? '',
+                damageType: photo.damageType ?? 'Unknown',
+                voicePath: photo.voicePath,
+                transcript: photo.transcript,
+                sourceType: photo.sourceType ?? SourceType.camera,
+                captureDevice: photo.captureDevice,
+                labelConfidence:
+                    photo.labelConfidence ?? photo.confidence ?? 0,
+              ));
             }
           }
         }
@@ -249,20 +270,8 @@ class _SendReportScreenState extends State<SendReportScreen> {
         'reportId': widget.metadata.reportId,
       if (widget.metadata.weatherNotes != null)
         'weatherNotes': widget.metadata.weatherNotes,
-      if (widget.metadata.lastSentTo != null)
-        'lastSentTo': widget.metadata.lastSentTo,
-      if (widget.metadata.lastSentAt != null)
-        'lastSentAt': widget.metadata.lastSentAt!.toIso8601String(),
-      if (widget.metadata.lastSendMethod != null)
-        'lastSendMethod': widget.metadata.lastSendMethod,
       if (widget.metadata.partnerCode != null)
         'partnerCode': widget.metadata.partnerCode,
-      if (widget.metadata.startTimestamp != null)
-        'startTimestamp': widget.metadata.startTimestamp!.toIso8601String(),
-      if (widget.metadata.startLatitude != null)
-        'startLatitude': widget.metadata.startLatitude,
-      if (widget.metadata.startLongitude != null)
-        'startLongitude': widget.metadata.startLongitude,
       'endTimestamp': DateTime.now().toIso8601String(),
     };
 
@@ -446,19 +455,22 @@ class _SendReportScreenState extends State<SendReportScreen> {
         final sections = <String, List<ReportPhotoEntry>>{};
         for (var entry in struct.sectionPhotos.entries) {
           final list = entry.value
-              .map((p) => ReportPhotoEntry(
-                    label: p.label,
-                    caption: p.caption,
-                    confidence: p.labelConfidence,
-                    photoUrl: p.url,
-                    timestamp: p.capturedAt,
-                    latitude: p.latitude,
-                    longitude: p.longitude,
-                    damageType: p.damageType,
-                    note: p.note,
-                    sourceType: p.sourceType,
-                    captureDevice: p.captureDevice,
-                  ))
+              .map((p) {
+                final d = p as dynamic;
+                return ReportPhotoEntry(
+                  label: d.label,
+                  caption: d.caption,
+                  confidence: d.labelConfidence ?? d.confidence ?? 0,
+                  photoUrl: d.url ?? d.photoUrl,
+                  timestamp: d.capturedAt ?? d.timestamp,
+                  latitude: d.latitude,
+                  longitude: d.longitude,
+                  damageType: d.damageType,
+                  note: d.note,
+                  sourceType: d.sourceType,
+                  captureDevice: d.captureDevice,
+                );
+              })
               .toList();
           sections[entry.key] = list;
         }
@@ -485,20 +497,8 @@ class _SendReportScreenState extends State<SendReportScreen> {
         'reportId': widget.metadata.reportId,
       if (widget.metadata.weatherNotes != null)
         'weatherNotes': widget.metadata.weatherNotes,
-      if (widget.metadata.lastSentTo != null)
-        'lastSentTo': widget.metadata.lastSentTo,
-      if (widget.metadata.lastSentAt != null)
-        'lastSentAt': widget.metadata.lastSentAt!.toIso8601String(),
-      if (widget.metadata.lastSendMethod != null)
-        'lastSendMethod': widget.metadata.lastSendMethod,
       if (widget.metadata.partnerCode != null)
         'partnerCode': widget.metadata.partnerCode,
-      if (widget.metadata.startTimestamp != null)
-        'startTimestamp': widget.metadata.startTimestamp!.toIso8601String(),
-      if (widget.metadata.startLatitude != null)
-        'startLatitude': widget.metadata.startLatitude,
-      if (widget.metadata.startLongitude != null)
-        'startLongitude': widget.metadata.startLongitude,
       'endTimestamp': DateTime.now().toIso8601String(),
     };
 
@@ -644,12 +644,6 @@ class _SendReportScreenState extends State<SendReportScreen> {
         'reportId': widget.metadata.reportId,
       if (widget.metadata.weatherNotes != null)
         'weatherNotes': widget.metadata.weatherNotes,
-      if (widget.metadata.lastSentTo != null)
-        'lastSentTo': widget.metadata.lastSentTo,
-      if (widget.metadata.lastSentAt != null)
-        'lastSentAt': widget.metadata.lastSentAt!.toIso8601String(),
-      if (widget.metadata.lastSendMethod != null)
-        'lastSendMethod': widget.metadata.lastSendMethod,
     };
     final report = SavedReport(
       inspectionMetadata: metaMap,
