@@ -2,7 +2,7 @@ import 'dart:convert';
 
 /// Displays the generated report HTML across Flutter platforms.
 ///
-/// * Web: uses `package:web/web.dart` to create an `IFrameElement` which is
+/// * Web: uses `dart:html` to create an `IFrameElement` which is
 ///   registered with `ui.platformViewRegistry` so it can be embedded
 ///   in the widget tree via `HtmlElementView`.
 /// * Mobile: uses the `webview_flutter` plugin. The HTML string is
@@ -16,7 +16,8 @@ import 'package:webview_flutter/webview_flutter.dart'
     if (dart.library.html) 'webview_stub.dart';
 
 // Only imported on web for HtmlElementView
-import 'package:web/web.dart' as html;
+// ignore: avoid_web_libraries_in_flutter
+import 'dart:html' as html show Blob, BlobPart, Url, IFrameElement;
 import 'dart:ui' as ui if (dart.library.html) 'dart:ui';
 
 class ReportPreviewWebView extends StatefulWidget {
@@ -54,7 +55,7 @@ class _ReportPreviewWebViewState extends State<ReportPreviewWebView> {
       ui.platformViewRegistry.registerViewFactory(
         _viewId!,
         (int viewId) {
-          final iframe = html.HTMLIFrameElement()
+          final iframe = html.IFrameElement()
             ..src = _blobUrl!
             ..style.border = 'none'
             ..style.width = '100%'

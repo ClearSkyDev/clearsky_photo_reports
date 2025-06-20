@@ -7,7 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart' show rootBundle;
 // Only used on web to trigger downloads
 // ignore: avoid_web_libraries_in_flutter
-import 'package:web/web.dart' as html;
+import 'dart:html' as html show Blob, BlobPart, Url, AnchorElement;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:http/http.dart' as http;
@@ -54,7 +54,7 @@ Future<void> generateAndDownloadPdf(
       'application/pdf',
     );
     final url = html.Url.createObjectUrlFromBlob(blob);
-    html.HTMLAnchorElement(href: url)
+    html.AnchorElement(href: url)
       ..setAttribute('download', 'report.pdf')
       ..click();
     html.Url.revokeObjectUrl(url);
@@ -88,7 +88,7 @@ Future<void> generateAndDownloadHtml(
       'text/html',
     );
     final url = html.Url.createObjectUrlFromBlob(blob);
-    html.HTMLAnchorElement(href: url)
+    html.AnchorElement(href: url)
       ..setAttribute('download', 'report.html')
       ..click();
     html.Url.revokeObjectUrl(url);
@@ -163,7 +163,7 @@ Future<File?> exportAsZip(SavedReport report) async {
       'application/zip',
     );
     final url = html.Url.createObjectUrlFromBlob(blob);
-    html.HTMLAnchorElement(href: url)
+    html.AnchorElement(href: url)
       ..setAttribute('download', fileName)
       ..click();
     html.Url.revokeObjectUrl(url);
@@ -242,7 +242,7 @@ Future<File?> exportFinalZip(SavedReport report,
         'type': 'zip',
       });
     } catch (_) {}
-    html.HTMLAnchorElement(href: url)
+    html.AnchorElement(href: url)
       ..target = '_blank'
       ..click();
     return null;
@@ -354,7 +354,7 @@ Future<File?> exportLegalCopy(SavedReport report,
     final url = await ref.getDownloadURL();
     await logExport(url);
     if (kIsWeb && !auto) {
-      html.HTMLAnchorElement(href: url)
+      html.AnchorElement(href: url)
         ..target = '_blank'
         ..click();
     }
@@ -997,7 +997,7 @@ Future<File?> exportCsv(SavedReport report) async {
       'text/csv',
     );
     final url = html.Url.createObjectUrlFromBlob(blob);
-    html.HTMLAnchorElement(href: url)
+    html.AnchorElement(href: url)
       ..setAttribute('download', fileName)
       ..click();
     html.Url.revokeObjectUrl(url);
