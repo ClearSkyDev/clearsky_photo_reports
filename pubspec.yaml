@@ -43,6 +43,7 @@ dependencies:
   intl: ^0.20.2
   signature: ^6.3.0
   reorderables: ^0.6.0
+  webview_flutter: ^4.13.0
 
 dev_dependencies:
   flutter_test:
