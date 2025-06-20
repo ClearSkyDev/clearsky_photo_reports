@@ -1,6 +1,4 @@
 import 'dart:math';
-import 'dart:io';
-import 'dart:convert';
 
 import '../models/photo_entry.dart';
 import '../models/inspection_metadata.dart';
@@ -21,15 +19,7 @@ Future<String> getDamageType(
   String sectionName,
   InspectionMetadata metadata,
 ) async {
-  // Extract image bytes for future AI integrations.
-  List<int> bytes = [];
-  try {
-    if (await File(photo.url).exists()) {
-      bytes = await File(photo.url).readAsBytes();
-    }
-  } catch (_) {}
-
-  final base64 = base64Encode(bytes); // ignore: unused_local_variable
+  // Placeholder for future image byte extraction.
 
   await Future.delayed(const Duration(milliseconds: 300));
   return _fakeDamageTypes[Random().nextInt(_fakeDamageTypes.length)];

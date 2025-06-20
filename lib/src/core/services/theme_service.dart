@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../app_theme.dart';
+import '../../app/app_theme.dart';
 import '../models/app_theme_option.dart';
 
 class ThemeService extends ChangeNotifier {
