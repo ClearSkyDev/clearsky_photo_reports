@@ -384,8 +384,10 @@ class _SendReportScreenState extends State<SendReportScreen> {
           'inspectorName': profile!.name
         else 'inspectorName': widget.metadata.inspectorName,
         if (profile?.name != null)
-          'inspectorName_lc': profile!.name.toLowerCase()
-        else 'inspectorName_lc': widget.metadata.inspectorName.toLowerCase(),
+          'inspectorName_lc': profile!.name?.toLowerCase() ?? ''
+        else
+          'inspectorName_lc':
+              widget.metadata.inspectorName?.toLowerCase() ?? '',
         'type': widget.metadata.inspectionType.name,
         'type_lc': widget.metadata.inspectionType.name.toLowerCase(),
         'labels': labels.toList(),
@@ -585,6 +587,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
       context,
       MaterialPageRoute(builder: (_) => const CaptureSignatureScreen()),
     );
+    if (!mounted) return;
     if (result != null) {
       setState(() {
         _signature = result;
@@ -612,10 +615,12 @@ class _SendReportScreenState extends State<SendReportScreen> {
     }
   }
 
-  void _openLink() {
+  Future<void> _openLink() async {
     if (_publicId == null) return;
     final uri = Uri.parse(_publicUrl);
-    launchUrl(uri, mode: LaunchMode.externalApplication);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
   }
 
   Future<void> _printCoverSheet() async {
@@ -877,7 +882,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
   Future<void> _shareAudio() async {
     if (_audioFile == null) return;
     if (_audioUrl != null) {
-      await Share.share('Listen: $_audioUrl');
+      await SharePlus.instance.share('Listen: $_audioUrl');
       return;
     }
     await shareReportFile(_audioFile!, subject: 'Inspection Summary');
@@ -1547,7 +1552,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
                             icon: const Icon(Icons.copy),
                           ),
                           IconButton(
-                            onPressed: _openLink,
+                            onPressed: () => _openLink(),
                             tooltip: 'Open Link',
                             icon: const Icon(Icons.open_in_browser),
                           ),
