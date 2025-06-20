@@ -12,9 +12,7 @@ import '../../core/models/report_template.dart';
 import '../../core/models/inspector_report_role.dart';
 // Only used on web to trigger downloads
 // ignore: avoid_web_libraries_in_flutter
-import 'dart:html' as html show Blob, BlobPart, BlobPropertyBag, Url, AnchorElement;
-import 'dart:js_interop';
-import 'package:js/js_util.dart' as js_util;
+import 'dart:html' as html show Blob, Url, AnchorElement;
 import 'package:pdf/widgets.dart' as pw;
 import 'package:pdf/pdf.dart';
 import 'send_report_screen.dart';
@@ -654,10 +652,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
   Future<void> _saveHtmlFile(String htmlContent) async {
     final bytes = utf8.encode(htmlContent);
     if (kIsWeb) {
-      final blob = html.Blob(
-        js_util.jsify([bytes]) as JSArray<html.BlobPart>,
-        js_util.jsify({'type': 'text/html'}) as html.BlobPropertyBag,
-      );
+      final blob = html.Blob([bytes], 'text/html');
       final url = html.Url.createObjectUrlFromBlob(blob);
       final fileName = _metadataFileName('html');
       html.AnchorElement(href: url)
@@ -1128,10 +1123,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
     final bytes = await _downloadPdf();
     final fileName = _metadataFileName('pdf');
     if (kIsWeb) {
-      final blob = html.Blob(
-        js_util.jsify([bytes]) as JSArray<html.BlobPart>,
-        js_util.jsify({'type': 'application/pdf'}) as html.BlobPropertyBag,
-      );
+      final blob = html.Blob([bytes], 'application/pdf');
       final url = html.Url.createObjectUrlFromBlob(blob);
       html.AnchorElement(href: url)
         ..setAttribute('download', fileName)

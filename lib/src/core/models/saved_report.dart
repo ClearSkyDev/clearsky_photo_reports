@@ -270,6 +270,9 @@ class ReportPhotoEntry {
   final SourceType sourceType;
   final String? captureDevice;
 
+  /// Confidence score for the assigned label. Alias for [confidence].
+  double get labelConfidence => confidence;
+
   ReportPhotoEntry({
     required this.label,
     this.caption = '',

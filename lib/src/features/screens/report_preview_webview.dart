@@ -16,9 +16,7 @@ import 'package:webview_flutter/webview_flutter.dart'
 
 // Only imported on web for HtmlElementView
 // ignore: avoid_web_libraries_in_flutter
-import 'dart:html' as html show Blob, BlobPart, BlobPropertyBag, Url, IFrameElement;
-import 'dart:js_interop';
-import 'package:js/js_util.dart' as js_util;
+import 'dart:html' as html show Blob, Url, IFrameElement;
 import 'dart:ui' as ui if (dart.library.html) 'dart:ui';
 
 class ReportPreviewWebView extends StatefulWidget {
@@ -47,10 +45,9 @@ class _ReportPreviewWebViewState extends State<ReportPreviewWebView> {
     if (kIsWeb) {
       _viewId = 'report-preview-${DateTime.now().millisecondsSinceEpoch}';
       // Create a Blob URL for the HTML content
-      final blob = html.Blob(
-        js_util.jsify([widget.html]) as JSArray<html.BlobPart>,
-        js_util.jsify({'type': 'text/html'}) as html.BlobPropertyBag,
-      );
+      final blob = html.Blob([
+        widget.html
+      ], 'text/html');
       _blobUrl = html.Url.createObjectUrlFromBlob(blob);
       // ignore: undefined_prefixed_name
       ui.platformViewRegistry.registerViewFactory(

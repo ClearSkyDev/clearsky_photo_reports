@@ -2,9 +2,7 @@ import 'package:flutter/foundation.dart';
 
 // Web imports
 // ignore: avoid_web_libraries_in_flutter
-import 'dart:html' as html show Blob, BlobPart, BlobPropertyBag, Url, AnchorElement;
-import 'dart:js_interop';
-import 'package:js/js_util.dart' as js_util;
+import 'dart:html' as html show Blob, Url, AnchorElement;
 
 // Mobile imports
 import 'dart:io';
@@ -26,10 +24,7 @@ Future<void> sendReportByEmail(
   List<String> attachmentPaths = const [],
 }) async {
   if (kIsWeb) {
-    final blob = html.Blob(
-      js_util.jsify([pdfBytes]) as JSArray<html.BlobPart>,
-      js_util.jsify({'type': 'application/pdf'}) as html.BlobPropertyBag,
-    );
+    final blob = html.Blob([pdfBytes], 'application/pdf');
     final url = html.Url.createObjectUrlFromBlob(blob);
     html.AnchorElement(href: url)
       ..setAttribute('download', 'report.pdf')
