@@ -78,6 +78,7 @@ class _MetadataScreenState extends State<MetadataScreen> {
 
   Future<void> _loadTemplates() async {
     final items = await TemplateStore.loadTemplates();
+    if (!mounted) return;
     setState(() {
       _templates = items;
       if (_templates.isNotEmpty) {
@@ -120,6 +121,7 @@ class _MetadataScreenState extends State<MetadataScreen> {
       lastDate: DateTime(2100),
     );
     if (picked != null) {
+      if (!mounted) return;
       setState(() {
         _inspectionDate = picked;
       });

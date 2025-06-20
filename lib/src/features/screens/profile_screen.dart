@@ -41,6 +41,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         _signature = base64Decode(profile.signature!);
       }
     }
+    if (!mounted) return;
     setState(() => _loading = false);
   }
 
@@ -50,6 +51,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       MaterialPageRoute(builder: (_) => const CaptureSignatureScreen()),
     );
     if (result != null) {
+      if (!mounted) return;
       setState(() {
         _signature = result;
       });

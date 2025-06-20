@@ -121,6 +121,7 @@ class _PublicReportScreenState extends State<PublicReportScreen> {
                       builder: (_) =>
                           ClientSignatureScreen(reportId: reportId)),
                 );
+                if (!mounted) return;
                 if (result != null) {
                   setState(() {
                     _futureReport = _loadReport();
@@ -149,6 +150,7 @@ class _PublicReportScreenState extends State<PublicReportScreen> {
           ElevatedButton(
             onPressed: () async {
               final file = await exportFinalZip(report);
+              if (!mounted) return;
               if (file != null) {
                 ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('ZIP downloaded')));

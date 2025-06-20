@@ -59,7 +59,10 @@ class _InspectorDashboardScreenState extends State<InspectorDashboardScreen> {
       lastDate: DateTime(now.year + 1),
       initialDateRange: _range,
     );
-    if (range != null) setState(() => _range = range);
+    if (range != null) {
+      if (!mounted) return;
+      setState(() => _range = range);
+    }
   }
 
   List<SavedReport> _applyFilters(List<SavedReport> reports) {
