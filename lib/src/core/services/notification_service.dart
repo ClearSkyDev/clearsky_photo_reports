@@ -24,7 +24,7 @@ class NotificationService {
 
   /// Initialize FCM, request permissions and set up listeners.
   Future<void> init() async {
-    debugPrint('[NotificationService] init');
+    print('[NotificationService] init');
     if (_initialized) return;
     await _requestPermissions();
 
@@ -75,12 +75,12 @@ class NotificationService {
   }
 
   void _handleMessage(RemoteMessage message) {
-    debugPrint('[NotificationService] message received');
+    print('[NotificationService] message received');
     _showNotification(message);
   }
 
   void _showNotification(RemoteMessage message) {
-    debugPrint('[NotificationService] showNotification');
+    print('[NotificationService] showNotification');
     final type = message.data['type'] as String?;
     if (type == 'message' && !_prefs.newMessage) return;
     if (type == 'report' && !_prefs.reportFinalized) return;
