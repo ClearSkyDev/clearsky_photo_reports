@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
-// Uncomment if using Firebase
-// import 'package:firebase_core/firebase_core.dart';
-// import 'src/core/firebase_options.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'src/core/firebase_options.dart';
+import 'src/core/services/offline_sync_service.dart';
+import 'src/core/services/notification_service.dart';
 
 import 'src/features/screens/client_dashboard_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  // If you're using Firebase, initialize here:
-  // await Firebase.initializeApp(
-  //   options: DefaultFirebaseOptions.currentPlatform,
-  // );
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  await OfflineSyncService.instance.init();
+  await NotificationService.instance.init();
 
   runApp(const ClearSkyApp());
 }
