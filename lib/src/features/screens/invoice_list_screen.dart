@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class Invoice {
   final String id;
@@ -66,13 +67,30 @@ class _InvoiceListScreenState extends State<InvoiceListScreen> {
     );
   }
 
+
   void _openInvoice(Invoice invoice) {
-    // TODO: Replace this with navigation to a full invoice view screen
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Open invoice: ${invoice.clientName}')),
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(invoice.clientName),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Location: ${invoice.jobLocation}'),
+            Text('Total: \$${invoice.totalAmount.toStringAsFixed(2)}'),
+            Text('Date: ${DateFormat.yMMMd().format(invoice.date)}'),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
     );
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

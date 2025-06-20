@@ -1,7 +1,6 @@
 import 'inspection_type.dart';
 import 'checklist_field_type.dart';
-
-enum PerilType { wind, hail, fire, flood }
+import 'peril_type.dart';
 
 enum InspectorReportRole { ladderAssist, adjuster, contractor }
 

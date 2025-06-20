@@ -1,5 +1,6 @@
 import 'inspection_type.dart';
-import 'checklist_template.dart' show PerilType, InspectorReportRole;
+import 'peril_type.dart';
+import 'checklist_template.dart' show InspectorReportRole;
 
 class InspectionMetadata {
   String clientName;

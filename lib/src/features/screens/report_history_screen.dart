@@ -6,7 +6,7 @@ import '../../core/models/inspection_metadata.dart';
 import '../../core/models/inspection_type.dart';
 import '../../core/models/photo_entry.dart';
 import '../../core/models/inspected_structure.dart';
-import '../../core/models/checklist_template.dart' show PerilType;
+import '../../core/models/peril_type.dart';
 import 'report_preview_screen.dart';
 import 'message_thread_screen.dart';
 import '../../core/utils/template_store.dart';

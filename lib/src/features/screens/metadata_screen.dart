@@ -5,6 +5,7 @@ import '../../core/models/inspection_metadata.dart';
 import '../../core/models/inspection_type.dart';
 import '../../core/models/checklist.dart';
 import '../../core/models/checklist_template.dart';
+import '../../core/models/peril_type.dart';
 import 'photo_upload_screen.dart';
 import '../../core/models/report_template.dart';
 import '../../core/utils/template_store.dart';
