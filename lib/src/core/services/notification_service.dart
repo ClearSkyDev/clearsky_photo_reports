@@ -18,7 +18,7 @@ class NotificationService {
   final FlutterLocalNotificationsPlugin _local =
       FlutterLocalNotificationsPlugin();
 
-  NotificationPreferences _prefs = const NotificationPreferences();
+  NotificationPreferences _prefs = NotificationPreferences();
 
   bool _initialized = false;
 
