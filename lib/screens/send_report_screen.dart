@@ -1539,7 +1539,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
                         child: SizedBox(
                           width: 160,
                           height: 160,
-                          child: QrImage(
+                          child: QrImageView(
                             data: _publicUrl,
                           ),
                         ),
