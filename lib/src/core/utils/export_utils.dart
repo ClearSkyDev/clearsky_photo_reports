@@ -729,7 +729,7 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
 
   pdf
     ..addPage(
-      pw.Page(
+      pw.MultiPage(
         footer: (context) => pw.Container(
           color: PdfColors.grey300,
           padding: const pw.EdgeInsets.all(6),
@@ -756,11 +756,12 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
             ],
           ),
         ),
-        build: (context) => pw.Center(
-          child: pw.Column(
-            mainAxisAlignment: pw.MainAxisAlignment.center,
-            crossAxisAlignment: pw.CrossAxisAlignment.center,
-            children: [
+        build: (context) => [
+          pw.Center(
+            child: pw.Column(
+              mainAxisAlignment: pw.MainAxisAlignment.center,
+              crossAxisAlignment: pw.CrossAxisAlignment.center,
+              children: [
               pw.Image(pw.MemoryImage(logoBytes), width: 150),
               pw.SizedBox(height: 20),
               pw.Text('Roof Inspection Report',
@@ -835,7 +836,7 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
             ],
           ),
         ),
-      ),
+      ]
     )
     ..addPage(
       pw.MultiPage(
