@@ -13,9 +13,11 @@ class AppTheme {
     scaffoldBackgroundColor: Colors.grey[900],
   );
 
-  // Build a high-contrast theme using the named constructor and a
-  // custom color scheme.
-  static ThemeData highContrastTheme = ThemeData.highContrastLight().copyWith(
+  // Build a high-contrast theme starting from a high-contrast color scheme
+  // and customizing common properties.
+  static ThemeData highContrastTheme = ThemeData.from(
+    colorScheme: const ColorScheme.highContrastLight(),
+  ).copyWith(
     textTheme: GoogleFonts.robotoMonoTextTheme(),
     primaryColor: Colors.blue,
     scaffoldBackgroundColor: Colors.white,
@@ -24,6 +26,8 @@ class AppTheme {
       foregroundColor: Colors.white,
       elevation: 0,
     ),
-    colorScheme: ColorScheme.fromSwatch().copyWith(secondary: Colors.orange),
+    colorScheme: const ColorScheme.highContrastLight().copyWith(
+      secondary: Colors.orange,
+    ),
   );
 }
