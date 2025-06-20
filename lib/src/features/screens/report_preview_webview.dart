@@ -11,7 +11,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 // Conditionally import webview_flutter only if not web
-// ignore: uri_does_not_exist
 import 'package:webview_flutter/webview_flutter.dart'
     if (dart.library.html) 'webview_stub.dart';
 
