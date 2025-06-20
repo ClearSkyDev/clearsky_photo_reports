@@ -5,8 +5,8 @@ import '../models/inspected_structure.dart';
 import '../models/saved_report.dart';
 import '../utils/summary_utils.dart';
 import 'ai_summary_service.dart';
-import '../models/inspector_report_role.dart';
-// Ensure that InspectorReportRole is defined in the imported file above.
+// Inspector roles are defined alongside checklist templates.
+import '../models/checklist_template.dart' show InspectorReportRole;
 
 /// Service that keeps an inspection summary up to date as photos are
 /// labeled or edited. The summary is grouped by section and can be
@@ -58,7 +58,8 @@ class DynamicSummaryService {
     final subReport = SavedReport(
       inspectionMetadata: {
         ...report.inspectionMetadata,
-        'inspectorRoles': role.map((e) => e?.name).toList(),
+        // Map the enum values to their string names for storage.
+        'inspectorRoles': role.map((e) => e.name).toList(),
       },
       structures: [
         InspectedStructure(
