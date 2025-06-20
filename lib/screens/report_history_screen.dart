@@ -15,7 +15,7 @@ import '../utils/template_store.dart';
 import '../models/report_template.dart';
 import 'metadata_screen.dart';
 import '../services/offline_draft_store.dart';
-import '../utils/sync_preferences.dart;
+import '../utils/sync_preferences.dart';
 import '../services/offline_sync_service.dart';
 
 class ReportHistoryScreen extends StatefulWidget {
