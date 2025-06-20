@@ -491,7 +491,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
           if (photos.isEmpty) continue;
           final label = section.replaceAll(' & Accessories', '');
           buffer.writeln('<h3>$label</h3>');
-          final missing = struct.slopeTestSquare[entry.key] == false;
+          final missing = struct.slopeTestSquare[section] == false;
           final issues = _collectIssues(photos, missingTestSquare: missing);
           if (issues.isNotEmpty) {
             buffer.writeln('<ul>');
@@ -641,18 +641,24 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
       return pw.Container(
         color: PdfColor.fromInt(_theme.primaryColor),
         padding: const pw.EdgeInsets.all(4),
-        child: pw.Text(text,
-            style: pw.TextStyle(
-                fontSize: 18,
-                fontWeight: pw.FontWeight.bold,
-                color: PdfColor.fromInt(_theme.primaryColor))),
-      );
-    }
-    return pw.Text(text,
-        style: pw.TextStyle(
+        child: pw.Text(
+          text,
+          style: pw.TextStyle(
             fontSize: 18,
             fontWeight: pw.FontWeight.bold,
-            color: PdfColor.fromInt(_theme.primaryColor)));
+            color: PdfColor.fromInt(_theme.primaryColor),
+          ),
+        ),
+      );
+    }
+    return pw.Text(
+      text,
+      style: pw.TextStyle(
+        fontSize: 18,
+        fontWeight: pw.FontWeight.bold,
+        color: PdfColor.fromInt(_theme.primaryColor),
+      ),
+    );
   }
 
   // Helper to load all images before PDF generation
