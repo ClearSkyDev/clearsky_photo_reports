@@ -305,13 +305,13 @@ class _InspectorDashboardScreenState extends State<InspectorDashboardScreen> {
                               setState(() => _statusFilter = val);
                             }
                           },
-                          items: const [
-                            DropdownMenuItem(value: 'all', child: Text('All')),
-                            DropdownMenuItem(
+                          items: [
+                            const DropdownMenuItem(value: 'all', child: Text('All')),
+                            const DropdownMenuItem(
                                 value: 'draft', child: Text('Draft')),
-                            DropdownMenuItem(
+                            const DropdownMenuItem(
                                 value: 'final', child: Text('Final')),
-                            DropdownMenuItem(
+                            const DropdownMenuItem(
                                 value: 'shared', child: Text('Shared')),
                           ],
                         ),

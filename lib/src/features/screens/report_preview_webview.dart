@@ -45,7 +45,10 @@ class _ReportPreviewWebViewState extends State<ReportPreviewWebView> {
     if (kIsWeb) {
       _viewId = 'report-preview-${DateTime.now().millisecondsSinceEpoch}';
       // Create a Blob URL for the HTML content
-      final blob = html.Blob(<dynamic>[widget.html], 'text/html');
+      final blob = html.Blob(
+        [widget.html].cast<html.BlobPart>(),
+        'text/html',
+      );
       _blobUrl = html.Url.createObjectUrlFromBlob(blob);
       // ignore: undefined_prefixed_name
       ui.platformViewRegistry.registerViewFactory(

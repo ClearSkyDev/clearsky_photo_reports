@@ -20,6 +20,7 @@ class _TemplateManagerScreenState extends State<TemplateManagerScreen> {
 
   Future<void> _load() async {
     final items = await TemplateStore.loadTemplates();
+    if (!mounted) return;
     setState(() => _templates = items);
   }
 

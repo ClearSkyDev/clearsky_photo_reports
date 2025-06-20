@@ -673,10 +673,10 @@ class _SendReportScreenState extends State<SendReportScreen> {
         barrierDismissible: false,
         builder: (_) => AlertDialog(
           content: Row(
-            children: const [
-              CircularProgressIndicator(),
-              SizedBox(width: 16),
-              Text('Generating summary...'),
+            children: [
+              const CircularProgressIndicator(),
+              const SizedBox(width: 16),
+              const Text('Generating summary...'),
             ],
           ),
           actions: [
@@ -891,7 +891,9 @@ class _SendReportScreenState extends State<SendReportScreen> {
   Future<void> _shareAudio() async {
     if (_audioFile == null) return;
     if (_audioUrl != null) {
-      await Share.share('Listen: $_audioUrl');
+      await SharePlus.instance.share(
+        ShareParams(text: 'Listen: $_audioUrl'),
+      );
       return;
     }
     await shareReportFile(_audioFile!, subject: 'Inspection Summary');

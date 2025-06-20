@@ -49,9 +49,12 @@ Future<void> generateAndDownloadPdf(
   );
   final bytes = await pdf.save();
   if (kIsWeb) {
-    final blob = html.Blob(<dynamic>[bytes], 'application/pdf');
+    final blob = html.Blob(
+      [bytes].cast<html.BlobPart>(),
+      'application/pdf',
+    );
     final url = html.Url.createObjectUrlFromBlob(blob);
-    html.HTMLAnchorElement(href: url)
+    html.AnchorElement(href: url)
       ..setAttribute('download', 'report.pdf')
       ..click();
     html.Url.revokeObjectUrl(url);
@@ -59,7 +62,9 @@ Future<void> generateAndDownloadPdf(
     final dir = await getTemporaryDirectory();
     final file = File(p.join(dir.path, 'report.pdf'));
     await file.writeAsBytes(bytes, flush: true);
-    await Share.shareXFiles([XFile(file.path)]);
+    await SharePlus.instance.share(
+      ShareParams(files: [XFile(file.path)]),
+    );
   }
 }
 
@@ -78,9 +83,12 @@ Future<void> generateAndDownloadHtml(
   final htmlStr = buffer.toString();
   final bytes = utf8.encode(htmlStr);
   if (kIsWeb) {
-    final blob = html.Blob(<dynamic>[bytes], 'text/html');
+    final blob = html.Blob(
+      [bytes].cast<html.BlobPart>(),
+      'text/html',
+    );
     final url = html.Url.createObjectUrlFromBlob(blob);
-    html.HTMLAnchorElement(href: url)
+    html.AnchorElement(href: url)
       ..setAttribute('download', 'report.html')
       ..click();
     html.Url.revokeObjectUrl(url);
@@ -88,7 +96,9 @@ Future<void> generateAndDownloadHtml(
     final dir = await getTemporaryDirectory();
     final file = File(p.join(dir.path, 'report.html'));
     await file.writeAsBytes(bytes, flush: true);
-    await Share.shareXFiles([XFile(file.path)]);
+    await SharePlus.instance.share(
+      ShareParams(files: [XFile(file.path)]),
+    );
   }
 }
 
@@ -148,9 +158,12 @@ Future<File?> exportAsZip(SavedReport report) async {
   final zipData = ZipEncoder().encode(archive);
 
   if (kIsWeb) {
-    final blob = html.Blob(<dynamic>[zipData], 'application/zip');
+    final blob = html.Blob(
+      [zipData].cast<html.BlobPart>(),
+      'application/zip',
+    );
     final url = html.Url.createObjectUrlFromBlob(blob);
-    html.HTMLAnchorElement(href: url)
+    html.AnchorElement(href: url)
       ..setAttribute('download', fileName)
       ..click();
     html.Url.revokeObjectUrl(url);
@@ -229,7 +242,7 @@ Future<File?> exportFinalZip(SavedReport report,
         'type': 'zip',
       });
     } catch (_) {}
-    html.HTMLAnchorElement(href: url)
+    html.AnchorElement(href: url)
       ..target = '_blank'
       ..click();
     return null;
@@ -341,7 +354,7 @@ Future<File?> exportLegalCopy(SavedReport report,
     final url = await ref.getDownloadURL();
     await logExport(url);
     if (kIsWeb && !auto) {
-      html.HTMLAnchorElement(href: url)
+      html.AnchorElement(href: url)
         ..target = '_blank'
         ..click();
     }
@@ -979,9 +992,12 @@ Future<File?> exportCsv(SavedReport report) async {
   final bytes = utf8.encode(csvStr);
 
   if (kIsWeb) {
-    final blob = html.Blob(<dynamic>[bytes], 'text/csv');
+    final blob = html.Blob(
+      [bytes].cast<html.BlobPart>(),
+      'text/csv',
+    );
     final url = html.Url.createObjectUrlFromBlob(blob);
-    html.HTMLAnchorElement(href: url)
+    html.AnchorElement(href: url)
       ..setAttribute('download', fileName)
       ..click();
     html.Url.revokeObjectUrl(url);

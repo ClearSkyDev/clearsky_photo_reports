@@ -46,7 +46,7 @@ class _SignaturePadState extends State<SignaturePad> {
     final dir = await getTemporaryDirectory();
     final file = File(p.join(dir.path, 'signature.png'));
     await file.writeAsBytes(bytes);
-
+    if (!mounted) return;
     setState(() {
       _signatureBytes = bytes;
     });

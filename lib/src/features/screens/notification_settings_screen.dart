@@ -97,14 +97,14 @@ class _NotificationSettingsScreenState
                 children: [
                   DropdownButton<int>(
                     value: _prefs.snapshotDay,
-                    items: const [
-                      DropdownMenuItem(value: 1, child: Text('Mon')),
-                      DropdownMenuItem(value: 2, child: Text('Tue')),
-                      DropdownMenuItem(value: 3, child: Text('Wed')),
-                      DropdownMenuItem(value: 4, child: Text('Thu')),
-                      DropdownMenuItem(value: 5, child: Text('Fri')),
-                      DropdownMenuItem(value: 6, child: Text('Sat')),
-                      DropdownMenuItem(value: 0, child: Text('Sun')),
+                    items: [
+                      const DropdownMenuItem(value: 1, child: Text('Mon')),
+                      const DropdownMenuItem(value: 2, child: Text('Tue')),
+                      const DropdownMenuItem(value: 3, child: Text('Wed')),
+                      const DropdownMenuItem(value: 4, child: Text('Thu')),
+                      const DropdownMenuItem(value: 5, child: Text('Fri')),
+                      const DropdownMenuItem(value: 6, child: Text('Sat')),
+                      const DropdownMenuItem(value: 0, child: Text('Sun')),
                     ],
                     onChanged: (val) => setState(() {
                       if (val != null) {
