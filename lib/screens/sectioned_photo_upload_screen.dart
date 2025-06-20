@@ -186,100 +186,107 @@ class _SectionedPhotoUploadScreenState extends State<SectionedPhotoUploadScreen>
                       child: Stack(
                         fit: StackFit.expand,
                         children: [
-                        Image.network(photos[index].url, fit: BoxFit.cover),
-                        Positioned(
-                          top: 4,
-                          left: 4,
-                          child: CircleAvatar(
-                            radius: 12,
-                            backgroundColor: Colors.black54,
-                            child: Text(
-                              '${index + 1}',
-                              style: const TextStyle(fontSize: 12, color: Colors.white),
+                          Image.network(photos[index].url, fit: BoxFit.cover),
+                          Positioned(
+                            top: 4,
+                            left: 4,
+                            child: CircleAvatar(
+                              radius: 12,
+                              backgroundColor: Colors.black54,
+                              child: Text(
+                                '${index + 1}',
+                                style: const TextStyle(fontSize: 12, color: Colors.white),
+                              ),
                             ),
                           ),
-                        ),
-                        Positioned(
-                          top: 4,
-                          right: 4,
-                          child: GestureDetector(
-                            onTap: () => onRemove(index),
-                            child: Semantics(
-                              label: 'Remove photo',
-                              button: true,
-                              child: CircleAvatar(
-                                radius: 12,
-                                backgroundColor: Colors.black54,
-                                child: Icon(
-                                  Icons.close,
-                                  size: 14,
-                                  color: Colors.white,
+                          Positioned(
+                            top: 4,
+                            right: 4,
+                            child: GestureDetector(
+                              onTap: () => onRemove(index),
+                              child: Semantics(
+                                label: 'Remove photo',
+                                button: true,
+                                child: CircleAvatar(
+                                  radius: 12,
+                                  backgroundColor: Colors.black54,
+                                  child: Icon(
+                                    Icons.close,
+                                    size: 14,
+                                    color: Colors.white,
+                                  ),
                                 ),
                               ),
                             ),
                           ),
-                        ),
-                        const Positioned(
-                          bottom: 4,
-                          right: 4,
-                          child: Icon(Icons.drag_handle, color: Colors.white),
-                        ),
-                        Positioned(
-                          bottom: 4,
-                          left: 4,
-                          child: Icon(
-                            _getSourceIcon(photos[index].sourceType),
-                            size: 16,
-                            color: Colors.white,
+                          const Positioned(
+                            bottom: 4,
+                            right: 4,
+                            child: Icon(Icons.drag_handle, color: Colors.white),
                           ),
-                        ),
-                        Positioned(
-                          bottom: 0,
-                          left: 0,
-                          right: 0,
-                          child: Container(
-                            color: Colors.black54,
-                            padding: const EdgeInsets.all(2),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  photos[index].capturedAt
-                                      .toLocal()
-                                      .toString()
-                                      .split('.').first,
-                                  style: const TextStyle(
-                                      color: Colors.white, fontSize: 10),
+                          Builder(
+                            builder: (context) {
+                              final iconData = _getSourceIcon(photos[index].sourceType);
+                              return Positioned(
+                                bottom: 4,
+                                left: 4,
+                                child: Icon(
+                                  iconData,
+                                  size: 16,
+                                  color: Colors.white,
                                 ),
-                                if (photos[index].latitude != null &&
-                                    photos[index].longitude != null)
-                                  GestureDetector(
-                                    onTap: () => _openMap(
-                                        photos[index].latitude!,
-                                        photos[index].longitude!),
-                                    child: Semantics(
-                                      label: 'Open in maps',
-                                      button: true,
-                                      child: Text(
-                                        '${photos[index].latitude!.toStringAsFixed(4)}, ${photos[index].longitude!.toStringAsFixed(4)}',
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 10,
-                                          decoration: TextDecoration.underline,
+                              );
+                            },
+                          ),
+                          Positioned(
+                            bottom: 0,
+                            left: 0,
+                            right: 0,
+                            child: Container(
+                              color: Colors.black54,
+                              padding: const EdgeInsets.all(2),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    photos[index].capturedAt
+                                        .toLocal()
+                                        .toString()
+                                        .split('.').first,
+                                    style: const TextStyle(
+                                        color: Colors.white, fontSize: 10),
+                                  ),
+                                  if (photos[index].latitude != null &&
+                                      photos[index].longitude != null)
+                                    GestureDetector(
+                                      onTap: () => _openMap(
+                                          photos[index].latitude!,
+                                          photos[index].longitude!),
+                                      child: Semantics(
+                                        label: 'Open in maps',
+                                        button: true,
+                                        child: Text(
+                                          '${photos[index].latitude!.toStringAsFixed(4)}, ${photos[index].longitude!.toStringAsFixed(4)}',
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 10,
+                                            decoration: TextDecoration.underline,
+                                          ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                 ],
               ),
-            ),
-        ],
+            const SizedBox(height: 8),
+          ],
+        ),
       ),
     );
   }
