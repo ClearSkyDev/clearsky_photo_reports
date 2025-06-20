@@ -1536,9 +1536,12 @@ class _SendReportScreenState extends State<SendReportScreen> {
                           style: TextStyle(fontWeight: FontWeight.bold)),
                       const SizedBox(height: 8),
                       Center(
-                        child: QrImage(
-                          data: _publicUrl,
-                          size: 160,
+                        child: SizedBox(
+                          width: 160,
+                          height: 160,
+                          child: QrImage(
+                            data: _publicUrl,
+                          ),
                         ),
                       ),
                       const SizedBox(height: 8),
