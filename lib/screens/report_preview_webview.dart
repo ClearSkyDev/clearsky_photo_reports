@@ -74,24 +74,26 @@ class _ReportPreviewWebViewState extends State<ReportPreviewWebView> {
 
   @override
   Widget build(BuildContext context) {
-    final preview = kIsWeb
-        ? HtmlElementView(viewType: _viewId!)
-        : WebView(
-        ? HtmlElementView(viewType: _viewId!)
-        : Builder(
-            builder: (context) {
-              // WebView is only available on non-web platforms
-              return WebView(
-                initialUrl: Uri.dataFromString(
-                  widget.html,
-                  mimeType: 'text/html',
-                  encoding: utf8,
-                  base64: true,
-                ).toString(),
-                javascriptMode: JavascriptMode.unrestricted,
-              );
-            },
+    Widget preview;
+    if (kIsWeb) {
+      preview = HtmlElementView(viewType: _viewId!);
+    } else {
+      preview = Builder(
+        builder: (context) {
+          return WebView(
+            initialUrl: Uri.dataFromString(
+              widget.html,
+              mimeType: 'text/html',
+              encoding: utf8,
+              base64: true,
+            ).toString(),
+            javascriptMode: JavaScriptMode.unrestricted,
           );
+        },
+      );
+    }
+
+    return Scaffold(
       appBar: AppBar(title: const Text('Preview Report')),
       body: Column(
         children: [

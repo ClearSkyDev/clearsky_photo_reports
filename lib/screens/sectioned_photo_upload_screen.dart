@@ -204,7 +204,7 @@ class _SectionedPhotoUploadScreenState extends State<SectionedPhotoUploadScreen>
                           right: 4,
                           child: GestureDetector(
                             onTap: () => onRemove(index),
-                            child: const Semantics(
+                            child: Semantics(
                               label: 'Remove photo',
                               button: true,
                               child: CircleAvatar(
