@@ -11,7 +11,7 @@ import '../models/saved_report.dart';
 import '../models/checklist.dart';
 import '../models/report_template.dart';
 import '../models/checklist_template.dart';
-import 'dart:html' as html; // for HTML download (web only)
+import 'package:web/web.dart' as html; // for HTML download (web only)
 import 'package:pdf/widgets.dart' as pw;
 import 'package:pdf/pdf.dart';
 import 'send_report_screen.dart';
