@@ -23,7 +23,7 @@ import '../utils/label_utils.dart';
 import '../models/report_theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:path/path.dart' as p;
-import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher.dart' as url_launcher;
 import 'package:path_provider/path_provider.dart' as pp;
 import '../utils/export_utils.dart';
 import '../utils/share_utils.dart';
@@ -499,7 +499,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
           if (photos.isEmpty) continue;
           final label = section.replaceAll(' & Accessories', '');
           buffer.writeln('<h3>$label</h3>');
-          final missing = struct.slopeTestSquare[section] == false;
+          final missing = struct.slopeTestSquare[entry.key] == false;
           final issues = _collectIssues(photos, missingTestSquare: missing);
           if (issues.isNotEmpty) {
             buffer.writeln('<ul>');
@@ -535,7 +535,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
           final photos = entry.value;
           if (photos.isEmpty) continue;
           buffer.writeln('<h3>${entry.key}</h3>');
-          final missing = struct.slopeTestSquare[section] == false;
+          final missing = struct.slopeTestSquare[entry.key] == false;
           final issues = _collectIssues(photos, missingTestSquare: missing);
           if (issues.isNotEmpty) {
             buffer.writeln('<ul>');
@@ -569,15 +569,6 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
     buffer.writeln(
         '<p style="text-align: center; margin-top: 40px;">$_contactInfo</p>');
     String footer = _disclaimerText;
-    if (_metadata.startLatitude != null && _metadata.startTimestamp != null) {
-      final dur = _metadata.endTimestamp != null
-          ? _metadata.endTimestamp!.difference(_metadata.startTimestamp!)
-          : DateTime.now().difference(_metadata.startTimestamp!);
-      footer +=
-          '<br>GPS: ${_metadata.startLatitude!.toStringAsFixed(4)}, ${_metadata.startLongitude!.toStringAsFixed(4)}';
-      footer +=
-          '<br>Inspection Duration: ${dur.inMinutes} minutes';
-    }
     buffer.writeln(
         '<footer style="background:#eee;padding:10px;margin-top:20px;font-size:12px;text-align:center;">$footer</footer>');
     buffer.writeln('</body></html>');
@@ -610,7 +601,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
 
   void _openMap(double lat, double lng) {
     final uri = Uri.parse('https://www.google.com/maps/search/?api=1&query=$lat,$lng');
-    launchUrl(uri, mode: LaunchMode.externalApplication);
+    url_launcher.launchUrl(uri, mode: url_launcher.LaunchMode.externalApplication);
   }
 
   Future<void> _dictate(TextEditingController controller, String field) async {
@@ -837,7 +828,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
 
     pdf
       ..addPage(
-        pw.Page(
+        pw.MultiPage(
           footer: (context) => pw.Container(
             color: PdfColors.grey300,
             padding: const pw.EdgeInsets.all(6),
@@ -854,11 +845,12 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
               ],
             ),
           ),
-          build: (context) => pw.Center(
-            child: pw.Column(
-              mainAxisAlignment: pw.MainAxisAlignment.center,
-              crossAxisAlignment: pw.CrossAxisAlignment.center,
-              children: [
+          build: (context) => [
+            pw.Center(
+              child: pw.Column(
+                mainAxisAlignment: pw.MainAxisAlignment.center,
+                crossAxisAlignment: pw.CrossAxisAlignment.center,
+                children: [
                 pw.Image(pw.MemoryImage(logoBytes), width: 150),
                 pw.SizedBox(height: 20),
                 pw.Text(
@@ -950,7 +942,8 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
             ),
           ),
         ),
-      )
+      ],
+    )
       ..addPage(
         pw.MultiPage(
           footer: (context) => pw.Container(
