@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 // Uncomment if using Firebase
 // import 'package:firebase_core/firebase_core.dart';
-// import 'firebase_options.dart';
+// import 'src/core/firebase_options.dart';
 
-import 'screens/client_dashboard_screen.dart';
+import 'src/features/screens/client_dashboard_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
