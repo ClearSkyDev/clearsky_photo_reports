@@ -17,7 +17,7 @@ class _ClientLoginScreenState extends State<ClientLoginScreen> {
   bool _loading = false;
 
   Future<void> _submit() async {
-    debugPrint('[ClientLoginScreen] Submit tapped, useMagic=$_useMagic');
+    print('[ClientLoginScreen] Submit tapped, useMagic=$_useMagic');
     setState(() {
       _loading = true;
       _error = null;
@@ -27,7 +27,7 @@ class _ClientLoginScreenState extends State<ClientLoginScreen> {
         if (_link.text.isEmpty) {
           await AuthService()
               .sendSignInLink(_email.text.trim(), Uri.base.toString());
-          debugPrint('[ClientLoginScreen] Magic link sent');
+          print('[ClientLoginScreen] Magic link sent');
           if (mounted) {
             ScaffoldMessenger.of(context)
                 .showSnackBar(const SnackBar(content: Text('Magic link sent')));
@@ -35,15 +35,15 @@ class _ClientLoginScreenState extends State<ClientLoginScreen> {
         } else {
           await AuthService()
               .signInWithLink(_email.text.trim(), _link.text.trim());
-          debugPrint('[ClientLoginScreen] Magic link login success');
+          print('[ClientLoginScreen] Magic link login success');
         }
       } else {
         await AuthService()
             .signIn(email: _email.text.trim(), password: _password.text.trim());
-        debugPrint('[ClientLoginScreen] Password login success');
+        print('[ClientLoginScreen] Password login success');
       }
     } catch (e) {
-      debugPrint('[ClientLoginScreen] Auth error: $e');
+      print('[ClientLoginScreen] Auth error: $e');
       setState(() => _error = e.toString());
     } finally {
       if (mounted) setState(() => _loading = false);
