@@ -1,8 +1,7 @@
 import 'inspection_type.dart';
 import 'checklist_field_type.dart';
 import 'peril_type.dart';
-
-enum InspectorReportRole { ladderAssist, adjuster, contractor }
+import 'inspector_report_role.dart';
 
 class ChecklistItemTemplate {
   final String title;
