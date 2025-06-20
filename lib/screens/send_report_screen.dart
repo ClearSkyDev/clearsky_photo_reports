@@ -230,7 +230,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
       for (final struct in widget.structures!) {
         final uploadedSections = <String, List<ReportPhotoEntry>>{};
         for (var entry in struct.sectionPhotos.entries) {
-          final uploaded = await uploadSection('${struct.name}/${entry.key}', entry.value);
+          final uploaded = await uploadSection('${struct.name}/${entry.key}', entry.value as List<PhotoEntry>);
           if (uploaded.isNotEmpty) {
             uploadedSections[entry.key] = uploaded;
           }
