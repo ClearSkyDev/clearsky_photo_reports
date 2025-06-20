@@ -49,15 +49,12 @@ Future<void> generateAndDownloadPdf(
   );
   final bytes = await pdf.save();
   if (kIsWeb) {
-    final blob = html.Blob(
-      <dynamic>[bytes],
-      html.BlobPropertyBag(type: 'application/pdf'),
-    );
-    final url = html.URL.createObjectURL(blob);
+    final blob = html.Blob(<dynamic>[bytes], 'application/pdf');
+    final url = html.Url.createObjectUrlFromBlob(blob);
     html.AnchorElement(href: url)
       ..setAttribute('download', 'report.pdf')
       ..click();
-    html.URL.revokeObjectURL(url);
+      html.Url.revokeObjectUrl(url);
   } else {
     final dir = await getTemporaryDirectory();
     final file = File(p.join(dir.path, 'report.pdf'));
@@ -81,15 +78,12 @@ Future<void> generateAndDownloadHtml(
   final htmlStr = buffer.toString();
   final bytes = utf8.encode(htmlStr);
   if (kIsWeb) {
-    final blob = html.Blob(
-      <dynamic>[bytes],
-      html.BlobPropertyBag(type: 'text/html'),
-    );
-    final url = html.URL.createObjectURL(blob);
+    final blob = html.Blob(<dynamic>[bytes], 'text/html');
+    final url = html.Url.createObjectUrlFromBlob(blob);
     html.AnchorElement(href: url)
       ..setAttribute('download', 'report.html')
       ..click();
-    html.URL.revokeObjectURL(url);
+    html.Url.revokeObjectUrl(url);
   } else {
     final dir = await getTemporaryDirectory();
     final file = File(p.join(dir.path, 'report.html'));
@@ -118,6 +112,7 @@ Future<File?> exportAsZip(SavedReport report) async {
   final meta = InspectionMetadata.fromMap(report.inspectionMetadata);
   final addressSlug = _slugify(meta.propertyAddress);
   final fileName = '${addressSlug}_clearsky_report.zip';
+
   final htmlStr = await _generateHtml(report);
   final pdfBytes = await _generatePdf(report);
   final csvStr = generateCsv(report);
@@ -138,53 +133,42 @@ Future<File?> exportAsZip(SavedReport report) async {
           if (!await file.exists()) continue;
           final bytes = await file.readAsBytes();
           final label = photo.label.isNotEmpty ? photo.label : 'Unlabeled';
-        final damage =
-            photo.damageType.isNotEmpty ? photo.damageType : 'Unknown';
-        final damage =
-            photo.damageType.isNotEmpty ? photo.damageType : 'Unknown';
-        final cleanLabel =
-            label.replaceAll(RegExp(r'[^A-Za-z0-9_-]'), '_');
-        final ext = p.extension(file.path);
-        final name = 'photos/${section}_$cleanLabel$ext';
-        archive.addFile(ArchiveFile(name, bytes.length, bytes));
-      } catch (_) {
-        // ignore file errors
-      }
+          final cleanLabel =
+              label.replaceAll(RegExp(r'[^A-Za-z0-9_-]'), '_');
+          final ext = p.extension(file.path);
+          final name = 'photos/${section}_$cleanLabel$ext';
+          archive.addFile(ArchiveFile(name, bytes.length, bytes));
+        } catch (_) {
+          // ignore file errors
+        }
       }
     }
-  }
-  return null;
   }
 
   final zipData = ZipEncoder().encode(archive);
 
   if (kIsWeb) {
-    final blob = html.Blob(
-      <dynamic>[zipData],
-      html.BlobPropertyBag(type: 'application/zip'),
-    );
-    final url = html.URL.createObjectURL(blob);
+    final blob = html.Blob(<dynamic>[zipData], 'application/zip');
+    final url = html.Url.createObjectUrlFromBlob(blob);
     html.AnchorElement(href: url)
       ..setAttribute('download', fileName)
       ..click();
-    html.URL.revokeObjectURL(url);
+    html.Url.revokeObjectUrl(url);
     return null;
   }
 
   Directory? dir;
-  void try {
+  try {
     dir = await getDownloadsDirectory();
-  } void catch (_) {
+  } catch (_) {
     dir = await getApplicationDocumentsDirectory();
   }
   dir ??= await getApplicationDocumentsDirectory();
 
   final filePath = p.join(dir.path, fileName);
   final file = File(filePath);
-  await file.writeAsBytes(zipData, flush = true);
-
-  final reportFile = File(filePath);
-  return reportFile;
+  await file.writeAsBytes(zipData, flush: true);
+  return file;
 }
 
 /// Exports the finalized report as a ZIP file containing the PDF and
@@ -968,15 +952,12 @@ Future<File?> exportCsv(SavedReport report) async {
   final bytes = utf8.encode(csvStr);
 
   if (kIsWeb) {
-    final blob = html.Blob(
-      <dynamic>[bytes],
-      html.BlobPropertyBag(type: 'text/csv'),
-    );
-    final url = html.URL.createObjectURL(blob);
+    final blob = html.Blob(<dynamic>[bytes], 'text/csv');
+    final url = html.Url.createObjectUrlFromBlob(blob);
     html.AnchorElement(href: url)
       ..setAttribute('download', fileName)
       ..click();
-    html.URL.revokeObjectURL(url);
+    html.Url.revokeObjectUrl(url);
     return null;
   }
 
