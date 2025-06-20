@@ -1,6 +1,12 @@
 # clearsky-photo-reports
 AI powered roof inspection reporting app
 
+## Getting Started
+
+1. Install [Flutter](https://docs.flutter.dev/get-started/install) on your machine.
+2. Run `flutter pub get` in the repository root to download all dependencies.
+3. Launch the app with `flutter run` or open it in your IDE of choice.
+
 ## Dynamic Summary Assistant
 
 The new `DynamicSummaryService` keeps inspection summaries up to date.

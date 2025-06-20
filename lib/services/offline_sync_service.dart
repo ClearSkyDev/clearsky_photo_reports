@@ -116,7 +116,7 @@ class OfflineSyncService {
           uploaded.add(ReportPhotoEntry(
             label: p.label,
             caption: p.caption,
-            confidence: p.labelConfidence,
+            confidence: p.confidence,
             photoUrl: url,
             timestamp: p.timestamp,
             latitude: p.latitude,
