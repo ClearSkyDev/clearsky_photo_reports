@@ -90,6 +90,7 @@ export default function ClearSkyPhotoIntakeScreen() {
   const [editingPhoto, setEditingPhoto] = useState(null);
 
   const handlePhotoUpload = async (section) => {
+    console.log('Upload photo for', section);
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: false,
@@ -111,6 +112,7 @@ export default function ClearSkyPhotoIntakeScreen() {
           : [newPhoto];
         return { ...prevData, [section]: updatedSection };
       });
+      console.log('Added photo to', section);
       if (autoChecklist) {
         setChecklist((prev) => ({ ...prev, [section]: true }));
       }
@@ -118,6 +120,7 @@ export default function ClearSkyPhotoIntakeScreen() {
   };
 
   const handleLabelChange = (section, index, newLabel) => {
+    console.log('Label change', section, index, newLabel);
     setPhotoData((prevData) => {
       const updatedSection = [...prevData[section]];
       updatedSection[index].userLabel = newLabel;
@@ -126,6 +129,7 @@ export default function ClearSkyPhotoIntakeScreen() {
   };
 
   const handleSaveAnnotations = (section, index, annotations) => {
+    console.log('Save annotations', section, index);
     setPhotoData((prevData) => {
       const updatedSection = [...prevData[section]];
       updatedSection[index].annotations = annotations;

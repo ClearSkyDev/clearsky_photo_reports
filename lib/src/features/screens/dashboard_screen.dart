@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 
 import 'dart:io';
 
@@ -20,6 +21,7 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
+    debugPrint('[DashboardScreen] build');
     final key = const String.fromEnvironment('OPENAI_API_KEY', defaultValue: '')
             .isNotEmpty
         ? const String.fromEnvironment('OPENAI_API_KEY')
