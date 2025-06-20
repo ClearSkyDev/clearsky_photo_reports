@@ -882,7 +882,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
   Future<void> _shareAudio() async {
     if (_audioFile == null) return;
     if (_audioUrl != null) {
-      await SharePlus.instance.share('Listen: $_audioUrl');
+      await Share.share('Listen: $_audioUrl');
       return;
     }
     await shareReportFile(_audioFile!, subject: 'Inspection Summary');

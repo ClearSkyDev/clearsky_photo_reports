@@ -52,7 +52,7 @@ class AiSummaryService {
           'Here are the findings: ${jsonEncode(sectionData)}';
     } else if (roles.contains(InspectorReportRole.adjuster) && roles.length == 1) {
       prompt =
-          'You are an insurance adjuster. Based on the observed damage and inspection findings, '\n'
+          'You are an insurance adjuster. Based on the observed damage and inspection findings, '
           'summarize the condition and note whether the damage is consistent with covered perils (like hail/wind).\n'
           'Lean into claim decision logic, but remain factual.\n\n'
           'Findings: ${jsonEncode(sectionData)}';
