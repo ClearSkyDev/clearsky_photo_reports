@@ -327,7 +327,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
   }
 
   // Generate the HTML string for the report preview
-  String generateHtmlPreview() {
+  String generateHtmlPreview(dynamic entry) {
     final buffer = StringBuffer();
     buffer.writeln('<html><head><title>Photo Report</title>');
     final color = '#${_theme.primaryColor.toRadixString(16).padLeft(8, '0').substring(2)}';
@@ -578,7 +578,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
 
   // HTML download
   void _downloadHtml() {
-    final htmlContent = generateHtmlPreview();
+    final htmlContent = generateHtmlPreview(null);
     _saveHtmlFile(htmlContent);
     inspectionChecklist.markComplete('Report Exported');
     ExportLog.addEntry(ExportLogEntry(

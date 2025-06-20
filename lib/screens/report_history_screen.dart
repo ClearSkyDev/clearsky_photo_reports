@@ -161,7 +161,7 @@ class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
                 MaterialPageRoute(
                   builder: (_) => MessageThreadScreen(
                     reportId: report.id,
-                    inspectorView: true,
+                    inspectorView: true, threadTitle: '', currentUserId: '',
                   ),
                 ),
               );
@@ -216,7 +216,18 @@ class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
           });
           structs.add(InspectedStructure(
             name: s.name,
-            sectionPhotos: sections,
+            sectionPhotos: sections.map((key, value) => MapEntry(
+              key,
+              value.map((e) => ReportPhotoEntry(
+                photoUrl: e.url,
+                label: e.label,
+                damageType: e.damageType,
+                timestamp: e.capturedAt,
+                latitude: e.latitude,
+                longitude: e.longitude,
+                note: e.note,
+              )).toList(),
+            )),
             slopeTestSquare: Map.from(s.slopeTestSquare),
           ));
         }
