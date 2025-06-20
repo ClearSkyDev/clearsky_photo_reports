@@ -21,7 +21,7 @@ dependencies:
   image: ^4.1.3
 
   # UI & layout
-  qr_flutter: ^4.0.0
+  qr_flutter: ^4.1.0
   signature: ^5.5.0
   reorderables: ^0.5.0
   google_fonts: ^6.1.0
@@ -32,7 +32,7 @@ dependencies:
 
   # Location & GPS
   geolocator: ^11.0.0
-  geocoding: ^2.2.0
+  geocoding: ^3.0.0
 
   # Media & storage
   image_picker: ^1.0.7
