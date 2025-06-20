@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-import 'dart:developer';
 import '../../core/models/photo_entry.dart';
 import '../../core/models/inspection_metadata.dart';
 import '../../core/models/report_template.dart';

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import 'dart:io';
-import 'dart:developer';
 
 import '../../core/models/inspector_user.dart';
 import '../../core/services/auth_service.dart';

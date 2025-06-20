@@ -3,7 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import '../models/inspector_user.dart';
 import 'audit_log_service.dart';
-import 'dart:developer';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
