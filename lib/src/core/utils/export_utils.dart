@@ -6,9 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart' show rootBundle;
 // Only used on web to trigger downloads
 // ignore: avoid_web_libraries_in_flutter
-import 'dart:html' as html show Blob, BlobPart, BlobPropertyBag, Url, AnchorElement;
-import 'dart:js_interop';
-import 'package:js/js_util.dart' as js_util;
+import 'dart:html' as html show Blob, Url, AnchorElement;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:http/http.dart' as http;
@@ -50,10 +48,7 @@ Future<void> generateAndDownloadPdf(
   );
   final bytes = await pdf.save();
   if (kIsWeb) {
-    final blob = html.Blob(
-      js_util.jsify([bytes]) as JSArray<html.BlobPart>,
-      js_util.jsify({'type': 'application/pdf'}) as html.BlobPropertyBag,
-    );
+    final blob = html.Blob([bytes], 'application/pdf');
     final url = html.Url.createObjectUrlFromBlob(blob);
     html.AnchorElement(href: url)
       ..setAttribute('download', 'report.pdf')
@@ -84,10 +79,7 @@ Future<void> generateAndDownloadHtml(
   final htmlStr = buffer.toString();
   final bytes = utf8.encode(htmlStr);
   if (kIsWeb) {
-    final blob = html.Blob(
-      js_util.jsify([bytes]) as JSArray<html.BlobPart>,
-      js_util.jsify({'type': 'text/html'}) as html.BlobPropertyBag,
-    );
+    final blob = html.Blob([bytes], 'text/html');
     final url = html.Url.createObjectUrlFromBlob(blob);
     html.AnchorElement(href: url)
       ..setAttribute('download', 'report.html')
@@ -159,10 +151,7 @@ Future<File?> exportAsZip(SavedReport report) async {
   final zipData = ZipEncoder().encode(archive);
 
   if (kIsWeb) {
-    final blob = html.Blob(
-      js_util.jsify([zipData]) as JSArray<html.BlobPart>,
-      js_util.jsify({'type': 'application/zip'}) as html.BlobPropertyBag,
-    );
+    final blob = html.Blob([zipData], 'application/zip');
     final url = html.Url.createObjectUrlFromBlob(blob);
     html.AnchorElement(href: url)
       ..setAttribute('download', fileName)
@@ -1007,10 +996,7 @@ Future<File?> exportCsv(SavedReport report) async {
   final bytes = utf8.encode(csvStr);
 
   if (kIsWeb) {
-    final blob = html.Blob(
-      js_util.jsify([bytes]) as JSArray<html.BlobPart>,
-      js_util.jsify({'type': 'text/csv'}) as html.BlobPropertyBag,
-    );
+    final blob = html.Blob([bytes], 'text/csv');
     final url = html.Url.createObjectUrlFromBlob(blob);
     html.AnchorElement(href: url)
       ..setAttribute('download', fileName)
