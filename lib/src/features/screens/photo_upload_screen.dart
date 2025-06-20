@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 import '../../core/models/photo_entry.dart';
 import '../../core/models/inspection_metadata.dart';
 import '../../core/models/report_template.dart';
@@ -64,8 +65,8 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
               itemBuilder: (context, index) {
                 return Stack(
                   children: [
-                    Image.network(
-                      _photos[index].url,
+                    Image.file(
+                      File(_photos[index].url),
                       fit: BoxFit.cover,
                       width: double.infinity,
                     ),

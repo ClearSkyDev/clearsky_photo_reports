@@ -18,6 +18,7 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:pdf/pdf.dart';
 import 'send_report_screen.dart';
 import 'report_preview_webview.dart';
+import '../widgets/export_progress_dialog.dart';
 import 'report_settings_screen.dart' show ReportSettings;
 import '../../core/utils/label_utils.dart';
 import '../../core/models/report_theme.dart';
@@ -285,17 +286,46 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
         : (Platform.environment['OPENAI_API_KEY'] ?? '');
     if (key.isEmpty) return;
     setState(() => _loadingSummary = true);
+    var cancelled = false;
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => AlertDialog(
+        content: Row(
+          children: const [
+            CircularProgressIndicator(),
+            SizedBox(width: 16),
+            Text('Generating summary...'),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              cancelled = true;
+              Navigator.pop(context);
+            },
+            child: const Text('Cancel'),
+          )
+        ],
+      ),
+    );
     try {
       final service = AiSummaryService(apiKey: key);
       final result = await service.generateSummary(report);
-      setState(() {
-        _aiSummary = AiSummaryReview(content: result.adjuster, status: 'draft');
-        _adjusterSummaryController.text = result.adjuster;
-        _homeownerSummaryController.text = result.homeowner;
-      });
+      if (!cancelled && mounted) {
+        setState(() {
+          _aiSummary =
+              AiSummaryReview(content: result.adjuster, status: 'draft');
+          _adjusterSummaryController.text = result.adjuster;
+          _homeownerSummaryController.text = result.homeowner;
+        });
+      }
     } catch (_) {
       // ignore errors
     } finally {
+      if (mounted && Navigator.of(context).canPop()) {
+        Navigator.of(context).pop();
+      }
       if (mounted) setState(() => _loadingSummary = false);
     }
   }
@@ -1135,12 +1165,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) => const AlertDialog(
-        content: SizedBox(
-          height: 60,
-          child: Center(child: CircularProgressIndicator()),
-        ),
-      ),
+      builder: (_) => const ExportProgressDialog(),
     );
     try {
       final file = await exportFinalZip(widget.savedReport!);

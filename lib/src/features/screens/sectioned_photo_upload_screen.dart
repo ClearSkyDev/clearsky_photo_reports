@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 import 'package:reorderables/reorderables.dart';
 
 import '../../core/models/photo_entry.dart';
@@ -189,7 +190,10 @@ class _SectionedPhotoUploadScreenState
                       child: Stack(
                         fit: StackFit.expand,
                         children: [
-                          Image.network(photos[index].url, fit: BoxFit.cover),
+                          Image.file(
+                            File(photos[index].url),
+                            fit: BoxFit.cover,
+                          ),
                           Positioned(
                             top: 4,
                             left: 4,
