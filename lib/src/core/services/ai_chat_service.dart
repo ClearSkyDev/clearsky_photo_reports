@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
 
 import '../models/chat_message.dart';
 
@@ -18,7 +17,7 @@ class AiChatService {
       {required String reportId,
       required String message,
       Map<String, dynamic>? context}) async {
-    debugPrint('[AiChatService] sendMessage to $reportId');
+    print('[AiChatService] sendMessage to $reportId');
     final history = await loadMessages(reportId);
     final messages = <Map<String, String>>[
       {
@@ -57,12 +56,12 @@ class AiChatService {
         ChatMessage(
             id: '', role: 'user', text: message, createdAt: DateTime.now()));
     await _storeMessage(reportId, reply);
-    debugPrint('[AiChatService] reply length ${reply.text.length}');
+    print('[AiChatService] reply length ${reply.text.length}');
     return reply;
   }
 
   Future<void> _storeMessage(String reportId, ChatMessage msg) async {
-    debugPrint('[AiChatService] storeMessage $reportId role=${msg.role}');
+    print('[AiChatService] storeMessage $reportId role=${msg.role}');
     await FirebaseFirestore.instance
         .collection('reports')
         .doc(reportId)
@@ -75,7 +74,7 @@ class AiChatService {
   }
 
   Future<List<ChatMessage>> loadMessages(String reportId) async {
-    debugPrint('[AiChatService] loadMessages $reportId');
+    print('[AiChatService] loadMessages $reportId');
     final snap = await FirebaseFirestore.instance
         .collection('reports')
         .doc(reportId)

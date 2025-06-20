@@ -47,6 +47,18 @@ dependencies:
   reorderables: ^0.6.0
   webview_flutter: ^4.13.0
   web: ^1.1.1
+  firebase_messaging: ^15.2.7
+  flutter_local_notifications: ^19.2.1
+  flutter_email_sender: ^7.0.0
+  flutter_tts: ^4.2.3
+  ffmpeg_kit_flutter: ^6.0.3
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  connectivity_plus: ^6.1.4
+  speech_to_text: ^7.0.0
+  http: ^1.4.0
+  image: ^4.5.4
+  archive: ^4.0.7
 
 dev_dependencies:
   flutter_test:

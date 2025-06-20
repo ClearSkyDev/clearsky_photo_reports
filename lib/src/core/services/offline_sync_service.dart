@@ -28,7 +28,7 @@ class OfflineSyncService {
   Timer? _timer;
 
   Future<void> init() async {
-    debugPrint('[OfflineSyncService] init');
+    print('[OfflineSyncService] init');
     await Hive.initFlutter();
     await OfflineDraftStore.instance.init();
     await SyncHistoryService.instance.init();
@@ -50,20 +50,20 @@ class OfflineSyncService {
   }
 
   Future<void> dispose() async {
-    debugPrint('[OfflineSyncService] dispose');
+    print('[OfflineSyncService] dispose');
     await _connSub?.cancel();
     _timer?.cancel();
   }
 
   Future<void> saveDraft(SavedReport report) {
-    debugPrint('[OfflineSyncService] saveDraft ${report.id}');
+    print('[OfflineSyncService] saveDraft ${report.id}');
     return OfflineDraftStore.instance.saveReport(report);
   }
 
   int get pendingCount => OfflineDraftStore.instance.count;
 
   Future<void> syncDrafts() async {
-    debugPrint('[OfflineSyncService] syncDrafts start');
+    print('[OfflineSyncService] syncDrafts start');
     if (!online.value) return;
     if (!await SyncPreferences.isCloudSyncEnabled()) return;
     final drafts = OfflineDraftStore.instance.loadReports();
@@ -88,11 +88,11 @@ class OfflineSyncService {
       }
       progress.value = (i + 1) / drafts.length;
     }
-    debugPrint('[OfflineSyncService] syncDrafts complete');
+    print('[OfflineSyncService] syncDrafts complete');
   }
 
   Future<void> _uploadDraft(SavedReport draft) async {
-    debugPrint('[OfflineSyncService] uploading draft ${draft.id}');
+    print('[OfflineSyncService] uploading draft ${draft.id}');
     final firestore = FirebaseFirestore.instance;
     final storage = FirebaseStorage.instance;
 
