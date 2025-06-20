@@ -18,7 +18,7 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _loading = false;
 
   Future<void> _submit() async {
-    debugPrint('[LoginScreen] Submit tapped, isLogin=$_isLogin');
+    print('[LoginScreen] Submit tapped, isLogin=$_isLogin');
     setState(() {
       _loading = true;
       _error = null;
@@ -29,21 +29,29 @@ class _LoginScreenState extends State<LoginScreen> {
           email: _emailController.text.trim(),
           password: _passwordController.text.trim(),
         );
-        debugPrint('[LoginScreen] Sign in successful');
+        print('[LoginScreen] Sign in successful');
       } else {
         await AuthService().signUp(
           email: _emailController.text.trim(),
           password: _passwordController.text.trim(),
           companyId: _companyController.text.trim(),
         );
-        debugPrint('[LoginScreen] Sign up successful');
+        print('[LoginScreen] Sign up successful');
       }
     } catch (e) {
-      debugPrint('[LoginScreen] Auth error: $e');
+      print('[LoginScreen] Auth error: $e');
       setState(() => _error = e.toString());
     } finally {
       if (mounted) setState(() => _loading = false);
     }
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    _companyController.dispose();
+    super.dispose();
   }
 
   @override
