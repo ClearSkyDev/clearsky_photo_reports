@@ -28,6 +28,7 @@ import '../models/inspection_type.dart';
 import '../models/inspection_sections.dart';
 import '../models/saved_report.dart';
 import '../models/photo_entry.dart';
+import '../models/inspector_report_role.dart';
 
 Future<void> generateAndDownloadPdf(
   List<PhotoEntry> photos,

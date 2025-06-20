@@ -4,8 +4,8 @@ import '../models/inspected_structure.dart';
 import '../models/saved_report.dart';
 import '../utils/summary_utils.dart';
 import 'ai_summary_service.dart';
-// Inspector roles are defined alongside checklist templates.
-import '../models/checklist_template.dart' show InspectorReportRole;
+// Inspector roles are defined in a separate model.
+import '../models/inspector_report_role.dart';
 
 /// Service that keeps an inspection summary up to date as photos are
 /// labeled or edited. The summary is grouped by section and can be

@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 import '../models/saved_report.dart';
-import '../models/checklist_template.dart' show InspectorReportRole;
+import '../models/inspector_report_role.dart';
 
 class AiSummary {
   final String adjuster;

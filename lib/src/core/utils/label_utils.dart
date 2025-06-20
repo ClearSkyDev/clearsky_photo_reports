@@ -1,4 +1,5 @@
 import '../models/checklist_template.dart';
+import '../models/inspector_report_role.dart';
 
 /// Format [damageType] for display based on the inspector [role].
 ///

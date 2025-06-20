@@ -5,7 +5,7 @@ import '../../core/models/saved_report.dart';
 import '../../core/models/inspection_metadata.dart';
 import '../../core/models/inspected_structure.dart';
 import '../../core/models/photo_entry.dart';
-import '../../core/models/checklist_template.dart' show InspectorReportRole;
+import '../../core/models/inspector_report_role.dart';
 import '../../core/services/offline_draft_store.dart';
 import '../../core/services/offline_sync_service.dart';
 import '../../core/utils/profile_storage.dart';

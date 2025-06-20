@@ -10,6 +10,7 @@ import '../../core/models/saved_report.dart';
 import '../../core/models/checklist.dart';
 import '../../core/models/report_template.dart';
 import '../../core/models/checklist_template.dart';
+import '../../core/models/inspector_report_role.dart';
 // Only used on web to trigger downloads
 // ignore: avoid_web_libraries_in_flutter
 import 'dart:html' as html show Blob, BlobPart, Url, AnchorElement;
