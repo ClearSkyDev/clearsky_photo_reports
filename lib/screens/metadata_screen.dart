@@ -229,7 +229,9 @@ class _MetadataScreenState extends State<MetadataScreen> {
                       decoration:
                           const InputDecoration(labelText: 'Inspection Date'),
                       controller: TextEditingController(
-                      text: _inspectionDate.toLocal().toString().split(' ')[0],
+                        text: _inspectionDate.toLocal().toString().split(' ')[0],
+                      ),
+                      readOnly: true,
                     ),
                   ),
                 ),

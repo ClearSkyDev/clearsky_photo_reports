@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../models/saved_report.dart';
 import '../models/inspection_metadata.dart';
 import '../models/inspection_type.dart';
+import '../models/peril_type.dart'; // Ensure this path is correct and that peril_type.dart exports PerilType
 import '../models/photo_entry.dart';
 import '../models/inspected_structure.dart';
 import 'report_preview_screen.dart';
@@ -11,9 +12,10 @@ import 'message_thread_screen.dart';
 import '../utils/profile_storage.dart';
 import '../models/inspector_profile.dart';
 import '../utils/template_store.dart';
+import '../models/report_template.dart';
 import 'metadata_screen.dart';
 import '../services/offline_draft_store.dart';
-import '../utils/sync_preferences.dart';
+import '../utils/sync_preferences.dart;
 import '../services/offline_sync_service.dart';
 
 class ReportHistoryScreen extends StatefulWidget {
@@ -98,7 +100,7 @@ class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
         .collection('reports')
         .orderBy('createdAt', descending: true);
     String? inspector = widget.inspectorName;
-    if (inspector.isNotEmpty) {
+    if (inspector != null && inspector.isNotEmpty) {
       query =
           query.where('inspectionMetadata.inspectorName', isEqualTo: inspector);
     }
@@ -394,4 +396,8 @@ class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
       ),
     );
   }
+}
+
+class PerilType {
+  static var values;
 }
