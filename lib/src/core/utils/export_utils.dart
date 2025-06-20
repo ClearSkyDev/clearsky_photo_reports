@@ -598,6 +598,19 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
     return pw.Wrap(spacing: 10, runSpacing: 10, children: items);
   }
 
+  // Placeholder for missing helper used during PDF generation.
+  pw.Widget _pdfSectionHeader(String text) {
+    // TODO: implement template-aware styling for section headers
+    return pw.Text(
+      text,
+      style: pw.TextStyle(
+        fontSize: 18,
+        fontWeight: pw.FontWeight.bold,
+        color: PdfColor.fromInt(theme.primaryColor),
+      ),
+    );
+  }
+
   Future<List<pw.Widget>> buildSections() async {
     const establishing = ['Address Photo', 'Front of House'];
     const ordered = [
