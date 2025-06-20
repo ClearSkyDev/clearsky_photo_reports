@@ -6,7 +6,6 @@ import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import '../models/photo_entry.dart';
 import '../models/inspection_metadata.dart';
-import '../models/inspection_type.dart';
 import '../models/inspection_sections.dart';
 import '../models/saved_report.dart';
 import '../models/checklist.dart';
@@ -15,7 +14,6 @@ import '../models/checklist_template.dart';
 import 'dart:html' as html; // for HTML download (web only)
 import 'package:pdf/widgets.dart' as pw;
 import 'package:pdf/pdf.dart';
-import 'package:printing/printing.dart';
 import 'send_report_screen.dart';
 import 'report_preview_webview.dart';
 import 'report_settings_screen.dart' show ReportSettings;
@@ -161,12 +159,6 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
     final title = sanitize(
         _titleController.text.isNotEmpty ? _titleController.text : _defaultReportTitle());
     return '$title.$ext';
-  }
-  void _updateLabel(int index, String value) {
-    if (widget.photos == null) return;
-    setState(() {
-      widget.photos![index].label = value;
-    });
   }
 
   List<MapEntry<String, List<ReportPhotoEntry>>> _gatherGroups() {
@@ -712,7 +704,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
                 if (photo.note.isNotEmpty)
                   pw.Text(photo.note,
                       textAlign: pw.TextAlign.center,
-                      style: const pw.TextStyle(
+                      style: pw.TextStyle(
                           fontSize: 10, fontStyle: pw.FontStyle.italic)),
               ],
             ),
@@ -941,8 +933,8 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
               ],
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     )
       ..addPage(
         pw.MultiPage(
@@ -1094,52 +1086,9 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
     await shareReportFile(_exportedFile!, subject: subject, text: body);
   }
 
-  /// Collect report parts into memory for export.
-  Future<Map<String, Uint8List>> _collectReportParts() async {
-    final files = <String, Uint8List>{};
-    final htmlContent = generateHtmlPreview();
-    files['report.html'] = Uint8List.fromList(utf8.encode(htmlContent));
-    files['report.pdf'] = await _downloadPdf();
-
-    Future<void> addPhotos(String section, List<ReportPhotoEntry> photos) async {
-      final sectionClean = section.replaceAll(RegExp(r'\s+'), '');
-      for (final photo in photos) {
-        try {
-          Uint8List bytes;
-          if (photo.photoUrl.startsWith('http')) {
-            final data =
-                await NetworkAssetBundle(Uri.parse(photo.photoUrl)).load('');
-            bytes = data.buffer.asUint8List();
-          } else {
-            final file = File(photo.photoUrl);
-            if (!await file.exists()) continue;
-            bytes = await file.readAsBytes();
-          }
-          final label = photo.label.isNotEmpty ? photo.label : 'Unlabeled';
-          final cleanLabel =
-              label.replaceAll(RegExp(r'[^A-Za-z0-9_-]'), '_');
-          final name = '${sectionClean}_$cleanLabel.jpg';
-          files[name] = bytes;
-        } catch (_) {}
-      }
-    }
-
-    if (widget.structures != null) {
-      for (final struct in widget.structures!) {
-        for (final entry in struct.sectionPhotos.entries) {
-          final label = widget.structures!.length > 1
-              ? '${struct.name} - ${entry.key}'
-              : entry.key;
-          await addPhotos(label, entry.value);
-        }
-      }
-    }
-
-    return files;
-  }
 
   void _previewFullReport() {
-    final htmlContent = generateHtmlPreview();
+    final htmlContent = generateHtmlPreview(null);
     Navigator.push(
       context,
       MaterialPageRoute(
