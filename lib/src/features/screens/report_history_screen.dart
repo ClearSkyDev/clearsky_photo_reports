@@ -48,6 +48,7 @@ class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
       initialDateRange: _selectedRange,
     );
     if (range != null) {
+      if (!mounted) return;
       setState(() {
         _selectedRange = range;
       });

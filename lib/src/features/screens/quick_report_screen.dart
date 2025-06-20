@@ -44,7 +44,7 @@ class _QuickReportScreenState extends State<QuickReportScreen> {
 
   Future<void> _pick() async {
     final XFile? image = await _picker.pickImage(source: ImageSource.camera);
-    if (image == null) return;
+    if (!mounted || image == null) return;
     setState(() {
       _photos[_step] = ReportPhotoEntry(
         label: _labels[_step],
@@ -70,6 +70,7 @@ class _QuickReportScreenState extends State<QuickReportScreen> {
   }
 
   Future<void> _generateSummary() async {
+    if (!mounted) return;
     setState(() => _loadingSummary = true);
     final struct = InspectedStructure(
         name: 'Main Structure',
@@ -95,6 +96,7 @@ class _QuickReportScreenState extends State<QuickReportScreen> {
     );
     final text = generateSummaryText(report);
     await Future.delayed(const Duration(milliseconds: 300));
+    if (!mounted) return;
     setState(() {
       _summary = text;
       _loadingSummary = false;
@@ -102,6 +104,7 @@ class _QuickReportScreenState extends State<QuickReportScreen> {
   }
 
   Future<void> _export() async {
+    if (!mounted) return;
     setState(() => _exporting = true);
     final struct = InspectedStructure(
       name: 'Main Structure',
@@ -135,6 +138,7 @@ class _QuickReportScreenState extends State<QuickReportScreen> {
       type: 'pdf',
       wasOffline: false,
     ));
+    if (!mounted) return;
     setState(() => _exporting = false);
   }
 

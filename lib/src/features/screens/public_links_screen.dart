@@ -29,6 +29,7 @@ class _PublicLinksScreenState extends State<PublicLinksScreen> {
       'publicReportId': FieldValue.delete(),
       'publicViewLink': FieldValue.delete()
     });
+    if (!mounted) return;
     setState(() {
       _future = FirebaseFirestore.instance
           .collection('reports')

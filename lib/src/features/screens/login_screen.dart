@@ -19,7 +19,7 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _loading = false;
 
   Future<void> _submit() async {
-    print('[LoginScreen] Submit tapped, isLogin=$_isLogin');
+    debugPrint('[LoginScreen] Submit tapped, isLogin=$_isLogin');
     setState(() {
       _loading = true;
       _error = null;
@@ -30,17 +30,18 @@ class _LoginScreenState extends State<LoginScreen> {
           email: _emailController.text.trim(),
           password: _passwordController.text.trim(),
         );
-        print('[LoginScreen] Sign in successful');
+        debugPrint('[LoginScreen] Sign in successful');
       } else {
         await AuthService().signUp(
           email: _emailController.text.trim(),
           password: _passwordController.text.trim(),
           companyId: _companyController.text.trim(),
         );
-        print('[LoginScreen] Sign up successful');
+        debugPrint('[LoginScreen] Sign up successful');
       }
     } catch (e) {
-      print('[LoginScreen] Auth error: $e');
+      debugPrint('[LoginScreen] Auth error: $e');
+      if (!mounted) return;
       setState(() => _error = e.toString());
     } finally {
       if (mounted) setState(() => _loading = false);

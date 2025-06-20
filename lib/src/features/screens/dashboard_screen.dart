@@ -20,7 +20,7 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
-    print('[DashboardScreen] build');
+    debugPrint('[DashboardScreen] build');
     final key = const String.fromEnvironment('OPENAI_API_KEY', defaultValue: '')
             .isNotEmpty
         ? const String.fromEnvironment('OPENAI_API_KEY')
