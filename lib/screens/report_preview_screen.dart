@@ -11,7 +11,9 @@ import '../models/saved_report.dart';
 import '../models/checklist.dart';
 import '../models/report_template.dart';
 import '../models/checklist_template.dart';
-import 'package:web/web.dart' as html show Blob, Url, AnchorElement; // for HTML download (web only)
+// Only used on web to trigger downloads
+// ignore: avoid_web_libraries_in_flutter
+import 'dart:html' as html show Blob, Url, AnchorElement;
 import 'package:pdf/widgets.dart' as pw;
 import 'package:pdf/pdf.dart';
 import 'send_report_screen.dart';
@@ -569,9 +571,9 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
   }
 
   // HTML download
-  void _downloadHtml() {
+  Future<void> _downloadHtml() async {
     final htmlContent = generateHtmlPreview(null);
-    _saveHtmlFile(htmlContent);
+    await _saveHtmlFile(htmlContent);
     inspectionChecklist.markComplete('Report Exported');
     ExportLog.addEntry(ExportLogEntry(
       reportName: _metadata.propertyAddress,
@@ -580,15 +582,34 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
     ));
   }
 
-  void _saveHtmlFile(String htmlContent) {
+  Future<void> _saveHtmlFile(String htmlContent) async {
     final bytes = utf8.encode(htmlContent);
-    final blob = html.Blob(<dynamic>[bytes], 'text/html');
-    final url = html.Url.createObjectUrlFromBlob(blob);
-    final fileName = _metadataFileName('html');
-    html.HTMLAnchorElement(href: url)
-      ..setAttribute("download", fileName)
-      ..click();
-    html.Url.revokeObjectUrl(url);
+    if (kIsWeb) {
+      final blob = html.Blob([bytes], 'text/html');
+      final url = html.Url.createObjectUrlFromBlob(blob);
+      final fileName = _metadataFileName('html');
+      html.AnchorElement(href: url)
+        ..setAttribute('download', fileName)
+        ..click();
+      html.Url.revokeObjectUrl(url);
+    } else {
+      Directory? dir;
+      try {
+        dir = await pp.getDownloadsDirectory();
+      } catch (_) {
+        dir = await pp.getApplicationDocumentsDirectory();
+      }
+      dir ??= await pp.getApplicationDocumentsDirectory();
+      final path = p.join(dir.path, _metadataFileName('html'));
+      final file = File(path);
+      await file.writeAsBytes(bytes, flush: true);
+      setState(() => _exportedFile = file);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('HTML exported')),
+        );
+      }
+    }
   }
 
   void _openMap(double lat, double lng) {
@@ -1020,9 +1041,9 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
     final bytes = await _downloadPdf();
     final fileName = _metadataFileName('pdf');
     if (kIsWeb) {
-      final blob = html.Blob(<dynamic>[bytes], 'application/pdf');
+      final blob = html.Blob([bytes], 'application/pdf');
       final url = html.Url.createObjectUrlFromBlob(blob);
-      html.HTMLAnchorElement(href: url)
+      html.AnchorElement(href: url)
         ..setAttribute('download', fileName)
         ..click();
       html.Url.revokeObjectUrl(url);
