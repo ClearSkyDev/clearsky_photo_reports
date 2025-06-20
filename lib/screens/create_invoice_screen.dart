@@ -8,7 +8,8 @@ import '../utils/invoice_pdf.dart';
 class CreateInvoiceScreen extends StatefulWidget {
   final String reportId;
   final String clientName;
-  const CreateInvoiceScreen({super.key, required this.reportId, required this.clientName});
+  const CreateInvoiceScreen(
+      {super.key, required this.reportId, required this.clientName});
 
   @override
   State<CreateInvoiceScreen> createState() => _CreateInvoiceScreenState();
@@ -32,8 +33,9 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
       clientName: widget.clientName,
       reportId: widget.reportId,
       items: _items,
-      dueDate: _dueDate ?? DateTime.now().add(const Duration(days:30)),
-      paymentUrl: _paymentController.text.isEmpty ? null : _paymentController.text,
+      dueDate: _dueDate ?? DateTime.now().add(const Duration(days: 30)),
+      paymentUrl:
+          _paymentController.text.isEmpty ? null : _paymentController.text,
     );
     await InvoiceService().createInvoice(invoice);
     final pdf = await generateInvoicePdf(invoice);
@@ -59,27 +61,31 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
               controller: _paymentController,
               decoration: const InputDecoration(labelText: 'Payment URL'),
             ),
-            const SizedBox(height:8),
+            const SizedBox(height: 8),
             Expanded(
               child: ListView.builder(
                 itemCount: _items.length,
-                itemBuilder: (c,i) {
+                itemBuilder: (c, i) {
                   final item = _items[i];
                   return Row(
                     children: [
                       Expanded(
                         child: TextField(
                           onChanged: (v) => item.description = v,
-                          decoration: const InputDecoration(labelText: 'Description'),
+                          decoration:
+                              const InputDecoration(labelText: 'Description'),
                         ),
                       ),
-                      const SizedBox(width:8),
+                      const SizedBox(width: 8),
                       SizedBox(
-                        width:80,
+                        width: 80,
                         child: TextField(
-                          keyboardType: const TextInputType.numberWithOptions(decimal:true),
-                          onChanged:(v)=> item.amount = double.tryParse(v) ?? 0,
-                          decoration: const InputDecoration(labelText: 'Amount'),
+                          keyboardType: const TextInputType.numberWithOptions(
+                              decimal: true),
+                          onChanged: (v) =>
+                              item.amount = double.tryParse(v) ?? 0,
+                          decoration:
+                              const InputDecoration(labelText: 'Amount'),
                         ),
                       ),
                       IconButton(

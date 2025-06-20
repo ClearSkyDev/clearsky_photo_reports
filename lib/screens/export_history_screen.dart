@@ -37,17 +37,14 @@ class _ExportHistoryScreenState extends State<ExportHistoryScreen> {
                   itemCount: _entries.length,
                   itemBuilder: (context, index) {
                     final e = _entries[index];
-                    final date = e.timestamp
-                        .toLocal()
-                        .toString()
-                        .split('.')[0];
+                    final date = e.timestamp.toLocal().toString().split('.')[0];
                     return ListTile(
                       leading: Icon(e.type.toLowerCase() == 'pdf'
                           ? Icons.picture_as_pdf
                           : Icons.language),
                       title: Text(e.reportName),
-                      subtitle: Text(
-                          '$date${e.wasOffline ? ' • Offline' : ''}'),
+                      subtitle:
+                          Text('$date${e.wasOffline ? ' • Offline' : ''}'),
                     );
                   },
                 ),

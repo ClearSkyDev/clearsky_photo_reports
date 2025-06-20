@@ -87,7 +87,8 @@ class _InvoiceListScreenState extends State<InvoiceListScreen> {
                 final invoice = _invoices[index];
                 return ListTile(
                   title: Text(invoice.clientName),
-                  subtitle: Text('${invoice.jobLocation} • \$${invoice.totalAmount.toStringAsFixed(2)}'),
+                  subtitle: Text(
+                      '${invoice.jobLocation} • \$${invoice.totalAmount.toStringAsFixed(2)}'),
                   trailing: IconButton(
                     icon: const Icon(Icons.delete, color: Colors.red),
                     onPressed: () => _deleteInvoice(index),

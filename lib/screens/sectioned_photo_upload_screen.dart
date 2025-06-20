@@ -15,7 +15,8 @@ class SectionedPhotoUploadScreen extends StatefulWidget {
       _SectionedPhotoUploadScreenState();
 }
 
-class _SectionedPhotoUploadScreenState extends State<SectionedPhotoUploadScreen> {
+class _SectionedPhotoUploadScreenState
+    extends State<SectionedPhotoUploadScreen> {
   final ImagePicker _picker = ImagePicker();
 
   // Base section names used for the main structure and any additional structures
@@ -81,7 +82,8 @@ class _SectionedPhotoUploadScreenState extends State<SectionedPhotoUploadScreen>
   }
 
   void _openMap(double lat, double lng) {
-    final uri = Uri.parse('https://www.google.com/maps/search/?api=1&query=$lat,$lng');
+    final uri =
+        Uri.parse('https://www.google.com/maps/search/?api=1&query=$lat,$lng');
     launchUrl(uri, mode: LaunchMode.externalApplication);
   }
 
@@ -178,7 +180,8 @@ class _SectionedPhotoUploadScreenState extends State<SectionedPhotoUploadScreen>
                         final updated = await Navigator.push<bool>(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => PhotoDetailScreen(entry: photos[index]),
+                            builder: (_) =>
+                                PhotoDetailScreen(entry: photos[index]),
                           ),
                         );
                         if (updated == true) setState(() {});
@@ -195,7 +198,8 @@ class _SectionedPhotoUploadScreenState extends State<SectionedPhotoUploadScreen>
                               backgroundColor: Colors.black54,
                               child: Text(
                                 '${index + 1}',
-                                style: const TextStyle(fontSize: 12, color: Colors.white),
+                                style: const TextStyle(
+                                    fontSize: 12, color: Colors.white),
                               ),
                             ),
                           ),
@@ -226,7 +230,8 @@ class _SectionedPhotoUploadScreenState extends State<SectionedPhotoUploadScreen>
                           ),
                           Builder(
                             builder: (context) {
-                              final iconData = _getSourceIcon(photos[index].sourceType);
+                              final iconData =
+                                  _getSourceIcon(photos[index].sourceType);
                               return Positioned(
                                 bottom: 4,
                                 left: 4,
@@ -249,10 +254,12 @@ class _SectionedPhotoUploadScreenState extends State<SectionedPhotoUploadScreen>
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Text(
-                                    photos[index].capturedAt
+                                    photos[index]
+                                        .capturedAt
                                         .toLocal()
                                         .toString()
-                                        .split('.').first,
+                                        .split('.')
+                                        .first,
                                     style: const TextStyle(
                                         color: Colors.white, fontSize: 10),
                                   ),
@@ -270,7 +277,8 @@ class _SectionedPhotoUploadScreenState extends State<SectionedPhotoUploadScreen>
                                           style: const TextStyle(
                                             color: Colors.white,
                                             fontSize: 10,
-                                            decoration: TextDecoration.underline,
+                                            decoration:
+                                                TextDecoration.underline,
                                           ),
                                         ),
                                       ),

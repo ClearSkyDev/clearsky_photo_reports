@@ -23,9 +23,12 @@ class MetadataScreen extends StatefulWidget {
 class _MetadataScreenState extends State<MetadataScreen> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _clientNameController = TextEditingController();
-  final TextEditingController _propertyAddressController = TextEditingController();
-  final TextEditingController _insuranceCarrierController = TextEditingController();
-  final TextEditingController _inspectorNameController = TextEditingController();
+  final TextEditingController _propertyAddressController =
+      TextEditingController();
+  final TextEditingController _insuranceCarrierController =
+      TextEditingController();
+  final TextEditingController _inspectorNameController =
+      TextEditingController();
   final TextEditingController _reportIdController = TextEditingController();
   final TextEditingController _weatherNotesController = TextEditingController();
   final TextEditingController _partnerCodeController = TextEditingController();
@@ -199,8 +202,8 @@ class _MetadataScreenState extends State<MetadataScreen> {
                       )
                       .toList(),
                   onChanged: (val) {
-                    final template =
-                        _templates.firstWhere((t) => t.id == val, orElse: () => _templates.first);
+                    final template = _templates.firstWhere((t) => t.id == val,
+                        orElse: () => _templates.first);
                     setState(() {
                       _selectedTemplate = template;
                       _applyTemplate(template);
@@ -215,7 +218,8 @@ class _MetadataScreenState extends State<MetadataScreen> {
               ),
               TextFormField(
                 controller: _propertyAddressController,
-                decoration: const InputDecoration(labelText: 'Property Address'),
+                decoration:
+                    const InputDecoration(labelText: 'Property Address'),
                 validator: (value) =>
                     value == null || value.isEmpty ? 'Required' : null,
               ),
@@ -229,7 +233,8 @@ class _MetadataScreenState extends State<MetadataScreen> {
                       decoration:
                           const InputDecoration(labelText: 'Inspection Date'),
                       controller: TextEditingController(
-                        text: _inspectionDate.toLocal().toString().split(' ')[0],
+                        text:
+                            _inspectionDate.toLocal().toString().split(' ')[0],
                       ),
                       readOnly: true,
                     ),
@@ -243,13 +248,13 @@ class _MetadataScreenState extends State<MetadataScreen> {
               ),
               DropdownButtonFormField<InspectionType>(
                 value: _selectedType,
-                decoration:
-                    const InputDecoration(labelText: 'Inspection Type'),
+                decoration: const InputDecoration(labelText: 'Inspection Type'),
                 items: InspectionType.values
                     .map(
                       (t) => DropdownMenuItem(
                         value: t,
-                        child: Text(t.name[0].toUpperCase() + t.name.substring(1)),
+                        child:
+                            Text(t.name[0].toUpperCase() + t.name.substring(1)),
                       ),
                     )
                     .toList(),
@@ -268,7 +273,8 @@ class _MetadataScreenState extends State<MetadataScreen> {
                     .map(
                       (p) => DropdownMenuItem(
                         value: p,
-                        child: Text(p.name[0].toUpperCase() + p.name.substring(1)),
+                        child:
+                            Text(p.name[0].toUpperCase() + p.name.substring(1)),
                       ),
                     )
                     .toList(),
@@ -321,8 +327,7 @@ class _MetadataScreenState extends State<MetadataScreen> {
                   onPressed: () => Navigator.pushNamed(context, '/quickReport'),
                   child: const Text('Start Quick Report'),
                 ),
-              if (_quickEnabled)
-                const SizedBox(height: 20),
+              if (_quickEnabled) const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _continue,
                 child: const Text('Continue to Photo Upload'),

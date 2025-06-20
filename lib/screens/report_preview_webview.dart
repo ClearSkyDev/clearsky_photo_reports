@@ -17,8 +17,7 @@ import 'package:webview_flutter/webview_flutter.dart'
 
 // Only imported on web for HtmlElementView
 import 'package:web/web.dart' as html;
-import 'dart:ui' as ui
-    if (dart.library.html) 'dart:ui';
+import 'dart:ui' as ui if (dart.library.html) 'dart:ui';
 
 class ReportPreviewWebView extends StatefulWidget {
   final String html;

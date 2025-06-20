@@ -7,7 +7,8 @@ class AiChatButton extends StatelessWidget {
   final String reportId;
   final Map<String, dynamic>? context;
   final String apiKey;
-  const AiChatButton({super.key, required this.reportId, required this.apiKey, this.context});
+  const AiChatButton(
+      {super.key, required this.reportId, required this.apiKey, this.context});
 
   @override
   Widget build(BuildContext context) {
@@ -25,13 +26,21 @@ class AiChatScaffold extends StatelessWidget {
   final String reportId;
   final Map<String, dynamic>? chatContext;
   final String apiKey;
-  const AiChatScaffold({super.key, required this.child, required this.reportId, required this.apiKey, this.chatContext});
+  const AiChatScaffold(
+      {super.key,
+      required this.child,
+      required this.reportId,
+      required this.apiKey,
+      this.chatContext});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      endDrawer: AiChatDrawer(reportId: reportId, apiKey: apiKey, context: chatContext),
-      floatingActionButton: Builder(builder: (context) => AiChatButton(reportId: reportId, apiKey: apiKey, context: chatContext)),
+      endDrawer: AiChatDrawer(
+          reportId: reportId, apiKey: apiKey, context: chatContext),
+      floatingActionButton: Builder(
+          builder: (context) => AiChatButton(
+              reportId: reportId, apiKey: apiKey, context: chatContext)),
       body: child,
     );
   }

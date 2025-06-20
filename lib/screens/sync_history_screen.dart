@@ -42,8 +42,7 @@ class _SyncHistoryScreenState extends State<SyncHistoryScreen> {
                     color: e.success ? Colors.green : Colors.red,
                   ),
                   title: Text(e.reportId),
-                  subtitle: Text(
-                      '${e.timestamp.toLocal()}\n${e.message}'),
+                  subtitle: Text('${e.timestamp.toLocal()}\n${e.message}'),
                 );
               },
             ),

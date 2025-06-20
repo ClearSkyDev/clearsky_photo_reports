@@ -14,12 +14,13 @@ Future<Uint8List> generateInvoicePdf(Invoice invoice) async {
           crossAxisAlignment: pw.CrossAxisAlignment.start,
           children: [
             pw.Text('ClearSky Roof Inspectors',
-                style: pw.TextStyle(
-                    fontSize: 24, fontWeight: pw.FontWeight.bold)),
+                style:
+                    pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold)),
             pw.SizedBox(height: 16),
             pw.Text('Invoice for ${invoice.clientName}',
                 style: const pw.TextStyle(fontSize: 18)),
-            pw.Text('Due: ${invoice.dueDate.toLocal().toString().split(' ')[0]}'),
+            pw.Text(
+                'Due: ${invoice.dueDate.toLocal().toString().split(' ')[0]}'),
             pw.SizedBox(height: 16),
             pw.Table(
               border: pw.TableBorder.all(),
@@ -49,8 +50,8 @@ Future<Uint8List> generateInvoicePdf(Invoice invoice) async {
                   pw.Padding(
                       padding: const pw.EdgeInsets.all(4),
                       child: pw.Text('Total',
-                          style:
-                              const pw.TextStyle(fontWeight: pw.FontWeight.bold))),
+                          style: const pw.TextStyle(
+                              fontWeight: pw.FontWeight.bold))),
                   pw.Padding(
                       padding: const pw.EdgeInsets.all(4),
                       child: pw.Text('\$${invoice.amount.toStringAsFixed(2)}',

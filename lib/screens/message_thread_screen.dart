@@ -24,7 +24,9 @@ class MessageThreadScreen extends StatefulWidget {
   const MessageThreadScreen({
     super.key,
     required this.threadTitle,
-    required this.currentUserId, required String reportId, required bool inspectorView,
+    required this.currentUserId,
+    required String reportId,
+    required bool inspectorView,
   });
 
   @override

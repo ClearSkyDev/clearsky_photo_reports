@@ -8,7 +8,8 @@ class ManageCollaboratorsScreen extends StatefulWidget {
   const ManageCollaboratorsScreen({super.key, required this.report});
 
   @override
-  State<ManageCollaboratorsScreen> createState() => _ManageCollaboratorsScreenState();
+  State<ManageCollaboratorsScreen> createState() =>
+      _ManageCollaboratorsScreenState();
 }
 
 class _ManageCollaboratorsScreenState extends State<ManageCollaboratorsScreen> {
@@ -85,7 +86,8 @@ class _ManageCollaboratorsScreenState extends State<ManageCollaboratorsScreen> {
               items: CollaboratorRole.values
                   .map((r) => DropdownMenuItem(value: r, child: Text(r.name)))
                   .toList(),
-              onChanged: (val) => setState(() => _role = val ?? CollaboratorRole.viewer),
+              onChanged: (val) =>
+                  setState(() => _role = val ?? CollaboratorRole.viewer),
             ),
             const SizedBox(height: 12),
             ElevatedButton(onPressed: _add, child: const Text('Add')),

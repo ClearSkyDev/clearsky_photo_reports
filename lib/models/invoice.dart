@@ -41,8 +41,7 @@ class Invoice {
     this.isPaid = false,
     DateTime? createdAt,
   })  : createdAt = createdAt ?? DateTime.now(),
-        amount = amount ??
-            items.fold(0, (double s, item) => s + item.amount);
+        amount = amount ?? items.fold(0, (double s, item) => s + item.amount);
 
   Map<String, dynamic> toMap() {
     return {
@@ -64,7 +63,8 @@ class Invoice {
       clientName: map['clientName'] ?? '',
       reportId: map['reportId'] ?? '',
       items: (map['items'] as List?)
-              ?.map((e) => InvoiceLineItem.fromMap(Map<String, dynamic>.from(e)))
+              ?.map(
+                  (e) => InvoiceLineItem.fromMap(Map<String, dynamic>.from(e)))
               .toList() ??
           const [],
       amount: (map['amount'] as num?)?.toDouble() ?? 0,

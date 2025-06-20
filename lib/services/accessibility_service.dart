@@ -17,7 +17,8 @@ class AccessibilityService extends ChangeNotifier {
       settings = AccessibilitySettings.fromMap(
           Map<String, dynamic>.from(jsonDecode(raw)));
     }
-    final features = WidgetsBinding.instance.platformDispatcher.accessibilityFeatures;
+    final features =
+        WidgetsBinding.instance.platformDispatcher.accessibilityFeatures;
     settings = settings.copyWith(
       highContrast: settings.highContrast || features.highContrast,
       reducedMotion: settings.reducedMotion || features.disableAnimations,

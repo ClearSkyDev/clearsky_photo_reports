@@ -25,8 +25,10 @@ class _PublicLinksScreenState extends State<PublicLinksScreen> {
   }
 
   Future<void> _revoke(String docId) async {
-    await FirebaseFirestore.instance.collection('reports').doc(docId).update(
-        {'publicReportId': FieldValue.delete(), 'publicViewLink': FieldValue.delete()});
+    await FirebaseFirestore.instance.collection('reports').doc(docId).update({
+      'publicReportId': FieldValue.delete(),
+      'publicViewLink': FieldValue.delete()
+    });
     setState(() {
       _future = FirebaseFirestore.instance
           .collection('reports')

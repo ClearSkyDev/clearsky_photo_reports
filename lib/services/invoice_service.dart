@@ -27,9 +27,7 @@ class InvoiceService {
       q = q.where('isPaid', isEqualTo: false);
     }
     final snap = await q.get();
-    return snap.docs
-        .map((d) => Invoice.fromMap(d.data(), d.id))
-        .toList();
+    return snap.docs.map((d) => Invoice.fromMap(d.data(), d.id)).toList();
   }
 
   Future<void> markPaid(String id) async {

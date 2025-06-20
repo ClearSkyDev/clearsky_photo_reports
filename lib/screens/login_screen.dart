@@ -76,9 +76,8 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Text(_isLogin ? 'Login' : 'Create Account'),
             ),
             TextButton(
-              onPressed: _loading
-                  ? null
-                  : () => setState(() => _isLogin = !_isLogin),
+              onPressed:
+                  _loading ? null : () => setState(() => _isLogin = !_isLogin),
               child: Text(_isLogin
                   ? 'Need an account? Sign Up'
                   : 'Have an account? Login'),

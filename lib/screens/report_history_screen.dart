@@ -71,10 +71,12 @@ class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
           return false;
         }
       }
-      if (_selectedPerils.isNotEmpty && !_selectedPerils.contains(meta.perilType)) {
+      if (_selectedPerils.isNotEmpty &&
+          !_selectedPerils.contains(meta.perilType)) {
         return false;
       }
-      if (_selectedTypes.isNotEmpty && !_selectedTypes.contains(meta.inspectionType)) {
+      if (_selectedTypes.isNotEmpty &&
+          !_selectedTypes.contains(meta.inspectionType)) {
         return false;
       }
       if (_statusFilter == 'finalized' && !r.isFinalized) return false;
@@ -92,9 +94,8 @@ class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
 
   Future<List<SavedReport>> _loadReports() async {
     final firestore = FirebaseFirestore.instance;
-    Query query = firestore
-        .collection('reports')
-        .orderBy('createdAt', descending: true);
+    Query query =
+        firestore.collection('reports').orderBy('createdAt', descending: true);
     String? inspector = widget.inspectorName;
     if (inspector != null && inspector.isNotEmpty) {
       query =
@@ -102,7 +103,8 @@ class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
     }
     final snapshot = await query.get();
     final remote = snapshot.docs
-        .map((doc) => SavedReport.fromMap(doc.data() as Map<String, dynamic>, doc.id))
+        .map((doc) =>
+            SavedReport.fromMap(doc.data() as Map<String, dynamic>, doc.id))
         .toList();
     final local = OfflineDraftStore.instance.loadReports();
     return [...local, ...remote];
@@ -159,7 +161,9 @@ class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
                 MaterialPageRoute(
                   builder: (_) => MessageThreadScreen(
                     reportId: report.id,
-                    inspectorView: true, threadTitle: '', currentUserId: '',
+                    inspectorView: true,
+                    threadTitle: '',
+                    currentUserId: '',
                   ),
                 ),
               );
@@ -169,7 +173,8 @@ class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
             icon: const Icon(Icons.copy),
             tooltip: 'Duplicate',
             onPressed: () async {
-              final meta = InspectionMetadata.fromMap(report.inspectionMetadata);
+              final meta =
+                  InspectionMetadata.fromMap(report.inspectionMetadata);
               ReportTemplate? template;
               if (report.templateId != null) {
                 final templates = await TemplateStore.loadTemplates();
@@ -191,8 +196,7 @@ class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
               }
             },
           ),
-          if (report.isFinalized)
-            const Icon(Icons.lock, color: Colors.red),
+          if (report.isFinalized) const Icon(Icons.lock, color: Colors.red),
         ],
       ),
       onTap: () {
@@ -215,17 +219,19 @@ class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
           structs.add(InspectedStructure(
             name: s.name,
             sectionPhotos: sections.map((key, value) => MapEntry(
-              key,
-              value.map((e) => ReportPhotoEntry(
-                photoUrl: e.url,
-                label: e.label,
-                damageType: e.damageType,
-                timestamp: e.capturedAt,
-                latitude: e.latitude,
-                longitude: e.longitude,
-                note: e.note,
-              )).toList(),
-            )),
+                  key,
+                  value
+                      .map((e) => ReportPhotoEntry(
+                            photoUrl: e.url,
+                            label: e.label,
+                            damageType: e.damageType,
+                            timestamp: e.capturedAt,
+                            latitude: e.latitude,
+                            longitude: e.longitude,
+                            note: e.note,
+                          ))
+                      .toList(),
+                )),
             slopeTestSquare: Map.from(s.slopeTestSquare),
           ));
         }
@@ -317,8 +323,10 @@ class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
                           },
                           items: const [
                             DropdownMenuItem(value: 'all', child: Text('All')),
-                            DropdownMenuItem(value: 'finalized', child: Text('Finalized')),
-                            DropdownMenuItem(value: 'draft', child: Text('Draft')),
+                            DropdownMenuItem(
+                                value: 'finalized', child: Text('Finalized')),
+                            DropdownMenuItem(
+                                value: 'draft', child: Text('Draft')),
                           ],
                         ),
                       ],

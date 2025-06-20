@@ -54,7 +54,7 @@ Future<void> generateAndDownloadPdf(
     html.HTMLAnchorElement(href: url)
       ..setAttribute('download', 'report.pdf')
       ..click();
-      html.Url.revokeObjectUrl(url);
+    html.Url.revokeObjectUrl(url);
   } else {
     final dir = await getTemporaryDirectory();
     final file = File(p.join(dir.path, 'report.pdf'));
@@ -126,15 +126,15 @@ Future<File?> exportAsZip(SavedReport report) async {
 
   for (final struct in report.structures) {
     for (final entry in struct.sectionPhotos.entries) {
-      final section = '${struct.name}_${entry.key}'.replaceAll(RegExp(r'\s+'), '');
+      final section =
+          '${struct.name}_${entry.key}'.replaceAll(RegExp(r'\s+'), '');
       for (final photo in entry.value) {
         try {
           final file = File(photo.photoUrl);
           if (!await file.exists()) continue;
           final bytes = await file.readAsBytes();
           final label = photo.label.isNotEmpty ? photo.label : 'Unlabeled';
-          final cleanLabel =
-              label.replaceAll(RegExp(r'[^A-Za-z0-9_-]'), '_');
+          final cleanLabel = label.replaceAll(RegExp(r'[^A-Za-z0-9_-]'), '_');
           final ext = p.extension(file.path);
           final name = 'photos/${section}_$cleanLabel$ext';
           archive.addFile(ArchiveFile(name, bytes.length, bytes));
@@ -379,37 +379,48 @@ Future<String> _generateHtml(SavedReport report) async {
   }
   final buffer = StringBuffer()
     ..writeln('<html><head><title>Photo Report</title>')
-    ..writeln('<style>body{font-family:${theme.fontFamily},sans-serif;} h2{background:#${theme.primaryColor.toRadixString(16).padLeft(8,'0').substring(2)};padding:4px;}</style>')
+    ..writeln(
+        '<style>body{font-family:${theme.fontFamily},sans-serif;} h2{background:#${theme.primaryColor.toRadixString(16).padLeft(8, '0').substring(2)};padding:4px;}</style>')
     ..writeln('</head><body>')
-    ..writeln('<img src="${theme.logoPath ?? 'assets/images/clearsky_logo.png'}" width="150"><h1>Roof Inspection Report</h1>')
+    ..writeln(
+        '<img src="${theme.logoPath ?? 'assets/images/clearsky_logo.png'}" width="150"><h1>Roof Inspection Report</h1>')
     ..writeln('<p><strong>Client Name:</strong> ${meta.clientName}<br>')
     ..writeln('<strong>Property Address:</strong> ${meta.propertyAddress}<br>')
     ..writeln(
         '<strong>Inspection Date:</strong> ${meta.inspectionDate.toLocal().toString().split(' ')[0]}</p>');
 
-  buffer.writeln('<p><strong>Insurance Carrier:</strong> ${meta.insuranceCarrier}</p>');
+  buffer.writeln(
+      '<p><strong>Insurance Carrier:</strong> ${meta.insuranceCarrier}</p>');
   buffer.writeln('<p><strong>Peril Type:</strong> ${meta.perilType.name}</p>');
-  buffer.writeln('<p><strong>Inspection Type:</strong> ${meta.inspectionType.name}</p>');
-  final roleText = meta.inspectorRoles.map((e) => e.name.replaceAll('_', ' ')).join(', ');
+  buffer.writeln(
+      '<p><strong>Inspection Type:</strong> ${meta.inspectionType.name}</p>');
+  final roleText =
+      meta.inspectorRoles.map((e) => e.name.replaceAll('_', ' ')).join(', ');
   buffer.writeln('<p><strong>Inspector Role:</strong> $roleText</p>');
-  buffer.writeln('<p><strong>Inspector Name:</strong> ${meta.inspectorName}</p>');
+  buffer
+      .writeln('<p><strong>Inspector Name:</strong> ${meta.inspectorName}</p>');
   final aiStatus = report.aiSummary?.status;
-  final showSummary =
-      aiStatus == 'approved' || aiStatus == 'edited';
-  if (showSummary && report.summaryText != null && report.summaryText!.isNotEmpty) {
+  final showSummary = aiStatus == 'approved' || aiStatus == 'edited';
+  if (showSummary &&
+      report.summaryText != null &&
+      report.summaryText!.isNotEmpty) {
     buffer
-      ..writeln('<div style="border:1px solid #ccc;padding:8px;margin-top:20px;">')
+      ..writeln(
+          '<div style="border:1px solid #ccc;padding:8px;margin-top:20px;">')
       ..writeln('<strong>Inspection Summary</strong><br>')
       ..writeln('<p>${report.summaryText}</p>');
     if (report.aiSummary?.editor != null) {
-      final ts = report.aiSummary!.editedAt?.toLocal().toString().split(' ').first;
-      buffer.writeln('<p><em>Reviewed by ${report.aiSummary!.editor} on $ts</em></p>');
+      final ts =
+          report.aiSummary!.editedAt?.toLocal().toString().split(' ').first;
+      buffer.writeln(
+          '<p><em>Reviewed by ${report.aiSummary!.editor} on $ts</em></p>');
     }
     buffer.writeln('</div>');
   }
   if (report.summary != null && report.summary!.isNotEmpty) {
     buffer
-      ..writeln('<div style="border:1px solid #ccc;padding:8px;margin-top:20px;">')
+      ..writeln(
+          '<div style="border:1px solid #ccc;padding:8px;margin-top:20px;">')
       ..writeln('<strong>Inspector Notes / Summary</strong><br>')
       ..writeln('<p>${report.summary}</p>')
       ..writeln('</div>');
@@ -432,17 +443,16 @@ Future<String> _generateHtml(SavedReport report) async {
     buffer.writeln('</ul>');
   }
 
-    for (int i = 0; i < report.structures.length; i++) {
-      final struct = report.structures[i];
-      if (report.structures.length > 1) {
-        buffer.writeln('<h2 id="prop${i + 1}">${struct.name}</h2>');
-        if (struct.address != null && struct.address!.isNotEmpty) {
-          buffer.writeln('<p><strong>Address:</strong> ${struct.address}</p>');
-        }
+  for (int i = 0; i < report.structures.length; i++) {
+    final struct = report.structures[i];
+    if (report.structures.length > 1) {
+      buffer.writeln('<h2 id="prop${i + 1}">${struct.name}</h2>');
+      if (struct.address != null && struct.address!.isNotEmpty) {
+        buffer.writeln('<p><strong>Address:</strong> ${struct.address}</p>');
       }
-      for (final section
-          in sectionsForType(meta.inspectionType)) {
-        final photos = struct.sectionPhotos[section] ?? [];
+    }
+    for (final section in sectionsForType(meta.inspectionType)) {
+      final photos = struct.sectionPhotos[section] ?? [];
       if (photos.isEmpty) continue;
       if (report.structures.length > 1) {
         buffer.writeln('<h3>$section</h3>');
@@ -456,11 +466,13 @@ Future<String> _generateHtml(SavedReport report) async {
             photo.damageType.isNotEmpty ? photo.damageType : 'Unknown';
         buffer
           ..writeln('<div style="width:300px;margin:5px;text-align:center;">')
-          ..writeln('<img src="${photo.photoUrl}" width="300" height="300" style="object-fit:cover;"><br>');
+          ..writeln(
+              '<img src="${photo.photoUrl}" width="300" height="300" style="object-fit:cover;"><br>');
         final ts = photo.timestamp?.toLocal().toString().split('.').first ?? '';
         String gps = '';
         if (showGps && photo.latitude != null && photo.longitude != null) {
-          gps = '<br><a href="https://www.google.com/maps/search/?api=1&query=${photo.latitude},${photo.longitude}">${photo.latitude!.toStringAsFixed(4)}, ${photo.longitude!.toStringAsFixed(4)}</a>';
+          gps =
+              '<br><a href="https://www.google.com/maps/search/?api=1&query=${photo.latitude},${photo.longitude}">${photo.latitude!.toStringAsFixed(4)}, ${photo.longitude!.toStringAsFixed(4)}</a>';
         }
         final note = photo.note.isNotEmpty ? '<br><em>${photo.note}</em>' : '';
         buffer
@@ -472,7 +484,8 @@ Future<String> _generateHtml(SavedReport report) async {
   }
 
   buffer
-    ..writeln('<p style="text-align: center; margin-top: 40px;">$_contactInfo</p>')
+    ..writeln(
+        '<p style="text-align: center; margin-top: 40px;">$_contactInfo</p>')
     ..writeln(
         '<footer style="background:#eee;padding:10px;margin-top:20px;font-size:12px;text-align:center;">$_disclaimerText</footer>')
     ..writeln('</body></html>');
@@ -515,30 +528,32 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
 
   Future<pw.Widget> buildWrap(List<ReportPhotoEntry> photos) async {
     final items = <pw.Widget>[];
-      for (final photo in photos) {
-        try {
-          final file = File(photo.photoUrl);
-          if (!await file.exists()) continue;
-          final bytes = await file.readAsBytes();
-          final label = photo.label.isNotEmpty ? photo.label : 'Unlabeled';
-          final damage =
-              formatDamageLabel(photo.damageType, meta.inspectorRoles);
-          final caption = damage.isNotEmpty ? '$label - $damage' : label;
-          items.add(
-            pw.Container(
-              width: 150,
-              child: pw.Column(
-                children: [
-                  pw.Image(pw.MemoryImage(bytes),
-                      width: 150, height: 150, fit: pw.BoxFit.cover),
-                  pw.SizedBox(height: 4),
-                  pw.Text(caption,
-                      textAlign: pw.TextAlign.center,
-                      style: const pw.TextStyle(fontSize: 12)),
+    for (final photo in photos) {
+      try {
+        final file = File(photo.photoUrl);
+        if (!await file.exists()) continue;
+        final bytes = await file.readAsBytes();
+        final label = photo.label.isNotEmpty ? photo.label : 'Unlabeled';
+        final damage = formatDamageLabel(photo.damageType, meta.inspectorRoles);
+        final caption = damage.isNotEmpty ? '$label - $damage' : label;
+        items.add(
+          pw.Container(
+            width: 150,
+            child: pw.Column(
+              children: [
+                pw.Image(pw.MemoryImage(bytes),
+                    width: 150, height: 150, fit: pw.BoxFit.cover),
+                pw.SizedBox(height: 4),
+                pw.Text(caption,
+                    textAlign: pw.TextAlign.center,
+                    style: const pw.TextStyle(fontSize: 12)),
                 pw.Text(
-                    photo.timestamp?.toLocal().toString().split('.').first ?? '',
+                    photo.timestamp?.toLocal().toString().split('.').first ??
+                        '',
                     style: const pw.TextStyle(fontSize: 10)),
-                if (showGps && photo.latitude != null && photo.longitude != null)
+                if (showGps &&
+                    photo.latitude != null &&
+                    photo.longitude != null)
                   pw.UrlLink(
                     destination:
                         'https://www.google.com/maps/search/?api=1&query=${photo.latitude},${photo.longitude}',
@@ -555,7 +570,8 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
                       textAlign: pw.TextAlign.center,
                       style: const pw.TextStyle(
                           fontSize: 10, fontStyle: pw.FontStyle.italic)),
-                pw.Text('Source: ${photo.sourceType.name}${photo.captureDevice != null ? ' (${photo.captureDevice})' : ''}',
+                pw.Text(
+                    'Source: ${photo.sourceType.name}${photo.captureDevice != null ? ' (${photo.captureDevice})' : ''}',
                     style: const pw.TextStyle(fontSize: 10)),
               ],
             ),
@@ -612,10 +628,7 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
         widgets.add(pw.SizedBox(height: 20));
       }
 
-      final otherSections = <String>{
-        ...ordered,
-        ...struct.sectionPhotos.keys
-      };
+      final otherSections = <String>{...ordered, ...struct.sectionPhotos.keys};
 
       for (final section in ordered) {
         if (!otherSections.contains(section)) continue;
@@ -693,7 +706,8 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
   }
 
   final widgets = await buildSections();
-  final logoData = await rootBundle.load(theme.logoPath ?? 'assets/images/clearsky_logo.png');
+  final logoData = await rootBundle
+      .load(theme.logoPath ?? 'assets/images/clearsky_logo.png');
   final logoBytes = logoData.buffer.asUint8List();
   final dateStr = DateTime.now().toLocal().toString().split(' ')[0];
   final summary = report.summary ?? '';
@@ -721,7 +735,8 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
                   padding: const pw.EdgeInsets.only(top: 2),
                   child: pw.Text(
                     '⚠️ Draft Created Offline — Please verify all data before submission',
-                    style: const pw.TextStyle(fontSize: 9, color: PdfColors.orange),
+                    style: const pw.TextStyle(
+                        fontSize: 9, color: PdfColors.orange),
                     textAlign: pw.TextAlign.center,
                   ),
                 ),
@@ -746,7 +761,8 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
                       ? 'Prepared from Adjuster Perspective'
                       : 'Prepared by: Third-Party Inspector',
                   style: pw.TextStyle(
-                      fontSize: 18, color: PdfColor.fromInt(theme.primaryColor))),
+                      fontSize: 18,
+                      color: PdfColor.fromInt(theme.primaryColor))),
               pw.SizedBox(height: 20),
               pw.Text('Client Name: ${meta.clientName}'),
               pw.Text('Property Address: ${meta.propertyAddress}'),
@@ -755,7 +771,8 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
               pw.Text('Insurance Carrier: ${meta.insuranceCarrier}'),
               pw.Text('Peril Type: ${meta.perilType.name}'),
               pw.Text('Inspection Type: ${meta.inspectionType.name}'),
-              pw.Text('Inspector Role: ${meta.inspectorRoles.map((e) => e.name.replaceAll('_', ' ')).join(', ')}'),
+              pw.Text(
+                  'Inspector Role: ${meta.inspectorRoles.map((e) => e.name.replaceAll('_', ' ')).join(', ')}'),
               pw.Text('Inspector Name: ${meta.inspectorName}'),
               pw.SizedBox(height: 20),
               if ((aiStatus == 'approved' || aiStatus == 'edited') &&
@@ -763,8 +780,8 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
                 pw.Container(
                   width: double.infinity,
                   padding: const pw.EdgeInsets.all(8),
-                  decoration:
-                      pw.BoxDecoration(border: pw.Border.all(color: PdfColors.grey)),
+                  decoration: pw.BoxDecoration(
+                      border: pw.Border.all(color: PdfColors.grey)),
                   child: pw.Column(
                     crossAxisAlignment: pw.CrossAxisAlignment.start,
                     children: [
@@ -792,8 +809,7 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
                     crossAxisAlignment: pw.CrossAxisAlignment.start,
                     children: [
                       pw.Text('Inspector Notes / Summary',
-                          style:
-                              pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                          style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
                       pw.SizedBox(height: 4),
                       pw.Text(summary),
                     ],
@@ -828,7 +844,8 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
                   padding: const pw.EdgeInsets.only(top: 2),
                   child: pw.Text(
                     '⚠️ Draft Created Offline — Please verify all data before submission',
-                    style: const pw.TextStyle(fontSize: 9, color: PdfColors.orange),
+                    style: const pw.TextStyle(
+                        fontSize: 9, color: PdfColors.orange),
                     textAlign: pw.TextAlign.center,
                   ),
                 ),
@@ -856,7 +873,8 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
           pw.Text('Insurance Carrier: ${meta.insuranceCarrier}'),
           pw.Text('Peril Type: ${meta.perilType.name}'),
           pw.Text('Inspection Type: ${meta.inspectionType.name}'),
-          pw.Text('Inspector Role: ${meta.inspectorRoles.map((e) => e.name.replaceAll('_', ' ')).join(', ')}'),
+          pw.Text(
+              'Inspector Role: ${meta.inspectorRoles.map((e) => e.name.replaceAll('_', ' ')).join(', ')}'),
           pw.Text('Inspector Name: ${meta.inspectorName}'),
           pw.SizedBox(height: 20),
           ...widgets,
@@ -864,30 +882,39 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
           pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
-              pw.Container(height: 1, width: double.infinity, color: PdfColors.black),
+              pw.Container(
+                  height: 1, width: double.infinity, color: PdfColors.black),
               pw.SizedBox(height: 8),
               pw.Text('Inspector Signature'),
               pw.Text('${meta.inspectorName} – $dateStr'),
             ],
           ),
-          if (report.homeownerSignature != null && !report.homeownerSignature!.declined) ...[
+          if (report.homeownerSignature != null &&
+              !report.homeownerSignature!.declined) ...[
             pw.SizedBox(height: 20),
             pw.Column(
               crossAxisAlignment: pw.CrossAxisAlignment.start,
               children: [
-                pw.Container(height: 1, width: double.infinity, color: PdfColors.black),
+                pw.Container(
+                    height: 1, width: double.infinity, color: PdfColors.black),
                 pw.SizedBox(height: 8),
                 pw.Text('Homeowner Signature'),
                 pw.SizedBox(height: 4),
-                pw.Image(pw.MemoryImage(base64Decode(report.homeownerSignature!.image)), height: 80),
-                pw.Text('Signed by ${report.homeownerSignature!.name} – ${report.homeownerSignature!.timestamp.toLocal().toString().split(' ')[0]}'),
+                pw.Image(
+                    pw.MemoryImage(
+                        base64Decode(report.homeownerSignature!.image)),
+                    height: 80),
+                pw.Text(
+                    'Signed by ${report.homeownerSignature!.name} – ${report.homeownerSignature!.timestamp.toLocal().toString().split(' ')[0]}'),
               ],
             ),
           ],
-          if (report.homeownerSignature != null && report.homeownerSignature!.declined)
+          if (report.homeownerSignature != null &&
+              report.homeownerSignature!.declined)
             pw.Padding(
               padding: const pw.EdgeInsets.only(top: 20),
-              child: pw.Text('Client declined to sign: ${report.homeownerSignature!.declineReason ?? ''}'),
+              child: pw.Text(
+                  'Client declined to sign: ${report.homeownerSignature!.declineReason ?? ''}'),
             ),
         ],
       ),
@@ -997,8 +1024,8 @@ Future<Uint8List> generateQrCoverSheet({
             pw.Image(pw.MemoryImage(logoBytes), width: 140),
             pw.SizedBox(height: 20),
             pw.Text('Scan to View Report',
-                style: pw.TextStyle(
-                    fontSize: 18, fontWeight: pw.FontWeight.bold)),
+                style:
+                    pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold)),
             pw.SizedBox(height: 20),
             pw.BarcodeWidget(
               barcode: pw.Barcode.qrCode(),

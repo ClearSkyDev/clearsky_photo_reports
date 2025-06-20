@@ -55,7 +55,8 @@ class _SignatureStatusScreenState extends State<SignatureStatusScreen> {
             },
           ),
           Expanded(
-            child: FutureBuilder<List<QueryDocumentSnapshot<Map<String, dynamic>>>>(
+            child: FutureBuilder<
+                List<QueryDocumentSnapshot<Map<String, dynamic>>>>(
               future: _future,
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {

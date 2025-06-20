@@ -15,7 +15,9 @@ class AiSummaryService {
   final String apiKey;
   final String apiUrl;
 
-  AiSummaryService({required this.apiKey, this.apiUrl = 'https://api.openai.com/v1/chat/completions'});
+  AiSummaryService(
+      {required this.apiKey,
+      this.apiUrl = 'https://api.openai.com/v1/chat/completions'});
 
   Future<AiSummary> generateSummary(SavedReport report) async {
     final sectionData = <Map<String, dynamic>>[];
@@ -37,8 +39,8 @@ class AiSummaryService {
       }
     }
 
-    final roleList =
-        (report.inspectionMetadata['inspectorRoles'] as List?) ?? ['ladderAssist'];
+    final roleList = (report.inspectionMetadata['inspectorRoles'] as List?) ??
+        ['ladderAssist'];
     final roles = roleList
         .map((e) => InspectorReportRole.values.byName(e as String))
         .toSet();
@@ -50,13 +52,15 @@ class AiSummaryService {
           'Do not mention recommendations, causes, or coverage.\n'
           'Simply describe the condition and any observable damage.\n\n'
           'Here are the findings: ${jsonEncode(sectionData)}';
-    } else if (roles.contains(InspectorReportRole.adjuster) && roles.length == 1) {
+    } else if (roles.contains(InspectorReportRole.adjuster) &&
+        roles.length == 1) {
       prompt =
           'You are an insurance adjuster. Based on the observed damage and inspection findings, '
           'summarize the condition and note whether the damage is consistent with covered perils (like hail/wind).\n'
           'Lean into claim decision logic, but remain factual.\n\n'
           'Findings: ${jsonEncode(sectionData)}';
-    } else if (roles.contains(InspectorReportRole.contractor) && roles.length == 1) {
+    } else if (roles.contains(InspectorReportRole.contractor) &&
+        roles.length == 1) {
       prompt =
           'You are a roofing contractor writing a report for a homeowner or claims submission.\n'
           'Use your summary to justify why repair or replacement may be needed based on the damage observed.\n\n'
@@ -67,14 +71,8 @@ class AiSummaryService {
     }
 
     final messages = [
-      {
-        'role': 'system',
-        'content': 'You summarize roof inspection findings.'
-      },
-      {
-        'role': 'user',
-        'content': prompt
-      }
+      {'role': 'system', 'content': 'You summarize roof inspection findings.'},
+      {'role': 'user', 'content': prompt}
     ];
 
     final res = await http.post(Uri.parse(apiUrl),

@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 
-
 import '../models/photo_entry.dart';
 
 class PhotoMapScreen extends StatelessWidget {

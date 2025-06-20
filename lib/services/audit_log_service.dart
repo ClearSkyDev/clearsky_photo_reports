@@ -48,8 +48,6 @@ class AuditLogService {
           .where('timestamp', isLessThanOrEqualTo: range.end);
     }
     final snap = await q.get();
-    return snap.docs
-        .map((d) => AuditLogEntry.fromMap(d.data(), d.id))
-        .toList();
+    return snap.docs.map((d) => AuditLogEntry.fromMap(d.data(), d.id)).toList();
   }
 }

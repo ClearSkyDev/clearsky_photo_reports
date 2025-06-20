@@ -106,6 +106,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
       await _runQualityCheck();
     }
   }
+
   String? _jobCost;
 
   List<PhotoEntry> _gpsPhotos() {
@@ -132,8 +133,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
                 transcript: photo.transcript,
                 sourceType: photo.sourceType ?? SourceType.camera,
                 captureDevice: photo.captureDevice,
-                labelConfidence:
-                    photo.labelConfidence ?? photo.confidence ?? 0,
+                labelConfidence: photo.labelConfidence ?? photo.confidence ?? 0,
               ));
             }
           }
@@ -200,9 +200,8 @@ class _SendReportScreenState extends State<SendReportScreen> {
         final p = photos[i];
         try {
           final file = File(p.url);
-          final ref = storage
-              .ref()
-              .child('reports/$reportId/$section/photo_$i.jpg');
+          final ref =
+              storage.ref().child('reports/$reportId/$section/photo_$i.jpg');
           await ref.putFile(file);
           final url = await ref.getDownloadURL();
           result.add(ReportPhotoEntry(
@@ -228,7 +227,8 @@ class _SendReportScreenState extends State<SendReportScreen> {
       for (final struct in widget.structures!) {
         final uploadedSections = <String, List<ReportPhotoEntry>>{};
         for (var entry in struct.sectionPhotos.entries) {
-          final uploaded = await uploadSection('${struct.name}/${entry.key}', entry.value as List<PhotoEntry>);
+          final uploaded = await uploadSection(
+              '${struct.name}/${entry.key}', entry.value as List<PhotoEntry>);
           if (uploaded.isNotEmpty) {
             uploadedSections[entry.key] = uploaded;
           }
@@ -244,10 +244,9 @@ class _SendReportScreenState extends State<SendReportScreen> {
     String? signatureUrl;
     if (_signature != null) {
       try {
-        final ref =
-            storage.ref().child('reports/$reportId/signature.png');
-        await ref.putData(_signature!,
-            SettableMetadata(contentType: 'image/png'));
+        final ref = storage.ref().child('reports/$reportId/signature.png');
+        await ref.putData(
+            _signature!, SettableMetadata(contentType: 'image/png'));
         signatureUrl = await ref.getDownloadURL();
       } catch (_) {}
     }
@@ -255,15 +254,16 @@ class _SendReportScreenState extends State<SendReportScreen> {
     final metadataMap = {
       'clientName': widget.metadata.clientName,
       'propertyAddress': widget.metadata.propertyAddress,
-      'inspectionDate':
-          widget.metadata.inspectionDate.toIso8601String(),
+      'inspectionDate': widget.metadata.inspectionDate.toIso8601String(),
       'insuranceCarrier': widget.metadata.insuranceCarrier,
       'perilType': widget.metadata.perilType.name,
       'inspectionType': widget.metadata.inspectionType.name,
-      'inspectorRoles': widget.metadata.inspectorRoles.map((e) => e.name).toList(),
+      'inspectorRoles':
+          widget.metadata.inspectorRoles.map((e) => e.name).toList(),
       if (profile?.name != null)
         'inspectorName': profile!.name
-      else 'inspectorName': widget.metadata.inspectorName,
+      else
+        'inspectorName': widget.metadata.inspectorName,
       if (widget.metadata.reportId != null)
         'reportId': widget.metadata.reportId,
       if (widget.metadata.weatherNotes != null)
@@ -277,7 +277,8 @@ class _SendReportScreenState extends State<SendReportScreen> {
     ReportTheme theme = ReportTheme.defaultTheme;
     final themeData = prefs.getString('report_theme');
     if (themeData != null) {
-      theme = ReportTheme.fromMap(jsonDecode(themeData) as Map<String, dynamic>);
+      theme =
+          ReportTheme.fromMap(jsonDecode(themeData) as Map<String, dynamic>);
     }
 
     double? latitude;
@@ -324,9 +325,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
       if (!await file.exists()) continue;
       final name = p.basename(att.url);
       try {
-        final ref = storage
-            .ref()
-            .child('reports/$reportId/attachments/$name');
+        final ref = storage.ref().child('reports/$reportId/attachments/$name');
         await ref.putFile(file);
         final url = await ref.getDownloadURL();
         uploadedAttachments.add(ReportAttachment(
@@ -351,7 +350,8 @@ class _SendReportScreenState extends State<SendReportScreen> {
       signature: signatureUrl,
       theme: theme,
       templateId: widget.template?.id,
-      clientEmail: _emailController.text.isNotEmpty ? _emailController.text : null,
+      clientEmail:
+          _emailController.text.isNotEmpty ? _emailController.text : null,
       partnerId: _partner?.id,
       referralDate: _partner != null ? DateTime.now() : null,
       signatureRequested: false,
@@ -380,7 +380,8 @@ class _SendReportScreenState extends State<SendReportScreen> {
         'clientName_lc': widget.metadata.clientName.toLowerCase(),
         if (profile?.name != null)
           'inspectorName': profile!.name
-        else 'inspectorName': widget.metadata.inspectorName,
+        else
+          'inspectorName': widget.metadata.inspectorName,
         if (profile?.name != null)
           'inspectorName_lc': profile!.name.toLowerCase() ?? ''
         else
@@ -399,8 +400,8 @@ class _SendReportScreenState extends State<SendReportScreen> {
 
     final metricsRef =
         FirebaseFirestore.instance.collection('metrics').doc(reportId);
-    final zipMatch =
-        RegExp(r'(\d{5})(?:[-\s]|\b)').firstMatch(widget.metadata.propertyAddress);
+    final zipMatch = RegExp(r'(\d{5})(?:[-\s]|\b)')
+        .firstMatch(widget.metadata.propertyAddress);
     double damagePercent = 0;
     final totalPhotos = _totalPhotoCount();
     if (totalPhotos > 0) {
@@ -454,24 +455,22 @@ class _SendReportScreenState extends State<SendReportScreen> {
       for (final struct in widget.structures!) {
         final sections = <String, List<ReportPhotoEntry>>{};
         for (var entry in struct.sectionPhotos.entries) {
-          final list = entry.value
-              .map((p) {
-                final d = p as dynamic;
-                return ReportPhotoEntry(
-                  label: d.label,
-                  caption: d.caption,
-                  confidence: d.labelConfidence ?? d.confidence ?? 0,
-                  photoUrl: d.url ?? d.photoUrl,
-                  timestamp: d.capturedAt ?? d.timestamp,
-                  latitude: d.latitude,
-                  longitude: d.longitude,
-                  damageType: d.damageType,
-                  note: d.note,
-                  sourceType: d.sourceType,
-                  captureDevice: d.captureDevice,
-                );
-              })
-              .toList();
+          final list = entry.value.map((p) {
+            final d = p as dynamic;
+            return ReportPhotoEntry(
+              label: d.label,
+              caption: d.caption,
+              confidence: d.labelConfidence ?? d.confidence ?? 0,
+              photoUrl: d.url ?? d.photoUrl,
+              timestamp: d.capturedAt ?? d.timestamp,
+              latitude: d.latitude,
+              longitude: d.longitude,
+              damageType: d.damageType,
+              note: d.note,
+              sourceType: d.sourceType,
+              captureDevice: d.captureDevice,
+            );
+          }).toList();
           sections[entry.key] = list;
         }
         structs.add(InspectedStructure(
@@ -489,10 +488,12 @@ class _SendReportScreenState extends State<SendReportScreen> {
       'insuranceCarrier': widget.metadata.insuranceCarrier,
       'perilType': widget.metadata.perilType.name,
       'inspectionType': widget.metadata.inspectionType.name,
-      'inspectorRoles': widget.metadata.inspectorRoles.map((e) => e.name).toList(),
+      'inspectorRoles':
+          widget.metadata.inspectorRoles.map((e) => e.name).toList(),
       if (profile?.name != null)
         'inspectorName': profile!.name
-      else 'inspectorName': widget.metadata.inspectorName,
+      else
+        'inspectorName': widget.metadata.inspectorName,
       if (widget.metadata.reportId != null)
         'reportId': widget.metadata.reportId,
       if (widget.metadata.weatherNotes != null)
@@ -537,7 +538,8 @@ class _SendReportScreenState extends State<SendReportScreen> {
       signature: sigData,
       theme: theme,
       templateId: widget.template?.id,
-      clientEmail: _emailController.text.isNotEmpty ? _emailController.text : null,
+      clientEmail:
+          _emailController.text.isNotEmpty ? _emailController.text : null,
       partnerId: _partner?.id,
       referralDate: _partner != null ? DateTime.now() : null,
       lastAuditPassed: null,
@@ -641,7 +643,8 @@ class _SendReportScreenState extends State<SendReportScreen> {
       'insuranceCarrier': widget.metadata.insuranceCarrier,
       'perilType': widget.metadata.perilType.name,
       'inspectionType': widget.metadata.inspectionType.name,
-      'inspectorRoles': widget.metadata.inspectorRoles.map((e) => e.name).toList(),
+      'inspectorRoles':
+          widget.metadata.inspectorRoles.map((e) => e.name).toList(),
       'inspectorName': widget.metadata.inspectorName,
       if (widget.metadata.reportId != null)
         'reportId': widget.metadata.reportId,
@@ -658,7 +661,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
       longitude: _gpsPhotos().isNotEmpty ? _gpsPhotos().first.longitude : null,
     );
     final key = const String.fromEnvironment('OPENAI_API_KEY', defaultValue: '')
-        .isNotEmpty
+            .isNotEmpty
         ? const String.fromEnvironment('OPENAI_API_KEY')
         : (Platform.environment['OPENAI_API_KEY'] ?? '');
     String text;
@@ -852,12 +855,12 @@ class _SendReportScreenState extends State<SendReportScreen> {
       }
       final intro = TtsService.instance.settings.brandingMessage.isNotEmpty
           ? TtsService.instance.settings.brandingMessage
-          :
-              'This report is provided by ${settings?.companyName ?? 'ClearSky'}.'
+          : 'This report is provided by ${settings?.companyName ?? 'ClearSky'}.'
               ' ${settings?.tagline ?? ''}';
-      final outro = 'Thank you for choosing ${settings?.companyName ?? 'ClearSky'}.';
-      final file = await TtsService.instance.exportSummary(
-          _summaryTextController.text, intro, outro);
+      final outro =
+          'Thank you for choosing ${settings?.companyName ?? 'ClearSky'}.';
+      final file = await TtsService.instance
+          .exportSummary(_summaryTextController.text, intro, outro);
       if (mounted) {
         setState(() => _audioFile = file);
         try {
@@ -934,7 +937,10 @@ class _SendReportScreenState extends State<SendReportScreen> {
     final result = await aiQualityCheck(_savedReport!);
     if (_docId != null) {
       try {
-        await FirebaseFirestore.instance.collection('reports').doc(_docId).update({
+        await FirebaseFirestore.instance
+            .collection('reports')
+            .doc(_docId)
+            .update({
           'lastAuditPassed': result.passed,
           'lastAuditIssues': result.issues.map((e) => e.toMap()).toList(),
         });
@@ -953,8 +959,8 @@ class _SendReportScreenState extends State<SendReportScreen> {
       context: context,
       builder: (_) {
         return AlertDialog(
-          title:
-              Text(_auditPassed! ? 'Quality Check Passed' : 'Quality Check Issues'),
+          title: Text(
+              _auditPassed! ? 'Quality Check Passed' : 'Quality Check Issues'),
           content: _auditPassed!
               ? const Text('No issues found.')
               : SizedBox(
@@ -998,7 +1004,8 @@ class _SendReportScreenState extends State<SendReportScreen> {
     final m = widget.metadata;
     final subject = 'Roof Inspection Report for ${m.clientName}';
     final inspector = m.inspectorName != null ? ' by ${m.inspectorName}' : '';
-    final body = 'Attached is the roof inspection report for ${m.clientName}$inspector.';
+    final body =
+        'Attached is the roof inspection report for ${m.clientName}$inspector.';
     await shareReportFile(_exportedFile!, subject: subject, text: body);
   }
 
@@ -1114,8 +1121,8 @@ class _SendReportScreenState extends State<SendReportScreen> {
     }
   }
 
-  Future<void> _sendEmail(
-      String to, String subject, String body, String signature, bool attachPdf) async {
+  Future<void> _sendEmail(String to, String subject, String body,
+      String signature, bool attachPdf) async {
     if (to.isEmpty || _savedReport == null) return;
     await _maybeRunQualityCheck();
     showDialog(
@@ -1145,7 +1152,8 @@ class _SendReportScreenState extends State<SendReportScreen> {
             'clientEmail': to,
             'inspectionMetadata.lastSentTo': to,
             'inspectionMetadata.lastSentAt': FieldValue.serverTimestamp(),
-            'inspectionMetadata.lastSendMethod': attachPdf ? 'attachment' : 'link',
+            'inspectionMetadata.lastSendMethod':
+                attachPdf ? 'attachment' : 'link',
           });
         } catch (_) {}
       }
@@ -1203,8 +1211,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Finalize Report'),
-        content: const Text(
-            'Lock this report and prevent any further edits?'),
+        content: const Text('Lock this report and prevent any further edits?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -1227,18 +1234,18 @@ class _SendReportScreenState extends State<SendReportScreen> {
           .collection('reports')
           .doc(_docId)
           .update({
-            'isFinalized': true,
-            'publicReportId': publicId,
-            'publicViewLink': viewLink,
-            'publicViewEnabled': _publicLinkEnabled,
-            if (_passwordController.text.isNotEmpty)
-              'publicViewPassword': _passwordController.text,
-            if (_expiryDate != null)
-              'publicViewExpiry': Timestamp.fromDate(_expiryDate!),
-            'summaryText': _summaryTextController.text,
-            'signatureRequested': _requestSignature,
-            'signatureStatus': _requestSignature ? 'pending' : 'none'
-          });
+        'isFinalized': true,
+        'publicReportId': publicId,
+        'publicViewLink': viewLink,
+        'publicViewEnabled': _publicLinkEnabled,
+        if (_passwordController.text.isNotEmpty)
+          'publicViewPassword': _passwordController.text,
+        if (_expiryDate != null)
+          'publicViewExpiry': Timestamp.fromDate(_expiryDate!),
+        'summaryText': _summaryTextController.text,
+        'signatureRequested': _requestSignature,
+        'signatureStatus': _requestSignature ? 'pending' : 'none'
+      });
       final metricsRef =
           FirebaseFirestore.instance.collection('metrics').doc(_docId);
       final metricSnap = await metricsRef.get();
@@ -1277,10 +1284,9 @@ class _SendReportScreenState extends State<SendReportScreen> {
           publicReportId: publicId,
           publicViewLink: viewLink,
           publicViewEnabled: _publicLinkEnabled,
-          publicViewPassword:
-              _passwordController.text.isNotEmpty
-                  ? _passwordController.text
-                  : null,
+          publicViewPassword: _passwordController.text.isNotEmpty
+              ? _passwordController.text
+              : null,
           publicViewExpiry: _expiryDate,
           clientEmail: _savedReport!.clientEmail,
           templateId: _savedReport!.templateId,
@@ -1365,8 +1371,10 @@ class _SendReportScreenState extends State<SendReportScreen> {
                   children: [
                     Text('Client: ${m.clientName}'),
                     Text('Address: ${m.propertyAddress}'),
-                    Text('Date: ${m.inspectionDate.toLocal().toString().split(' ')[0]}'),
-                    if (widget.summary != null && widget.summary!.isNotEmpty) ...[
+                    Text(
+                        'Date: ${m.inspectionDate.toLocal().toString().split(' ')[0]}'),
+                    if (widget.summary != null &&
+                        widget.summary!.isNotEmpty) ...[
                       const SizedBox(height: 8),
                       const Text('Inspector Notes / Summary:',
                           style: TextStyle(fontWeight: FontWeight.bold)),
@@ -1398,8 +1406,8 @@ class _SendReportScreenState extends State<SendReportScreen> {
             ],
             TextField(
               controller: _summaryTextController,
-              decoration: const InputDecoration(
-                  labelText: 'Summary of Findings'),
+              decoration:
+                  const InputDecoration(labelText: 'Summary of Findings'),
               maxLines: 3,
             ),
             TextField(
@@ -1464,8 +1472,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 ElevatedButton(
-                    onPressed: _downloadPdf,
-                    child: const Text('Download PDF')),
+                    onPressed: _downloadPdf, child: const Text('Download PDF')),
                 ElevatedButton(
                     onPressed: _downloadHtml,
                     child: const Text('Download HTML')),
@@ -1497,13 +1504,13 @@ class _SendReportScreenState extends State<SendReportScreen> {
                               child: CircularProgressIndicator(strokeWidth: 2),
                             )
                           : const Text('Export Legal Copy')),
-              if (_exportedFile != null)
+                if (_exportedFile != null)
+                  ElevatedButton(
+                      onPressed: _shareReport,
+                      child: const Text('Share Report')),
                 ElevatedButton(
-                    onPressed: _shareReport,
-                    child: const Text('Share Report')),
-              ElevatedButton(
-                  onPressed: _runQualityCheck,
-                  child: const Text('Run AI Quality Check')),
+                    onPressed: _runQualityCheck,
+                    child: const Text('Run AI Quality Check')),
               ],
             ),
             const AiDisclaimerBanner(),
@@ -1568,21 +1575,21 @@ class _SendReportScreenState extends State<SendReportScreen> {
                   ),
                 ),
               ),
-            const SizedBox(height: 12),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => CreateInvoiceScreen(
-                      reportId: _savedReport?.id ?? _docId!,
-                      clientName: m.clientName,
+              const SizedBox(height: 12),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => CreateInvoiceScreen(
+                        reportId: _savedReport?.id ?? _docId!,
+                        clientName: m.clientName,
+                      ),
                     ),
-                  ),
-                );
-              },
-              child: const Text('Create Invoice'),
-            ),
+                  );
+                },
+                child: const Text('Create Invoice'),
+              ),
             ],
             if (!_finalized)
               SwitchListTile(
@@ -1615,10 +1622,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
                   Expanded(
                     child: Text(_expiryDate == null
                         ? 'none'
-                        : _expiryDate!
-                            .toLocal()
-                            .toString()
-                            .split(' ')[0]),
+                        : _expiryDate!.toLocal().toString().split(' ')[0]),
                   ),
                   TextButton(
                     onPressed: () async {
@@ -1642,7 +1646,8 @@ class _SendReportScreenState extends State<SendReportScreen> {
             if (!_finalized)
               ElevatedButton(
                 onPressed: _finalizeReport,
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
+                style:
+                    ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
                 child: const Text('Finalize & Lock Report'),
               ),
             const SizedBox(height: 12),
@@ -1653,7 +1658,8 @@ class _SendReportScreenState extends State<SendReportScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => ChangeHistoryScreen(report: _savedReport!),
+                          builder: (_) =>
+                              ChangeHistoryScreen(report: _savedReport!),
                         ),
                       );
                     },

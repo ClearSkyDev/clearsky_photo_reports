@@ -15,7 +15,8 @@ class NotificationService {
   static final NotificationService instance = NotificationService._();
 
   final FirebaseMessaging _fcm = FirebaseMessaging.instance;
-  final FlutterLocalNotificationsPlugin _local = FlutterLocalNotificationsPlugin();
+  final FlutterLocalNotificationsPlugin _local =
+      FlutterLocalNotificationsPlugin();
 
   NotificationPreferences _prefs = const NotificationPreferences();
 
@@ -26,7 +27,8 @@ class NotificationService {
     if (_initialized) return;
     await _requestPermissions();
 
-    const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+    const androidSettings =
+        AndroidInitializationSettings('@mipmap/ic_launcher');
     const initSettings = InitializationSettings(android: androidSettings);
     await _local.initialize(initSettings);
 

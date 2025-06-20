@@ -49,9 +49,9 @@ class _ReportThemeScreenState extends State<ReportThemeScreen> {
       setState(() {
         _logoPath = theme.logoPath;
         _selectedColor = _colors.entries
-                .firstWhere((e) => e.value.value == theme.primaryColor,
-                    orElse: () => const MapEntry('Blue', Colors.blue))
-                .key;
+            .firstWhere((e) => e.value.value == theme.primaryColor,
+                orElse: () => const MapEntry('Blue', Colors.blue))
+            .key;
         if (_fonts.contains(theme.fontFamily)) {
           _selectedFont = theme.fontFamily;
         }
@@ -148,8 +148,7 @@ class _ReportThemeScreenState extends State<ReportThemeScreen> {
               ),
               child: Column(
                 children: [
-                  if (_logoPath != null)
-                    Image.network(_logoPath!, height: 80),
+                  if (_logoPath != null) Image.network(_logoPath!, height: 80),
                   Text(
                     'Section Header',
                     style: TextStyle(

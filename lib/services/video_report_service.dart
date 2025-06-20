@@ -38,7 +38,8 @@ class VideoReportService {
       }
     }
     if (slides.isNotEmpty) {
-      final last = report.structures.last.sectionPhotos.values.last.last.photoUrl;
+      final last =
+          report.structures.last.sectionPhotos.values.last.last.photoUrl;
       slides.writeln("file '$last'");
     }
     await slideList.writeAsString(slides.toString());
@@ -55,8 +56,8 @@ class VideoReportService {
       "-y -f concat -safe 0 -i ${audioListFile.path} -c copy $voicePath",
     );
 
-    final output = File(
-        p.join(temp.path, 'video_report_${DateTime.now().millisecondsSinceEpoch}.mp4'));
+    final output = File(p.join(temp.path,
+        'video_report_${DateTime.now().millisecondsSinceEpoch}.mp4'));
     final cmd = musicPath == null
         ? "-y -f concat -safe 0 -i ${slideList.path} -vf fps=25 -pix_fmt yuv420p -i $voicePath -shortest ${output.path}"
         : "-y -f concat -safe 0 -i ${slideList.path} -vf fps=25 -pix_fmt yuv420p -i $voicePath -i $musicPath -filter_complex '[1:a][2:a]amix=inputs=2:duration=longest' -shortest ${output.path}";
@@ -64,4 +65,3 @@ class VideoReportService {
     return output;
   }
 }
-

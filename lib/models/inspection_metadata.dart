@@ -59,8 +59,8 @@ class InspectionMetadata {
       inspectionDate: DateTime.parse(map['inspectionDate']),
       insuranceCarrier: map['insuranceCarrier'],
       perilType: PerilType.values.byName(map['perilType'] ?? 'wind'),
-      inspectionType:
-          InspectionType.values.byName(map['inspectionType'] ?? 'residentialRoof'),
+      inspectionType: InspectionType.values
+          .byName(map['inspectionType'] ?? 'residentialRoof'),
       inspectorName: map['inspectorName'],
       inspectorRoles: roles,
       reportId: map['reportId'],

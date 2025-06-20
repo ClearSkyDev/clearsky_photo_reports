@@ -15,7 +15,8 @@ class ChangelogScreen extends StatelessWidget {
         itemBuilder: (context, index) {
           final e = entries[index];
           return ExpansionTile(
-            title: Text('${e.version} - ${e.date.toLocal().toString().split(' ')[0]}'),
+            title: Text(
+                '${e.version} - ${e.date.toLocal().toString().split(' ')[0]}'),
             children: [
               Padding(
                 padding: const EdgeInsets.all(8),
