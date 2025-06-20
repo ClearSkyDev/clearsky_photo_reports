@@ -49,12 +49,15 @@ Future<void> generateAndDownloadPdf(
   );
   final bytes = await pdf.save();
   if (kIsWeb) {
-    final blob = html.Blob([bytes]);
-    final url = html.Url.createObjectUrlFromBlob(blob);
+    final blob = html.Blob(
+      <dynamic>[bytes],
+      html.BlobPropertyBag(type: 'application/pdf'),
+    );
+    final url = html.URL.createObjectURL(blob);
     html.AnchorElement(href: url)
       ..setAttribute('download', 'report.pdf')
       ..click();
-    html.Url.revokeObjectUrl(url);
+    html.URL.revokeObjectURL(url);
   } else {
     final dir = await getTemporaryDirectory();
     final file = File(p.join(dir.path, 'report.pdf'));
@@ -78,12 +81,15 @@ Future<void> generateAndDownloadHtml(
   final htmlStr = buffer.toString();
   final bytes = utf8.encode(htmlStr);
   if (kIsWeb) {
-    final blob = html.Blob([bytes], 'text/html');
-    final url = html.Url.createObjectUrlFromBlob(blob);
+    final blob = html.Blob(
+      <dynamic>[bytes],
+      html.BlobPropertyBag(type: 'text/html'),
+    );
+    final url = html.URL.createObjectURL(blob);
     html.AnchorElement(href: url)
       ..setAttribute('download', 'report.html')
       ..click();
-    html.Url.revokeObjectUrl(url);
+    html.URL.revokeObjectURL(url);
   } else {
     final dir = await getTemporaryDirectory();
     final file = File(p.join(dir.path, 'report.html'));
@@ -152,13 +158,16 @@ Future<File?> exportAsZip(SavedReport report) async {
 
   final zipData = ZipEncoder().encode(archive);
 
-  Null if (kIsWeb) {
-    final blob = html.Blob([zipData], 'application/zip');
-    final url = html.Url.createObjectUrlFromBlob(blob);
+  if (kIsWeb) {
+    final blob = html.Blob(
+      <dynamic>[zipData],
+      html.BlobPropertyBag(type: 'application/zip'),
+    );
+    final url = html.URL.createObjectURL(blob);
     html.AnchorElement(href: url)
       ..setAttribute('download', fileName)
       ..click();
-    html.Url.revokeObjectUrl(url);
+    html.URL.revokeObjectURL(url);
     return null;
   }
 
@@ -959,12 +968,15 @@ Future<File?> exportCsv(SavedReport report) async {
   final bytes = utf8.encode(csvStr);
 
   if (kIsWeb) {
-    final blob = html.Blob([bytes], 'text/csv');
-    final url = html.Url.createObjectUrlFromBlob(blob);
+    final blob = html.Blob(
+      <dynamic>[bytes],
+      html.BlobPropertyBag(type: 'text/csv'),
+    );
+    final url = html.URL.createObjectURL(blob);
     html.AnchorElement(href: url)
       ..setAttribute('download', fileName)
       ..click();
-    html.Url.revokeObjectUrl(url);
+    html.URL.revokeObjectURL(url);
     return null;
   }
 

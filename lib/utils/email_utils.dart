@@ -24,12 +24,15 @@ Future<void> sendReportByEmail(
   List<String> attachmentPaths = const [],
 }) async {
   if (kIsWeb) {
-    final blob = html.Blob([pdfBytes], 'application/pdf');
-    final url = html.Url.createObjectUrlFromBlob(blob);
+    final blob = html.Blob(
+      <dynamic>[pdfBytes],
+      html.BlobPropertyBag(type: 'application/pdf'),
+    );
+    final url = html.URL.createObjectURL(blob);
     html.AnchorElement(href: url)
       ..setAttribute('download', 'report.pdf')
       ..click();
-    html.Url.revokeObjectUrl(url);
+    html.URL.revokeObjectURL(url);
     final mailto =
         'mailto:$email?subject=${Uri.encodeComponent(subject)}&body=${Uri.encodeComponent(message)}';
     html.AnchorElement(href: mailto).click();
