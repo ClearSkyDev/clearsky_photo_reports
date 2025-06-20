@@ -3,7 +3,7 @@ import '../models/inspector_report_role.dart';
 /// Format [damageType] for display based on the inspector [role].
 ///
 /// Adjusters see the raw damage type label. Contractors and
-/// third-party inspectors see "Evidence of <Type> Damage". The word
+/// third-party inspectors see "Evidence of `<Type>` Damage". The word
 /// "Damage" is never shown alone.
 String formatDamageLabel(String damageType, Set<InspectorReportRole> roles) {
   if (damageType.isEmpty || damageType == 'Unknown') return '';
