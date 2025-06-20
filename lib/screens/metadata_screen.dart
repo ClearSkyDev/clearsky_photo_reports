@@ -314,13 +314,13 @@ class _MetadataScreenState extends State<MetadataScreen> {
                 decoration: const InputDecoration(labelText: 'Referral Code'),
               ),
               const SizedBox(height: 20),
-              if (_quickEnabled) [
+              if (_quickEnabled)
                 ElevatedButton(
                   onPressed: () => Navigator.pushNamed(context, '/quickReport'),
                   child: const Text('Start Quick Report'),
                 ),
+              if (_quickEnabled)
                 const SizedBox(height: 20),
-              ],
               ElevatedButton(
                 onPressed: _continue,
                 child: const Text('Continue to Photo Upload'),
