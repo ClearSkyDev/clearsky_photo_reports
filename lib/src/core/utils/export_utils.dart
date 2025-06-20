@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:archive/archive.dart';
 import 'package:flutter/foundation.dart';
@@ -26,7 +25,6 @@ import '../utils/invoice_pdf.dart';
 import '../models/report_theme.dart';
 
 import '../models/inspection_metadata.dart';
-import '../models/inspection_type.dart';
 import '../models/inspection_sections.dart';
 import '../models/saved_report.dart';
 import '../models/photo_entry.dart';
