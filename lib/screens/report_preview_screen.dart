@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show NetworkAssetBundle, rootBundle;
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import '../models/photo_entry.dart';
 import '../models/inspection_metadata.dart';
@@ -10,7 +11,7 @@ import '../models/saved_report.dart';
 import '../models/checklist.dart';
 import '../models/report_template.dart';
 import '../models/checklist_template.dart';
-import 'package:web/web.dart' as html; // for HTML download (web only)
+import 'package:web/web.dart' as html show Blob, Url, AnchorElement; // for HTML download (web only)
 import 'package:pdf/widgets.dart' as pw;
 import 'package:pdf/pdf.dart';
 import 'send_report_screen.dart';
@@ -581,7 +582,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
 
   void _saveHtmlFile(String htmlContent) {
     final bytes = utf8.encode(htmlContent);
-    final blob = html.Blob([bytes]);
+    final blob = html.Blob(<dynamic>[bytes]);
     final url = html.Url.createObjectUrlFromBlob(blob);
     final fileName = _metadataFileName('html');
     html.AnchorElement(href: url)
@@ -603,6 +604,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
       reportId: _metadata.reportId ?? widget.savedReport?.id ?? '',
     );
     scaffold.hideCurrentSnackBar();
+    if (!mounted) return;
     if (text == null) return;
     final use = await showDialog<bool>(
       context: context,
@@ -1012,7 +1014,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
     final bytes = await _downloadPdf();
     final fileName = _metadataFileName('pdf');
     if (kIsWeb) {
-      final blob = html.Blob([bytes], 'application/pdf');
+      final blob = html.Blob(<dynamic>[bytes]);
       final url = html.Url.createObjectUrlFromBlob(blob);
       html.AnchorElement(href: url)
         ..setAttribute('download', fileName)
@@ -1033,6 +1035,8 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
     final file = File(path);
     await file.writeAsBytes(bytes, flush: true);
     setState(() => _exportedFile = file);
+
+    if (!mounted) return;
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('PDF exported')),
