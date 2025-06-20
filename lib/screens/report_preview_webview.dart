@@ -47,7 +47,7 @@ class _ReportPreviewWebViewState extends State<ReportPreviewWebView> {
       _viewId = 'report-preview-${DateTime.now().millisecondsSinceEpoch}';
       // Create a Blob URL for the HTML content
       final blob = html.Blob(<dynamic>[widget.html], 'text/html');
-      _blobUrl = html.Url.createObjectUrlFromBlob(blob);
+      _blobUrl = html.URL.createObjectURL(blob);
       // ignore: undefined_prefixed_name
       ui.platformViewRegistry.registerViewFactory(
         _viewId!,
@@ -66,7 +66,7 @@ class _ReportPreviewWebViewState extends State<ReportPreviewWebView> {
   @override
   void dispose() {
     if (_blobUrl != null) {
-      html.Url.revokeObjectUrl(_blobUrl!);
+      html.URL.revokeObjectURL(_blobUrl!);
     }
     super.dispose();
   }

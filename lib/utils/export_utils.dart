@@ -50,11 +50,11 @@ Future<void> generateAndDownloadPdf(
   final bytes = await pdf.save();
   if (kIsWeb) {
     final blob = html.Blob(<dynamic>[bytes], 'application/pdf');
-    final url = html.Url.createObjectUrlFromBlob(blob);
+    final url = html.URL.createObjectURL(blob);
     html.AnchorElement(href: url)
       ..setAttribute('download', 'report.pdf')
       ..click();
-      html.Url.revokeObjectUrl(url);
+    html.URL.revokeObjectURL(url);
   } else {
     final dir = await getTemporaryDirectory();
     final file = File(p.join(dir.path, 'report.pdf'));
@@ -79,11 +79,11 @@ Future<void> generateAndDownloadHtml(
   final bytes = utf8.encode(htmlStr);
   if (kIsWeb) {
     final blob = html.Blob(<dynamic>[bytes], 'text/html');
-    final url = html.Url.createObjectUrlFromBlob(blob);
+    final url = html.URL.createObjectURL(blob);
     html.AnchorElement(href: url)
       ..setAttribute('download', 'report.html')
       ..click();
-    html.Url.revokeObjectUrl(url);
+    html.URL.revokeObjectURL(url);
   } else {
     final dir = await getTemporaryDirectory();
     final file = File(p.join(dir.path, 'report.html'));
@@ -149,11 +149,11 @@ Future<File?> exportAsZip(SavedReport report) async {
 
   if (kIsWeb) {
     final blob = html.Blob(<dynamic>[zipData], 'application/zip');
-    final url = html.Url.createObjectUrlFromBlob(blob);
+    final url = html.URL.createObjectURL(blob);
     html.AnchorElement(href: url)
       ..setAttribute('download', fileName)
       ..click();
-    html.Url.revokeObjectUrl(url);
+    html.URL.revokeObjectURL(url);
     return null;
   }
 
@@ -953,11 +953,11 @@ Future<File?> exportCsv(SavedReport report) async {
 
   if (kIsWeb) {
     final blob = html.Blob(<dynamic>[bytes], 'text/csv');
-    final url = html.Url.createObjectUrlFromBlob(blob);
+    final url = html.URL.createObjectURL(blob);
     html.AnchorElement(href: url)
       ..setAttribute('download', fileName)
       ..click();
-    html.Url.revokeObjectUrl(url);
+    html.URL.revokeObjectURL(url);
     return null;
   }
 

@@ -11,7 +11,7 @@ import '../models/saved_report.dart';
 import '../models/checklist.dart';
 import '../models/report_template.dart';
 import '../models/checklist_template.dart';
-import 'package:web/web.dart' as html show Blob, Url, AnchorElement; // for HTML download (web only)
+import 'package:web/web.dart' as html show Blob, URL, AnchorElement; // for HTML download (web only)
 import 'package:pdf/widgets.dart' as pw;
 import 'package:pdf/pdf.dart';
 import 'send_report_screen.dart';
@@ -583,12 +583,12 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
   void _saveHtmlFile(String htmlContent) {
     final bytes = utf8.encode(htmlContent);
     final blob = html.Blob(<dynamic>[bytes], 'text/html');
-    final url = html.Url.createObjectUrlFromBlob(blob);
+    final url = html.URL.createObjectURL(blob);
     final fileName = _metadataFileName('html');
     html.AnchorElement(href: url)
       ..setAttribute("download", fileName)
       ..click();
-    html.Url.revokeObjectUrl(url);
+    html.URL.revokeObjectURL(url);
   }
 
   void _openMap(double lat, double lng) {
@@ -1015,11 +1015,11 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
     final fileName = _metadataFileName('pdf');
     if (kIsWeb) {
       final blob = html.Blob(<dynamic>[bytes], 'application/pdf');
-      final url = html.Url.createObjectUrlFromBlob(blob);
+      final url = html.URL.createObjectURL(blob);
       html.AnchorElement(href: url)
         ..setAttribute('download', fileName)
         ..click();
-      html.Url.revokeObjectUrl(url);
+      html.URL.revokeObjectURL(url);
       return;
     }
 

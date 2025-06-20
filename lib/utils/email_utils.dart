@@ -2,7 +2,7 @@ import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 
 // Web imports
-import 'package:web/web.dart' as html show Blob, Url, AnchorElement;
+import 'package:web/web.dart' as html show Blob, URL, AnchorElement;
 
 // Mobile imports
 import 'dart:io';
@@ -25,11 +25,11 @@ Future<void> sendReportByEmail(
 }) async {
   if (kIsWeb) {
     final blob = html.Blob(<dynamic>[pdfBytes], 'application/pdf');
-    final url = html.Url.createObjectUrlFromBlob(blob);
+    final url = html.URL.createObjectURL(blob);
     html.AnchorElement(href: url)
       ..setAttribute('download', 'report.pdf')
       ..click();
-    html.Url.revokeObjectUrl(url);
+    html.URL.revokeObjectURL(url);
     final mailto =
         'mailto:$email?subject=${Uri.encodeComponent(subject)}&body=${Uri.encodeComponent(message)}';
     html.AnchorElement(href: mailto).click();
