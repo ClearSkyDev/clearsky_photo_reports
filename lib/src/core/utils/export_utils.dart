@@ -599,7 +599,7 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
   }
 
   // Placeholder for missing helper used during PDF generation.
-  pw.Widget _pdfSectionHeader(String text) {
+  pw.Widget pdfSectionHeader(String text) {
     // TODO: implement template-aware styling for section headers
     return pw.Text(
       text,
@@ -629,7 +629,7 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
     for (int i = 0; i < report.structures.length; i++) {
       final struct = report.structures[i];
       if (report.structures.length > 1) {
-        widgets.add(_pdfSectionHeader('${i + 1}. ${struct.name}'));
+        widgets.add(pdfSectionHeader('${i + 1}. ${struct.name}'));
         if (struct.address != null && struct.address!.isNotEmpty) {
           widgets.add(pw.Text(struct.address!));
         }
@@ -641,7 +641,7 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
         estPhotos.addAll(struct.sectionPhotos[sec] ?? []);
       }
       if (estPhotos.isNotEmpty) {
-        widgets.add(_pdfSectionHeader('Establishing Shots'));
+        widgets.add(pdfSectionHeader('Establishing Shots'));
         final issues = collectIssues(estPhotos);
         if (issues.isNotEmpty) {
           widgets.add(pw.Column(
@@ -664,7 +664,7 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
         final photos = struct.sectionPhotos[section] ?? [];
         if (photos.isEmpty) continue;
         final label = section.replaceAll(' & Accessories', '');
-        widgets.add(_pdfSectionHeader(label));
+        widgets.add(pdfSectionHeader(label));
         final missing = struct.slopeTestSquare[section] == false;
         final issues = collectIssues(photos, missingTestSquare: missing);
         if (issues.isNotEmpty) {
@@ -687,7 +687,7 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
         }
         final photos = entry.value;
         if (photos.isEmpty) continue;
-        widgets.add(_pdfSectionHeader(entry.key));
+        widgets.add(pdfSectionHeader(entry.key));
         final missing = struct.slopeTestSquare[entry.key] == false;
         final issues = collectIssues(photos, missingTestSquare: missing);
         if (issues.isNotEmpty) {
@@ -705,11 +705,11 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
       }
 
       if (struct.interiorRooms.isNotEmpty) {
-        widgets.add(_pdfSectionHeader('Interior Damage'));
+        widgets.add(pdfSectionHeader('Interior Damage'));
         for (final room in struct.interiorRooms) {
           final photos = room.photos;
           if (photos.isEmpty) continue;
-          widgets.add(_pdfSectionHeader(room.name));
+          widgets.add(pdfSectionHeader(room.name));
           if (room.summary.isNotEmpty) {
             widgets.add(pw.Text(room.summary));
             widgets.add(pw.SizedBox(height: 8));
@@ -744,7 +744,7 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
   final aiStatus = report.aiSummary?.status;
 
   pdf
-    ..addPage(
+    .addPage(
       pw.MultiPage(
         footer: (context) => pw.Container(
           color: PdfColors.grey300,

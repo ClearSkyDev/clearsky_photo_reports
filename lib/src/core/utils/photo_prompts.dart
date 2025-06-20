@@ -1,4 +1,3 @@
-import '../models/inspection_metadata.dart';
 import '../models/photo_entry.dart';
 import '../models/inspector_report_role.dart';
 
