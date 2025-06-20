@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong2/latlong.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../models/saved_report.dart';
@@ -85,8 +83,6 @@ class _ReportMapScreenState extends State<ReportMapScreen> {
           if (filtered.isEmpty) {
             return const Center(child: Text('No reports found'));
           }
-          final center =
-              LatLng(filtered.first.latitude!, filtered.first.longitude!);
           return Column(
             children: [
               Padding(
@@ -133,74 +129,33 @@ class _ReportMapScreenState extends State<ReportMapScreen> {
               ),
               const Divider(height: 0),
               Expanded(
-                child: FlutterMap(
-                  options: MapOptions(center: center, zoom: 12),
-                  children: [
-                    TileLayer(
-                      urlTemplate:
-                          'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-                      subdomains: ['a', 'b', 'c'],
-                      userAgentPackageName: 'com.clearsky.app',
-                    ),
-                    MarkerLayer(
-                      markers: [
-                        for (final r in filtered)
-                          Marker(
-                            point: LatLng(r.latitude!, r.longitude!),
-                            width: 40,
-                            height: 40,
-                            builder: (context) => GestureDetector(
-                              onTap: () {
-                                final meta = InspectionMetadata.fromMap(
-                                    r.inspectionMetadata);
-                                showDialog(
-                                  context: context,
-                                  builder: (_) => AlertDialog(
-                                    title: Text(meta.propertyAddress),
-                                    content: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text('Inspector: ${meta.inspectorName ?? ''}'),
-                                        Text('Status: ${r.isFinalized ? 'finalized' : 'draft'}'),
-                                        const SizedBox(height: 8),
-                                        ElevatedButton(
-                                          onPressed: () {
-                                            Navigator.pop(context);
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (_) => ReportPreviewScreen(
-                                                  metadata: meta,
-                                                  structures: r.structures,
-                                                  readOnly: true,
-                                                  summary: r.summary,
-                                                  savedReport: r,
-                                                ),
-                                              ),
-                                            );
-                                          },
-                                          child: const Text('Open Report'),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              },
-                              child: Semantics(
-                                label: 'Report location',
-                                button: true,
-                                child: Icon(
-                                  Icons.location_on,
-                                  color: r.isFinalized ? Colors.green : Colors.orange,
-                                  size: 40,
-                                ),
-                              ),
+                child: ListView.builder(
+                  itemCount: filtered.length,
+                  itemBuilder: (context, index) {
+                    final r = filtered[index];
+                    final meta =
+                        InspectionMetadata.fromMap(r.inspectionMetadata);
+                    return ListTile(
+                      leading: const Icon(Icons.location_on),
+                      title: Text(meta.propertyAddress),
+                      subtitle: Text(
+                          'Inspector: ${meta.inspectorName ?? ''} - Status: ${r.isFinalized ? 'finalized' : 'draft'}'),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => ReportPreviewScreen(
+                              metadata: meta,
+                              structures: r.structures,
+                              readOnly: true,
+                              summary: r.summary,
+                              savedReport: r,
                             ),
                           ),
-                      ],
-                    ),
-                  ],
+                        );
+                      },
+                    );
+                  },
                 ),
               ),
             ],
