@@ -9,8 +9,6 @@ import 'dart:convert';
 ///   converted to a base64 data URI and loaded as local content.
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 
 // Conditionally import webview_flutter only if not web
 // ignore: uri_does_not_exist
@@ -79,16 +77,21 @@ class _ReportPreviewWebViewState extends State<ReportPreviewWebView> {
     final preview = kIsWeb
         ? HtmlElementView(viewType: _viewId!)
         : WebView(
-            initialUrl: Uri.dataFromString(
-              widget.html,
-              mimeType: 'text/html',
-              encoding: utf8,
-              base64: true,
-            ).toString(),
-            javascriptMode: JavascriptMode.unrestricted,
+        ? HtmlElementView(viewType: _viewId!)
+        : Builder(
+            builder: (context) {
+              // WebView is only available on non-web platforms
+              return WebView(
+                initialUrl: Uri.dataFromString(
+                  widget.html,
+                  mimeType: 'text/html',
+                  encoding: utf8,
+                  base64: true,
+                ).toString(),
+                javascriptMode: JavascriptMode.unrestricted,
+              );
+            },
           );
-
-    return Scaffold(
       appBar: AppBar(title: const Text('Preview Report')),
       body: Column(
         children: [
