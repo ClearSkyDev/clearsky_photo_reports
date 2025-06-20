@@ -98,7 +98,7 @@ This project uses Firebase for data storage and optional photo uploads. Install 
 
 1. Create a Firebase project in the [Firebase console](https://console.firebase.google.com).
 2. Download **google-services.json** for Android and **GoogleService-Info.plist** for iOS and place them in the respective platform directories.
-3. Run `flutterfire configure` to generate `lib/firebase_options.dart` which provides the `DefaultFirebaseOptions` used during `Firebase.initializeApp`.
+3. Run `flutterfire configure` to generate `lib/src/core/firebase_options.dart` which provides the `DefaultFirebaseOptions` used during `Firebase.initializeApp`.
 
 ## Local Storage Alternative
 
