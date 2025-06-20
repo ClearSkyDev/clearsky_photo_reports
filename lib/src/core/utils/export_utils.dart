@@ -7,7 +7,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart' show rootBundle;
 // Only used on web to trigger downloads
 // ignore: avoid_web_libraries_in_flutter
-import 'dart:html' as html show Blob, BlobPart, Url, AnchorElement;
+import 'dart:html' as html show Blob, BlobPart, BlobPropertyBag, Url, AnchorElement;
+import 'dart:js_interop';
+import 'package:js/js_util.dart' as js_util;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:http/http.dart' as http;
@@ -51,8 +53,8 @@ Future<void> generateAndDownloadPdf(
   final bytes = await pdf.save();
   if (kIsWeb) {
     final blob = html.Blob(
-      [bytes].cast<html.BlobPart>(),
-      'application/pdf',
+      js_util.jsify([bytes]) as JSArray<html.BlobPart>,
+      js_util.jsify({'type': 'application/pdf'}) as html.BlobPropertyBag,
     );
     final url = html.Url.createObjectUrlFromBlob(blob);
     html.AnchorElement(href: url)
@@ -85,8 +87,8 @@ Future<void> generateAndDownloadHtml(
   final bytes = utf8.encode(htmlStr);
   if (kIsWeb) {
     final blob = html.Blob(
-      [bytes].cast<html.BlobPart>(),
-      'text/html',
+      js_util.jsify([bytes]) as JSArray<html.BlobPart>,
+      js_util.jsify({'type': 'text/html'}) as html.BlobPropertyBag,
     );
     final url = html.Url.createObjectUrlFromBlob(blob);
     html.AnchorElement(href: url)
@@ -160,8 +162,8 @@ Future<File?> exportAsZip(SavedReport report) async {
 
   if (kIsWeb) {
     final blob = html.Blob(
-      [zipData].cast<html.BlobPart>(),
-      'application/zip',
+      js_util.jsify([zipData]) as JSArray<html.BlobPart>,
+      js_util.jsify({'type': 'application/zip'}) as html.BlobPropertyBag,
     );
     final url = html.Url.createObjectUrlFromBlob(blob);
     html.AnchorElement(href: url)
@@ -995,8 +997,8 @@ Future<File?> exportCsv(SavedReport report) async {
 
   if (kIsWeb) {
     final blob = html.Blob(
-      [bytes].cast<html.BlobPart>(),
-      'text/csv',
+      js_util.jsify([bytes]) as JSArray<html.BlobPart>,
+      js_util.jsify({'type': 'text/csv'}) as html.BlobPropertyBag,
     );
     final url = html.Url.createObjectUrlFromBlob(blob);
     html.AnchorElement(href: url)
