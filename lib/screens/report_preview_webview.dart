@@ -9,12 +9,19 @@ import 'dart:convert';
 ///   converted to a base64 data URI and loaded as local content.
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:webview_flutter/webview_flutter.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+
+// Conditionally import webview_flutter only if not web
+// ignore: uri_does_not_exist
+import 'package:webview_flutter/webview_flutter.dart'
+    if (dart.library.html) 'webview_stub.dart';
 
 // Only imported on web for HtmlElementView
 // ignore: avoid_web_libraries_in_flutter
 import 'dart:html' as html;
-import 'dart:ui' as ui;
+import 'dart:ui' as ui
+    if (dart.library.html) 'dart:ui';
 
 class ReportPreviewWebView extends StatefulWidget {
   final String html;
@@ -41,8 +48,7 @@ class _ReportPreviewWebViewState extends State<ReportPreviewWebView> {
     super.initState();
     if (kIsWeb) {
       _viewId = 'report-preview-${DateTime.now().millisecondsSinceEpoch}';
-      final blob = html.Blob([widget.html], 'text/html');
-      _blobUrl = html.Url.createObjectUrlFromBlob(blob);
+      // ignore: undefined_prefixed_name
       ui.platformViewRegistry.registerViewFactory(
         _viewId!,
         (int viewId) {
@@ -54,6 +60,9 @@ class _ReportPreviewWebViewState extends State<ReportPreviewWebView> {
           return iframe;
         },
       );
+      // Create a Blob URL for the HTML content
+      final blob = html.Blob([widget.html], 'text/html');
+      _blobUrl = html.Url.createObjectUrlFromBlob(blob);
     }
   }
 

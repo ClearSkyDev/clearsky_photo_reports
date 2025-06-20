@@ -102,7 +102,7 @@ class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
     }
     final snapshot = await query.get();
     final remote = snapshot.docs
-        .map((doc) => SavedReport.fromMap(doc.data(), doc.id))
+        .map((doc) => SavedReport.fromMap(doc.data() as Map<String, dynamic>, doc.id))
         .toList();
     final local = OfflineDraftStore.instance.loadReports();
     return [...local, ...remote];

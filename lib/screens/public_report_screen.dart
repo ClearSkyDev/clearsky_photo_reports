@@ -171,7 +171,7 @@ class _PublicReportScreenState extends State<PublicReportScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => MessageThreadScreen(reportId: reportId, threadTitle: '', currentUserId: '',),
+                  builder: (_) => MessageThreadScreen(reportId: reportId, threadTitle: '', currentUserId: '', inspectorView: false,),
                 ),
               );
             },
