@@ -28,6 +28,7 @@ import 'package:path/path.dart' as p;
 import 'package:share_plus/share_plus.dart';
 import '../../core/utils/share_utils.dart';
 import '../../core/utils/email_utils.dart';
+import '../widgets/export_progress_dialog.dart';
 import 'inspection_checklist_screen.dart';
 import 'photo_map_screen.dart';
 import 'change_history_screen.dart';
@@ -665,13 +666,44 @@ class _SendReportScreenState extends State<SendReportScreen> {
         ? const String.fromEnvironment('OPENAI_API_KEY')
         : (Platform.environment['OPENAI_API_KEY'] ?? '');
     String text;
+    var cancelled = false;
     if (key.isNotEmpty) {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) => AlertDialog(
+          content: Row(
+            children: const [
+              CircularProgressIndicator(),
+              SizedBox(width: 16),
+              Text('Generating summary...'),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                cancelled = true;
+                Navigator.pop(context);
+              },
+              child: const Text('Cancel'),
+            )
+          ],
+        ),
+      );
       try {
         final svc = AiSummaryService(apiKey: key);
         final result = await svc.generateSummary(report);
-        text = result.adjuster;
+        if (!cancelled) {
+          text = result.adjuster;
+        } else {
+          text = generateSummaryText(report);
+        }
       } catch (_) {
         text = generateSummaryText(report);
+      } finally {
+        if (Navigator.of(context).canPop()) {
+          Navigator.of(context).pop();
+        }
       }
     } else {
       text = generateSummaryText(report);
@@ -727,12 +759,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) => const AlertDialog(
-        content: SizedBox(
-          height: 60,
-          child: Center(child: CircularProgressIndicator()),
-        ),
-      ),
+      builder: (_) => const ExportProgressDialog(),
     );
     try {
       final file = await exportCsv(_savedReport!);
@@ -768,14 +795,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) => const AlertDialog(
-        content: SizedBox(
-          height: 60,
-          child: Center(
-            child: CircularProgressIndicator(),
-          ),
-        ),
-      ),
+      builder: (_) => const ExportProgressDialog(),
     );
     try {
       final file = await exportFinalZip(_savedReport!);
@@ -807,14 +827,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) => const AlertDialog(
-        content: SizedBox(
-          height: 60,
-          child: Center(
-            child: CircularProgressIndicator(),
-          ),
-        ),
-      ),
+      builder: (_) => const ExportProgressDialog(),
     );
     try {
       final file = await exportLegalCopy(_savedReport!, userId: _profile?.id);
@@ -839,12 +852,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) => const AlertDialog(
-        content: SizedBox(
-          height: 60,
-          child: Center(child: CircularProgressIndicator()),
-        ),
-      ),
+      builder: (_) => const ExportProgressDialog(),
     );
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -1128,12 +1136,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) => const AlertDialog(
-        content: SizedBox(
-          height: 60,
-          child: Center(child: CircularProgressIndicator()),
-        ),
-      ),
+      builder: (_) => const ExportProgressDialog(),
     );
     try {
       final pdf = await generatePdf(_savedReport!);

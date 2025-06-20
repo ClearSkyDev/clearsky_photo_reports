@@ -12,19 +12,38 @@ class InspectionChecklistScreen extends StatefulWidget {
 }
 
 class _InspectionChecklistScreenState extends State<InspectionChecklistScreen> {
+  final Map<String, TextEditingController> _controllers = {};
   @override
   void initState() {
     super.initState();
+    for (final step in inspectionChecklist.steps) {
+      if (step.type == ChecklistFieldType.text) {
+        _controllers[step.title] =
+            TextEditingController(text: step.textValue);
+      }
+    }
     inspectionChecklist.addListener(_update);
   }
 
   @override
   void dispose() {
+    for (final c in _controllers.values) {
+      c.dispose();
+    }
     inspectionChecklist.removeListener(_update);
     super.dispose();
   }
 
-  void _update() => setState(() {});
+  void _update() {
+    for (final step in inspectionChecklist.steps) {
+      if (step.type == ChecklistFieldType.text &&
+          !_controllers.containsKey(step.title)) {
+        _controllers[step.title] =
+            TextEditingController(text: step.textValue);
+      }
+    }
+    setState(() {});
+  }
 
   void _showAddStepDialog() {
     final titleController = TextEditingController();
@@ -49,6 +68,7 @@ class _InspectionChecklistScreenState extends State<InspectionChecklistScreen> {
                   inspectionChecklist.steps.add(
                     ChecklistStep(title: text),
                   );
+                  _controllers[text] = TextEditingController();
                   ChecklistStorage.save(inspectionChecklist);
                 });
               }
@@ -83,10 +103,12 @@ class _InspectionChecklistScreenState extends State<InspectionChecklistScreen> {
                 Widget tile;
                 switch (step.type) {
                   case ChecklistFieldType.text:
+                    final controller = _controllers[step.title] ??=
+                        TextEditingController(text: step.textValue);
                     tile = ListTile(
                       title: Text(step.title),
                       subtitle: TextField(
-                        controller: TextEditingController(text: step.textValue),
+                        controller: controller,
                         onChanged: (v) =>
                             inspectionChecklist.updateText(step.title, v),
                       ),

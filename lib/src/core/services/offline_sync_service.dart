@@ -107,29 +107,31 @@ class OfflineSyncService {
     for (final struct in draft.structures) {
       final sections = <String, List<ReportPhotoEntry>>{};
       for (var entry in struct.sectionPhotos.entries) {
-        final uploaded = <ReportPhotoEntry>[];
+        final tasks = <Future<ReportPhotoEntry>>[];
         for (var i = 0; i < entry.value.length; i++) {
           final p = entry.value[i];
           final file = File(p.photoUrl);
           if (!await file.exists()) continue;
           final ref = storage.ref().child(
               'reports/${draft.id}/${struct.name}/${entry.key}/photo_$i.jpg');
-          await ref.putFile(file);
-          final url = await ref.getDownloadURL();
-          uploaded.add(ReportPhotoEntry(
-            label: p.label,
-            caption: p.caption,
-            confidence: p.confidence,
-            photoUrl: url,
-            timestamp: p.timestamp,
-            latitude: p.latitude,
-            longitude: p.longitude,
-            damageType: p.damageType,
-            note: p.note,
-            sourceType: p.sourceType,
-            captureDevice: p.captureDevice,
-          ));
+          tasks.add(ref.putFile(file).then((_) async {
+            final url = await ref.getDownloadURL();
+            return ReportPhotoEntry(
+              label: p.label,
+              caption: p.caption,
+              confidence: p.confidence,
+              photoUrl: url,
+              timestamp: p.timestamp,
+              latitude: p.latitude,
+              longitude: p.longitude,
+              damageType: p.damageType,
+              note: p.note,
+              sourceType: p.sourceType,
+              captureDevice: p.captureDevice,
+            );
+          }));
         }
+        final uploaded = await Future.wait(tasks);
         if (uploaded.isNotEmpty) {
           sections[entry.key] = uploaded;
         }

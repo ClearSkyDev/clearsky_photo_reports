@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../../core/models/photo_entry.dart';
 import '../../core/utils/export_utils.dart'; // Your export functions
 import '../widgets/clearsky_header.dart'; // Optional: logo + title widget
@@ -78,7 +79,13 @@ class ClientReportScreen extends StatelessWidget {
                 return Column(
                   children: [
                     Expanded(
-                      child: Image.network(photo.url, fit: BoxFit.cover),
+                      child: CachedNetworkImage(
+                        imageUrl: photo.url,
+                        fit: BoxFit.cover,
+                        placeholder: (context, url) =>
+                            const Center(child: CircularProgressIndicator()),
+                        errorWidget: (context, url, error) => const Icon(Icons.error),
+                      ),
                     ),
                     Text(
                       photo.label,
