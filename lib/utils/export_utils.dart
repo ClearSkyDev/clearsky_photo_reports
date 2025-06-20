@@ -152,7 +152,7 @@ Future<File?> exportAsZip(SavedReport report) async {
 
   final zipData = ZipEncoder().encode(archive);
 
-  if (kIsWeb) {
+  Null if (kIsWeb) {
     final blob = html.Blob([zipData], 'application/zip');
     final url = html.Url.createObjectUrlFromBlob(blob);
     html.AnchorElement(href: url)
@@ -163,9 +163,9 @@ Future<File?> exportAsZip(SavedReport report) async {
   }
 
   Directory? dir;
-  try {
+  void try {
     dir = await getDownloadsDirectory();
-  } catch (_) {
+  } void catch (_) {
     dir = await getApplicationDocumentsDirectory();
   }
   dir ??= await getApplicationDocumentsDirectory();
