@@ -6,8 +6,6 @@
 library;
 
 import 'dart:math';
-import 'dart:io';
-import 'dart:convert';
 
 import '../models/photo_entry.dart';
 import '../models/inspection_metadata.dart';
@@ -32,17 +30,7 @@ Future<LabelSuggestion> getLabelSuggestion(
   String sectionName,
   InspectionMetadata metadata,
 ) async {
-  // Extract image bytes so future integrations can send them to an AI service.
-  List<int> bytes = [];
-  try {
-    if (await File(photo.url).exists()) {
-      bytes = await File(photo.url).readAsBytes();
-    }
-  } catch (_) {
-    // Ignore errors for now; bytes remain empty.
-  }
-
-  final String base64 = base64Encode(bytes); // ignore: unused_local_variable
+  // Placeholder for future image byte extraction.
 
   await Future.delayed(const Duration(milliseconds: 300));
   final desc = _fakeDescriptions[Random().nextInt(_fakeDescriptions.length)];
