@@ -160,7 +160,7 @@ class _ReportSettingsScreenState extends State<ReportSettingsScreen> {
         _footerController.text = settings.footerText;
         _logoPath = settings.logoPath;
         _selectedColor = _colors.entries
-            .firstWhere((e) => e.value.value == settings.primaryColor,
+            .firstWhere((e) => e.value.toArgb32() == settings.primaryColor,
                 orElse: () => const MapEntry('Blue', Colors.blue))
             .key;
         _includeDisclaimer = settings.includeDisclaimer;
@@ -198,7 +198,7 @@ class _ReportSettingsScreenState extends State<ReportSettingsScreen> {
       companyName: _companyController.text.trim(),
       tagline: _taglineController.text.trim(),
       logoPath: _logoPath,
-      primaryColor: _colors[_selectedColor]!.value,
+      primaryColor: _colors[_selectedColor]!.toArgb32(),
       includeDisclaimer: _includeDisclaimer,
       showGpsData: _showGpsData,
       autoLegalBackup: _autoLegalBackup,

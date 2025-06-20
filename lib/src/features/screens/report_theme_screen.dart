@@ -49,7 +49,7 @@ class _ReportThemeScreenState extends State<ReportThemeScreen> {
       setState(() {
         _logoPath = theme.logoPath;
         _selectedColor = _colors.entries
-            .firstWhere((e) => e.value.value == theme.primaryColor,
+            .firstWhere((e) => e.value.toArgb32() == theme.primaryColor,
                 orElse: () => const MapEntry('Blue', Colors.blue))
             .key;
         if (_fonts.contains(theme.fontFamily)) {
@@ -71,7 +71,7 @@ class _ReportThemeScreenState extends State<ReportThemeScreen> {
   Future<void> _saveTheme() async {
     final theme = ReportTheme(
       name: 'custom',
-      primaryColor: _colors[_selectedColor]!.value,
+      primaryColor: _colors[_selectedColor]!.toArgb32(),
       fontFamily: _selectedFont,
       logoPath: _logoPath,
     );
