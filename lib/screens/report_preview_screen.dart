@@ -11,6 +11,7 @@ import '../models/inspection_sections.dart';
 import '../models/saved_report.dart';
 import '../models/checklist.dart';
 import '../models/report_template.dart';
+import '../models/checklist_template.dart';
 import 'dart:html' as html; // for HTML download (web only)
 import 'package:pdf/widgets.dart' as pw;
 import 'package:pdf/pdf.dart';
@@ -23,7 +24,7 @@ import '../models/report_theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:path/path.dart' as p;
 import 'package:url_launcher/url_launcher.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:path_provider/path_provider.dart' as pp;
 import '../utils/export_utils.dart';
 import '../utils/share_utils.dart';
 import 'photo_map_screen.dart';
@@ -168,8 +169,8 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
     });
   }
 
-  List<MapEntry<String, List<PhotoEntry>>> _gatherGroups() {
-    final List<MapEntry<String, List<PhotoEntry>>> groups = [];
+  List<MapEntry<String, List<ReportPhotoEntry>>> _gatherGroups() {
+    final List<MapEntry<String, List<ReportPhotoEntry>>> groups = [];
 
     if (widget.structures != null) {
       for (final struct in widget.structures!) {
@@ -196,13 +197,17 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
     }
     for (var group in _gatherGroups()) {
       for (var p in group.value) {
-        final suffix = p.label != 'Unlabeled' ? ' - ${p.label}' : '';
+        final suffix = p.label.isNotEmpty && p.label != 'Unlabeled'
+            ? ' - ${p.label}'
+            : '';
         all.add(PhotoEntry(
-            url: p.url,
-            label: '${group.key}$suffix',
-            latitude: p.latitude,
-            longitude: p.longitude,
-            note: p.note));
+          url: p.photoUrl,
+          capturedAt: p.timestamp,
+          label: '${group.key}$suffix',
+          latitude: p.latitude,
+          longitude: p.longitude,
+          note: p.note,
+        ));
       }
     }
     return all;
@@ -212,6 +217,22 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
     return _gatherAllPhotos()
         .where((p) => p.latitude != null && p.longitude != null)
         .toList();
+  }
+
+  List<String> _collectIssues(List<dynamic> photos, {bool missingTestSquare = false}) {
+    final issues = <String>{};
+    for (final p in photos) {
+      final note = (p as dynamic).note as String?;
+      if (note != null && note.isNotEmpty) issues.add(note);
+      final damage = (p as dynamic).damageType as String?;
+      if (damage != null && damage.isNotEmpty && damage != 'Unknown') {
+        issues.add(formatDamageLabel(damage, _metadata.inspectorRoles));
+      }
+    }
+    if (missingTestSquare) {
+      issues.add('No test square photo included for this slope');
+    }
+    return issues.toList();
   }
 
   Widget _summaryField(TextEditingController controller, String label) {
@@ -387,10 +408,10 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
           '<div style="border:1px solid #ccc;padding:8px;margin-top:20px;">');
       buffer.writeln('<strong>Inspector Notes / Summary</strong><br>');
       buffer.writeln('<p>${_summaryController.text}</p>');
-      if (_jobCostController.text.isNotEmpty) {
-        buffer.writeln('<p><strong>Estimated Job Cost:</strong> \
-${_jobCostController.text}</p>');
-      }
+        if (_jobCostController.text.isNotEmpty) {
+          buffer.writeln(
+              '<p><strong>Estimated Job Cost:</strong> ${_jobCostController.text}</p>');
+        }
       buffer.writeln('</div>');
     }
 
@@ -433,13 +454,13 @@ ${_jobCostController.text}</p>');
           buffer.writeln('<h2>${struct.name}</h2>');
         }
 
-        final estPhotos = <PhotoEntry>[];
+        final estPhotos = <ReportPhotoEntry>[];
         for (final sec in establishing) {
           estPhotos.addAll(struct.sectionPhotos[sec] ?? []);
         }
         if (estPhotos.isNotEmpty) {
           buffer.writeln('<h3>Establishing Shots</h3>');
-          final issues = collectIssues(estPhotos);
+          final issues = _collectIssues(estPhotos);
           if (issues.isNotEmpty) {
             buffer.writeln('<ul>');
             for (final i in issues) {
@@ -454,12 +475,12 @@ ${_jobCostController.text}</p>');
             final caption = damage.isNotEmpty ? '$label - $damage' : label;
             final containerClass = _template == 'side' ? 'class="photo"' : 'style="width:300px;margin:5px;text-align:center;"';
             buffer.writeln('<div $containerClass>');
-            buffer.writeln('<img src="${photo.url}" width="300" height="300" style="object-fit:cover;"><br>');
-            final ts = photo.capturedAt.toLocal().toString().split('.').first;
+            buffer.writeln('<img src="${photo.photoUrl}" width="300" height="300" style="object-fit:cover;"><br>');
+            final ts = photo.timestamp?.toLocal().toString().split('.').first ?? '';
             String gps = '';
-            if (_showGps && photo.latitude != null && photo.longitude != null) {
-              gps = '<br><a href="https://www.google.com/maps/search/?api=1&query=${photo.latitude},${photo.longitude}">${photo.latitude!.toStringAsFixed(4)}, ${photo.longitude!.toStringAsFixed(4)}</a>';
-            }
+              if (_showGps && photo.latitude != null && photo.longitude != null) {
+                gps = '<br><a href="https://www.google.com/maps/search/?api=1&query=${photo.latitude},${photo.longitude}">${photo.latitude!.toStringAsFixed(4)}, ${photo.longitude!.toStringAsFixed(4)}</a>';
+              }
             final note = photo.note.isNotEmpty ? '<br><em>${photo.note}</em>' : '';
             buffer.writeln('<span>$caption<br>$ts$gps$note</span>');
             buffer.writeln('</div>');
@@ -467,10 +488,10 @@ ${_jobCostController.text}</p>');
           buffer.writeln('</div>');
         }
 
-        final otherSections = <String>{
-          ...ordered,
-          ...struct.sectionPhotos.keys
-        };
+          final otherSections = <String>{
+            ...ordered,
+            ...struct.sectionPhotos.keys
+          };
 
         for (final section in ordered) {
           if (!otherSections.contains(section)) continue;
@@ -479,7 +500,7 @@ ${_jobCostController.text}</p>');
           final label = section.replaceAll(' & Accessories', '');
           buffer.writeln('<h3>$label</h3>');
           final missing = struct.slopeTestSquare[section] == false;
-          final issues = collectIssues(photos, missingTestSquare: missing);
+          final issues = _collectIssues(photos, missingTestSquare: missing);
           if (issues.isNotEmpty) {
             buffer.writeln('<ul>');
             for (final i in issues) {
@@ -488,18 +509,18 @@ ${_jobCostController.text}</p>');
             buffer.writeln('</ul>');
           }
           buffer.writeln('<div style="display:flex;flex-wrap:wrap;">');
-          for (var photo in photos) {
-            final labelText = photo.label.isNotEmpty ? photo.label : 'Unlabeled';
-            final damage = formatDamageLabel(photo.damageType, _metadata.inspectorRoles);
-            final caption = damage.isNotEmpty ? '$labelText - $damage' : labelText;
+            for (var photo in photos) {
+              final labelText = photo.label.isNotEmpty ? photo.label : 'Unlabeled';
+              final damage = formatDamageLabel(photo.damageType, _metadata.inspectorRoles);
+              final caption = damage.isNotEmpty ? '$labelText - $damage' : labelText;
             final containerClass = _template == 'side' ? 'class="photo"' : 'style="width:300px;margin:5px;text-align:center;"';
             buffer.writeln('<div $containerClass>');
-            buffer.writeln('<img src="${photo.url}" width="300" height="300" style="object-fit:cover;"><br>');
-            final ts = photo.capturedAt.toLocal().toString().split('.').first;
+              buffer.writeln('<img src="${photo.photoUrl}" width="300" height="300" style="object-fit:cover;"><br>');
+              final ts = photo.timestamp?.toLocal().toString().split('.').first ?? '';
             String gps = '';
-            if (_showGps && photo.latitude != null && photo.longitude != null) {
-              gps = '<br><a href="https://www.google.com/maps/search/?api=1&query=${photo.latitude},${photo.longitude}">${photo.latitude!.toStringAsFixed(4)}, ${photo.longitude!.toStringAsFixed(4)}</a>';
-            }
+              if (_showGps && photo.latitude != null && photo.longitude != null) {
+                gps = '<br><a href="https://www.google.com/maps/search/?api=1&query=${photo.latitude},${photo.longitude}">${photo.latitude!.toStringAsFixed(4)}, ${photo.longitude!.toStringAsFixed(4)}</a>';
+              }
             final note = photo.note.isNotEmpty ? '<br><em>${photo.note}</em>' : '';
             buffer.writeln('<span>$caption<br>$ts$gps$note</span>');
             buffer.writeln('</div>');
@@ -515,7 +536,7 @@ ${_jobCostController.text}</p>');
           if (photos.isEmpty) continue;
           buffer.writeln('<h3>${entry.key}</h3>');
           final missing = struct.slopeTestSquare[section] == false;
-          final issues = collectIssues(photos, missingTestSquare: missing);
+          final issues = _collectIssues(photos, missingTestSquare: missing);
           if (issues.isNotEmpty) {
             buffer.writeln('<ul>');
             for (final i in issues) {
@@ -530,8 +551,8 @@ ${_jobCostController.text}</p>');
             final caption = damage.isNotEmpty ? '$labelText - $damage' : labelText;
             final containerClass = _template == 'side' ? 'class="photo"' : 'style="width:300px;margin:5px;text-align:center;"';
             buffer.writeln('<div $containerClass>');
-            buffer.writeln('<img src="${photo.url}" width="300" height="300" style="object-fit:cover;"><br>');
-            final ts = photo.capturedAt.toLocal().toString().split('.').first;
+            buffer.writeln('<img src="${photo.photoUrl}" width="300" height="300" style="object-fit:cover;"><br>');
+            final ts = photo.timestamp?.toLocal().toString().split('.').first ?? '';
             String gps = '';
             if (_showGps && photo.latitude != null && photo.longitude != null) {
               gps = '<br><a href="https://www.google.com/maps/search/?api=1&query=${photo.latitude},${photo.longitude}">${photo.latitude!.toStringAsFixed(4)}, ${photo.longitude!.toStringAsFixed(4)}</a>';
@@ -634,7 +655,7 @@ ${_jobCostController.text}</p>');
   pw.Widget _pdfSectionHeader(String text) {
     if (_template == 'modern') {
       return pw.Container(
-        color: PdfColor.fromInt(_theme.primaryColor).withOpacity(0.2),
+        color: PdfColor.fromInt(_theme.primaryColor),
         padding: const pw.EdgeInsets.all(4),
         child: pw.Text(text,
             style: pw.TextStyle(
@@ -654,25 +675,12 @@ ${_jobCostController.text}</p>');
   Future<List<pw.Widget>> _buildPdfWidgets() async {
     final List<pw.Widget> widgets = [];
 
-    List<String> collectIssues(List<PhotoEntry> photos, {bool missingTestSquare = false}) {
-      final issues = <String>{};
-      for (final p in photos) {
-        if (p.note.isNotEmpty) issues.add(p.note);
-        if (p.damageType.isNotEmpty && p.damageType != 'Unknown') {
-          issues.add(formatDamageLabel(p.damageType, _metadata.inspectorRoles));
-        }
-      }
-      if (missingTestSquare) {
-        issues.add('No test square photo included for this slope');
-      }
-      return issues.toList();
-    }
 
-    Future<pw.Widget> buildWrap(List<PhotoEntry> photos) async {
+    Future<pw.Widget> buildWrap(List<ReportPhotoEntry> photos) async {
       final items = <pw.Widget>[];
       for (var photo in photos) {
         final imageData =
-            await NetworkAssetBundle(Uri.parse(photo.url)).load("");
+            await NetworkAssetBundle(Uri.parse(photo.photoUrl)).load("");
         final bytes = imageData.buffer.asUint8List();
         final label = photo.label.isNotEmpty ? photo.label : 'Unlabeled';
         final damage =
@@ -691,10 +699,10 @@ ${_jobCostController.text}</p>');
                     textAlign: pw.TextAlign.center,
                     style: const pw.TextStyle(fontSize: 12)),
                 pw.Text(
-                    photo.capturedAt
-                        .toLocal()
+                    photo.timestamp
+                        ?.toLocal()
                         .toString()
-                        .split('.').first,
+                        .split('.').first ?? '',
                     style: const pw.TextStyle(fontSize: 10)),
                 if (_showGps &&
                     photo.latitude != null &&
@@ -744,13 +752,13 @@ ${_jobCostController.text}</p>');
           widgets.add(pw.SizedBox(height: 10));
         }
 
-        final estPhotos = <PhotoEntry>[];
+        final estPhotos = <ReportPhotoEntry>[];
         for (final sec in establishing) {
           estPhotos.addAll(struct.sectionPhotos[sec] ?? []);
         }
         if (estPhotos.isNotEmpty) {
           widgets.add(_pdfSectionHeader('Establishing Shots'));
-          final issues = collectIssues(estPhotos);
+          final issues = _collectIssues(estPhotos);
           if (issues.isNotEmpty) {
             widgets.add(pw.Column(
                 crossAxisAlignment: pw.CrossAxisAlignment.start,
@@ -770,13 +778,13 @@ ${_jobCostController.text}</p>');
           ...struct.sectionPhotos.keys
         };
 
-        for (final section in ordered) {
-          if (!otherSections.contains(section)) continue;
-          final photos = struct.sectionPhotos[section] ?? [];
-          if (photos.isEmpty) continue;
-          final label = section.replaceAll(' & Accessories', '');
-          widgets.add(_pdfSectionHeader(label));
-          final issues = collectIssues(photos);
+          for (final section in ordered) {
+            if (!otherSections.contains(section)) continue;
+            final photos = struct.sectionPhotos[section] ?? [];
+            if (photos.isEmpty) continue;
+            final label = section.replaceAll(' & Accessories', '');
+            widgets.add(_pdfSectionHeader(label));
+            final issues = _collectIssues(photos);
           if (issues.isNotEmpty) {
             widgets.add(pw.Column(
                 crossAxisAlignment: pw.CrossAxisAlignment.start,
@@ -787,18 +795,18 @@ ${_jobCostController.text}</p>');
                 ]));
             widgets.add(pw.SizedBox(height: 8));
           }
-          widgets.add(await buildWrap(photos));
+            widgets.add(await buildWrap(photos));
           widgets.add(pw.SizedBox(height: 20));
         }
 
-        for (final entry in struct.sectionPhotos.entries) {
-          if (ordered.contains(entry.key) || establishing.contains(entry.key)) {
-            continue;
-          }
-          final photos = entry.value;
-          if (photos.isEmpty) continue;
-          widgets.add(_pdfSectionHeader(entry.key));
-          final issues = collectIssues(photos);
+          for (final entry in struct.sectionPhotos.entries) {
+            if (ordered.contains(entry.key) || establishing.contains(entry.key)) {
+              continue;
+            }
+            final photos = entry.value;
+            if (photos.isEmpty) continue;
+            widgets.add(_pdfSectionHeader(entry.key));
+            final issues = _collectIssues(photos);
           if (issues.isNotEmpty) {
             widgets.add(pw.Column(
                 crossAxisAlignment: pw.CrossAxisAlignment.start,
@@ -809,7 +817,7 @@ ${_jobCostController.text}</p>');
                 ]));
             widgets.add(pw.SizedBox(height: 8));
           }
-          widgets.add(await buildWrap(photos));
+            widgets.add(await buildWrap(photos));
           widgets.add(pw.SizedBox(height: 20));
         }
       }
@@ -1031,11 +1039,11 @@ ${_jobCostController.text}</p>');
 
     Directory? dir;
     try {
-      dir = await getDownloadsDirectory();
+      dir = await pp.getDownloadsDirectory();
     } catch (_) {
-      dir = await getApplicationDocumentsDirectory();
+      dir = await pp.getApplicationDocumentsDirectory();
     }
-    dir ??= await getApplicationDocumentsDirectory();
+    dir ??= await pp.getApplicationDocumentsDirectory();
 
     final path = p.join(dir.path, fileName);
     final file = File(path);
@@ -1100,17 +1108,17 @@ ${_jobCostController.text}</p>');
     files['report.html'] = Uint8List.fromList(utf8.encode(htmlContent));
     files['report.pdf'] = await _downloadPdf();
 
-    Future<void> addPhotos(String section, List<PhotoEntry> photos) async {
+    Future<void> addPhotos(String section, List<ReportPhotoEntry> photos) async {
       final sectionClean = section.replaceAll(RegExp(r'\s+'), '');
       for (final photo in photos) {
         try {
           Uint8List bytes;
-          if (photo.url.startsWith('http')) {
+          if (photo.photoUrl.startsWith('http')) {
             final data =
-                await NetworkAssetBundle(Uri.parse(photo.url)).load('');
+                await NetworkAssetBundle(Uri.parse(photo.photoUrl)).load('');
             bytes = data.buffer.asUint8List();
           } else {
-            final file = File(photo.url);
+            final file = File(photo.photoUrl);
             if (!await file.exists()) continue;
             bytes = await file.readAsBytes();
           }
@@ -1398,27 +1406,27 @@ ${_jobCostController.text}</p>');
                             mainAxisSpacing: 6,
                           ),
                           itemBuilder: (context, index) {
-                            final photo = group.value[index];
+                              final photo = group.value[index];
                             final label =
                                 photo.label.isNotEmpty ? photo.label : 'Unlabeled';
                             return Column(
                               children: [
-                                AspectRatio(
-                                  aspectRatio: 1,
-                                  child: Image.network(photo.url, fit: BoxFit.cover),
-                                ),
+                                  AspectRatio(
+                                    aspectRatio: 1,
+                                    child: Image.network(photo.photoUrl, fit: BoxFit.cover),
+                                  ),
                                 Padding(
                                   padding: const EdgeInsets.all(4.0),
                                   child: Column(
                                     children: [
                                       Text(label),
-                                      Text(
-                                        photo.capturedAt
-                                            .toLocal()
-                                            .toString()
-                                            .split('.').first,
-                                        style: const TextStyle(fontSize: 10),
-                                      ),
+                                        Text(
+                                          photo.timestamp
+                                              ?.toLocal()
+                                              .toString()
+                                              .split('.').first ?? '',
+                                          style: const TextStyle(fontSize: 10),
+                                        ),
                                       if (_showGps &&
                                           photo.latitude != null &&
                                           photo.longitude != null)
