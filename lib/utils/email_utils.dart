@@ -2,7 +2,7 @@ import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 
 // Web imports
-import 'dart:html' as html show Blob, Url, AnchorElement;
+import 'package:web/web.dart' as html show Blob, Url, AnchorElement;
 
 // Mobile imports
 import 'dart:io';
