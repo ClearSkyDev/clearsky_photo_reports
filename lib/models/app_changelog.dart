@@ -14,7 +14,8 @@ class AppChangeEntry {
   factory AppChangeEntry.fromMap(Map<String, dynamic> map) {
     return AppChangeEntry(
       version: map['version'] as String? ?? '',
-      date: DateTime.parse(map['date'] as String? ?? DateTime.now().toIso8601String()),
+      date: DateTime.parse(
+          map['date'] as String? ?? DateTime.now().toIso8601String()),
       highlights: List<String>.from(map['highlights'] ?? []),
       notes: map['notes'] as String? ?? '',
     );

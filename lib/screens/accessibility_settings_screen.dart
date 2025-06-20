@@ -7,10 +7,12 @@ class AccessibilitySettingsScreen extends StatefulWidget {
   const AccessibilitySettingsScreen({super.key});
 
   @override
-  State<AccessibilitySettingsScreen> createState() => _AccessibilitySettingsScreenState();
+  State<AccessibilitySettingsScreen> createState() =>
+      _AccessibilitySettingsScreenState();
 }
 
-class _AccessibilitySettingsScreenState extends State<AccessibilitySettingsScreen> {
+class _AccessibilitySettingsScreenState
+    extends State<AccessibilitySettingsScreen> {
   AccessibilitySettings _settings = const AccessibilitySettings();
   bool _loaded = false;
 
@@ -51,8 +53,8 @@ class _AccessibilitySettingsScreenState extends State<AccessibilitySettingsScree
               max: 1.5,
               divisions: 7,
               label: _settings.textScale.toStringAsFixed(1),
-              onChanged: (v) => setState(() =>
-                  _settings = _settings.copyWith(textScale: v)),
+              onChanged: (v) =>
+                  setState(() => _settings = _settings.copyWith(textScale: v)),
             ),
           ),
           SwitchListTile(
@@ -70,8 +72,8 @@ class _AccessibilitySettingsScreenState extends State<AccessibilitySettingsScree
           SwitchListTile(
             title: const Text('Reduced Motion'),
             value: _settings.reducedMotion,
-            onChanged: (v) =>
-                setState(() => _settings = _settings.copyWith(reducedMotion: v)),
+            onChanged: (v) => setState(
+                () => _settings = _settings.copyWith(reducedMotion: v)),
           ),
           SwitchListTile(
             title: const Text('Haptics'),

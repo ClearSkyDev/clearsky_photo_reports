@@ -18,19 +18,25 @@ class SavedReport {
   final Map<String, dynamic> inspectionMetadata;
   final List<InspectedStructure> structures;
   final String? summary;
+
   /// Paragraph summarizing the overall findings.
   final String? summaryText;
+
   /// Draft AI-generated summary review information.
   final AiSummaryReview? aiSummary;
+
   /// Either a download URL or base64 encoded PNG of the inspector signature.
   final String? signature;
+
   /// Random ID used for public sharing of the report.
   final String? publicReportId;
+
   /// Fully qualified URL that clients can use to view the report.
   final String? publicViewLink;
   final bool publicViewEnabled;
   final String? publicViewPassword;
   final DateTime? publicViewExpiry;
+
   /// Email address associated with the client portal account.
   final String? clientEmail;
   final String? templateId;
@@ -56,6 +62,7 @@ class SavedReport {
   final double? longitude;
   final Map<String, dynamic>? searchIndex;
   final bool localOnly;
+
   /// Indicates this report was initially created while offline.
   final bool wasOffline;
 
@@ -170,8 +177,7 @@ class SavedReport {
       summary: map['summary'] as String?,
       summaryText: map['summaryText'] as String?,
       aiSummary: map['aiSummary'] != null
-          ? AiSummaryReview.fromMap(
-              Map<String, dynamic>.from(map['aiSummary']))
+          ? AiSummaryReview.fromMap(Map<String, dynamic>.from(map['aiSummary']))
           : null,
       signature: map['signature'] as String?,
       publicReportId: map['publicReportId'] as String?,

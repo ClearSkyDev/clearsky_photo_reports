@@ -97,8 +97,8 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
     _summaryController = TextEditingController(text: widget.summary ?? '');
     _adjusterSummaryController = TextEditingController();
     _homeownerSummaryController = TextEditingController();
-    _jobCostController = TextEditingController(
-        text: widget.savedReport?.jobCost ?? '');
+    _jobCostController =
+        TextEditingController(text: widget.savedReport?.jobCost ?? '');
     _titleController = TextEditingController(text: _defaultReportTitle());
     _aiSummary = widget.savedReport?.aiSummary;
     if (_aiSummary != null) {
@@ -158,8 +158,9 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
           .replaceAll(RegExp(r'_+'), '_');
     }
 
-    final title = sanitize(
-        _titleController.text.isNotEmpty ? _titleController.text : _defaultReportTitle());
+    final title = sanitize(_titleController.text.isNotEmpty
+        ? _titleController.text
+        : _defaultReportTitle());
     return '$title.$ext';
   }
 
@@ -168,8 +169,8 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
 
     if (widget.structures != null) {
       for (final struct in widget.structures!) {
-        for (var section
-            in widget.template?.sections ?? sectionsForType(_metadata.inspectionType)) {
+        for (var section in widget.template?.sections ??
+            sectionsForType(_metadata.inspectionType)) {
           final photos = struct.sectionPhotos[section] ?? [];
           if (photos.isNotEmpty) {
             final label = widget.structures!.length > 1
@@ -191,9 +192,8 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
     }
     for (var group in _gatherGroups()) {
       for (var p in group.value) {
-        final suffix = p.label.isNotEmpty && p.label != 'Unlabeled'
-            ? ' - ${p.label}'
-            : '';
+        final suffix =
+            p.label.isNotEmpty && p.label != 'Unlabeled' ? ' - ${p.label}' : '';
         all.add(PhotoEntry(
           url: p.photoUrl,
           capturedAt: p.timestamp,
@@ -213,7 +213,8 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
         .toList();
   }
 
-  List<String> _collectIssues(List<dynamic> photos, {bool missingTestSquare = false}) {
+  List<String> _collectIssues(List<dynamic> photos,
+      {bool missingTestSquare = false}) {
     final issues = <String>{};
     for (final p in photos) {
       final note = (p as dynamic).note as String?;
@@ -279,7 +280,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
       summaryText: _adjusterSummaryController.text,
     );
     final key = const String.fromEnvironment('OPENAI_API_KEY', defaultValue: '')
-        .isNotEmpty
+            .isNotEmpty
         ? const String.fromEnvironment('OPENAI_API_KEY')
         : (Platform.environment['OPENAI_API_KEY'] ?? '');
     if (key.isEmpty) return;
@@ -324,16 +325,15 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
   String generateHtmlPreview(dynamic entry) {
     final buffer = StringBuffer();
     buffer.writeln('<html><head><title>Photo Report</title>');
-    final color = '#${_theme.primaryColor.toRadixString(16).padLeft(8, '0').substring(2)}';
+    final color =
+        '#${_theme.primaryColor.toRadixString(16).padLeft(8, '0').substring(2)}';
     String style;
     switch (_template) {
       case 'side':
-        style =
-            '.photo{width:48%;margin:1%;display:inline-block;}';
+        style = '.photo{width:48%;margin:1%;display:inline-block;}';
         break;
       case 'dark':
-        style =
-            'body{background:#333;color:#eee;} a{color:$color;}';
+        style = 'body{background:#333;color:#eee;} a{color:$color;}';
         break;
       default:
         style =
@@ -354,22 +354,32 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
         '<div style="position:absolute;top:10px;right:10px;font-size:12px;font-weight:bold;">$preparedLabel</div>');
 
     buffer.writeln('<table>');
-    buffer.writeln('<tr><td><strong>Client Name:</strong></td><td>${_metadata.clientName}</td></tr>');
-    buffer.writeln('<tr><td><strong>Property Address:</strong></td><td>${_metadata.propertyAddress}</td></tr>');
-    buffer.writeln('<tr><td><strong>Inspection Date:</strong></td><td>${_metadata.inspectionDate.toLocal().toString().split(" ")[0]}</td></tr>');
-    buffer.writeln('<tr><td><strong>Insurance Carrier:</strong></td><td>${_metadata.insuranceCarrier}</td></tr>');
-      buffer.writeln('<tr><td><strong>Peril Type:</strong></td><td>${_metadata.perilType.name}</td></tr>');
-    buffer.writeln('<tr><td><strong>Inspection Type:</strong></td><td>${_metadata.inspectionType.name}</td></tr>');
+    buffer.writeln(
+        '<tr><td><strong>Client Name:</strong></td><td>${_metadata.clientName}</td></tr>');
+    buffer.writeln(
+        '<tr><td><strong>Property Address:</strong></td><td>${_metadata.propertyAddress}</td></tr>');
+    buffer.writeln(
+        '<tr><td><strong>Inspection Date:</strong></td><td>${_metadata.inspectionDate.toLocal().toString().split(" ")[0]}</td></tr>');
+    buffer.writeln(
+        '<tr><td><strong>Insurance Carrier:</strong></td><td>${_metadata.insuranceCarrier}</td></tr>');
+    buffer.writeln(
+        '<tr><td><strong>Peril Type:</strong></td><td>${_metadata.perilType.name}</td></tr>');
+    buffer.writeln(
+        '<tr><td><strong>Inspection Type:</strong></td><td>${_metadata.inspectionType.name}</td></tr>');
     final roleText = _metadata.inspectorRoles
         .map((e) => e.name.replaceAll('_', ' '))
         .join(', ');
-    buffer.writeln('<tr><td><strong>Inspector Role:</strong></td><td>$roleText</td></tr>');
-    buffer.writeln('<tr><td><strong>Inspector Name:</strong></td><td>${_metadata.inspectorName}</td></tr>');
-      if (_metadata.reportId != null) {
-      buffer.writeln('<tr><td><strong>Report ID:</strong></td><td>${_metadata.reportId}</td></tr>');
+    buffer.writeln(
+        '<tr><td><strong>Inspector Role:</strong></td><td>$roleText</td></tr>');
+    buffer.writeln(
+        '<tr><td><strong>Inspector Name:</strong></td><td>${_metadata.inspectorName}</td></tr>');
+    if (_metadata.reportId != null) {
+      buffer.writeln(
+          '<tr><td><strong>Report ID:</strong></td><td>${_metadata.reportId}</td></tr>');
     }
     if (_metadata.weatherNotes != null) {
-      buffer.writeln('<tr><td><strong>Weather Notes:</strong></td><td>${_metadata.weatherNotes}</td></tr>');
+      buffer.writeln(
+          '<tr><td><strong>Weather Notes:</strong></td><td>${_metadata.weatherNotes}</td></tr>');
     }
     buffer.writeln('</table>');
 
@@ -402,10 +412,10 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
           '<div style="border:1px solid #ccc;padding:8px;margin-top:20px;">');
       buffer.writeln('<strong>Inspector Notes / Summary</strong><br>');
       buffer.writeln('<p>${_summaryController.text}</p>');
-        if (_jobCostController.text.isNotEmpty) {
-          buffer.writeln(
-              '<p><strong>Estimated Job Cost:</strong> ${_jobCostController.text}</p>');
-        }
+      if (_jobCostController.text.isNotEmpty) {
+        buffer.writeln(
+            '<p><strong>Estimated Job Cost:</strong> ${_jobCostController.text}</p>');
+      }
       buffer.writeln('</div>');
     }
 
@@ -414,7 +424,8 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
       buffer.writeln(
           '<p class="signature"><img src="data:image/png;base64,$encoded" height="100"></p>');
     } else {
-      buffer.writeln('<p class="signature">Inspector Signature: ________________________________</p>');
+      buffer.writeln(
+          '<p class="signature">Inspector Signature: ________________________________</p>');
     }
     buffer.writeln('<p style="font-size:12px;">$_coverDisclaimer</p>');
     buffer.writeln('</div>');
@@ -424,7 +435,9 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
     for (final step in inspectionChecklist.steps) {
       final icon = step.isComplete ? '✓' : '✗';
       final color = step.isComplete ? 'black' : 'red';
-      final req = step.requiredPhotos > 0 ? ' (${step.photosTaken}/${step.requiredPhotos})' : '';
+      final req = step.requiredPhotos > 0
+          ? ' (${step.photosTaken}/${step.requiredPhotos})'
+          : '';
       buffer.writeln('<li style="color:$color">$icon ${step.title}$req</li>');
     }
     buffer.writeln('</ul>');
@@ -465,27 +478,34 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
           buffer.writeln('<div style="display:flex;flex-wrap:wrap;">');
           for (var photo in estPhotos) {
             final label = photo.label.isNotEmpty ? photo.label : 'Unlabeled';
-            final damage = formatDamageLabel(photo.damageType, _metadata.inspectorRoles);
+            final damage =
+                formatDamageLabel(photo.damageType, _metadata.inspectorRoles);
             final caption = damage.isNotEmpty ? '$label - $damage' : label;
-            final containerClass = _template == 'side' ? 'class="photo"' : 'style="width:300px;margin:5px;text-align:center;"';
+            final containerClass = _template == 'side'
+                ? 'class="photo"'
+                : 'style="width:300px;margin:5px;text-align:center;"';
             buffer.writeln('<div $containerClass>');
-            buffer.writeln('<img src="${photo.photoUrl}" width="300" height="300" style="object-fit:cover;"><br>');
-            final ts = photo.timestamp?.toLocal().toString().split('.').first ?? '';
+            buffer.writeln(
+                '<img src="${photo.photoUrl}" width="300" height="300" style="object-fit:cover;"><br>');
+            final ts =
+                photo.timestamp?.toLocal().toString().split('.').first ?? '';
             String gps = '';
-              if (_showGps && photo.latitude != null && photo.longitude != null) {
-                gps = '<br><a href="https://www.google.com/maps/search/?api=1&query=${photo.latitude},${photo.longitude}">${photo.latitude!.toStringAsFixed(4)}, ${photo.longitude!.toStringAsFixed(4)}</a>';
-              }
-            final note = photo.note.isNotEmpty ? '<br><em>${photo.note}</em>' : '';
+            if (_showGps && photo.latitude != null && photo.longitude != null) {
+              gps =
+                  '<br><a href="https://www.google.com/maps/search/?api=1&query=${photo.latitude},${photo.longitude}">${photo.latitude!.toStringAsFixed(4)}, ${photo.longitude!.toStringAsFixed(4)}</a>';
+            }
+            final note =
+                photo.note.isNotEmpty ? '<br><em>${photo.note}</em>' : '';
             buffer.writeln('<span>$caption<br>$ts$gps$note</span>');
             buffer.writeln('</div>');
           }
           buffer.writeln('</div>');
         }
 
-          final otherSections = <String>{
-            ...ordered,
-            ...struct.sectionPhotos.keys
-          };
+        final otherSections = <String>{
+          ...ordered,
+          ...struct.sectionPhotos.keys
+        };
 
         for (final section in ordered) {
           if (!otherSections.contains(section)) continue;
@@ -503,19 +523,28 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
             buffer.writeln('</ul>');
           }
           buffer.writeln('<div style="display:flex;flex-wrap:wrap;">');
-            for (var photo in photos) {
-              final labelText = photo.label.isNotEmpty ? photo.label : 'Unlabeled';
-              final damage = formatDamageLabel(photo.damageType, _metadata.inspectorRoles);
-              final caption = damage.isNotEmpty ? '$labelText - $damage' : labelText;
-            final containerClass = _template == 'side' ? 'class="photo"' : 'style="width:300px;margin:5px;text-align:center;"';
+          for (var photo in photos) {
+            final labelText =
+                photo.label.isNotEmpty ? photo.label : 'Unlabeled';
+            final damage =
+                formatDamageLabel(photo.damageType, _metadata.inspectorRoles);
+            final caption =
+                damage.isNotEmpty ? '$labelText - $damage' : labelText;
+            final containerClass = _template == 'side'
+                ? 'class="photo"'
+                : 'style="width:300px;margin:5px;text-align:center;"';
             buffer.writeln('<div $containerClass>');
-              buffer.writeln('<img src="${photo.photoUrl}" width="300" height="300" style="object-fit:cover;"><br>');
-              final ts = photo.timestamp?.toLocal().toString().split('.').first ?? '';
+            buffer.writeln(
+                '<img src="${photo.photoUrl}" width="300" height="300" style="object-fit:cover;"><br>');
+            final ts =
+                photo.timestamp?.toLocal().toString().split('.').first ?? '';
             String gps = '';
-              if (_showGps && photo.latitude != null && photo.longitude != null) {
-                gps = '<br><a href="https://www.google.com/maps/search/?api=1&query=${photo.latitude},${photo.longitude}">${photo.latitude!.toStringAsFixed(4)}, ${photo.longitude!.toStringAsFixed(4)}</a>';
-              }
-            final note = photo.note.isNotEmpty ? '<br><em>${photo.note}</em>' : '';
+            if (_showGps && photo.latitude != null && photo.longitude != null) {
+              gps =
+                  '<br><a href="https://www.google.com/maps/search/?api=1&query=${photo.latitude},${photo.longitude}">${photo.latitude!.toStringAsFixed(4)}, ${photo.longitude!.toStringAsFixed(4)}</a>';
+            }
+            final note =
+                photo.note.isNotEmpty ? '<br><em>${photo.note}</em>' : '';
             buffer.writeln('<span>$caption<br>$ts$gps$note</span>');
             buffer.writeln('</div>');
           }
@@ -540,18 +569,27 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
           }
           buffer.writeln('<div style="display:flex;flex-wrap:wrap;">');
           for (var photo in photos) {
-            final labelText = photo.label.isNotEmpty ? photo.label : 'Unlabeled';
-            final damage = formatDamageLabel(photo.damageType, _metadata.inspectorRoles);
-            final caption = damage.isNotEmpty ? '$labelText - $damage' : labelText;
-            final containerClass = _template == 'side' ? 'class="photo"' : 'style="width:300px;margin:5px;text-align:center;"';
+            final labelText =
+                photo.label.isNotEmpty ? photo.label : 'Unlabeled';
+            final damage =
+                formatDamageLabel(photo.damageType, _metadata.inspectorRoles);
+            final caption =
+                damage.isNotEmpty ? '$labelText - $damage' : labelText;
+            final containerClass = _template == 'side'
+                ? 'class="photo"'
+                : 'style="width:300px;margin:5px;text-align:center;"';
             buffer.writeln('<div $containerClass>');
-            buffer.writeln('<img src="${photo.photoUrl}" width="300" height="300" style="object-fit:cover;"><br>');
-            final ts = photo.timestamp?.toLocal().toString().split('.').first ?? '';
+            buffer.writeln(
+                '<img src="${photo.photoUrl}" width="300" height="300" style="object-fit:cover;"><br>');
+            final ts =
+                photo.timestamp?.toLocal().toString().split('.').first ?? '';
             String gps = '';
             if (_showGps && photo.latitude != null && photo.longitude != null) {
-              gps = '<br><a href="https://www.google.com/maps/search/?api=1&query=${photo.latitude},${photo.longitude}">${photo.latitude!.toStringAsFixed(4)}, ${photo.longitude!.toStringAsFixed(4)}</a>';
+              gps =
+                  '<br><a href="https://www.google.com/maps/search/?api=1&query=${photo.latitude},${photo.longitude}">${photo.latitude!.toStringAsFixed(4)}, ${photo.longitude!.toStringAsFixed(4)}</a>';
             }
-            final note = photo.note.isNotEmpty ? '<br><em>${photo.note}</em>' : '';
+            final note =
+                photo.note.isNotEmpty ? '<br><em>${photo.note}</em>' : '';
             buffer.writeln('<span>$caption<br>$ts$gps$note</span>');
             buffer.writeln('</div>');
           }
@@ -613,8 +651,10 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
   }
 
   void _openMap(double lat, double lng) {
-    final uri = Uri.parse('https://www.google.com/maps/search/?api=1&query=$lat,$lng');
-    url_launcher.launchUrl(uri, mode: url_launcher.LaunchMode.externalApplication);
+    final uri =
+        Uri.parse('https://www.google.com/maps/search/?api=1&query=$lat,$lng');
+    url_launcher.launchUrl(uri,
+        mode: url_launcher.LaunchMode.externalApplication);
   }
 
   Future<void> _dictate(TextEditingController controller, String field) async {
@@ -686,7 +726,6 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
   Future<List<pw.Widget>> _buildPdfWidgets() async {
     final List<pw.Widget> widgets = [];
 
-
     Future<pw.Widget> buildWrap(List<ReportPhotoEntry> photos) async {
       final items = <pw.Widget>[];
       for (var photo in photos) {
@@ -710,10 +749,8 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
                     textAlign: pw.TextAlign.center,
                     style: const pw.TextStyle(fontSize: 12)),
                 pw.Text(
-                    photo.timestamp
-                        ?.toLocal()
-                        .toString()
-                        .split('.').first ?? '',
+                    photo.timestamp?.toLocal().toString().split('.').first ??
+                        '',
                     style: const pw.TextStyle(fontSize: 10)),
                 if (_showGps &&
                     photo.latitude != null &&
@@ -789,13 +826,13 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
           ...struct.sectionPhotos.keys
         };
 
-          for (final section in ordered) {
-            if (!otherSections.contains(section)) continue;
-            final photos = struct.sectionPhotos[section] ?? [];
-            if (photos.isEmpty) continue;
-            final label = section.replaceAll(' & Accessories', '');
-            widgets.add(_pdfSectionHeader(label));
-            final issues = _collectIssues(photos);
+        for (final section in ordered) {
+          if (!otherSections.contains(section)) continue;
+          final photos = struct.sectionPhotos[section] ?? [];
+          if (photos.isEmpty) continue;
+          final label = section.replaceAll(' & Accessories', '');
+          widgets.add(_pdfSectionHeader(label));
+          final issues = _collectIssues(photos);
           if (issues.isNotEmpty) {
             widgets.add(pw.Column(
                 crossAxisAlignment: pw.CrossAxisAlignment.start,
@@ -806,18 +843,18 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
                 ]));
             widgets.add(pw.SizedBox(height: 8));
           }
-            widgets.add(await buildWrap(photos));
+          widgets.add(await buildWrap(photos));
           widgets.add(pw.SizedBox(height: 20));
         }
 
-          for (final entry in struct.sectionPhotos.entries) {
-            if (ordered.contains(entry.key) || establishing.contains(entry.key)) {
-              continue;
-            }
-            final photos = entry.value;
-            if (photos.isEmpty) continue;
-            widgets.add(_pdfSectionHeader(entry.key));
-            final issues = _collectIssues(photos);
+        for (final entry in struct.sectionPhotos.entries) {
+          if (ordered.contains(entry.key) || establishing.contains(entry.key)) {
+            continue;
+          }
+          final photos = entry.value;
+          if (photos.isEmpty) continue;
+          widgets.add(_pdfSectionHeader(entry.key));
+          final issues = _collectIssues(photos);
           if (issues.isNotEmpty) {
             widgets.add(pw.Column(
                 crossAxisAlignment: pw.CrossAxisAlignment.start,
@@ -828,7 +865,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
                 ]));
             widgets.add(pw.SizedBox(height: 8));
           }
-            widgets.add(await buildWrap(photos));
+          widgets.add(await buildWrap(photos));
           widgets.add(pw.SizedBox(height: 20));
         }
       }
@@ -871,99 +908,106 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
                 mainAxisAlignment: pw.MainAxisAlignment.center,
                 crossAxisAlignment: pw.CrossAxisAlignment.center,
                 children: [
-                pw.Image(pw.MemoryImage(logoBytes), width: 150),
-                pw.SizedBox(height: 20),
-                pw.Text(
-                  'Roof Inspection Report',
-                  style: pw.TextStyle(
-                    fontSize: 24,
-                    fontWeight: pw.FontWeight.bold,
-                    color: PdfColor.fromInt(_theme.primaryColor),
-                  ),
-                ),
-                pw.SizedBox(height: 10),
-                pw.Text(
-                  _metadata.inspectorRoles.contains(InspectorReportRole.adjuster)
-                      ? 'Prepared from Adjuster Perspective'
-                      : 'Prepared by: Third-Party Inspector',
-                  style: pw.TextStyle(
-                    fontSize: 18,
-                    color: PdfColor.fromInt(_theme.primaryColor),
-                  ),
-                ),
-                pw.SizedBox(height: 20),
-                pw.Text('Client Name: ${_metadata.clientName}'),
-                pw.Text('Property Address: ${_metadata.propertyAddress}'),
-                pw.Text('Inspection Date: ${_metadata.inspectionDate.toLocal().toString().split(' ')[0]}'),
-                pw.Text('Insurance Carrier: ${_metadata.insuranceCarrier}'),
-                pw.Text('Peril Type: ${_metadata.perilType.name}'),
-                pw.Text('Inspection Type: ${_metadata.inspectionType.name}'),
-                pw.Text('Inspector Role: ${_metadata.inspectorRoles.map((e) => e.name.replaceAll('_', ' ')).join(', ')}'),
-                pw.Text('Inspector Name: ${_metadata.inspectorName}'),
-                pw.SizedBox(height: 20),
-                if ((_aiSummary?.status == 'approved' ||
-                        _aiSummary?.status == 'edited') &&
-                    (_adjusterSummaryController.text.isNotEmpty ||
-                        _homeownerSummaryController.text.isNotEmpty))
-                  pw.Container(
-                    width: double.infinity,
-                    padding: const pw.EdgeInsets.all(8),
-                    decoration:
-                        pw.BoxDecoration(border: pw.Border.all(color: PdfColors.grey)),
-                    child: pw.Column(
-                      crossAxisAlignment: pw.CrossAxisAlignment.start,
-                      children: [
-                        pw.Text('Inspection Summary',
-                            style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-                        if (_adjusterSummaryController.text.isNotEmpty) ...[
-                          pw.SizedBox(height: 4),
-                          pw.Text('For Adjuster: ${_adjusterSummaryController.text}'),
-                        ],
-                        if (_homeownerSummaryController.text.isNotEmpty) ...[
-                          pw.SizedBox(height: 4),
-                          pw.Text('For Homeowner: ${_homeownerSummaryController.text}'),
-                        ],
-                        if (_aiSummary?.editor != null)
-                          pw.Padding(
-                            padding: const pw.EdgeInsets.only(top: 4),
-                            child: pw.Text(
-                                'Reviewed by ${_aiSummary!.editor} on ${_aiSummary!.editedAt?.toLocal().toString().split(' ')[0]}',
-                                style: const pw.TextStyle(fontSize: 10)),
-                          )
-                      ],
+                  pw.Image(pw.MemoryImage(logoBytes), width: 150),
+                  pw.SizedBox(height: 20),
+                  pw.Text(
+                    'Roof Inspection Report',
+                    style: pw.TextStyle(
+                      fontSize: 24,
+                      fontWeight: pw.FontWeight.bold,
+                      color: PdfColor.fromInt(_theme.primaryColor),
                     ),
                   ),
-                if (_summaryController.text.isNotEmpty)
-                  pw.Container(
-                    width: double.infinity,
-                    padding: const pw.EdgeInsets.all(8),
-                    decoration: pw.BoxDecoration(
-                        border: pw.Border.all(color: PdfColors.grey)),
-                    child: pw.Column(
-                      crossAxisAlignment: pw.CrossAxisAlignment.start,
-                      children: [
-                        pw.Text('Inspector Notes / Summary',
-                            style: pw.TextStyle(
-                                fontWeight: pw.FontWeight.bold)),
-                        pw.SizedBox(height: 4),
-                        pw.Text(_summaryController.text),
-                        if (_jobCostController.text.isNotEmpty)
-                          pw.Text('Estimated Job Cost: ${_jobCostController.text}'),
-                      ],
+                  pw.SizedBox(height: 10),
+                  pw.Text(
+                    _metadata.inspectorRoles
+                            .contains(InspectorReportRole.adjuster)
+                        ? 'Prepared from Adjuster Perspective'
+                        : 'Prepared by: Third-Party Inspector',
+                    style: pw.TextStyle(
+                      fontSize: 18,
+                      color: PdfColor.fromInt(_theme.primaryColor),
                     ),
                   ),
-                pw.SizedBox(height: 20),
-                pw.Text(
-                  _coverDisclaimer,
-                  style: const pw.TextStyle(fontSize: 12),
-                  textAlign: pw.TextAlign.center,
-                ),
-              ],
+                  pw.SizedBox(height: 20),
+                  pw.Text('Client Name: ${_metadata.clientName}'),
+                  pw.Text('Property Address: ${_metadata.propertyAddress}'),
+                  pw.Text(
+                      'Inspection Date: ${_metadata.inspectionDate.toLocal().toString().split(' ')[0]}'),
+                  pw.Text('Insurance Carrier: ${_metadata.insuranceCarrier}'),
+                  pw.Text('Peril Type: ${_metadata.perilType.name}'),
+                  pw.Text('Inspection Type: ${_metadata.inspectionType.name}'),
+                  pw.Text(
+                      'Inspector Role: ${_metadata.inspectorRoles.map((e) => e.name.replaceAll('_', ' ')).join(', ')}'),
+                  pw.Text('Inspector Name: ${_metadata.inspectorName}'),
+                  pw.SizedBox(height: 20),
+                  if ((_aiSummary?.status == 'approved' ||
+                          _aiSummary?.status == 'edited') &&
+                      (_adjusterSummaryController.text.isNotEmpty ||
+                          _homeownerSummaryController.text.isNotEmpty))
+                    pw.Container(
+                      width: double.infinity,
+                      padding: const pw.EdgeInsets.all(8),
+                      decoration: pw.BoxDecoration(
+                          border: pw.Border.all(color: PdfColors.grey)),
+                      child: pw.Column(
+                        crossAxisAlignment: pw.CrossAxisAlignment.start,
+                        children: [
+                          pw.Text('Inspection Summary',
+                              style:
+                                  pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                          if (_adjusterSummaryController.text.isNotEmpty) ...[
+                            pw.SizedBox(height: 4),
+                            pw.Text(
+                                'For Adjuster: ${_adjusterSummaryController.text}'),
+                          ],
+                          if (_homeownerSummaryController.text.isNotEmpty) ...[
+                            pw.SizedBox(height: 4),
+                            pw.Text(
+                                'For Homeowner: ${_homeownerSummaryController.text}'),
+                          ],
+                          if (_aiSummary?.editor != null)
+                            pw.Padding(
+                              padding: const pw.EdgeInsets.only(top: 4),
+                              child: pw.Text(
+                                  'Reviewed by ${_aiSummary!.editor} on ${_aiSummary!.editedAt?.toLocal().toString().split(' ')[0]}',
+                                  style: const pw.TextStyle(fontSize: 10)),
+                            )
+                        ],
+                      ),
+                    ),
+                  if (_summaryController.text.isNotEmpty)
+                    pw.Container(
+                      width: double.infinity,
+                      padding: const pw.EdgeInsets.all(8),
+                      decoration: pw.BoxDecoration(
+                          border: pw.Border.all(color: PdfColors.grey)),
+                      child: pw.Column(
+                        crossAxisAlignment: pw.CrossAxisAlignment.start,
+                        children: [
+                          pw.Text('Inspector Notes / Summary',
+                              style:
+                                  pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                          pw.SizedBox(height: 4),
+                          pw.Text(_summaryController.text),
+                          if (_jobCostController.text.isNotEmpty)
+                            pw.Text(
+                                'Estimated Job Cost: ${_jobCostController.text}'),
+                        ],
+                      ),
+                    ),
+                  pw.SizedBox(height: 20),
+                  pw.Text(
+                    _coverDisclaimer,
+                    style: const pw.TextStyle(fontSize: 12),
+                    textAlign: pw.TextAlign.center,
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
-      ),
-    )
+          ],
+        ),
+      )
       ..addPage(
         pw.MultiPage(
           footer: (context) => pw.Container(
@@ -986,11 +1030,13 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
             pw.Header(level: 0, text: 'ClearSky Photo Report'),
             pw.Text('Client Name: ${_metadata.clientName}'),
             pw.Text('Property Address: ${_metadata.propertyAddress}'),
-            pw.Text('Inspection Date: ${_metadata.inspectionDate.toLocal().toString().split(' ')[0]}'),
+            pw.Text(
+                'Inspection Date: ${_metadata.inspectionDate.toLocal().toString().split(' ')[0]}'),
             pw.Text('Insurance Carrier: ${_metadata.insuranceCarrier}'),
             pw.Text('Peril Type: ${_metadata.perilType.name}'),
             pw.Text('Inspection Type: ${_metadata.inspectionType.name}'),
-            pw.Text('Inspector Role: ${_metadata.inspectorRoles.map((e) => e.name.replaceAll('_', ' ')).join(', ')}'),
+            pw.Text(
+                'Inspector Role: ${_metadata.inspectorRoles.map((e) => e.name.replaceAll('_', ' ')).join(', ')}'),
             pw.Text('Inspector Name: ${_metadata.inspectorName}'),
             pw.SizedBox(height: 20),
             pw.Text('Inspection Checklist',
@@ -1003,14 +1049,18 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
                   pw.Row(children: [
                     pw.Text(step.isComplete ? '✓' : '✗',
                         style: pw.TextStyle(
-                            color: step.isComplete ? PdfColors.black : PdfColors.red)),
+                            color: step.isComplete
+                                ? PdfColors.black
+                                : PdfColors.red)),
                     pw.SizedBox(width: 4),
                     pw.Text(
                       step.requiredPhotos > 0
                           ? '${step.title} (${step.photosTaken}/${step.requiredPhotos})'
                           : step.title,
                       style: pw.TextStyle(
-                          color: step.isComplete ? PdfColors.black : PdfColors.red),
+                          color: step.isComplete
+                              ? PdfColors.black
+                              : PdfColors.red),
                     ),
                   ])
               ],
@@ -1026,7 +1076,10 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
                 if (_signature != null)
                   pw.Image(pw.MemoryImage(_signature!), height: 80)
                 else
-                  pw.Container(height: 1, width: double.infinity, color: PdfColors.black),
+                  pw.Container(
+                      height: 1,
+                      width: double.infinity,
+                      color: PdfColors.black),
                 pw.Text('${_metadata.inspectorName} – $dateStr'),
               ],
             ),
@@ -1116,7 +1169,6 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
     await shareReportFile(_exportedFile!, subject: subject, text: body);
   }
 
-
   void _previewFullReport() {
     final htmlContent = generateHtmlPreview(null);
     Navigator.push(
@@ -1164,7 +1216,8 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
               children: [
                 Text('Client Name: ${_metadata.clientName}'),
                 Text('Property Address: ${_metadata.propertyAddress}'),
-                Text('Inspection Date: ${_metadata.inspectionDate.toLocal().toString().split(" ")[0]}'),
+                Text(
+                    'Inspection Date: ${_metadata.inspectionDate.toLocal().toString().split(" ")[0]}'),
                 Text('Insurance Carrier: ${_metadata.insuranceCarrier}'),
                 Text('Peril Type: ${_metadata.perilType.name}'),
                 Text('Inspection Type: ${_metadata.inspectionType.name}'),
@@ -1189,11 +1242,15 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
                                       }
                                       _metadata = InspectionMetadata(
                                         clientName: _metadata.clientName,
-                                        propertyAddress: _metadata.propertyAddress,
-                                        inspectionDate: _metadata.inspectionDate,
-                                        insuranceCarrier: _metadata.insuranceCarrier,
+                                        propertyAddress:
+                                            _metadata.propertyAddress,
+                                        inspectionDate:
+                                            _metadata.inspectionDate,
+                                        insuranceCarrier:
+                                            _metadata.insuranceCarrier,
                                         perilType: _metadata.perilType,
-                                        inspectionType: _metadata.inspectionType,
+                                        inspectionType:
+                                            _metadata.inspectionType,
                                         inspectorName: _metadata.inspectorName,
                                         inspectorRoles: _selectedRole,
                                         reportId: _metadata.reportId,
@@ -1224,8 +1281,8 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
                     width: double.infinity,
                     margin: const EdgeInsets.only(bottom: 16),
                     padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey)),
+                    decoration:
+                        BoxDecoration(border: Border.all(color: Colors.grey)),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -1246,11 +1303,12 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
                       suffixIcon: IconButton(
                         icon: const Icon(Icons.mic),
                         tooltip: 'Dictate summary',
-                        onPressed: () => _dictate(_summaryController, 'summary'),
+                        onPressed: () =>
+                            _dictate(_summaryController, 'summary'),
                       ),
                     ),
-                  maxLines: 3,
-                ),
+                    maxLines: 3,
+                  ),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
@@ -1267,8 +1325,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
               children: [
                 _summaryField(_adjusterSummaryController, 'Adjuster Summary'),
                 const SizedBox(height: 8),
-                _summaryField(
-                    _homeownerSummaryController, 'Homeowner Summary'),
+                _summaryField(_homeownerSummaryController, 'Homeowner Summary'),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
@@ -1284,9 +1341,9 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
                     ),
                     const SizedBox(width: 8),
                     ElevatedButton(
-                      onPressed:
-                          _loadingSummary ? null : _regenerateWithRole,
-                      child: const Text('Regenerate Summary with Different Role'),
+                      onPressed: _loadingSummary ? null : _regenerateWithRole,
+                      child:
+                          const Text('Regenerate Summary with Different Role'),
                     ),
                     const SizedBox(width: 8),
                     ElevatedButton(
@@ -1378,37 +1435,43 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
                             mainAxisSpacing: 6,
                           ),
                           itemBuilder: (context, index) {
-                              final photo = group.value[index];
-                            final label =
-                                photo.label.isNotEmpty ? photo.label : 'Unlabeled';
+                            final photo = group.value[index];
+                            final label = photo.label.isNotEmpty
+                                ? photo.label
+                                : 'Unlabeled';
                             return Column(
                               children: [
-                                  AspectRatio(
-                                    aspectRatio: 1,
-                                    child: Image.network(photo.photoUrl, fit: BoxFit.cover),
-                                  ),
+                                AspectRatio(
+                                  aspectRatio: 1,
+                                  child: Image.network(photo.photoUrl,
+                                      fit: BoxFit.cover),
+                                ),
                                 Padding(
                                   padding: const EdgeInsets.all(4.0),
                                   child: Column(
                                     children: [
                                       Text(label),
-                                        Text(
-                                          photo.timestamp
-                                              ?.toLocal()
-                                              .toString()
-                                              .split('.').first ?? '',
-                                          style: const TextStyle(fontSize: 10),
-                                        ),
+                                      Text(
+                                        photo.timestamp
+                                                ?.toLocal()
+                                                .toString()
+                                                .split('.')
+                                                .first ??
+                                            '',
+                                        style: const TextStyle(fontSize: 10),
+                                      ),
                                       if (_showGps &&
                                           photo.latitude != null &&
                                           photo.longitude != null)
                                         GestureDetector(
-                                          onTap: () => _openMap(photo.latitude!, photo.longitude!),
+                                          onTap: () => _openMap(photo.latitude!,
+                                              photo.longitude!),
                                           child: Text(
                                             '${photo.latitude!.toStringAsFixed(4)}, ${photo.longitude!.toStringAsFixed(4)}',
                                             style: const TextStyle(
                                                 fontSize: 10,
-                                                decoration: TextDecoration.underline),
+                                                decoration:
+                                                    TextDecoration.underline),
                                           ),
                                         ),
                                       if (photo.note.isNotEmpty)
@@ -1442,7 +1505,8 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blueAccent,
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 12),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
@@ -1454,7 +1518,8 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blueAccent,
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 12),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
@@ -1492,27 +1557,27 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
-              ),
-              onPressed: _shareReport,
-              child: const Text('Share Report'),
-            ),
-            if (_gpsPhotos().isNotEmpty)
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => PhotoMapScreen(photos: _gpsPhotos()),
                     ),
-                  );
-                },
-              child: const Text('View Inspection Map'),
+                    onPressed: _shareReport,
+                    child: const Text('Share Report'),
+                  ),
+                if (_gpsPhotos().isNotEmpty)
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => PhotoMapScreen(photos: _gpsPhotos()),
+                        ),
+                      );
+                    },
+                    child: const Text('View Inspection Map'),
+                  ),
+                const AiDisclaimerBanner(),
+              ],
             ),
-          const AiDisclaimerBanner(),
-          ],
-        ),
-      ),
-      if (!widget.readOnly) ...[
+          ),
+          if (!widget.readOnly) ...[
             Padding(
               padding: const EdgeInsets.only(bottom: 16),
               child: ElevatedButton(
@@ -1547,4 +1612,3 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
     );
   }
 }
-

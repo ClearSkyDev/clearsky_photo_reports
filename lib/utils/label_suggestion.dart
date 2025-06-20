@@ -54,4 +54,3 @@ Future<LabelSuggestion> getLabelSuggestion(
     reason: 'Placeholder AI analysis',
   );
 }
-

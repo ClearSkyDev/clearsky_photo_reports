@@ -77,7 +77,8 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
                         child: const CircleAvatar(
                           radius: 12,
                           backgroundColor: Colors.black54,
-                          child: Icon(Icons.close, size: 14, color: Colors.white),
+                          child:
+                              Icon(Icons.close, size: 14, color: Colors.white),
                         ),
                       ),
                     ),

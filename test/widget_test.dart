@@ -4,7 +4,8 @@ import 'package:clearsky_photo_reports/screens/client_dashboard_screen.dart';
 import 'package:clearsky_photo_reports/models/inspection_report.dart';
 
 void main() {
-  testWidgets('Dashboard loads and new inspection triggers snackBar', (WidgetTester tester) async {
+  testWidgets('Dashboard loads and new inspection triggers snackBar',
+      (WidgetTester tester) async {
     // Build the widget tree
     await tester.pumpWidget(
       const MaterialApp(
@@ -26,7 +27,8 @@ void main() {
     expect(find.text('New Inspection button tapped'), findsOneWidget);
   });
 
-  testWidgets('Dashboard shows a list of inspections', (WidgetTester tester) async {
+  testWidgets('Dashboard shows a list of inspections',
+      (WidgetTester tester) async {
     // Create fake reports
     final reports = [
       InspectionReport(id: '1', title: 'Roof A', synced: false),

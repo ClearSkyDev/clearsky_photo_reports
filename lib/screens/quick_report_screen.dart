@@ -43,8 +43,7 @@ class _QuickReportScreenState extends State<QuickReportScreen> {
   }
 
   Future<void> _pick() async {
-    final XFile? image =
-        await _picker.pickImage(source: ImageSource.camera);
+    final XFile? image = await _picker.pickImage(source: ImageSource.camera);
     if (image == null) return;
     setState(() {
       _photos[_step] = ReportPhotoEntry(
@@ -76,10 +75,12 @@ class _QuickReportScreenState extends State<QuickReportScreen> {
         name: 'Main Structure',
         address: _addressController.text,
         sectionPhotos: {
-      for (var i = 0; i < _labels.length; i++)
-        _labels[i]: _photos[i] != null ? [_photos[i]!] : []
-    },
-        slopeTestSquare: {'Roof Slopes': _includeTestSquare});
+          for (var i = 0; i < _labels.length; i++)
+            _labels[i]: _photos[i] != null ? [_photos[i]!] : []
+        },
+        slopeTestSquare: {
+          'Roof Slopes': _includeTestSquare
+        });
     final metadata = {
       'clientName': '',
       'propertyAddress': _addressController.text,
@@ -147,8 +148,7 @@ class _QuickReportScreenState extends State<QuickReportScreen> {
           if (_step == 0)
             TextField(
               controller: _addressController,
-              decoration:
-                  const InputDecoration(labelText: 'Property Address'),
+              decoration: const InputDecoration(labelText: 'Property Address'),
             ),
           const SizedBox(height: 12),
           ElevatedButton.icon(

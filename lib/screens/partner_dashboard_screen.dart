@@ -12,9 +12,8 @@ class PartnerDashboardScreen extends StatelessWidget {
         .collection('reports')
         .where('partnerId', isEqualTo: partnerId)
         .snapshots()
-        .map((s) => s.docs
-            .map((d) => SavedReport.fromMap(d.data(), d.id))
-            .toList());
+        .map((s) =>
+            s.docs.map((d) => SavedReport.fromMap(d.data(), d.id)).toList());
   }
 
   @override
@@ -28,8 +27,7 @@ class PartnerDashboardScreen extends StatelessWidget {
             return const Center(child: CircularProgressIndicator());
           }
           final reports = snapshot.data!;
-          final completed =
-              reports.where((r) => r.isFinalized).toList().length;
+          final completed = reports.where((r) => r.isFinalized).toList().length;
           final avgTurnaround = reports
               .where((r) => r.isFinalized)
               .map((r) => r.lastEditedAt!.difference(r.createdAt).inHours)
@@ -41,7 +39,8 @@ class PartnerDashboardScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Text('Total Referrals: ${reports.length}'),
-                Text('Completion Rate: ${reports.isEmpty ? 0 : (completed / reports.length * 100).toStringAsFixed(1)}%'),
+                Text(
+                    'Completion Rate: ${reports.isEmpty ? 0 : (completed / reports.length * 100).toStringAsFixed(1)}%'),
                 Text('Avg Turnaround: ${avg.toStringAsFixed(1)} hrs'),
                 const SizedBox(height: 16),
                 Expanded(

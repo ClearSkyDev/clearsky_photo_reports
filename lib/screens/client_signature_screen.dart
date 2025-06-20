@@ -33,7 +33,10 @@ class _ClientSignatureScreenState extends State<ClientSignatureScreen> {
       name: name,
       image: base64Encode(_signature!),
     );
-    await FirebaseFirestore.instance.collection('reports').doc(widget.reportId).update({
+    await FirebaseFirestore.instance
+        .collection('reports')
+        .doc(widget.reportId)
+        .update({
       'homeownerSignature': sig.toMap(),
       'signatureStatus': 'signed',
     });
@@ -67,7 +70,10 @@ class _ClientSignatureScreenState extends State<ClientSignatureScreen> {
       ),
     );
     if (reason == null) return;
-    await FirebaseFirestore.instance.collection('reports').doc(widget.reportId).update({
+    await FirebaseFirestore.instance
+        .collection('reports')
+        .doc(widget.reportId)
+        .update({
       'homeownerSignature': {
         'declined': true,
         'declineReason': reason,

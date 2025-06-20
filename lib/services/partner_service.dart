@@ -14,7 +14,7 @@ class PartnerService {
   }
 
   Stream<List<Partner>> streamPartners() {
-    return _partners.snapshots().map((s) =>
-        s.docs.map((d) => Partner.fromMap(d.id, d.data())).toList());
+    return _partners.snapshots().map(
+        (s) => s.docs.map((d) => Partner.fromMap(d.id, d.data())).toList());
   }
 }

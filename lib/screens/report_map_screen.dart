@@ -26,9 +26,7 @@ class _ReportMapScreenState extends State<ReportMapScreen> {
 
   Future<List<SavedReport>> _loadReports() async {
     final snap = await FirebaseFirestore.instance.collection('reports').get();
-    return snap.docs
-        .map((d) => SavedReport.fromMap(d.data(), d.id))
-        .toList();
+    return snap.docs.map((d) => SavedReport.fromMap(d.data(), d.id)).toList();
   }
 
   List<SavedReport> _applyFilters(List<SavedReport> reports) {
@@ -112,14 +110,15 @@ class _ReportMapScreenState extends State<ReportMapScreen> {
                         DropdownButton<String>(
                           value: _statusFilter,
                           onChanged: (val) {
-                            if (val != null) setState(() => _statusFilter = val);
+                            if (val != null)
+                              setState(() => _statusFilter = val);
                           },
                           items: const [
-                            DropdownMenuItem(
-                                value: 'all', child: Text('All')),
+                            DropdownMenuItem(value: 'all', child: Text('All')),
                             DropdownMenuItem(
                                 value: 'finalized', child: Text('Finalized')),
-                            DropdownMenuItem(value: 'draft', child: Text('Draft')),
+                            DropdownMenuItem(
+                                value: 'draft', child: Text('Draft')),
                           ],
                         ),
                       ],

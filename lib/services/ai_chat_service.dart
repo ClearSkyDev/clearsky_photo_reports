@@ -9,12 +9,20 @@ class AiChatService {
   final String apiKey;
   final String apiUrl;
 
-  AiChatService({required this.apiKey, this.apiUrl = 'https://api.openai.com/v1/chat/completions'});
+  AiChatService(
+      {required this.apiKey,
+      this.apiUrl = 'https://api.openai.com/v1/chat/completions'});
 
-  Future<ChatMessage> sendMessage({required String reportId, required String message, Map<String, dynamic>? context}) async {
+  Future<ChatMessage> sendMessage(
+      {required String reportId,
+      required String message,
+      Map<String, dynamic>? context}) async {
     final history = await loadMessages(reportId);
     final messages = <Map<String, String>>[
-      {'role': 'system', 'content': 'You are a helpful roof inspection assistant.'},
+      {
+        'role': 'system',
+        'content': 'You are a helpful roof inspection assistant.'
+      },
       if (context != null) {'role': 'system', 'content': jsonEncode(context)},
       for (final h in history) {'role': h.role, 'content': h.text},
       {'role': 'user', 'content': message},
@@ -42,7 +50,10 @@ class AiChatService {
       text: content.trim(),
       createdAt: DateTime.now(),
     );
-    await _storeMessage(reportId, ChatMessage(id: '', role: 'user', text: message, createdAt: DateTime.now()));
+    await _storeMessage(
+        reportId,
+        ChatMessage(
+            id: '', role: 'user', text: message, createdAt: DateTime.now()));
     await _storeMessage(reportId, reply);
     return reply;
   }

@@ -61,7 +61,8 @@ const List<ChecklistTemplate> defaultChecklists = [
         type: ChecklistFieldType.dropdown,
         options: ['Minor', 'Moderate', 'Severe'],
       ),
-      ChecklistItemTemplate(title: 'Adjuster Notes', type: ChecklistFieldType.text),
+      ChecklistItemTemplate(
+          title: 'Adjuster Notes', type: ChecklistFieldType.text),
     ],
   ),
   ChecklistTemplate(

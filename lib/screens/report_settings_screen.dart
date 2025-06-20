@@ -160,10 +160,9 @@ class _ReportSettingsScreenState extends State<ReportSettingsScreen> {
         _footerController.text = settings.footerText;
         _logoPath = settings.logoPath;
         _selectedColor = _colors.entries
-                .firstWhere(
-                    (e) => e.value.value == settings.primaryColor,
-                    orElse: () => const MapEntry('Blue', Colors.blue))
-                .key;
+            .firstWhere((e) => e.value.value == settings.primaryColor,
+                orElse: () => const MapEntry('Blue', Colors.blue))
+            .key;
         _includeDisclaimer = settings.includeDisclaimer;
         _showGpsData = settings.showGpsData;
         _autoLegalBackup = settings.autoLegalBackup;
@@ -171,10 +170,9 @@ class _ReportSettingsScreenState extends State<ReportSettingsScreen> {
         _signatureController.text = settings.emailSignature;
         _attachPdf = settings.attachPdf;
         _selectedTemplate = _templates.entries
-                .firstWhere(
-                    (e) => e.value == settings.template,
-                    orElse: () => const MapEntry('Standard', 'standard'))
-                .key;
+            .firstWhere((e) => e.value == settings.template,
+                orElse: () => const MapEntry('Standard', 'standard'))
+            .key;
       });
     }
     final ttsRaw = prefs.getString('tts_settings');
@@ -403,8 +401,7 @@ class _ReportSettingsScreenState extends State<ReportSettingsScreen> {
               trailing: const Icon(Icons.chevron_right),
               onTap: () => Navigator.push(
                 context,
-                MaterialPageRoute(
-                    builder: (_) => const ThemeSettingsScreen()),
+                MaterialPageRoute(builder: (_) => const ThemeSettingsScreen()),
               ),
             ),
             ListTile(

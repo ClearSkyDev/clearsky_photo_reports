@@ -17,7 +17,8 @@ class InspectorDashboardScreen extends StatefulWidget {
   const InspectorDashboardScreen({super.key});
 
   @override
-  State<InspectorDashboardScreen> createState() => _InspectorDashboardScreenState();
+  State<InspectorDashboardScreen> createState() =>
+      _InspectorDashboardScreenState();
 }
 
 class _InspectorDashboardScreenState extends State<InspectorDashboardScreen> {
@@ -35,10 +36,12 @@ class _InspectorDashboardScreenState extends State<InspectorDashboardScreen> {
 
   Future<List<SavedReport>> _loadReports() async {
     final firestore = FirebaseFirestore.instance;
-    Query query = firestore.collection('reports').orderBy('createdAt', descending: true);
+    Query query =
+        firestore.collection('reports').orderBy('createdAt', descending: true);
     final profile = await ProfileStorage.load();
     if (profile != null && profile.role != InspectorRole.admin) {
-      query = query.where('inspectionMetadata.inspectorName', isEqualTo: profile.name);
+      query = query.where('inspectionMetadata.inspectorName',
+          isEqualTo: profile.name);
     }
     final snap = await query.get();
     final remote = snap.docs
@@ -67,16 +70,20 @@ class _InspectorDashboardScreenState extends State<InspectorDashboardScreen> {
         final name = meta.clientName.toLowerCase();
         final addr = meta.propertyAddress.toLowerCase();
         final date = meta.inspectionDate.toLocal().toString().split(' ')[0];
-        if (!name.contains(query) && !addr.contains(query) && !date.contains(query)) {
+        if (!name.contains(query) &&
+            !addr.contains(query) &&
+            !date.contains(query)) {
           return false;
         }
       }
       if (_range != null) {
-        if (meta.inspectionDate.isBefore(_range!.start) || meta.inspectionDate.isAfter(_range!.end)) {
+        if (meta.inspectionDate.isBefore(_range!.start) ||
+            meta.inspectionDate.isAfter(_range!.end)) {
           return false;
         }
       }
-      if (_roleFilter != null && !meta.inspectorRoles.contains(_roleFilter)) return false;
+      if (_roleFilter != null && !meta.inspectorRoles.contains(_roleFilter))
+        return false;
       if (_statusFilter == 'draft' && r.isFinalized) return false;
       if (_statusFilter == 'final' && !r.isFinalized) return false;
       if (_statusFilter == 'shared' && r.publicViewLink == null) return false;
@@ -125,8 +132,10 @@ class _InspectorDashboardScreenState extends State<InspectorDashboardScreen> {
                   });
                   structs.add(InspectedStructure(
                     name: s.name,
-                    sectionPhotos:
-                        map as Map<String, List<ReportPhotoEntry>>, // ignore: cast_nullable_to_non_nullable
+                    sectionPhotos: map as Map<
+                        String,
+                        List<
+                            ReportPhotoEntry>>, // ignore: cast_nullable_to_non_nullable
                     slopeTestSquare: Map.from(s.slopeTestSquare),
                   ));
                 }
@@ -166,8 +175,10 @@ class _InspectorDashboardScreenState extends State<InspectorDashboardScreen> {
                   });
                   structs.add(InspectedStructure(
                     name: s.name,
-                    sectionPhotos:
-                        map as Map<String, List<ReportPhotoEntry>>, // ignore: cast_nullable_to_non_nullable
+                    sectionPhotos: map as Map<
+                        String,
+                        List<
+                            ReportPhotoEntry>>, // ignore: cast_nullable_to_non_nullable
                     slopeTestSquare: Map.from(s.slopeTestSquare),
                   ));
                 }
@@ -207,8 +218,10 @@ class _InspectorDashboardScreenState extends State<InspectorDashboardScreen> {
                   });
                   structs.add(InspectedStructure(
                     name: s.name,
-                    sectionPhotos:
-                        map as Map<String, List<ReportPhotoEntry>>, // ignore: cast_nullable_to_non_nullable
+                    sectionPhotos: map as Map<
+                        String,
+                        List<
+                            ReportPhotoEntry>>, // ignore: cast_nullable_to_non_nullable
                     slopeTestSquare: Map.from(s.slopeTestSquare),
                   ));
                 }
@@ -287,13 +300,17 @@ class _InspectorDashboardScreenState extends State<InspectorDashboardScreen> {
                         DropdownButton<String>(
                           value: _statusFilter,
                           onChanged: (val) {
-                            if (val != null) setState(() => _statusFilter = val);
+                            if (val != null)
+                              setState(() => _statusFilter = val);
                           },
                           items: const [
                             DropdownMenuItem(value: 'all', child: Text('All')),
-                            DropdownMenuItem(value: 'draft', child: Text('Draft')),
-                            DropdownMenuItem(value: 'final', child: Text('Final')),
-                            DropdownMenuItem(value: 'shared', child: Text('Shared')),
+                            DropdownMenuItem(
+                                value: 'draft', child: Text('Draft')),
+                            DropdownMenuItem(
+                                value: 'final', child: Text('Final')),
+                            DropdownMenuItem(
+                                value: 'shared', child: Text('Shared')),
                           ],
                         ),
                         const SizedBox(width: 8),

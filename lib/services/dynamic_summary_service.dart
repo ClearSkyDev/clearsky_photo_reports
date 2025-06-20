@@ -51,8 +51,7 @@ class DynamicSummaryService {
   Future<void> rewriteSection(String section, SavedReport report) async {
     final struct = report.structures.firstWhere(
       (s) => s.sectionPhotos.containsKey(section),
-      orElse: () =>
-          InspectedStructure(name: '', sectionPhotos: {section: []}),
+      orElse: () => InspectedStructure(name: '', sectionPhotos: {section: []}),
     );
     final subReport = SavedReport(
       inspectionMetadata: {
@@ -63,7 +62,9 @@ class DynamicSummaryService {
       structures: [
         InspectedStructure(
           name: struct.name,
-          sectionPhotos: {section: List.from(struct.sectionPhotos[section] ?? [])},
+          sectionPhotos: {
+            section: List.from(struct.sectionPhotos[section] ?? [])
+          },
         )
       ],
     );

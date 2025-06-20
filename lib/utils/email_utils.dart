@@ -50,7 +50,8 @@ Future<void> sendReportByEmail(
   try {
     await FlutterEmailSender.send(mail);
   } catch (_) {
-    await Share.shareXFiles([XFile(file.path)], subject: subject, text: message);
+    await Share.shareXFiles([XFile(file.path)],
+        subject: subject, text: message);
   }
 }
 
@@ -83,16 +84,15 @@ Future<void> sendReportEmail(
   bool attachPdf = true,
   List<ReportAttachment> attachments = const [],
 }) async {
-  final fullMessage = [message, if (signature.isNotEmpty) signature].join('\n\n');
+  final fullMessage =
+      [message, if (signature.isNotEmpty) signature].join('\n\n');
   if (attachPdf) {
     final localPaths = attachments
         .where((a) => !a.url.startsWith('http'))
         .map((a) => a.url)
         .toList();
     await sendReportByEmail(email, pdfBytes,
-        subject: subject,
-        message: fullMessage,
-        attachmentPaths: localPaths);
+        subject: subject, message: fullMessage, attachmentPaths: localPaths);
     return;
   }
   final url = await _uploadPdf(pdfBytes);
@@ -103,8 +103,12 @@ Future<void> sendReportEmail(
       links.add('$label: ${a.url}');
     }
   }
-  final body = [message, 'Download: $url', if (links.isNotEmpty) links.join('\n'), if (signature.isNotEmpty) signature]
-      .join('\n\n');
+  final body = [
+    message,
+    'Download: $url',
+    if (links.isNotEmpty) links.join('\n'),
+    if (signature.isNotEmpty) signature
+  ].join('\n\n');
   if (kIsWeb) {
     final mailto =
         'mailto:$email?subject=${Uri.encodeComponent(subject)}&body=${Uri.encodeComponent(body)}';

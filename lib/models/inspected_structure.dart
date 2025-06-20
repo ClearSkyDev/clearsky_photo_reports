@@ -40,8 +40,7 @@ class InspectedStructure {
       sections[key] = list;
     });
     final rooms = (map['interiorRooms'] as List?)
-            ?.map((e) =>
-                InteriorRoom.fromMap(Map<String, dynamic>.from(e)))
+            ?.map((e) => InteriorRoom.fromMap(Map<String, dynamic>.from(e)))
             .toList() ??
         [];
     final slopeFlags = Map<String, bool>.from(map['slopeTestSquare'] ?? {});

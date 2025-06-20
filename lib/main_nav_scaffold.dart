@@ -43,9 +43,12 @@ class _MainNavScaffoldState extends State<MainNavScaffold> {
         type: BottomNavigationBarType.fixed,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.photo_camera), label: 'Photos'),
-          BottomNavigationBarItem(icon: Icon(Icons.picture_as_pdf), label: 'Report'),
-          BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Settings'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.photo_camera), label: 'Photos'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.picture_as_pdf), label: 'Report'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.settings), label: 'Settings'),
         ],
       ),
     );

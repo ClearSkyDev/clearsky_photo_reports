@@ -1,4 +1,3 @@
-
 class ReportTheme {
   final String name;
   final int primaryColor;

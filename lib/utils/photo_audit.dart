@@ -32,8 +32,8 @@ class PhotoAuditIssue {
       structure: map['structure'] as String? ?? '',
       section: map['section'] as String? ?? '',
       issue: map['issue'] as String? ?? '',
-      photo:
-          ReportPhotoEntry.fromMap(Map<String, dynamic>.from(map['photo'] ?? {})),
+      photo: ReportPhotoEntry.fromMap(
+          Map<String, dynamic>.from(map['photo'] ?? {})),
       suggestion: map['suggestion'] as String?,
     );
   }
@@ -72,11 +72,11 @@ Future<PhotoAuditResult> photoAudit(SavedReport report) async {
           section: entry.key,
           issue: 'Missing required elevation photos',
           photo: ReportPhotoEntry(
-            label: '',
-            caption: '',
-            confidence: 0,
-            photoUrl: '',
-            timestamp: null),
+              label: '',
+              caption: '',
+              confidence: 0,
+              photoUrl: '',
+              timestamp: null),
         ));
       }
       for (final photo in entry.value) {
@@ -111,12 +111,12 @@ Future<PhotoAuditResult> photoAudit(SavedReport report) async {
           if (await file.exists()) {
             final bytes = await file.readAsBytes();
             final decoded = img.decodeImage(bytes);
-            if (decoded != null && (decoded.width < 800 || decoded.height < 600)) {
+            if (decoded != null &&
+                (decoded.width < 800 || decoded.height < 600)) {
               issues.add(PhotoAuditIssue(
                 structure: struct.name,
                 section: entry.key,
-                issue:
-                    'Low resolution (${decoded.width}x${decoded.height})',
+                issue: 'Low resolution (${decoded.width}x${decoded.height})',
                 photo: photo,
               ));
             }
@@ -154,8 +154,11 @@ Future<PhotoAuditResult> photoAudit(SavedReport report) async {
           duplicate = true;
         }
       }
-      if (!duplicate && a.photo.timestamp != null && b.photo.timestamp != null) {
-        final diff = a.photo.timestamp!.difference(b.photo.timestamp!).inSeconds.abs();
+      if (!duplicate &&
+          a.photo.timestamp != null &&
+          b.photo.timestamp != null) {
+        final diff =
+            a.photo.timestamp!.difference(b.photo.timestamp!).inSeconds.abs();
         if (diff <= 2) duplicate = true;
       }
       if (duplicate) {
@@ -195,4 +198,3 @@ double _blurScore(img.Image image) {
   }
   return variance / sobel.length;
 }
-

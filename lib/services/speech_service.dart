@@ -17,7 +17,8 @@ class SpeechService {
 
   bool get isListening => _speech.isListening;
 
-  Future<String?> record({required String fieldType, required String reportId}) async {
+  Future<String?> record(
+      {required String fieldType, required String reportId}) async {
     if (!_available) {
       _available = await _speech.initialize();
       if (!_available) return null;

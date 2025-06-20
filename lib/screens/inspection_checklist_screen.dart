@@ -7,7 +7,8 @@ class InspectionChecklistScreen extends StatefulWidget {
   const InspectionChecklistScreen({super.key});
 
   @override
-  State<InspectionChecklistScreen> createState() => _InspectionChecklistScreenState();
+  State<InspectionChecklistScreen> createState() =>
+      _InspectionChecklistScreenState();
 }
 
 class _InspectionChecklistScreenState extends State<InspectionChecklistScreen> {
@@ -106,7 +107,8 @@ class _InspectionChecklistScreenState extends State<InspectionChecklistScreen> {
                                 ))
                             .toList(),
                         onChanged: (val) => val != null
-                            ? inspectionChecklist.updateDropdown(step.title, val)
+                            ? inspectionChecklist.updateDropdown(
+                                step.title, val)
                             : null,
                       ),
                     );

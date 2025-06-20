@@ -53,8 +53,10 @@ class _DroneMediaUploadScreenState extends State<DroneMediaUploadScreen> {
                   value: _type,
                   onChanged: (v) => setState(() => _type = v!),
                   items: const [
-                    DropdownMenuItem(value: SourceType.drone, child: Text('Drone')),
-                    DropdownMenuItem(value: SourceType.thermal, child: Text('Thermal')),
+                    DropdownMenuItem(
+                        value: SourceType.drone, child: Text('Drone')),
+                    DropdownMenuItem(
+                        value: SourceType.thermal, child: Text('Thermal')),
                   ],
                 ),
                 const SizedBox(width: 8),
@@ -90,7 +92,8 @@ class _DroneMediaUploadScreenState extends State<DroneMediaUploadScreen> {
                   Positioned(
                     bottom: 4,
                     left: 4,
-                    child: Icon(_iconFor(_photos[i].sourceType), color: Colors.white),
+                    child: Icon(_iconFor(_photos[i].sourceType),
+                        color: Colors.white),
                   )
                 ],
               ),

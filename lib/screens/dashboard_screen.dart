@@ -74,7 +74,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             backgroundColor: Colors.red,
                             child: Text(
                               '${OfflineSyncService.instance.pendingCount}',
-                              style: const TextStyle(fontSize: 10, color: Colors.white),
+                              style: const TextStyle(
+                                  fontSize: 10, color: Colors.white),
                             ),
                           ),
                         ),
@@ -133,7 +134,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             if (widget.user.role == UserRole.admin)
               ElevatedButton(
-                onPressed: () => Navigator.pushNamed(context, '/signatureStatus'),
+                onPressed: () =>
+                    Navigator.pushNamed(context, '/signatureStatus'),
                 child: const Text('Signature Status'),
               ),
             if (widget.user.role == UserRole.admin)

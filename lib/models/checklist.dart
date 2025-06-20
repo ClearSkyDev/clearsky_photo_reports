@@ -101,7 +101,9 @@ class InspectionChecklist extends ChangeNotifier {
     for (final step in steps) {
       if (step.title == title) {
         step.photosTaken++;
-        if (!step.isComplete && step.photosTaken >= step.requiredPhotos && step.requiredPhotos > 0) {
+        if (!step.isComplete &&
+            step.photosTaken >= step.requiredPhotos &&
+            step.requiredPhotos > 0) {
           step.isComplete = true;
         }
         notifyListeners();

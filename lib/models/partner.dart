@@ -4,7 +4,11 @@ class Partner {
   final String code;
   final String email;
 
-  Partner({required this.id, required this.name, required this.code, required this.email});
+  Partner(
+      {required this.id,
+      required this.name,
+      required this.code,
+      required this.email});
 
   factory Partner.fromMap(String id, Map<String, dynamic> map) {
     return Partner(

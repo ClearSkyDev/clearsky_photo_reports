@@ -21,9 +21,11 @@ class AuthService {
       email: email,
       password: password,
     );
-    final user = InspectorUser(uid: cred.user!.uid, role: role, companyId: companyId);
+    final user =
+        InspectorUser(uid: cred.user!.uid, role: role, companyId: companyId);
     await _usersCollection.doc(user.uid).set(user.toMap());
-    await AuditLogService().logAction('sign_up', targetId: user.uid, targetType: 'user');
+    await AuditLogService()
+        .logAction('sign_up', targetId: user.uid, targetType: 'user');
     return user;
   }
 
@@ -41,7 +43,8 @@ class AuthService {
       androidInstallApp: true,
       androidMinimumVersion: '21',
     );
-    return _auth.sendSignInLinkToEmail(email: email, actionCodeSettings: settings);
+    return _auth.sendSignInLinkToEmail(
+        email: email, actionCodeSettings: settings);
   }
 
   Future<void> signInWithLink(String email, String link) {

@@ -19,8 +19,8 @@ class TtsService {
     final sp = await SharedPreferences.getInstance();
     final raw = sp.getString('tts_settings');
     if (raw != null) {
-      settings = TtsSettings.fromMap(
-          Map<String, dynamic>.from(jsonDecode(raw)));
+      settings =
+          TtsSettings.fromMap(Map<String, dynamic>.from(jsonDecode(raw)));
     }
     await _apply();
   }
@@ -29,7 +29,8 @@ class TtsService {
     await _tts.setLanguage(settings.language);
     await _tts.setSpeechRate(settings.rate);
     if (settings.voice.isNotEmpty) {
-      await _tts.setVoice({'name': settings.voice, 'locale': settings.language});
+      await _tts
+          .setVoice({'name': settings.voice, 'locale': settings.language});
     }
   }
 

@@ -8,7 +8,8 @@ class AiChatDrawer extends StatefulWidget {
   final String reportId;
   final Map<String, dynamic>? context;
   final String apiKey;
-  const AiChatDrawer({super.key, required this.reportId, required this.apiKey, this.context});
+  const AiChatDrawer(
+      {super.key, required this.reportId, required this.apiKey, this.context});
 
   @override
   State<AiChatDrawer> createState() => _AiChatDrawerState();
@@ -36,11 +37,13 @@ class _AiChatDrawerState extends State<AiChatDrawer> {
     final text = _controller.text.trim();
     if (text.isEmpty) return;
     setState(() {
-      _messages.add(ChatMessage(id: '', role: 'user', text: text, createdAt: DateTime.now()));
+      _messages.add(ChatMessage(
+          id: '', role: 'user', text: text, createdAt: DateTime.now()));
       _loading = true;
     });
     _controller.clear();
-    final reply = await _service.sendMessage(reportId: widget.reportId, message: text, context: widget.context);
+    final reply = await _service.sendMessage(
+        reportId: widget.reportId, message: text, context: widget.context);
     setState(() {
       _messages.add(reply);
       _loading = false;
@@ -55,7 +58,8 @@ class _AiChatDrawerState extends State<AiChatDrawer> {
           children: [
             const Padding(
               padding: EdgeInsets.all(8.0),
-              child: Text('ClearSky AI Assistant', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              child: Text('ClearSky AI Assistant',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             ),
             Expanded(
               child: ListView(
@@ -70,7 +74,8 @@ class _AiChatDrawerState extends State<AiChatDrawer> {
                   Expanded(
                     child: TextField(
                       controller: _controller,
-                      decoration: const InputDecoration(hintText: 'Ask a question'),
+                      decoration:
+                          const InputDecoration(hintText: 'Ask a question'),
                     ),
                   ),
                   IconButton(

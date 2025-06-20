@@ -26,7 +26,8 @@ class AdminAuditLogScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    logs.sort((a, b) => b.timestamp.compareTo(a.timestamp)); // Most recent first
+    logs.sort(
+        (a, b) => b.timestamp.compareTo(a.timestamp)); // Most recent first
 
     return Scaffold(
       appBar: AppBar(title: const Text('Audit Log')),
@@ -45,10 +46,12 @@ class AdminAuditLogScreen extends StatelessWidget {
                       children: [
                         Text('Target: ${log.target}'),
                         if (log.extraInfo != null)
-                          Text('Details: ${log.extraInfo!}', style: const TextStyle(fontSize: 13)),
+                          Text('Details: ${log.extraInfo!}',
+                              style: const TextStyle(fontSize: 13)),
                         Text(
                           _formatTime(log.timestamp),
-                          style: const TextStyle(color: Colors.grey, fontSize: 12),
+                          style:
+                              const TextStyle(color: Colors.grey, fontSize: 12),
                         ),
                       ],
                     ),
@@ -61,8 +64,10 @@ class AdminAuditLogScreen extends StatelessWidget {
   }
 
   String _formatTime(DateTime dt) {
-    final date = '${dt.year}-${dt.month.toString().padLeft(2, '0')}-${dt.day.toString().padLeft(2, '0')}';
-    final time = '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
+    final date =
+        '${dt.year}-${dt.month.toString().padLeft(2, '0')}-${dt.day.toString().padLeft(2, '0')}';
+    final time =
+        '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
     return '$date $time';
   }
 }

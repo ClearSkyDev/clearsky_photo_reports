@@ -30,8 +30,8 @@ class _LearningSettingsScreenState extends State<LearningSettingsScreen> {
   Future<void> _save() async {
     await LearningPreferences.setLearningEnabled(_enabled);
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Preferences saved')));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Preferences saved')));
     }
   }
 
@@ -41,16 +41,15 @@ class _LearningSettingsScreenState extends State<LearningSettingsScreen> {
       await AiFeedbackService.instance.clearHistory(uid);
     }
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('History cleared')));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('History cleared')));
     }
   }
 
   @override
   Widget build(BuildContext context) {
     if (!_loaded) {
-      return const Scaffold(
-          body: Center(child: CircularProgressIndicator()));
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
     return Scaffold(
       appBar: AppBar(title: const Text('AI Learning')),
@@ -63,10 +62,8 @@ class _LearningSettingsScreenState extends State<LearningSettingsScreen> {
           ),
           ListTile(
             title: const Text('View Edit History'),
-            onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (_) => const EditHistoryScreen())),
+            onTap: () => Navigator.push(context,
+                MaterialPageRoute(builder: (_) => const EditHistoryScreen())),
           ),
           ListTile(
             title: const Text('Reset History'),

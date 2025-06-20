@@ -85,7 +85,8 @@ class _PublicReportScreenState extends State<PublicReportScreen> {
                 style: TextStyle(fontWeight: FontWeight.bold)),
             Text(report.summaryText!),
             if (report.aiSummary?.editor != null)
-              Text('Reviewed by ${report.aiSummary!.editor} on ${report.aiSummary!.editedAt?.toLocal().toString().split(' ')[0]}',
+              Text(
+                  'Reviewed by ${report.aiSummary!.editor} on ${report.aiSummary!.editedAt?.toLocal().toString().split(' ')[0]}',
                   style: const TextStyle(fontSize: 12)),
             const SizedBox(height: 12),
           ],
@@ -103,8 +104,8 @@ class _PublicReportScreenState extends State<PublicReportScreen> {
                 runSpacing: 8,
                 children: [
                   for (final photo in entry.value)
-                    Image.network(photo.photoUrl, width: 120, height: 120,
-                        fit: BoxFit.cover),
+                    Image.network(photo.photoUrl,
+                        width: 120, height: 120, fit: BoxFit.cover),
                 ],
               ),
               const SizedBox(height: 12),
@@ -117,7 +118,8 @@ class _PublicReportScreenState extends State<PublicReportScreen> {
                 final result = await Navigator.push<bool>(
                   context,
                   MaterialPageRoute(
-                      builder: (_) => ClientSignatureScreen(reportId: reportId)),
+                      builder: (_) =>
+                          ClientSignatureScreen(reportId: reportId)),
                 );
                 if (result != null) {
                   setState(() {
@@ -140,7 +142,8 @@ class _PublicReportScreenState extends State<PublicReportScreen> {
           if (report.signatureStatus == 'declined' &&
               report.homeownerSignature != null) ...[
             const SizedBox(height: 8),
-            Text('Signature declined: ${report.homeownerSignature!.declineReason ?? ''}'),
+            Text(
+                'Signature declined: ${report.homeownerSignature!.declineReason ?? ''}'),
           ],
           const SizedBox(height: 16),
           ElevatedButton(
@@ -156,8 +159,7 @@ class _PublicReportScreenState extends State<PublicReportScreen> {
           const SizedBox(height: 24),
           TextField(
             controller: _commentController,
-            decoration:
-                const InputDecoration(labelText: 'Leave a comment'),
+            decoration: const InputDecoration(labelText: 'Leave a comment'),
             maxLines: 3,
           ),
           const SizedBox(height: 8),
@@ -171,7 +173,12 @@ class _PublicReportScreenState extends State<PublicReportScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => MessageThreadScreen(reportId: reportId, threadTitle: '', currentUserId: '', inspectorView: false,),
+                  builder: (_) => MessageThreadScreen(
+                    reportId: reportId,
+                    threadTitle: '',
+                    currentUserId: '',
+                    inspectorView: false,
+                  ),
                 ),
               );
             },
@@ -201,4 +208,3 @@ class _PublicReportScreenState extends State<PublicReportScreen> {
     );
   }
 }
-

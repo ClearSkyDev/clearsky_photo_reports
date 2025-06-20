@@ -52,7 +52,8 @@ class LocalReportStore {
           final pEntry = entry.value[i];
           final src = File(pEntry.photoUrl);
           final ext = p.extension(src.path);
-          final dest = p.join(reportDir.path, '${struct.name}_${entry.key}_$i$ext');
+          final dest =
+              p.join(reportDir.path, '${struct.name}_${entry.key}_$i$ext');
           if (await src.exists()) {
             await src.copy(dest);
           }
@@ -127,8 +128,7 @@ class LocalReportStore {
       final map = jsonDecode(data) as Map<String, dynamic>;
       final report = SavedReport.fromMap(map, id);
       if (inspectorName != null) {
-        final meta =
-            InspectionMetadata.fromMap(report.inspectionMetadata);
+        final meta = InspectionMetadata.fromMap(report.inspectionMetadata);
         if (meta.inspectorName != inspectorName) continue;
       }
       reports.add(report);
@@ -145,8 +145,8 @@ class LocalReportStore {
     if (!await dir.exists()) {
       await dir.create(recursive: true);
     }
-    final file = File(
-        p.join(dir.path, 'snapshot_${DateTime.now().millisecondsSinceEpoch}.json'));
+    final file = File(p.join(
+        dir.path, 'snapshot_${DateTime.now().millisecondsSinceEpoch}.json'));
     await file.writeAsString(jsonEncode(report.toMap()));
   }
 }

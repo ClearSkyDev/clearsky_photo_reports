@@ -92,8 +92,11 @@ class OfflineSyncService {
     final existing = await firestore.collection('reports').doc(draft.id).get();
     if (existing.exists) {
       final data = existing.data();
-      if (data != null && data['lastEditedAt'] != null && draft.lastEditedAt != null) {
-        final remote = DateTime.fromMillisecondsSinceEpoch(data['lastEditedAt']);
+      if (data != null &&
+          data['lastEditedAt'] != null &&
+          draft.lastEditedAt != null) {
+        final remote =
+            DateTime.fromMillisecondsSinceEpoch(data['lastEditedAt']);
         if (remote.isAfter(draft.lastEditedAt!)) {
           throw Exception('Conflict detected: remote version newer');
         }
@@ -159,9 +162,7 @@ class OfflineSyncService {
       final file = File(att.url);
       if (!await file.exists()) continue;
       final name = p.basename(att.url);
-      final ref = storage
-          .ref()
-          .child('reports/${draft.id}/attachments/$name');
+      final ref = storage.ref().child('reports/${draft.id}/attachments/$name');
       try {
         await ref.putFile(file);
         final url = await ref.getDownloadURL();
