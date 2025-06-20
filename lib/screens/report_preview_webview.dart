@@ -45,11 +45,17 @@ class _ReportPreviewWebViewState extends State<ReportPreviewWebView> {
     super.initState();
     if (kIsWeb) {
       _viewId = 'report-preview-${DateTime.now().millisecondsSinceEpoch}';
+      // Create a Blob URL for the HTML content
+      final blob = html.Blob(
+        <dynamic>[widget.html],
+        html.BlobPropertyBag(type: 'text/html'),
+      );
+      _blobUrl = html.URL.createObjectURL(blob);
       // ignore: undefined_prefixed_name
       ui.platformViewRegistry.registerViewFactory(
         _viewId!,
         (int viewId) {
-          final iframe = html.IFrameElement()
+          final iframe = html.HTMLIFrameElement()
             ..src = _blobUrl!
             ..style.border = 'none'
             ..style.width = '100%'
@@ -57,16 +63,13 @@ class _ReportPreviewWebViewState extends State<ReportPreviewWebView> {
           return iframe;
         },
       );
-      // Create a Blob URL for the HTML content
-      final blob = html.Blob([widget.html], 'text/html');
-      _blobUrl = html.Url.createObjectUrlFromBlob(blob);
     }
   }
 
   @override
   void dispose() {
     if (_blobUrl != null) {
-      html.Url.revokeObjectUrl(_blobUrl!);
+      html.URL.revokeObjectURL(_blobUrl!);
     }
     super.dispose();
   }
