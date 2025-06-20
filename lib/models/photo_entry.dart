@@ -5,6 +5,7 @@ class PhotoEntry {
   String? originalUrl;
   String label;
   String caption;
+  double confidence;
   double labelConfidence;
   String? labelReason;
   bool labelLoading;
@@ -27,6 +28,7 @@ class PhotoEntry {
     this.longitude,
     this.label = 'Unlabeled',
     this.caption = '',
+    this.confidence = 0,
     this.labelConfidence = 0,
     this.labelReason,
     this.labelLoading = false,

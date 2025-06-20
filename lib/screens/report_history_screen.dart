@@ -6,6 +6,7 @@ import '../models/inspection_metadata.dart';
 import '../models/inspection_type.dart';
 import '../models/photo_entry.dart';
 import '../models/inspected_structure.dart';
+import '../models/checklist_template.dart' show PerilType;
 import 'report_preview_screen.dart';
 import 'message_thread_screen.dart';
 import '../utils/template_store.dart';
@@ -400,8 +401,4 @@ class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
       ),
     );
   }
-}
-
-class PerilType {
-  static var values;
 }
