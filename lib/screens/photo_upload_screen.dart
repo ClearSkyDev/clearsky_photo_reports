@@ -110,7 +110,11 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => ReportPreviewScreen(photos: _photos),
+                      builder: (context) => ReportPreviewScreen(
+                        photos: _photos,
+                        metadata: widget.metadata,
+                        template: widget.template,
+                      ),
                     ),
                   );
                 }
