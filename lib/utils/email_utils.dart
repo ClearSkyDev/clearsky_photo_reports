@@ -26,13 +26,13 @@ Future<void> sendReportByEmail(
   if (kIsWeb) {
     final blob = html.Blob(<dynamic>[pdfBytes], 'application/pdf');
     final url = html.Url.createObjectUrlFromBlob(blob);
-    html.AnchorElement(href: url)
+    html.HTMLAnchorElement(href: url)
       ..setAttribute('download', 'report.pdf')
       ..click();
     html.Url.revokeObjectUrl(url);
     final mailto =
         'mailto:$email?subject=${Uri.encodeComponent(subject)}&body=${Uri.encodeComponent(message)}';
-    html.AnchorElement(href: mailto).click();
+    html.HTMLAnchorElement(href: mailto).click();
     return;
   }
 
@@ -108,7 +108,7 @@ Future<void> sendReportEmail(
   if (kIsWeb) {
     final mailto =
         'mailto:$email?subject=${Uri.encodeComponent(subject)}&body=${Uri.encodeComponent(body)}';
-    html.AnchorElement(href: mailto).click();
+    html.HTMLAnchorElement(href: mailto).click();
     return;
   }
   final mail = Email(

@@ -585,7 +585,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
     final blob = html.Blob(<dynamic>[bytes], 'text/html');
     final url = html.Url.createObjectUrlFromBlob(blob);
     final fileName = _metadataFileName('html');
-    html.AnchorElement(href: url)
+    html.HTMLAnchorElement(href: url)
       ..setAttribute("download", fileName)
       ..click();
     html.Url.revokeObjectUrl(url);
@@ -1016,7 +1016,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
     if (kIsWeb) {
       final blob = html.Blob(<dynamic>[bytes], 'application/pdf');
       final url = html.Url.createObjectUrlFromBlob(blob);
-      html.AnchorElement(href: url)
+      html.HTMLAnchorElement(href: url)
         ..setAttribute('download', fileName)
         ..click();
       html.Url.revokeObjectUrl(url);

@@ -51,7 +51,7 @@ Future<void> generateAndDownloadPdf(
   if (kIsWeb) {
     final blob = html.Blob(<dynamic>[bytes], 'application/pdf');
     final url = html.Url.createObjectUrlFromBlob(blob);
-    html.AnchorElement(href: url)
+    html.HTMLAnchorElement(href: url)
       ..setAttribute('download', 'report.pdf')
       ..click();
       html.Url.revokeObjectUrl(url);
@@ -80,7 +80,7 @@ Future<void> generateAndDownloadHtml(
   if (kIsWeb) {
     final blob = html.Blob(<dynamic>[bytes], 'text/html');
     final url = html.Url.createObjectUrlFromBlob(blob);
-    html.AnchorElement(href: url)
+    html.HTMLAnchorElement(href: url)
       ..setAttribute('download', 'report.html')
       ..click();
     html.Url.revokeObjectUrl(url);
@@ -150,7 +150,7 @@ Future<File?> exportAsZip(SavedReport report) async {
   if (kIsWeb) {
     final blob = html.Blob(<dynamic>[zipData], 'application/zip');
     final url = html.Url.createObjectUrlFromBlob(blob);
-    html.AnchorElement(href: url)
+    html.HTMLAnchorElement(href: url)
       ..setAttribute('download', fileName)
       ..click();
     html.Url.revokeObjectUrl(url);
@@ -229,7 +229,7 @@ Future<File?> exportFinalZip(SavedReport report,
         'type': 'zip',
       });
     } catch (_) {}
-    html.AnchorElement(href: url)
+    html.HTMLAnchorElement(href: url)
       ..target = '_blank'
       ..click();
     return null;
@@ -341,7 +341,7 @@ Future<File?> exportLegalCopy(SavedReport report,
     final url = await ref.getDownloadURL();
     await logExport(url);
     if (kIsWeb && !auto) {
-      html.AnchorElement(href: url)
+      html.HTMLAnchorElement(href: url)
         ..target = '_blank'
         ..click();
     }
@@ -954,7 +954,7 @@ Future<File?> exportCsv(SavedReport report) async {
   if (kIsWeb) {
     final blob = html.Blob(<dynamic>[bytes], 'text/csv');
     final url = html.Url.createObjectUrlFromBlob(blob);
-    html.AnchorElement(href: url)
+    html.HTMLAnchorElement(href: url)
       ..setAttribute('download', fileName)
       ..click();
     html.Url.revokeObjectUrl(url);
