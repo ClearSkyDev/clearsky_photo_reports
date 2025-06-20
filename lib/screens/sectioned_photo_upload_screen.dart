@@ -278,8 +278,8 @@ class _SectionedPhotoUploadScreenState extends State<SectionedPhotoUploadScreen>
                     ),
                 ],
               ),
-          ],
-        ),
+            ),
+        ],
       ),
     );
   }
