@@ -701,7 +701,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
       } catch (_) {
         text = generateSummaryText(report);
       } finally {
-        if (Navigator.of(context).canPop()) {
+        if (mounted && Navigator.of(context).canPop()) {
           Navigator.of(context).pop();
         }
       }
@@ -905,6 +905,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
       type: FileType.custom,
       allowedExtensions: ['pdf', 'docx', 'csv'],
     );
+    if (!mounted) return;
     if (result != null && result.files.single.path != null) {
       final path = result.files.single.path!;
       final name = p.basename(path);
@@ -960,6 +961,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
       _auditPassed = result.passed;
       _auditIssues = result.issues;
     });
+    if (!mounted) return;
     _showAuditDialog();
   }
 
@@ -1076,6 +1078,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
     String signature = '';
     bool attachPdf = true;
     final prefs = await SharedPreferences.getInstance();
+    if (!mounted) return;
     final raw = prefs.getString('report_settings');
     if (raw != null) {
       final map = jsonDecode(raw) as Map<String, dynamic>;
