@@ -63,9 +63,11 @@ class NotificationService {
     await sp.setString('notif_prefs', jsonEncode(prefs.toMap()));
   }
 
+  @pragma('vm:entry-point')
   static Future<void> _backgroundHandler(RemoteMessage message) async {
     await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform);
+    await NotificationService.instance._loadPrefs();
     NotificationService.instance._showNotification(message);
   }
 
