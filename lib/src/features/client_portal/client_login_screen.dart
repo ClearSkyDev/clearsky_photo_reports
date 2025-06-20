@@ -51,6 +51,14 @@ class _ClientLoginScreenState extends State<ClientLoginScreen> {
   }
 
   @override
+  void dispose() {
+    _email.dispose();
+    _password.dispose();
+    _link.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Client Login')),
