@@ -582,16 +582,13 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
 
   void _saveHtmlFile(String htmlContent) {
     final bytes = utf8.encode(htmlContent);
-    final blob = html.Blob(
-      <dynamic>[bytes],
-      html.BlobPropertyBag(type: 'text/html'),
-    );
-    final url = html.URL.createObjectURL(blob);
+    final blob = html.Blob(<dynamic>[bytes], 'text/html');
+    final url = html.Url.createObjectUrlFromBlob(blob);
     final fileName = _metadataFileName('html');
     html.AnchorElement(href: url)
       ..setAttribute("download", fileName)
       ..click();
-    html.URL.revokeObjectURL(url);
+    html.Url.revokeObjectUrl(url);
   }
 
   void _openMap(double lat, double lng) {
@@ -1017,15 +1014,12 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
     final bytes = await _downloadPdf();
     final fileName = _metadataFileName('pdf');
     if (kIsWeb) {
-      final blob = html.Blob(
-        <dynamic>[bytes],
-        html.BlobPropertyBag(type: 'application/pdf'),
-      );
-      final url = html.URL.createObjectURL(blob);
+      final blob = html.Blob(<dynamic>[bytes], 'application/pdf');
+      final url = html.Url.createObjectUrlFromBlob(blob);
       html.AnchorElement(href: url)
         ..setAttribute('download', fileName)
         ..click();
-      html.URL.revokeObjectURL(url);
+      html.Url.revokeObjectUrl(url);
       return;
     }
 

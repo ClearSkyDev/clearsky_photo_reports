@@ -25,13 +25,14 @@ Future<Uint8List> generateInvoicePdf(Invoice invoice) async {
               border: pw.TableBorder.all(),
               children: [
                 pw.TableRow(
-                  decoration:
-                      const pw.BoxDecoration(color: PdfColors.grey300),
-                  children: const [
+                  decoration: const pw.BoxDecoration(color: PdfColors.grey300),
+                  children: [
                     pw.Padding(
-                        padding: pw.EdgeInsets.all(4), child: pw.Text('Item')),
+                        padding: const pw.EdgeInsets.all(4),
+                        child: const pw.Text('Item')),
                     pw.Padding(
-                        padding: pw.EdgeInsets.all(4), child: pw.Text('Amount')),
+                        padding: const pw.EdgeInsets.all(4),
+                        child: const pw.Text('Amount')),
                   ],
                 ),
                 ...invoice.items.map(

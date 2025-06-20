@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import '../models/inspection_metadata.dart';
 import '../models/inspected_structure.dart';
 import '../models/saved_report.dart';
 import '../utils/summary_utils.dart';
