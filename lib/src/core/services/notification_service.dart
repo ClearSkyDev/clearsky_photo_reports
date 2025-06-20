@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../firebase_options.dart';
@@ -24,6 +25,7 @@ class NotificationService {
 
   /// Initialize FCM, request permissions and set up listeners.
   Future<void> init() async {
+    debugPrint('[NotificationService] init');
     if (_initialized) return;
     await _requestPermissions();
 
@@ -74,10 +76,12 @@ class NotificationService {
   }
 
   void _handleMessage(RemoteMessage message) {
+    debugPrint('[NotificationService] message received');
     _showNotification(message);
   }
 
   void _showNotification(RemoteMessage message) {
+    debugPrint('[NotificationService] showNotification');
     final type = message.data['type'] as String?;
     if (type == 'message' && !_prefs.newMessage) return;
     if (type == 'report' && !_prefs.reportFinalized) return;

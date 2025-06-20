@@ -17,6 +17,7 @@ class AuthService {
     required String companyId,
     UserRole role = UserRole.inspector,
   }) async {
+    debugPrint('[AuthService] signUp email=$email, company=$companyId');
     final cred = await _auth.createUserWithEmailAndPassword(
       email: email,
       password: password,
@@ -30,11 +31,13 @@ class AuthService {
   }
 
   Future<void> signIn({required String email, required String password}) async {
+    debugPrint('[AuthService] signIn email=$email');
     await _auth.signInWithEmailAndPassword(email: email, password: password);
     await AuditLogService().logAction('login');
   }
 
   Future<void> sendSignInLink(String email, String url) {
+    debugPrint('[AuthService] sendSignInLink to $email');
     final settings = ActionCodeSettings(
       url: url,
       handleCodeInApp: true,
@@ -48,12 +51,17 @@ class AuthService {
   }
 
   Future<void> signInWithLink(String email, String link) {
+    debugPrint('[AuthService] signInWithLink for $email');
     return _auth.signInWithEmailLink(email: email, emailLink: link);
   }
 
-  Future<void> signOut() => _auth.signOut();
+  Future<void> signOut() {
+    debugPrint('[AuthService] signOut');
+    return _auth.signOut();
+  }
 
   Future<InspectorUser?> fetchUser(String uid) async {
+    debugPrint('[AuthService] fetchUser $uid');
     final snap = await _usersCollection.doc(uid).get();
     if (!snap.exists) return null;
     return InspectorUser.fromMap(uid, snap.data()!);

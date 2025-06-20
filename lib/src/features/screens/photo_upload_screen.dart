@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import '../../core/models/photo_entry.dart';
@@ -24,6 +25,7 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
   final List<PhotoEntry> _photos = [];
 
   Future<void> _pickImages() async {
+    debugPrint('[PhotoUploadScreen] Picking images');
     final List<XFile> selected = await _picker.pickMultiImage();
     if (selected.isNotEmpty) {
       setState(() {
@@ -31,10 +33,12 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
           selected.map((xfile) => PhotoEntry(url: xfile.path)).toList(),
         );
       });
+      debugPrint('[PhotoUploadScreen] Added ${selected.length} photos');
     }
   }
 
   void _removePhoto(int index) {
+    debugPrint('[PhotoUploadScreen] Removing photo $index');
     setState(() {
       _photos.removeAt(index);
     });
@@ -42,6 +46,7 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
 
   @override
   Widget build(BuildContext context) {
+    debugPrint('[PhotoUploadScreen] build');
     return Scaffold(
       appBar: AppBar(title: const Text('Photo Upload')),
       body: Column(
@@ -109,6 +114,7 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
             child: ElevatedButton(
               onPressed: () {
                 if (_photos.isNotEmpty) {
+                  debugPrint('[PhotoUploadScreen] Navigating to preview');
                   Navigator.push(
                     context,
                     MaterialPageRoute(
