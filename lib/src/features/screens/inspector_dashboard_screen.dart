@@ -82,8 +82,9 @@ class _InspectorDashboardScreenState extends State<InspectorDashboardScreen> {
           return false;
         }
       }
-      if (_roleFilter != null && !meta.inspectorRoles.contains(_roleFilter))
+      if (_roleFilter != null && !meta.inspectorRoles.contains(_roleFilter)) {
         return false;
+      }
       if (_statusFilter == 'draft' && r.isFinalized) return false;
       if (_statusFilter == 'final' && !r.isFinalized) return false;
       if (_statusFilter == 'shared' && r.publicViewLink == null) return false;
@@ -300,8 +301,9 @@ class _InspectorDashboardScreenState extends State<InspectorDashboardScreen> {
                         DropdownButton<String>(
                           value: _statusFilter,
                           onChanged: (val) {
-                            if (val != null)
+                            if (val != null) {
                               setState(() => _statusFilter = val);
+                            }
                           },
                           items: const [
                             DropdownMenuItem(value: 'all', child: Text('All')),

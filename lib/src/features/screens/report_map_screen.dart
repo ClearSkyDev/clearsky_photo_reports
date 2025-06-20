@@ -110,8 +110,9 @@ class _ReportMapScreenState extends State<ReportMapScreen> {
                         DropdownButton<String>(
                           value: _statusFilter,
                           onChanged: (val) {
-                            if (val != null)
+                            if (val != null) {
                               setState(() => _statusFilter = val);
+                            }
                           },
                           items: const [
                             DropdownMenuItem(value: 'all', child: Text('All')),
