@@ -41,6 +41,8 @@ class ThemeService extends ChangeNotifier {
   ThemeData get lightTheme {
     if (_option == AppThemeOption.highContrast) {
       return AppTheme.highContrastTheme;
+    } else if (_option == AppThemeOption.clearSky) {
+      return AppTheme.clearSkyTheme;
     }
     return AppTheme.lightTheme;
   }

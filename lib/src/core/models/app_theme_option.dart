@@ -1,1 +1,1 @@
-enum AppThemeOption { light, dark, highContrast }
+enum AppThemeOption { light, dark, highContrast, clearSky }

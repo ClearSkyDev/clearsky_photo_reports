@@ -63,6 +63,12 @@ class _ThemeSettingsScreenState extends State<ThemeSettingsScreen> {
             groupValue: _option,
             onChanged: (v) => setState(() => _option = v!),
           ),
+          RadioListTile<AppThemeOption>(
+            title: const Text('Clear Sky'),
+            value: AppThemeOption.clearSky,
+            groupValue: _option,
+            onChanged: (v) => setState(() => _option = v!),
+          ),
           Padding(
             padding: const EdgeInsets.all(16),
             child: ElevatedButton(

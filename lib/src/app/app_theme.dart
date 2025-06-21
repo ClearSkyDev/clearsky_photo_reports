@@ -13,6 +13,20 @@ class AppTheme {
     scaffoldBackgroundColor: Colors.grey[900],
   );
 
+  static ThemeData clearSkyTheme = ThemeData(
+    primaryColor: const Color(0xFF4DB8FF),
+    colorScheme: ColorScheme.fromSwatch().copyWith(
+      secondary: const Color(0xFFFFD54F),
+    ),
+    scaffoldBackgroundColor: const Color(0xFFF5F5F5),
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: const Color(0xFFFF8A65),
+        foregroundColor: Colors.white,
+      ),
+    ),
+  );
+
   // Build a high-contrast theme starting from a high-contrast color scheme
   // and customizing common properties.
   static ThemeData highContrastTheme = ThemeData.from(
