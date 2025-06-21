@@ -776,11 +776,11 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
                 pw.SizedBox(height: 4),
                 pw.Text(caption,
                     textAlign: pw.TextAlign.center,
-                    style: const pw.TextStyle(fontSize: 12)),
+                    style: pw.TextStyle(fontSize: 12)),
                 pw.Text(
                     photo.timestamp?.toLocal().toString().split('.').first ??
                         '',
-                    style: const pw.TextStyle(fontSize: 10)),
+                    style: pw.TextStyle(fontSize: 10)),
                 if (_showGps &&
                     photo.latitude != null &&
                     photo.longitude != null)
@@ -789,7 +789,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
                         'https://www.google.com/maps/search/?api=1&query=${photo.latitude},${photo.longitude}',
                     child: pw.Text(
                       '${photo.latitude!.toStringAsFixed(4)}, ${photo.longitude!.toStringAsFixed(4)}',
-                      style: const pw.TextStyle(
+                      style: pw.TextStyle(
                         fontSize: 10,
                         decoration: pw.TextDecoration.underline,
                       ),
@@ -922,11 +922,11 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
               mainAxisSize: pw.MainAxisSize.min,
               children: [
                 pw.Text(_disclaimerText,
-                    style: const pw.TextStyle(fontSize: 9),
+                    style: pw.TextStyle(fontSize: 9),
                     textAlign: pw.TextAlign.center),
                 pw.SizedBox(height: 2),
                 pw.Text(_contactInfo,
-                    style: const pw.TextStyle(fontSize: 9),
+                    style: pw.TextStyle(fontSize: 9),
                     textAlign: pw.TextAlign.center),
               ],
             ),
@@ -1000,7 +1000,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
                               padding: const pw.EdgeInsets.only(top: 4),
                               child: pw.Text(
                                   'Reviewed by ${_aiSummary!.editor} on ${_aiSummary!.editedAt?.toLocal().toString().split(' ')[0]}',
-                                  style: const pw.TextStyle(fontSize: 10)),
+                                  style: pw.TextStyle(fontSize: 10)),
                             )
                         ],
                       ),
@@ -1028,7 +1028,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
                   pw.SizedBox(height: 20),
                   pw.Text(
                     _coverDisclaimer,
-                    style: const pw.TextStyle(fontSize: 12),
+                    style: pw.TextStyle(fontSize: 12),
                     textAlign: pw.TextAlign.center,
                   ),
                 ],
@@ -1046,11 +1046,11 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
               mainAxisSize: pw.MainAxisSize.min,
               children: [
                 pw.Text(_disclaimerText,
-                    style: const pw.TextStyle(fontSize: 9),
+                    style: pw.TextStyle(fontSize: 9),
                     textAlign: pw.TextAlign.center),
                 pw.SizedBox(height: 2),
                 pw.Text(_contactInfo,
-                    style: const pw.TextStyle(fontSize: 9),
+                    style: pw.TextStyle(fontSize: 9),
                     textAlign: pw.TextAlign.center),
               ],
             ),
