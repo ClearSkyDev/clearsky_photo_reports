@@ -60,6 +60,7 @@ class _PhotoDetailScreenState extends State<PhotoDetailScreen> {
         p.join(dir, '${p.basenameWithoutExtension(file.path)}_marked.jpg');
     final newFile = File(newPath);
     await newFile.writeAsBytes(img.encodeJpg(baseImage));
+    if (!mounted) return;
     setState(() {
       widget.entry.originalUrl ??= widget.entry.url;
       widget.entry.url = newFile.path;

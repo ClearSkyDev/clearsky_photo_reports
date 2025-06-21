@@ -121,6 +121,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
     if (data != null) {
       final map = jsonDecode(data) as Map<String, dynamic>;
       final settings = ReportSettings.fromMap(map);
+      if (!mounted) return;
       setState(() {
         _template = settings.template;
         _showGps = settings.showGpsData;
@@ -128,6 +129,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
     }
     if (themeData != null) {
       final map = jsonDecode(themeData) as Map<String, dynamic>;
+      if (!mounted) return;
       setState(() {
         _theme = ReportTheme.fromMap(map);
       });
@@ -666,6 +668,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
       final path = p.join(dir.path, _metadataFileName('html'));
       final file = File(path);
       await file.writeAsBytes(bytes, flush: true);
+      if (!mounted) return;
       setState(() => _exportedFile = file);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -709,6 +712,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
         ],
       ),
     );
+    if (!mounted) return;
     if (use == true) {
       setState(() {
         if (controller.text.isEmpty) {
@@ -1134,9 +1138,8 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
     final path = p.join(dir.path, fileName);
     final file = File(path);
     await file.writeAsBytes(bytes, flush: true);
-    setState(() => _exportedFile = file);
-
     if (!mounted) return;
+    setState(() => _exportedFile = file);
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('PDF exported')),
