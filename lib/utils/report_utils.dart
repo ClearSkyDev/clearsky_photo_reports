@@ -4,12 +4,13 @@ import 'dart:typed_data';
 import 'package:image/image.dart' as img;
 import 'package:pdf/widgets.dart' as pw;
 
-/// Convenience wrapper around [pw.Document.addPage].
+/// Convenience helper to add a [page] to [pdf] using [pw.MultiPage].
 ///
-/// This ensures the [pw.MultiPage] widget is added to the provided [pdf]
-/// document correctly.
-void addPage(pw.Document pdf, pw.MultiPage page) {
-  pdf.addPage(page);
+/// The widget is wrapped in a [pw.MultiPage] so it can be added as a full page
+/// in the generated PDF document. This avoids calling `addPage` on
+/// `pw.MultiPage` itself which would result in a compilation error.
+void addPage(pw.Document pdf, pw.Widget page) {
+  pdf.addPage(pw.MultiPage(build: (_) => [page]));
 }
 
 /// Safely decode raw [bytes] to an [img.Image].
