@@ -5,7 +5,7 @@ import 'package:flutter/widgets.dart';
 class WebViewController {
   void loadRequest(Uri uri) {}
   void loadHtmlString(String html) {}
-  void setJavaScriptMode(JavascriptMode mode) {}
+  void setJavaScriptMode(JavaScriptMode mode) {}
 }
 
 class WebViewWidget extends StatelessWidget {
@@ -16,4 +16,4 @@ class WebViewWidget extends StatelessWidget {
   Widget build(BuildContext context) => const SizedBox.shrink();
 }
 
-enum JavascriptMode { unrestricted, disabled }
+enum JavaScriptMode { unrestricted, disabled }
