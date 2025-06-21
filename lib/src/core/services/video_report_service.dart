@@ -30,9 +30,7 @@ class VideoReportService {
             ..writeln("file '${photo.photoUrl}'")
             ..writeln('duration 3');
           final label = photo.label.isNotEmpty ? photo.label : entry.key;
-          final slideIndex = audioList.length;
-          final audio = await TtsService.instance
-              .synthesizeClip(label, name: 'slide_\${slideIndex}.mp3');
+          final audio = await TtsService.instance.synthesizeClip(label);
           audioList.add(audio.path);
         }
       }
