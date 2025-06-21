@@ -1,4 +1,3 @@
-import 'dart:typed_data';
 import 'dart:js' as js;
 import 'package:flutter/foundation.dart';
 

@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'dart:js' as js; // for web interop
+// for web interop
 import '../../web/js_utils.dart' as web_js;
 
 // Mobile imports

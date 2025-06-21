@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show NetworkAssetBundle, rootBundle;
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import '../../core/models/photo_entry.dart';
 import '../../core/models/inspection_metadata.dart';
@@ -13,7 +12,7 @@ import '../../core/models/report_template.dart';
 import '../../core/models/inspector_report_role.dart';
 // Only used on web to trigger downloads
 // ignore: avoid_web_libraries_in_flutter
-import 'dart:js' as js; // for web interop
+// for web interop
 import '../../web/js_utils.dart' as web_js;
 import 'package:pdf/widgets.dart' as pw;
 import 'package:pdf/pdf.dart';
