@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/utils/sync_preferences.dart';
+import '../../core/utils/color_extensions.dart';
 import '../../core/models/tts_settings.dart';
 import '../../core/services/tts_service.dart';
 import 'comment_template_screen.dart';
@@ -160,7 +161,7 @@ class _ReportSettingsScreenState extends State<ReportSettingsScreen> {
         _footerController.text = settings.footerText;
         _logoPath = settings.logoPath;
         _selectedColor = _colors.entries
-            .firstWhere((e) => e.value.value == settings.primaryColor,
+            .firstWhere((e) => e.value.toArgb() == settings.primaryColor,
                 orElse: () => const MapEntry('Blue', Colors.blue))
             .key;
         _includeDisclaimer = settings.includeDisclaimer;
@@ -198,7 +199,7 @@ class _ReportSettingsScreenState extends State<ReportSettingsScreen> {
       companyName: _companyController.text.trim(),
       tagline: _taglineController.text.trim(),
       logoPath: _logoPath,
-      primaryColor: _colors[_selectedColor]!.value,
+      primaryColor: _colors[_selectedColor]!.toArgb(),
       includeDisclaimer: _includeDisclaimer,
       showGpsData: _showGpsData,
       autoLegalBackup: _autoLegalBackup,

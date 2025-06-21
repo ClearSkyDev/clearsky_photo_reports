@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../core/utils/color_extensions.dart';
 
 import '../../core/models/report_theme.dart';
 
@@ -49,7 +50,7 @@ class _ReportThemeScreenState extends State<ReportThemeScreen> {
       setState(() {
         _logoPath = theme.logoPath;
         _selectedColor = _colors.entries
-            .firstWhere((e) => e.value.value == theme.primaryColor,
+            .firstWhere((e) => e.value.toArgb() == theme.primaryColor,
                 orElse: () => const MapEntry('Blue', Colors.blue))
             .key;
         if (_fonts.contains(theme.fontFamily)) {
@@ -71,7 +72,7 @@ class _ReportThemeScreenState extends State<ReportThemeScreen> {
   Future<void> _saveTheme() async {
     final theme = ReportTheme(
       name: 'custom',
-      primaryColor: _colors[_selectedColor]!.value,
+      primaryColor: _colors[_selectedColor]!.toArgb(),
       fontFamily: _selectedFont,
       logoPath: _logoPath,
     );
