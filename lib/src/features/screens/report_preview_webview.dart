@@ -76,19 +76,17 @@ class _ReportPreviewWebViewState extends State<ReportPreviewWebView> {
     if (kIsWeb) {
       preview = HtmlElementView(viewType: _viewId!);
     } else {
-      preview = Builder(
-        builder: (context) {
-          return WebView(
-            initialUrl: Uri.dataFromString(
-              widget.html,
-              mimeType: 'text/html',
-              encoding: utf8,
-              base64: true,
-            ).toString(),
-            javascriptMode: JavaScriptMode.unrestricted,
-          );
-        },
-      );
+      final controller = WebViewController()
+        ..setJavaScriptMode(JavascriptMode.unrestricted)
+        ..loadRequest(
+          Uri.dataFromString(
+            widget.html,
+            mimeType: 'text/html',
+            encoding: utf8,
+            base64: true,
+          ),
+        );
+      preview = WebViewWidget(controller: controller);
     }
 
     return Scaffold(
