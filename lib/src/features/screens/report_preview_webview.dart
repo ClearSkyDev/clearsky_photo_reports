@@ -17,7 +17,7 @@ import 'package:webview_flutter/webview_flutter.dart'
 
 // Only imported on web for HtmlElementView
 // ignore: avoid_web_libraries_in_flutter
-import 'dart:js' as js; // for web interop
+import 'dart:js_interop' as js; // for web interop
 import '../../web/js_utils.dart' as web_js;
 import 'dart:ui' as ui if (dart.library.html) 'dart:ui';
 

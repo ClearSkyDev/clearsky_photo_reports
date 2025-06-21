@@ -1,4 +1,4 @@
-import 'dart:js' as js;
+import 'dart:js_interop' as js;
 import 'package:flutter/foundation.dart';
 
 String createBlobUrl(Uint8List data, String mimeType) {
