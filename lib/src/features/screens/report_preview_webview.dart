@@ -77,7 +77,7 @@ class _ReportPreviewWebViewState extends State<ReportPreviewWebView> {
       preview = HtmlElementView(viewType: _viewId!);
     } else {
       final controller = WebViewController()
-        ..setJavaScriptMode(JavascriptMode.unrestricted)
+        ..setJavaScriptMode(JavaScriptMode.unrestricted)
         ..loadRequest(
           Uri.dataFromString(
             widget.html,
