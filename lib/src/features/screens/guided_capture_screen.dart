@@ -6,10 +6,10 @@ class GuidedCaptureScreen extends StatefulWidget {
   const GuidedCaptureScreen({super.key});
 
   @override
-  _GuidedCaptureScreenState createState() => _GuidedCaptureScreenState();
+  GuidedCaptureScreenState createState() => GuidedCaptureScreenState();
 }
 
-class _GuidedCaptureScreenState extends State<GuidedCaptureScreen> {
+class GuidedCaptureScreenState extends State<GuidedCaptureScreen> {
   final List<String> captureSteps = [
     'Address Photo',
     'Front of House',
