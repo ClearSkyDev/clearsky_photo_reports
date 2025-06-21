@@ -9,10 +9,10 @@ class ReportSearchScreen extends StatefulWidget {
   const ReportSearchScreen({super.key, required this.allReports});
 
   @override
-  _ReportSearchScreenState createState() => _ReportSearchScreenState();
+  ReportSearchScreenState createState() => ReportSearchScreenState();
 }
 
-class _ReportSearchScreenState extends State<ReportSearchScreen> {
+class ReportSearchScreenState extends State<ReportSearchScreen> {
   List<InspectionReport> _filteredReports = [];
   String _searchQuery = '';
 

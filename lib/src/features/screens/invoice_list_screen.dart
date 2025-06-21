@@ -21,10 +21,10 @@ class InvoiceListScreen extends StatefulWidget {
   const InvoiceListScreen({super.key});
 
   @override
-  _InvoiceListScreenState createState() => _InvoiceListScreenState();
+  InvoiceListScreenState createState() => InvoiceListScreenState();
 }
 
-class _InvoiceListScreenState extends State<InvoiceListScreen> {
+class InvoiceListScreenState extends State<InvoiceListScreen> {
   final List<Invoice> _invoices = [];
 
   void _addDummyInvoice() {
