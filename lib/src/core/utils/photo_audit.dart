@@ -186,15 +186,17 @@ class _EntryInfo {
 double _blurScore(img.Image image) {
   final gray = img.grayscale(image);
   final sobel = img.sobel(gray);
+  final data = sobel?.data ?? [];
+  if (data.isEmpty) return 0;
   double mean = 0;
-  for (final p in sobel.data) {
+  for (final p in data) {
     mean += (p & 0xFF);
   }
-  mean /= sobel.length;
+  mean /= data.length;
   double variance = 0;
-  for (final p in sobel.data) {
+  for (final p in data) {
     final v = (p & 0xFF) - mean;
     variance += v * v;
   }
-  return variance / sobel.length;
+  return variance / data.length;
 }
