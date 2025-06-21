@@ -34,15 +34,17 @@ Future<void> generateAndDownloadPdf(
   // Placeholder implementation using simple PDF with summary text
   final pdf = pw.Document();
   pdf.addPage(
-    pw.Page(
-      build: (context) => pw.Column(
-        children: [
-          pw.Text(summary),
-          pw.SizedBox(height: 20),
-          for (final p in photos)
-            pw.Text(p.label, style: const pw.TextStyle(fontSize: 10)),
-        ],
-      ),
+    pw.MultiPage(
+      build: (context) => [
+        pw.Column(
+          children: [
+            pw.Text(summary),
+            pw.SizedBox(height: 20),
+            for (final p in photos)
+              pw.Text(p.label, style: pw.TextStyle(fontSize: 10)),
+          ],
+        ),
+      ],
     ),
   );
   final bytes = await pdf.save();
@@ -537,11 +539,11 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
                 pw.SizedBox(height: 4),
                 pw.Text(caption,
                     textAlign: pw.TextAlign.center,
-                    style: const pw.TextStyle(fontSize: 12)),
+                    style: pw.TextStyle(fontSize: 12)),
                 pw.Text(
                     photo.timestamp?.toLocal().toString().split('.').first ??
                         '',
-                    style: const pw.TextStyle(fontSize: 10)),
+                    style: pw.TextStyle(fontSize: 10)),
                 if (showGps &&
                     photo.latitude != null &&
                     photo.longitude != null)
@@ -550,7 +552,7 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
                         'https://www.google.com/maps/search/?api=1&query=${photo.latitude},${photo.longitude}',
                     child: pw.Text(
                       '${photo.latitude!.toStringAsFixed(4)}, ${photo.longitude!.toStringAsFixed(4)}',
-                      style: const pw.TextStyle(
+                      style: pw.TextStyle(
                         fontSize: 10,
                         decoration: pw.TextDecoration.underline,
                       ),
@@ -559,11 +561,11 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
                 if (photo.note.isNotEmpty)
                   pw.Text(photo.note,
                       textAlign: pw.TextAlign.center,
-                      style: const pw.TextStyle(
+                      style: pw.TextStyle(
                           fontSize: 10, fontStyle: pw.FontStyle.italic)),
                 pw.Text(
                     'Source: ${photo.sourceType.name}${photo.captureDevice != null ? ' (${photo.captureDevice})' : ''}',
-                    style: const pw.TextStyle(fontSize: 10)),
+                    style: pw.TextStyle(fontSize: 10)),
               ],
             ),
           ),
@@ -728,18 +730,18 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
             mainAxisSize: pw.MainAxisSize.min,
             children: [
               pw.Text(_disclaimerText,
-                  style: const pw.TextStyle(fontSize: 9),
+                  style: pw.TextStyle(fontSize: 9),
                   textAlign: pw.TextAlign.center),
               pw.SizedBox(height: 2),
               pw.Text(_contactInfo,
-                  style: const pw.TextStyle(fontSize: 9),
+                  style: pw.TextStyle(fontSize: 9),
                   textAlign: pw.TextAlign.center),
               if (report.wasOffline)
                 pw.Padding(
                   padding: const pw.EdgeInsets.only(top: 2),
                   child: pw.Text(
                     '⚠️ Draft Created Offline — Please verify all data before submission',
-                    style: const pw.TextStyle(
+                    style: pw.TextStyle(
                         fontSize: 9, color: PdfColors.orange),
                     textAlign: pw.TextAlign.center,
                   ),
@@ -799,7 +801,7 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
                           padding: const pw.EdgeInsets.only(top: 4),
                           child: pw.Text(
                               'Reviewed by ${report.aiSummary!.editor} on ${report.aiSummary!.editedAt?.toLocal().toString().split(' ')[0]}',
-                              style: const pw.TextStyle(fontSize: 10)),
+                              style: pw.TextStyle(fontSize: 10)),
                         ),
                     ],
                   ),
@@ -822,7 +824,7 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
                 ),
               pw.SizedBox(height: 20),
               pw.Text(_coverDisclaimer,
-                  style: const pw.TextStyle(fontSize: 12),
+                  style: pw.TextStyle(fontSize: 12),
                   textAlign: pw.TextAlign.center),
             ],
           ),
@@ -838,18 +840,18 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
             mainAxisSize: pw.MainAxisSize.min,
             children: [
               pw.Text(_disclaimerText,
-                  style: const pw.TextStyle(fontSize: 9),
+                  style: pw.TextStyle(fontSize: 9),
                   textAlign: pw.TextAlign.center),
               pw.SizedBox(height: 2),
               pw.Text(_contactInfo,
-                  style: const pw.TextStyle(fontSize: 9),
+                  style: pw.TextStyle(fontSize: 9),
                   textAlign: pw.TextAlign.center),
               if (report.wasOffline)
                 pw.Padding(
                   padding: const pw.EdgeInsets.only(top: 2),
                   child: pw.Text(
                     '⚠️ Draft Created Offline — Please verify all data before submission',
-                    style: const pw.TextStyle(
+                    style: pw.TextStyle(
                         fontSize: 9, color: PdfColors.orange),
                     textAlign: pw.TextAlign.center,
                   ),
@@ -1040,7 +1042,7 @@ Future<Uint8List> generateQrCoverSheet({
               pw.Text(
                   'Inspection Date: ${inspectionDate.toLocal().toString().split(' ')[0]}'),
             pw.SizedBox(height: 20),
-            pw.Text(url, style: const pw.TextStyle(fontSize: 12)),
+            pw.Text(url, style: pw.TextStyle(fontSize: 12)),
           ],
         ),
       ),
