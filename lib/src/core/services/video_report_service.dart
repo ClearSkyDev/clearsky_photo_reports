@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
@@ -63,5 +64,15 @@ class VideoReportService {
         : "-y -f concat -safe 0 -i ${slideList.path} -vf fps=25 -pix_fmt yuv420p -i $voicePath -i $musicPath -filter_complex '[1:a][2:a]amix=inputs=2:duration=longest' -shortest ${output.path}";
     await FFmpegKit.execute(cmd);
     return output;
+  }
+
+  /// Convenience helper to return the generated video as bytes.
+  Future<Uint8List> generateVideoReportBytes(
+    SavedReport report, {
+    String? musicPath,
+  }) async {
+    final file = await generateVideoReport(report, musicPath: musicPath);
+    final bytes = await file.readAsBytes();
+    return Uint8List.fromList(bytes);
   }
 }
