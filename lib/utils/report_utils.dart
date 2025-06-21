@@ -3,8 +3,11 @@ import 'package:image/image.dart' as img;
 import 'package:pdf/widgets.dart' as pw;
 
 /// Convenience wrapper around [pw.Document.addPage].
-void addPage(pw.Document doc, pw.Page page) {
-  doc.addPage(page);
+///
+/// This ensures the [pw.MultiPage] widget is added to the provided [pdf]
+/// document correctly.
+void addPage(pw.Document pdf, pw.MultiPage page) {
+  pdf.addPage(page);
 }
 
 /// Safely decode raw [bytes] to an [img.Image].
