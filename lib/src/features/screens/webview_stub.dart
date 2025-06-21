@@ -1,23 +1,19 @@
 import 'package:flutter/widgets.dart';
 
-/// Stub for the WebView widget when the webview_flutter plugin is
-/// unavailable (e.g. on web). This simply displays a placeholder
-/// indicating that WebView is not supported.
-class WebView extends StatelessWidget {
-  final String? initialUrl;
-  final JavascriptMode javascriptMode;
-
-  const WebView({
-    super.key,
-    this.initialUrl,
-    this.javascriptMode = JavascriptMode.unrestricted,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return const SizedBox.shrink();
-  }
+/// Stub classes mirroring the webview_flutter API when the plugin is
+/// unavailable (e.g. on web). These simply render nothing.
+class WebViewController {
+  void loadRequest(Uri uri) {}
+  void loadHtmlString(String html) {}
+  void setJavaScriptMode(JavascriptMode mode) {}
 }
 
-/// Minimal enum matching the API from webview_flutter.
+class WebViewWidget extends StatelessWidget {
+  final WebViewController controller;
+  const WebViewWidget({super.key, required this.controller});
+
+  @override
+  Widget build(BuildContext context) => const SizedBox.shrink();
+}
+
 enum JavascriptMode { unrestricted, disabled }
