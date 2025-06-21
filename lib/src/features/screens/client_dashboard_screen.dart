@@ -22,6 +22,13 @@ class ClientDashboardScreen extends StatelessWidget {
               },
               child: const Text('Start Inspection'),
             ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pushNamed(context, '/history');
+              },
+              child: const Text('View Inspections'),
+            ),
           ],
         ),
       ),
