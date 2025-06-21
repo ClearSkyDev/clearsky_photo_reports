@@ -23,7 +23,7 @@ class OfflineSyncService {
 
   final ValueNotifier<bool> online = ValueNotifier(true);
   final ValueNotifier<double> progress = ValueNotifier(0);
-  StreamSubscription<List<ConnectivityResult>>? _connSub;
+  StreamSubscription<ConnectivityResult>? _connSub;
   Timer? _timer;
 
   Future<void> init() async {
@@ -32,15 +32,15 @@ class OfflineSyncService {
     await OfflineDraftStore.instance.init();
     await SyncHistoryService.instance.init();
     final initial = await Connectivity().checkConnectivity();
-    online.value = !initial.contains(ConnectivityResult.none);
+    online.value = initial != ConnectivityResult.none;
     // Perform an initial sync on startup
     if (online.value) {
       unawaited(syncDrafts());
     }
     // Periodically attempt to sync any drafts
     _timer = Timer.periodic(const Duration(minutes: 5), (_) => syncDrafts());
-    _connSub = Connectivity().onConnectivityChanged.listen((List<ConnectivityResult> result) {
-      final newOnline = !result.contains(ConnectivityResult.none);
+    _connSub = Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
+      final newOnline = result != ConnectivityResult.none;
       if (!online.value && newOnline) {
         syncDrafts();
       }
