@@ -577,7 +577,7 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
 
   // Placeholder for missing helper used during PDF generation.
   pw.Widget pdfSectionHeader(String text) {
-    // TODO: implement template-aware styling for section headers
+    // Basic styling for section headers
     return pw.Text(
       text,
       style: pw.TextStyle(

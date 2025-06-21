@@ -67,7 +67,7 @@ Future<PhotoAuditResult> photoAudit(SavedReport report) async {
   for (final struct in report.structures) {
     for (final entry in struct.sectionPhotos.entries) {
       final List<ReportPhotoEntry> photos = entry.value;
-      if (elevationSections.contains(entry.key) && (photos?.isEmpty ?? true)) {
+      if (elevationSections.contains(entry.key) && photos.isEmpty) {
         issues.add(PhotoAuditIssue(
           structure: struct.name,
           section: entry.key,
@@ -80,7 +80,7 @@ Future<PhotoAuditResult> photoAudit(SavedReport report) async {
               timestamp: null),
         ));
       }
-      for (final photo in photos ?? []) {
+      for (final photo in photos) {
         all.add(_EntryInfo(photo, struct.name, entry.key));
         if (photo.label.isEmpty) {
           issues.add(PhotoAuditIssue(
@@ -188,21 +188,22 @@ double _blurScore(img.Image image) {
   final gray = img.grayscale(image);
   final sobel = img.sobel(gray);
   final rawData = sobel.data;
-  if (rawData is List) {
-    final data = rawData.cast<int>();
-    if (data.isNotEmpty) {
-      double mean = 0;
-      for (final p in data) {
-        mean += (p & 0xFF);
-      }
-      mean /= data.length;
-      double variance = 0;
-      for (final p in data) {
-        final v = (p & 0xFF) - mean;
-        variance += v * v;
-      }
-      return variance / data.length;
+  if (rawData is! List) {
+    return 0;
+  }
+  final data = rawData.cast<int>();
+  if (data.isNotEmpty) {
+    double mean = 0;
+    for (final p in data) {
+      mean += (p & 0xFF);
     }
+    mean /= data.length;
+    double variance = 0;
+    for (final p in data) {
+      final v = (p & 0xFF) - mean;
+      variance += v * v;
+    }
+    return variance / data.length;
   }
   return 0;
 }
