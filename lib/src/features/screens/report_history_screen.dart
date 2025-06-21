@@ -185,17 +185,16 @@ class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
                       templates.firstWhere((t) => t.id == report.templateId);
                 } catch (_) {}
               }
-              if (context.mounted) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => MetadataScreen(
-                      initialMetadata: meta,
-                      initialTemplate: template,
-                    ),
+              if (!mounted) return;
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => MetadataScreen(
+                    initialMetadata: meta,
+                    initialTemplate: template,
                   ),
-                );
-              }
+                ),
+              );
             },
           ),
           if (report.isFinalized) const Icon(Icons.lock, color: Colors.red),

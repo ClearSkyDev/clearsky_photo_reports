@@ -749,6 +749,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
   Future<void> _exportCsv() async {
     if (_savedReport == null || _exporting) return;
     await _maybeRunQualityCheck();
+    if (!mounted) return;
     if (!canEditReport(_savedReport!, _profile)) {
       ScaffoldMessenger.of(context)
           .showSnackBar(const SnackBar(content: Text('Permission denied')));
@@ -778,6 +779,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
   Future<void> _exportZip() async {
     if (_savedReport == null || _exporting) return;
     await _maybeRunQualityCheck();
+    if (!mounted) return;
     if (!canEditReport(_savedReport!, _profile)) {
       ScaffoldMessenger.of(context)
           .showSnackBar(const SnackBar(content: Text('Permission denied')));
@@ -815,6 +817,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
   Future<void> _exportLegal() async {
     if (_savedReport == null || _exporting) return;
     await _maybeRunQualityCheck();
+    if (!mounted) return;
     if (_profile?.role != InspectorRole.admin) {
       ScaffoldMessenger.of(context)
           .showSnackBar(const SnackBar(content: Text('Admin only')));
@@ -844,6 +847,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
   Future<void> _exportAudio() async {
     if (_savedReport == null || _exporting) return;
     await _maybeRunQualityCheck();
+    if (!mounted) return;
     setState(() => _exporting = true);
     showDialog(
       context: context,
@@ -1135,6 +1139,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
       String signature, bool attachPdf) async {
     if (to.isEmpty || _savedReport == null) return;
     await _maybeRunQualityCheck();
+    if (!mounted) return;
     showDialog(
       context: context,
       barrierDismissible: false,
