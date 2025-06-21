@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:archive/archive.dart';
 import 'package:flutter/foundation.dart';
@@ -19,6 +18,12 @@ import 'package:share_plus/share_plus.dart';
 import '../services/invoice_service.dart';
 import 'label_utils.dart';
 import '../utils/invoice_pdf.dart';
+import '../models/report_theme.dart';
+import '../models/inspection_metadata.dart';
+import '../models/inspection_sections.dart';
+import '../models/saved_report.dart';
+import '../models/photo_entry.dart';
+import '../models/inspector_report_role.dart';
 
 Future<void> saveHtmlToFile(String htmlContent, String filename) async {
   final directory = await getApplicationDocumentsDirectory();
@@ -32,13 +37,6 @@ Future<void> savePdfToFile(Uint8List pdfBytes, String filename) async {
   await file.writeAsBytes(pdfBytes);
 }
 
-import '../models/report_theme.dart';
-
-import '../models/inspection_metadata.dart';
-import '../models/inspection_sections.dart';
-import '../models/saved_report.dart';
-import '../models/photo_entry.dart';
-import '../models/inspector_report_role.dart';
 
 Future<void> generateAndDownloadPdf(
   List<PhotoEntry> photos,
@@ -735,9 +733,8 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
   final summaryText = report.summaryText ?? '';
   final aiStatus = report.aiSummary?.status;
 
-  pdf
-    .addPage(
-      pw.MultiPage(
+  pdf.addPage(
+    pw.MultiPage(
         footer: (context) => pw.Container(
           color: PdfColors.grey300,
           padding: const pw.EdgeInsets.all(6),
@@ -845,9 +842,10 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
           ),
         ),
       ]
-    )
-    ..addPage(
-      pw.MultiPage(
+      ),
+  );
+  pdf.addPage(
+    pw.MultiPage(
         footer: (context) => pw.Container(
           color: PdfColors.grey300,
           padding: const pw.EdgeInsets.all(6),
