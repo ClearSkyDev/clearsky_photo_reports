@@ -23,7 +23,6 @@ class VideoReportService {
     final slideList = File(p.join(temp.path, 'slides.txt'));
     final audioList = <String>[];
     final slides = StringBuffer();
-    var index = 0;
     for (final struct in report.structures) {
       for (final entry in struct.sectionPhotos.entries) {
         for (final photo in entry.value) {
@@ -31,10 +30,10 @@ class VideoReportService {
             ..writeln("file '${photo.photoUrl}'")
             ..writeln('duration 3');
           final label = photo.label.isNotEmpty ? photo.label : entry.key;
+          final slideIndex = audioList.length;
           final audio = await TtsService.instance
-              .synthesizeClip(label, name: 'slide_\$index.mp3');
+              .synthesizeClip(label, name: 'slide_\${slideIndex}.mp3');
           audioList.add(audio.path);
-          index++;
         }
       }
     }

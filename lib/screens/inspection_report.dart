@@ -17,4 +17,4 @@ class InspectionReportScreen extends StatelessWidget {
 }
 
 /// Convenience function returning the [InspectionReportScreen] widget.
-Widget InspectionReport() => const InspectionReportScreen();
+Widget inspectionReport() => const InspectionReportScreen();
