@@ -98,6 +98,14 @@ String _slugify(String input) {
       .replaceAll(RegExp(r'^_+|_+$'), '');
 }
 
+/// Convenience helper to add a single [pw.Widget] to [pdf].
+///
+/// The widget is wrapped in a [pw.MultiPage] so it can be added
+/// as a full page in the generated PDF document.
+void addPage(pw.Document pdf, pw.Widget page) {
+  pdf.addPage(pw.MultiPage(build: (_) => [page]));
+}
+
 /// Exports [report] as a ZIP archive containing an HTML file, PDF file
 /// and a folder of labeled photos. Returns the saved file on mobile.
 Future<File?> exportAsZip(SavedReport report) async {
