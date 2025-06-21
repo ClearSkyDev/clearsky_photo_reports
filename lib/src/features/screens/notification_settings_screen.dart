@@ -47,7 +47,7 @@ class _NotificationSettingsScreenState
   @override
   Widget build(BuildContext context) {
     if (!_loaded) {
-      return const Scaffold(
+      return Scaffold(
         body: Center(child: CircularProgressIndicator()),
       );
     }
