@@ -3,13 +3,19 @@ import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 
 class GuidedCaptureScreen extends StatefulWidget {
-  const GuidedCaptureScreen({super.key});
+  final String inspectionId;
+
+  const GuidedCaptureScreen({
+    super.key,
+    required this.inspectionId,
+  });
 
   @override
   GuidedCaptureScreenState createState() => GuidedCaptureScreenState();
 }
 
 class GuidedCaptureScreenState extends State<GuidedCaptureScreen> {
+  // Use widget.inspectionId when saving photos
   final List<String> captureSteps = [
     'Address Photo',
     'Front of House',

@@ -42,10 +42,28 @@ class ClearSkyApp extends StatelessWidget {
       home: const SplashScreen(),
       routes: {
         '/dashboard': (context) => const ClientDashboardScreen(),
-        '/capture': (context) => const GuidedCaptureScreen(),
         // Add more routes as needed
         // '/upload': (context) => SectionedPhotoUploadScreen(),
         // '/send': (context) => SendReportScreen(),
+      },
+      onGenerateRoute: (settings) {
+        if (settings.name == '/capture') {
+          final args = settings.arguments as Map<String, dynamic>?;
+          final inspectionId = args?['inspectionId'];
+          if (inspectionId is String) {
+            return MaterialPageRoute(
+              builder: (_) => GuidedCaptureScreen(
+                inspectionId: inspectionId,
+              ),
+            );
+          }
+          return MaterialPageRoute(
+            builder: (_) => const Scaffold(
+              body: Center(child: Text('Missing inspection ID')),
+            ),
+          );
+        }
+        return null;
       },
     );
   }
