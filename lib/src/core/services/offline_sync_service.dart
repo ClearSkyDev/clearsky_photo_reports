@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:flutter/foundation.dart';
@@ -16,6 +17,8 @@ import 'offline_draft_store.dart';
 import '../utils/sync_preferences.dart';
 import 'sync_history_service.dart';
 import '../models/sync_log_entry.dart';
+import '../models/pending_photo.dart';
+import 'pending_photo_store.dart';
 
 class OfflineSyncService {
   OfflineSyncService._();
@@ -30,6 +33,7 @@ class OfflineSyncService {
     debugPrint('[OfflineSyncService] init');
     await Hive.initFlutter();
     await OfflineDraftStore.instance.init();
+    await PendingPhotoStore.instance.init();
     await SyncHistoryService.instance.init();
     final initial = await Connectivity().checkConnectivity();
     final initResult =
@@ -94,6 +98,43 @@ class OfflineSyncService {
       progress.value = (i + 1) / drafts.length;
     }
     debugPrint('[OfflineSyncService] syncDrafts complete');
+  }
+
+  Future<void> syncPendingPhotos(String inspectionId) async {
+    debugPrint('[OfflineSyncService] syncPendingPhotos $inspectionId');
+    if (!online.value) return;
+    if (!await SyncPreferences.isCloudSyncEnabled()) return;
+
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) return;
+
+    final photos = PendingPhotoStore.instance.loadUnsynced(inspectionId);
+    if (photos.isEmpty) return;
+
+    final firestore = FirebaseFirestore.instance;
+    final storage = FirebaseStorage.instance;
+
+    for (final pending in photos) {
+      final file = File(pending.path);
+      if (!await file.exists()) {
+        await PendingPhotoStore.instance.delete(pending.id);
+        continue;
+      }
+      try {
+        final ref = storage
+            .ref()
+            .child('users/$uid/inspections/$inspectionId/photos/${pending.name}');
+        await ref.putFile(file);
+        final url = await ref.getDownloadURL();
+        await firestore
+            .collection('users')
+            .doc(uid)
+            .collection('inspections')
+            .doc(inspectionId)
+            .update({'photos': FieldValue.arrayUnion([url])});
+        await PendingPhotoStore.instance.delete(pending.id);
+      } catch (_) {}
+    }
   }
 
   Future<void> _uploadDraft(SavedReport draft) async {
