@@ -6,6 +6,7 @@ import 'src/core/services/notification_service.dart';
 
 import 'src/features/screens/client_dashboard_screen.dart';
 import 'src/features/screens/guided_capture_screen.dart';
+import 'src/features/screens/splash_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -40,7 +41,8 @@ class ClearSkyApp extends StatelessWidget {
       ),
       initialRoute: '/',
       routes: {
-        '/': (context) => const ClientDashboardScreen(),
+        '/': (context) => const SplashScreen(),
+        '/dashboard': (context) => const ClientDashboardScreen(),
         '/capture': (context) => const GuidedCaptureScreen(),
         // Add more routes as needed
         // '/upload': (context) => SectionedPhotoUploadScreen(),
