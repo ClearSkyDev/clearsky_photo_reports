@@ -32,6 +32,7 @@ class _NotificationSettingsScreenState
       _prefs = NotificationPreferences.fromMap(
           Map<String, dynamic>.from(jsonDecode(raw)));
     }
+    if (!mounted) return;
     setState(() => _loaded = true);
   }
 

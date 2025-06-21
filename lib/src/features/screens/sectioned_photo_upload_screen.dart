@@ -56,6 +56,7 @@ class _SectionedPhotoUploadScreenState
     final List<XFile> selected = await _picker.pickMultiImage();
     if (selected.isNotEmpty) {
       final position = await _getPosition();
+      if (!mounted) return;
       setState(() {
         final target = structure == null
             ? _sections[section]!
