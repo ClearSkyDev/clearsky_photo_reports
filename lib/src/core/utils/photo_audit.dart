@@ -66,7 +66,7 @@ Future<PhotoAuditResult> photoAudit(SavedReport report) async {
 
   for (final struct in report.structures) {
     for (final entry in struct.sectionPhotos.entries) {
-      final List<ReportPhotoEntry>? photos = entry.value;
+      final List<ReportPhotoEntry> photos = entry.value;
       if (elevationSections.contains(entry.key) && (photos?.isEmpty ?? true)) {
         issues.add(PhotoAuditIssue(
           structure: struct.name,
