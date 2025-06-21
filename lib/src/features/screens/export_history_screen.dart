@@ -22,6 +22,7 @@ class _ExportHistoryScreenState extends State<ExportHistoryScreen> {
 
   Future<void> _load() async {
     _entries = await ExportLog.load();
+    if (!mounted) return;
     setState(() => _loading = false);
   }
 

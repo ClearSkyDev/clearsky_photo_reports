@@ -73,17 +73,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
       role: _role,
     );
     await ProfileStorage.save(profile);
-    if (mounted) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Profile saved')));
-    }
+    if (!mounted) return;
+    ScaffoldMessenger.of(context)
+        .showSnackBar(const SnackBar(content: Text('Profile saved')));
   }
 
   Future<void> _logout() async {
     await ProfileStorage.clear();
-    if (mounted) {
-      Navigator.pushNamedAndRemoveUntil(context, '/login', (_) => false);
-    }
+    if (!mounted) return;
+    Navigator.pushNamedAndRemoveUntil(context, '/login', (_) => false);
   }
 
   @override

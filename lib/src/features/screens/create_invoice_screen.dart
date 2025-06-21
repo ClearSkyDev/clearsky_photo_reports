@@ -40,7 +40,8 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
     await InvoiceService().createInvoice(invoice);
     final pdf = await generateInvoicePdf(invoice);
     await Printing.sharePdf(bytes: pdf, filename: 'invoice.pdf');
-    if (mounted) Navigator.pop(context);
+    if (!mounted) return;
+    Navigator.pop(context);
   }
 
   void _addItem() {

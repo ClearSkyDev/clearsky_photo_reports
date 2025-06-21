@@ -19,15 +19,15 @@ class _CommentTemplateScreenState extends State<CommentTemplateScreen> {
 
   Future<void> _load() async {
     final items = await CommentTemplateStore.loadTemplates();
+    if (!mounted) return;
     setState(() => _templates = items);
   }
 
   Future<void> _save() async {
     await CommentTemplateStore.saveTemplates(_templates);
-    if (mounted) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Templates saved')));
-    }
+    if (!mounted) return;
+    ScaffoldMessenger.of(context)
+        .showSnackBar(const SnackBar(content: Text('Templates saved')));
   }
 
   void _edit([String? template, int? index]) {
