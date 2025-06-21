@@ -6,6 +6,7 @@ import 'src/core/services/notification_service.dart';
 
 import 'src/features/screens/client_dashboard_screen.dart';
 import 'src/features/screens/guided_capture_screen.dart';
+import 'src/features/screens/inspection_history_screen.dart';
 import 'src/features/screens/splash_screen.dart';
 
 void main() async {
@@ -42,6 +43,7 @@ class ClearSkyApp extends StatelessWidget {
       home: const SplashScreen(),
       routes: {
         '/dashboard': (context) => const ClientDashboardScreen(),
+        '/history': (context) => const InspectionHistoryScreen(),
         // Add more routes as needed
         // '/upload': (context) => SectionedPhotoUploadScreen(),
         // '/send': (context) => SendReportScreen(),
