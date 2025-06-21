@@ -32,14 +32,20 @@ class OfflineSyncService {
     await OfflineDraftStore.instance.init();
     await SyncHistoryService.instance.init();
     final initial = await Connectivity().checkConnectivity();
-    online.value = initial != ConnectivityResult.none;
+    final initResult =
+        initial.isNotEmpty ? initial.first : ConnectivityResult.none;
+    online.value = initResult != ConnectivityResult.none;
     // Perform an initial sync on startup
     if (online.value) {
       unawaited(syncDrafts());
     }
     // Periodically attempt to sync any drafts
     _timer = Timer.periodic(const Duration(minutes: 5), (_) => syncDrafts());
-    _connSub = Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
+    _connSub = Connectivity()
+        .onConnectivityChanged
+        .map((results) =>
+            results.isNotEmpty ? results.first : ConnectivityResult.none)
+        .listen((ConnectivityResult result) {
       final newOnline = result != ConnectivityResult.none;
       if (!online.value && newOnline) {
         syncDrafts();
