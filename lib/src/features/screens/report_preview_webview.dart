@@ -1,8 +1,9 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 /// Displays the generated report HTML across Flutter platforms.
 ///
-/// * Web: uses `dart:html` to create an `IFrameElement` which is
+/// * Web: uses JS interop to create an iframe which is
 ///   registered with `ui.platformViewRegistry` so it can be embedded
 ///   in the widget tree via `HtmlElementView`.
 /// * Mobile: uses the `webview_flutter` plugin. The HTML string is
@@ -16,7 +17,8 @@ import 'package:webview_flutter/webview_flutter.dart'
 
 // Only imported on web for HtmlElementView
 // ignore: avoid_web_libraries_in_flutter
-import 'dart:html' as html show Blob, Url, IFrameElement;
+import 'dart:js' as js; // for web interop
+import '../../web/js_utils.dart' as web_js;
 import 'dart:ui' as ui if (dart.library.html) 'dart:ui';
 
 class ReportPreviewWebView extends StatefulWidget {
@@ -45,19 +47,15 @@ class _ReportPreviewWebViewState extends State<ReportPreviewWebView> {
     if (kIsWeb) {
       _viewId = 'report-preview-${DateTime.now().millisecondsSinceEpoch}';
       // Create a Blob URL for the HTML content
-      final blob = html.Blob([
-        widget.html
-      ], 'text/html');
-      _blobUrl = html.Url.createObjectUrlFromBlob(blob);
+      _blobUrl = web_js.createBlobUrl(
+        Uint8List.fromList(utf8.encode(widget.html)),
+        'text/html',
+      );
       // ignore: undefined_prefixed_name
       ui.platformViewRegistry.registerViewFactory(
         _viewId!,
         (int viewId) {
-          final iframe = html.IFrameElement()
-            ..src = _blobUrl!
-            ..style.border = 'none'
-            ..style.width = '100%'
-            ..style.height = '100%';
+          final iframe = web_js.createIFrame(_blobUrl!);
           return iframe;
         },
       );
@@ -67,7 +65,7 @@ class _ReportPreviewWebViewState extends State<ReportPreviewWebView> {
   @override
   void dispose() {
     if (_blobUrl != null) {
-      html.Url.revokeObjectUrl(_blobUrl!);
+      web_js.revokeObjectUrl(_blobUrl!);
     }
     super.dispose();
   }

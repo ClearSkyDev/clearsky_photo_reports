@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show NetworkAssetBundle, rootBundle;
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import '../../core/models/photo_entry.dart';
 import '../../core/models/inspection_metadata.dart';
@@ -12,7 +13,8 @@ import '../../core/models/report_template.dart';
 import '../../core/models/inspector_report_role.dart';
 // Only used on web to trigger downloads
 // ignore: avoid_web_libraries_in_flutter
-import 'dart:html' as html show Blob, Url, AnchorElement;
+import 'dart:js' as js; // for web interop
+import '../../web/js_utils.dart' as web_js;
 import 'package:pdf/widgets.dart' as pw;
 import 'package:pdf/pdf.dart';
 import 'send_report_screen.dart';
@@ -652,13 +654,8 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
   Future<void> _saveHtmlFile(String htmlContent) async {
     final bytes = utf8.encode(htmlContent);
     if (kIsWeb) {
-      final blob = html.Blob([bytes], 'text/html');
-      final url = html.Url.createObjectUrlFromBlob(blob);
       final fileName = _metadataFileName('html');
-      html.AnchorElement(href: url)
-        ..setAttribute('download', fileName)
-        ..click();
-      html.Url.revokeObjectUrl(url);
+      web_js.downloadBytes(Uint8List.fromList(bytes), fileName, 'text/html');
     } else {
       Directory? dir;
       try {
@@ -1123,12 +1120,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
     final bytes = await _downloadPdf();
     final fileName = _metadataFileName('pdf');
     if (kIsWeb) {
-      final blob = html.Blob([bytes], 'application/pdf');
-      final url = html.Url.createObjectUrlFromBlob(blob);
-      html.AnchorElement(href: url)
-        ..setAttribute('download', fileName)
-        ..click();
-      html.Url.revokeObjectUrl(url);
+      web_js.downloadBytes(bytes, fileName, 'application/pdf');
       return;
     }
 

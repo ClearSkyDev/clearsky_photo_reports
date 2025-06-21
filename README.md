@@ -89,7 +89,7 @@ Reports with saved GPS coordinates appear on an interactive map available from t
 
 The Flutter implementation renders the inspection report HTML differently depending on the platform:
 
-- **Web**: an `IFrameElement` from `dart:html` is registered with `ui.platformViewRegistry` and inserted using `HtmlElementView`.
+- **Web**: an iframe is created via JS interop and registered with `ui.platformViewRegistry` for embedding using `HtmlElementView`.
 - **Mobile**: the [`webview_flutter`](https://pub.dev/packages/webview_flutter) plugin displays the report. The HTML is converted to a base64 data URI and loaded as local content.
 
 ## Firebase Setup
