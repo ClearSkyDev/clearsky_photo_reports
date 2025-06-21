@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:archive/archive.dart';
 import 'package:flutter/foundation.dart';
@@ -18,6 +19,18 @@ import 'package:share_plus/share_plus.dart';
 import '../services/invoice_service.dart';
 import 'label_utils.dart';
 import '../utils/invoice_pdf.dart';
+
+Future<void> saveHtmlToFile(String htmlContent, String filename) async {
+  final directory = await getApplicationDocumentsDirectory();
+  final file = File('${directory.path}/$filename.html');
+  await file.writeAsString(htmlContent);
+}
+
+Future<void> savePdfToFile(Uint8List pdfBytes, String filename) async {
+  final directory = await getApplicationDocumentsDirectory();
+  final file = File('${directory.path}/$filename.pdf');
+  await file.writeAsBytes(pdfBytes);
+}
 
 import '../models/report_theme.dart';
 
@@ -487,6 +500,8 @@ Future<String> _generateHtml(SavedReport report) async {
 }
 
 Future<Uint8List> generatePdf(SavedReport report) => _generatePdf(report);
+
+Future<String> generateHtml(SavedReport report) => _generateHtml(report);
 
 Future<Uint8List> _generatePdf(SavedReport report) async {
   final meta = InspectionMetadata.fromMap(report.inspectionMetadata);

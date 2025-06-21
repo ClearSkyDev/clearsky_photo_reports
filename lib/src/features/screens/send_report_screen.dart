@@ -738,12 +738,16 @@ class _SendReportScreenState extends State<SendReportScreen> {
     });
   }
 
-  void _downloadPdf() {
-    // TODO: reuse _downloadPdf from ReportPreviewScreen
+  Future<void> _downloadPdf() async {
+    if (_savedReport == null) return;
+    final pdfBytes = await generatePdf(_savedReport!);
+    await savePdfToFile(pdfBytes, 'roof_report');
   }
 
-  void _downloadHtml() {
-    // TODO: reuse _saveHtmlFile logic
+  Future<void> _downloadHtml() async {
+    if (_savedReport == null) return;
+    final html = await generateHtml(_savedReport!);
+    await saveHtmlToFile(html, 'roof_report');
   }
 
   Future<void> _exportCsv() async {
