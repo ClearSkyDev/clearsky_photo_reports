@@ -39,9 +39,8 @@ class ClearSkyApp extends StatelessWidget {
           backgroundColor: Colors.blueGrey,
         ),
       ),
-      initialRoute: '/',
+      home: const SplashScreen(),
       routes: {
-        '/': (context) => const SplashScreen(),
         '/dashboard': (context) => const ClientDashboardScreen(),
         '/capture': (context) => const GuidedCaptureScreen(),
         // Add more routes as needed
