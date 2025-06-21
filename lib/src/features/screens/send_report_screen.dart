@@ -340,6 +340,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
     }
 
     final version = (_savedReport?.version ?? 0) + 1;
+    final inspectorName = profile?.name ?? widget.metadata.inspectorName;
     final saved = SavedReport(
       id: reportId,
       version: version,
@@ -379,15 +380,8 @@ class _SendReportScreenState extends State<SendReportScreen> {
         'address_lc': widget.metadata.propertyAddress.toLowerCase(),
         'clientName': widget.metadata.clientName,
         'clientName_lc': widget.metadata.clientName.toLowerCase(),
-        if (profile?.name != null)
-          'inspectorName': profile!.name
-        else
-          'inspectorName': widget.metadata.inspectorName,
-        if (profile?.name != null)
-          'inspectorName_lc': profile!.name.toLowerCase() ?? ''
-        else
-          'inspectorName_lc':
-              widget.metadata.inspectorName?.toLowerCase() ?? '',
+        'inspectorName': inspectorName,
+        'inspectorName_lc': inspectorName?.toLowerCase() ?? '',
         'type': widget.metadata.inspectionType.name,
         'type_lc': widget.metadata.inspectionType.name.toLowerCase(),
         'labels': labels.toList(),
