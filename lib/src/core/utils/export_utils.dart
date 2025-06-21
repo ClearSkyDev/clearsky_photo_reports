@@ -1,12 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:archive/archive.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart' show rootBundle;
-// Only used on web to trigger downloads
-// ignore: avoid_web_libraries_in_flutter
-import 'dart:html' as html show Blob, Url, AnchorElement;
+import 'dart:js' as js; // for web interop
+import '../../web/js_utils.dart' as web_js;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:http/http.dart' as http;
@@ -48,12 +48,7 @@ Future<void> generateAndDownloadPdf(
   );
   final bytes = await pdf.save();
   if (kIsWeb) {
-    final blob = html.Blob([bytes], 'application/pdf');
-    final url = html.Url.createObjectUrlFromBlob(blob);
-    html.AnchorElement(href: url)
-      ..setAttribute('download', 'report.pdf')
-      ..click();
-    html.Url.revokeObjectUrl(url);
+    web_js.downloadBytes(bytes, 'report.pdf', 'application/pdf');
   } else {
     final dir = await getTemporaryDirectory();
     final file = File(p.join(dir.path, 'report.pdf'));
@@ -79,12 +74,7 @@ Future<void> generateAndDownloadHtml(
   final htmlStr = buffer.toString();
   final bytes = utf8.encode(htmlStr);
   if (kIsWeb) {
-    final blob = html.Blob([bytes], 'text/html');
-    final url = html.Url.createObjectUrlFromBlob(blob);
-    html.AnchorElement(href: url)
-      ..setAttribute('download', 'report.html')
-      ..click();
-    html.Url.revokeObjectUrl(url);
+    web_js.downloadBytes(Uint8List.fromList(bytes), 'report.html', 'text/html');
   } else {
     final dir = await getTemporaryDirectory();
     final file = File(p.join(dir.path, 'report.html'));
@@ -151,12 +141,7 @@ Future<File?> exportAsZip(SavedReport report) async {
   final zipData = ZipEncoder().encode(archive);
 
   if (kIsWeb) {
-    final blob = html.Blob([zipData], 'application/zip');
-    final url = html.Url.createObjectUrlFromBlob(blob);
-    html.AnchorElement(href: url)
-      ..setAttribute('download', fileName)
-      ..click();
-    html.Url.revokeObjectUrl(url);
+    web_js.downloadBytes(Uint8List.fromList(zipData), fileName, 'application/zip');
     return null;
   }
 
@@ -232,9 +217,7 @@ Future<File?> exportFinalZip(SavedReport report,
         'type': 'zip',
       });
     } catch (_) {}
-    html.AnchorElement(href: url)
-      ..target = '_blank'
-      ..click();
+    web_js.openLink(url, target: '_blank');
     return null;
   }
 
@@ -344,9 +327,7 @@ Future<File?> exportLegalCopy(SavedReport report,
     final url = await ref.getDownloadURL();
     await logExport(url);
     if (kIsWeb && !auto) {
-      html.AnchorElement(href: url)
-        ..target = '_blank'
-        ..click();
+      web_js.openLink(url, target: '_blank');
     }
     return null;
   }
@@ -996,12 +977,7 @@ Future<File?> exportCsv(SavedReport report) async {
   final bytes = utf8.encode(csvStr);
 
   if (kIsWeb) {
-    final blob = html.Blob([bytes], 'text/csv');
-    final url = html.Url.createObjectUrlFromBlob(blob);
-    html.AnchorElement(href: url)
-      ..setAttribute('download', fileName)
-      ..click();
-    html.Url.revokeObjectUrl(url);
+    web_js.downloadBytes(Uint8List.fromList(bytes), fileName, 'text/csv');
     return null;
   }
 

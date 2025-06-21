@@ -1,8 +1,6 @@
 import 'package:flutter/foundation.dart';
-
-// Web imports
-// ignore: avoid_web_libraries_in_flutter
-import 'dart:html' as html show Blob, Url, AnchorElement;
+import 'dart:js' as js; // for web interop
+import '../../web/js_utils.dart' as web_js;
 
 // Mobile imports
 import 'dart:io';
@@ -24,15 +22,10 @@ Future<void> sendReportByEmail(
   List<String> attachmentPaths = const [],
 }) async {
   if (kIsWeb) {
-    final blob = html.Blob([pdfBytes], 'application/pdf');
-    final url = html.Url.createObjectUrlFromBlob(blob);
-    html.AnchorElement(href: url)
-      ..setAttribute('download', 'report.pdf')
-      ..click();
-    html.Url.revokeObjectUrl(url);
+    web_js.downloadBytes(pdfBytes, 'report.pdf', 'application/pdf');
     final mailto =
         'mailto:$email?subject=${Uri.encodeComponent(subject)}&body=${Uri.encodeComponent(message)}';
-    html.AnchorElement(href: mailto).click();
+    web_js.openLink(mailto);
     return;
   }
 
@@ -117,7 +110,7 @@ Future<void> sendReportEmail(
   if (kIsWeb) {
     final mailto =
         'mailto:$email?subject=${Uri.encodeComponent(subject)}&body=${Uri.encodeComponent(body)}';
-    html.AnchorElement(href: mailto).click();
+    web_js.openLink(mailto);
     return;
   }
   final mail = Email(
