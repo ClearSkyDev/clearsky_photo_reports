@@ -191,7 +191,7 @@ double _blurScore(img.Image image) {
   if (rawData is! List) {
     return 0;
   }
-  final data = rawData.cast<int>();
+  final data = (rawData as List?)?.cast<int>() ?? <int>[];
   if (data.isNotEmpty) {
     double mean = 0;
     for (final p in data) {
