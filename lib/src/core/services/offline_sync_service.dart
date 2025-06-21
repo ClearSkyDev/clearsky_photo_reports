@@ -32,7 +32,10 @@ class OfflineSyncService {
     await OfflineDraftStore.instance.init();
     await SyncHistoryService.instance.init();
     final initial = await Connectivity().checkConnectivity();
-    online.value = !initial.contains(ConnectivityResult.none);
+    final results = initial is List<ConnectivityResult>
+        ? initial
+        : <ConnectivityResult>[initial as ConnectivityResult];
+    online.value = !results.contains(ConnectivityResult.none);
     // Perform an initial sync on startup
     if (online.value) {
       unawaited(syncDrafts());
