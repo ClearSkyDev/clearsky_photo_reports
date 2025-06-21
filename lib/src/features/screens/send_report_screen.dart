@@ -1642,6 +1642,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
                         firstDate: now,
                         lastDate: DateTime(now.year + 5),
                       );
+                      if (!mounted) return;
                       if (picked != null) {
                         setState(() => _expiryDate = picked);
                       }

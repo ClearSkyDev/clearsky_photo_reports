@@ -17,6 +17,7 @@ class ReportSearchScreenState extends State<ReportSearchScreen> {
   String _searchQuery = '';
 
   void _updateSearch(String value) {
+    if (!mounted) return;
     setState(() {
       _searchQuery = value.toLowerCase().trim();
       _filteredReports = widget.allReports.where((report) {
