@@ -1,4 +1,3 @@
-import 'dart:typed_data';
 
 import 'package:image/image.dart' as img;
 import 'package:pdf/widgets.dart' as pw;
