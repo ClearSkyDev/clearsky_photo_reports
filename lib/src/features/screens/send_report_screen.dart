@@ -431,6 +431,8 @@ class _SendReportScreenState extends State<SendReportScreen> {
       if (_partner != null) 'partnerId': _partner!.id,
     });
 
+    if (!mounted) return;
+
     setState(() {
       _saving = false;
       _docId = reportId;
@@ -568,6 +570,8 @@ class _SendReportScreenState extends State<SendReportScreen> {
 
     await OfflineSyncService.instance.saveDraft(saved);
 
+    if (!mounted) return;
+
     setState(() {
       _saving = false;
       _docId = id;
@@ -600,6 +604,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
   Future<void> _lockSignature() async {
     if (_signature == null || _finalized) return;
     await SignatureStorage.save(_signature!);
+    if (!mounted) return;
     setState(() {
       _signatureLocked = true;
     });
@@ -610,10 +615,9 @@ class _SendReportScreenState extends State<SendReportScreen> {
   Future<void> _copyLink() async {
     if (_publicId == null) return;
     await Clipboard.setData(ClipboardData(text: _publicUrl));
-    if (mounted) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Link copied')));
-    }
+    if (!mounted) return;
+    ScaffoldMessenger.of(context)
+        .showSnackBar(const SnackBar(content: Text('Link copied')));
   }
 
   Future<void> _openLink() async {
@@ -708,6 +712,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
     } else {
       text = generateSummaryText(report);
     }
+    if (!mounted) return;
     setState(() {
       _summaryTextController.text = text;
       if (_savedReport != null) {
@@ -763,12 +768,11 @@ class _SendReportScreenState extends State<SendReportScreen> {
     );
     try {
       final file = await exportCsv(_savedReport!);
-      if (mounted) {
-        setState(() => _exportedFile = file);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('CSV exported')),
-        );
-      }
+      if (!mounted) return;
+      setState(() => _exportedFile = file);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('CSV exported')),
+      );
     } finally {
       if (mounted && Navigator.of(context).canPop()) {
         Navigator.of(context).pop();
@@ -799,14 +803,13 @@ class _SendReportScreenState extends State<SendReportScreen> {
     );
     try {
       final file = await exportFinalZip(_savedReport!);
-      if (mounted) {
-        setState(() => _exportedFile = file);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('ZIP exported')),
-        );
-        inspectionChecklist.markComplete('Report Exported');
-        LocalReportStore.instance.saveSnapshot(_savedReport!);
-      }
+      if (!mounted) return;
+      setState(() => _exportedFile = file);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('ZIP exported')),
+      );
+      inspectionChecklist.markComplete('Report Exported');
+      LocalReportStore.instance.saveSnapshot(_savedReport!);
     } finally {
       if (mounted && Navigator.of(context).canPop()) {
         Navigator.of(context).pop();
@@ -831,12 +834,11 @@ class _SendReportScreenState extends State<SendReportScreen> {
     );
     try {
       final file = await exportLegalCopy(_savedReport!, userId: _profile?.id);
-      if (mounted) {
-        setState(() => _exportedFile = file);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Legal copy exported')),
-        );
-      }
+      if (!mounted) return;
+      setState(() => _exportedFile = file);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Legal copy exported')),
+      );
     } finally {
       if (mounted && Navigator.of(context).canPop()) {
         Navigator.of(context).pop();
@@ -869,17 +871,17 @@ class _SendReportScreenState extends State<SendReportScreen> {
           'Thank you for choosing ${settings?.companyName ?? 'ClearSky'}.';
       final file = await TtsService.instance
           .exportSummary(_summaryTextController.text, intro, outro);
-      if (mounted) {
-        setState(() => _audioFile = file);
-        try {
-          _audioUrl = await uploadAudioFile(file);
-        } catch (_) {
-          _audioUrl = null;
-        }
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Audio exported')),
-        );
+      if (!mounted) return;
+      setState(() => _audioFile = file);
+      try {
+        _audioUrl = await uploadAudioFile(file);
+      } catch (_) {
+        _audioUrl = null;
       }
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Audio exported')),
+      );
     } finally {
       if (mounted && Navigator.of(context).canPop()) {
         Navigator.of(context).pop();
@@ -930,6 +932,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
           ],
         ),
       );
+      if (!mounted) return;
       if (confirmed == true) {
         setState(() {
           _attachments.add(ReportAttachment(
@@ -957,11 +960,11 @@ class _SendReportScreenState extends State<SendReportScreen> {
         });
       } catch (_) {}
     }
+    if (!mounted) return;
     setState(() {
       _auditPassed = result.passed;
       _auditIssues = result.issues;
     });
-    if (!mounted) return;
     _showAuditDialog();
   }
 
@@ -1031,6 +1034,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
           .update({'clientEmail': email});
       await AuditLogService().logAction('assign_client', targetId: _docId);
       await AuthService().sendSignInLink(email, Uri.base.toString());
+      if (!mounted) return;
       if (_savedReport != null) {
         setState(() {
           _savedReport = SavedReport(
@@ -1056,14 +1060,13 @@ class _SendReportScreenState extends State<SendReportScreen> {
             lastEditedBy: _savedReport!.lastEditedBy,
             lastEditedAt: _savedReport!.lastEditedAt,
             latitude: _savedReport!.latitude,
-            longitude: _savedReport!.longitude,
-          );
-        });
+          longitude: _savedReport!.longitude,
+        );
+      });
       }
-      if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(const SnackBar(content: Text('Client invited')));
-      }
+      if (!mounted) return;
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Client invited')));
     } catch (_) {}
   }
 
@@ -1173,6 +1176,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
       meta['lastSentTo'] = to;
       meta['lastSentAt'] = DateTime.now().toIso8601String();
       meta['lastSendMethod'] = attachPdf ? 'attachment' : 'link';
+      if (!mounted) return;
       setState(() {
         _savedReport = SavedReport(
           id: _savedReport!.id,
@@ -1271,7 +1275,7 @@ class _SendReportScreenState extends State<SendReportScreen> {
           'durationMillis': DateTime.now().millisecondsSinceEpoch - createdMs,
       });
     } catch (_) {}
-
+    if (!mounted) return;
     setState(() {
       _finalized = true;
       _publicId = publicId;
@@ -1326,12 +1330,10 @@ class _SendReportScreenState extends State<SendReportScreen> {
         }
       }
     }
-
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Report finalized')),
-      );
-    }
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Report finalized')),
+    );
   }
 
   @override
