@@ -1,104 +1,118 @@
 import 'package:flutter/material.dart';
 
-import 'client_dashboard_screen.dart';
-import 'guided_capture_screen.dart';
-import 'analytics_dashboard_screen.dart';
+import '../../app/app_theme.dart';
+import 'project_details_screen.dart';
 
-import '../../core/models/inspection_report.dart';
-
+/// Landing screen with project creation and upgrade prompts.
 class HomeScreen extends StatelessWidget {
-  final List<InspectionReport> allReports;
+  final int freeReportsRemaining;
+  final bool isSubscribed;
 
-  const HomeScreen({super.key, required this.allReports});
+  const HomeScreen({
+    super.key,
+    required this.freeReportsRemaining,
+    required this.isSubscribed,
+  });
+
+  void _handleCreateProject(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const ProjectDetailsScreen()),
+    );
+  }
+
+  void _handleUpgrade(BuildContext context) {
+    // TODO: implement upgrade flow
+  }
+
+  void _checkSubscription(BuildContext context) {
+    if (freeReportsRemaining <= 0 && !isSubscribed) {
+      showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: const Text('Upgrade Needed'),
+          content: const Text(
+            'You have reached your free report limit. Upgrade to continue.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () => _handleUpgrade(context),
+              child: const Text('Upgrade'),
+            ),
+          ],
+        ),
+      );
+    } else {
+      _handleCreateProject(context);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppTheme.clearSkyTheme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text('ClearSky Photo Reports'),
+        title: const Text('Home'),
+        backgroundColor: AppTheme.clearSkyTheme.primaryColor,
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
+      body: Column(
         children: [
-          _HomeCard(
-            icon: Icons.camera_alt,
-            title: 'Start Guided Inspection',
-            subtitle: 'Step-by-step photo intake',
-            onTap: () async {
-              await Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const GuidedCaptureScreen()),
-              );
-              // Optionally handle result here
-            },
+          if (!isSubscribed)
+            Container(
+              padding: const EdgeInsets.all(12),
+              color: AppTheme.clearSkyTheme.colorScheme.secondary,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Free trial: $freeReportsRemaining report${freeReportsRemaining == 1 ? '' : 's'} remaining',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  ElevatedButton(
+                    onPressed: () => _handleUpgrade(context),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFFF8A65),
+                    ),
+                    child: const Text('Upgrade'),
+                  ),
+                ],
+              ),
+            ),
+          const SizedBox(height: 20),
+          Text(
+            'ClearSky Photo Reports',
+            style: Theme.of(context).textTheme.headline6,
           ),
-          _HomeCard(
-            icon: Icons.dashboard_customize,
-            title: 'View All Reports',
-            subtitle: 'See synced and unsynced inspections',
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => const ClientDashboardScreen(),
-                ),
-              );
-            },
-          ),
-          _HomeCard(
-            icon: Icons.bar_chart,
-            title: 'Analytics',
-            subtitle: 'Sync status and progress tracking',
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => AnalyticsDashboardScreen(reports: allReports),
-                ),
-              );
-            },
-          ),
-          _HomeCard(
-            icon: Icons.settings,
-            title: 'Settings',
-            subtitle: 'Theme, sync, account (coming soon)',
-            onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Settings not implemented yet.')),
-              );
-            },
+          const Text('Create professional inspection reports'),
+          const SizedBox(height: 20),
+          ElevatedButton.icon(
+            onPressed: () => _checkSubscription(context),
+            icon: const Icon(Icons.add),
+            label: const Text('Create Project'),
           ),
         ],
       ),
-    );
-  }
-}
-
-class _HomeCard extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String subtitle;
-  final VoidCallback onTap;
-
-  const _HomeCard({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 16),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: ListTile(
-        contentPadding: const EdgeInsets.all(16),
-        leading: Icon(icon, size: 32, color: Colors.blueGrey),
-        title: Text(title, style: Theme.of(context).textTheme.titleMedium),
-        subtitle: Text(subtitle),
-        trailing: const Icon(Icons.arrow_forward_ios, size: 18),
-        onTap: onTap,
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: 0,
+        onTap: (i) {
+          // TODO: implement navigation
+        },
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(icon: Icon(Icons.camera_alt), label: 'Camera'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.receipt_long),
+            label: 'Reports',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings),
+            label: 'Settings',
+          ),
+        ],
       ),
     );
   }
