@@ -30,10 +30,10 @@ Future<Uint8List> generateInvoicePdf(Invoice invoice) async {
                   children: [
                     pw.Padding(
                         padding: const pw.EdgeInsets.all(4),
-                        child: const pw.Text('Item')),
+                        child: pw.Text('Item')),
                     pw.Padding(
                         padding: const pw.EdgeInsets.all(4),
-                        child: const pw.Text('Amount')),
+                        child: pw.Text('Amount')),
                   ],
                 ),
                 ...invoice.items.map(
