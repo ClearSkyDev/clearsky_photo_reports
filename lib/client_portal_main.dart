@@ -47,7 +47,7 @@ class _AuthGate extends StatelessWidget {
       stream: AuthService().authStateChanges(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Scaffold(
+          return Scaffold(
               body: Center(child: CircularProgressIndicator()));
         }
         if (!snapshot.hasData) return const ClientLoginScreen();

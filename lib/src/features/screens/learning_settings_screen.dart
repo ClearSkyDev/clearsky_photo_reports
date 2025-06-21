@@ -49,7 +49,7 @@ class _LearningSettingsScreenState extends State<LearningSettingsScreen> {
   @override
   Widget build(BuildContext context) {
     if (!_loaded) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return Scaffold(body: Center(child: CircularProgressIndicator()));
     }
     return Scaffold(
       appBar: AppBar(title: const Text('AI Learning')),

@@ -39,7 +39,7 @@ class _AccessibilitySettingsScreenState
   @override
   Widget build(BuildContext context) {
     if (!_loaded) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return Scaffold(body: Center(child: CircularProgressIndicator()));
     }
     return Scaffold(
       appBar: AppBar(title: const Text('Accessibility Settings')),
