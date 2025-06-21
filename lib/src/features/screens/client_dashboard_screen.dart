@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'guided_capture_screen.dart';
 
 class ClientDashboardScreen extends StatelessWidget {
   const ClientDashboardScreen({super.key});
