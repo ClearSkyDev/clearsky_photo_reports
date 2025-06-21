@@ -85,7 +85,7 @@ class HomeScreen extends StatelessWidget {
           const SizedBox(height: 20),
           Text(
             'ClearSky Photo Reports',
-            style: Theme.of(context).textTheme.headline6,
+            style: Theme.of(context).textTheme.titleLarge,
           ),
           const Text('Create professional inspection reports'),
           const SizedBox(height: 20),
