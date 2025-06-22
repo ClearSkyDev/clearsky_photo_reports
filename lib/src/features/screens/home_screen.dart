@@ -102,6 +102,28 @@ class HomeScreen extends StatelessWidget {
           ElevatedButton.icon(
             onPressed: () => _checkSubscription(context),
             icon: const Icon(Icons.add),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.clearSkyBlue,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 24,
+                vertical: 12,
+              ),
+              elevation: 0,
+              textStyle: const TextStyle(
+                fontWeight: FontWeight.bold,
+                shadows: [
+                  Shadow(
+                    offset: Offset(0.5, 0.5),
+                    blurRadius: 2,
+                    color: Colors.black,
+                  ),
+                ],
+              ),
+            ),
             label: const Text('Create Project'),
           ),
         ],
