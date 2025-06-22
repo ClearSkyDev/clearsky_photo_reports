@@ -6,6 +6,7 @@ class InspectionMetadata {
   final String claimNumber;
   final String projectNumber;
   final DateTime? appointmentDate;
+  final DateTime? lastSynced;
   int position;
 
   InspectionMetadata({
@@ -14,6 +15,7 @@ class InspectionMetadata {
     required this.claimNumber,
     required this.projectNumber,
     this.appointmentDate,
+    this.lastSynced,
     this.position = 0,
   });
 
@@ -25,6 +27,9 @@ class InspectionMetadata {
       projectNumber: data['projectNumber'] ?? '',
       appointmentDate: data['appointmentDate'] != null
           ? (data['appointmentDate'] as Timestamp).toDate()
+          : null,
+      lastSynced: data['lastSynced'] != null
+          ? (data['lastSynced'] as Timestamp).toDate()
           : null,
       position: data['position'] is int ? data['position'] as int : 0,
     );

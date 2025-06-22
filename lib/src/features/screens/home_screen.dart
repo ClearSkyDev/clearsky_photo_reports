@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
+import 'package:hive/hive.dart';
 
 import '../../app/app_theme.dart';
 import '../../../models/simple_inspection_metadata.dart';
+import '../../core/models/local_inspection.dart';
+import '../../../services/offline_sync_service.dart';
 
 /// Landing screen with project creation and upgrade prompts.
 class HomeScreen extends StatefulWidget {
@@ -25,6 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
   int selectedFilterIndex = 0; // 0 = All, 1 = Upcoming, 2 = Unscheduled
 
   final List<String> filters = const ['All', 'Upcoming', 'Unscheduled'];
+  final Set<String> _syncing = {};
 
   void _handleCreateProject(BuildContext context) {
     Navigator.pushNamed(context, '/projectDetails');
@@ -85,6 +89,19 @@ class _HomeScreenState extends State<HomeScreen> {
     } else {
       _handleCreateProject(context);
     }
+  }
+
+  Future<bool> _hasUnsynced(String id) async {
+    final box = await Hive.openBox<LocalInspection>('inspections');
+    final local = box.get(id) as LocalInspection?;
+    return local != null && !local.isSynced;
+  }
+
+  Future<void> _syncProject(InspectionMetadata project) async {
+    if (_syncing.contains(project.id)) return;
+    setState(() => _syncing.add(project.id));
+    await OfflineSyncService.syncInspection(project.id);
+    if (mounted) setState(() => _syncing.remove(project.id));
   }
 
   Future<List<InspectionMetadata>> _loadProjects() async {
@@ -189,7 +206,17 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      child: Column(
+      child: FutureBuilder<bool>(
+        future: _hasUnsynced(project.id),
+        builder: (context, snapshot) {
+          final unsynced = snapshot.data ?? false;
+          final syncing = _syncing.contains(project.id);
+          final status = syncing
+              ? 'Syncing'
+              : unsynced
+                  ? 'Unsynced'
+                  : 'Synced';
+          return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
@@ -209,7 +236,27 @@ class _HomeScreenState extends State<HomeScreen> {
                 fontWeight: FontWeight.bold,
               ),
             ),
+          const SizedBox(height: 8),
+          Text('Status: $status'),
+          if (project.lastSynced != null && !unsynced)
+            Text("Last synced: ${DateFormat('MMM d, h:mm a').format(project.lastSynced!)}"),
+          const SizedBox(height: 4),
+          Align(
+            alignment: Alignment.centerRight,
+            child: ElevatedButton(
+              onPressed: syncing ? null : () => _syncProject(project),
+              child: syncing
+                  ? const SizedBox(
+                      height: 16,
+                      width: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Text('Sync Now'),
+            ),
+          ),
         ],
+          );
+        },
       ),
     );
   }
