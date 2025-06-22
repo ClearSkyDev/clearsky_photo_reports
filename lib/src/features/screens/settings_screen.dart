@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../app/app_theme.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 
 import '../../core/services/inspector_role_service.dart';
@@ -122,7 +124,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Settings')),
+      backgroundColor: AppTheme.clearSkyTheme.scaffoldBackgroundColor,
+      appBar: AppBar(
+        title: const Text('Settings'),
+        backgroundColor: AppTheme.clearSkyTheme.primaryColor,
+        foregroundColor: AppTheme.clearSkyTheme.colorScheme.onPrimary,
+      ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
