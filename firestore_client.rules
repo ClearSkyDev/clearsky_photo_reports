@@ -13,5 +13,8 @@ service cloud.firestore {
     match /clientActivity/{id} {
       allow create: if request.auth != null && request.auth.uid == request.resource.data.uid;
     }
+    match /users/{userId}/inspections/{docId} {
+      allow read, write: if request.auth.uid == userId;
+    }
   }
 }
