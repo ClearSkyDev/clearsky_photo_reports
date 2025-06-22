@@ -165,15 +165,17 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildProjectTile(InspectionMetadata project) {
-    final isUnscheduled = project.appointmentDate == null;
-    return Container(
+    final isScheduled = project.appointmentDate != null;
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isScheduled ? Colors.white : Colors.blue.shade50,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: isUnscheduled ? const Color(0xFF007BFF) : Colors.grey.shade300,
+          color: isScheduled ? Colors.grey.shade300 : const Color(0xFF007BFF),
           width: 2,
         ),
         boxShadow: [
