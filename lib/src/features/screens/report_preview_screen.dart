@@ -1293,6 +1293,19 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
                   ],
                 ),
                 Text('Inspector Name: ${_metadata.inspectorName}'),
+                if (_metadata.externalReportUrls.isNotEmpty)
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Attached Reports',
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                      ..._metadata.externalReportUrls
+                          .map((url) => Text(url.split('/').last)),
+                    ],
+                  ),
               ],
             ),
           ),
