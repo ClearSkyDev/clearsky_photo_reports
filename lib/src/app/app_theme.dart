@@ -40,13 +40,13 @@ class AppTheme {
 
   static ThemeData lightTheme = ThemeData(
     colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-    textTheme: _outlinedTextTheme(GoogleFonts.robotoTextTheme()),
+    textTheme: _outlinedTextTheme(GoogleFonts.interTextTheme()),
     scaffoldBackgroundColor: Colors.grey[50],
   );
 
   static ThemeData darkTheme = ThemeData.dark().copyWith(
     textTheme:
-        _outlinedTextTheme(GoogleFonts.robotoTextTheme(ThemeData.dark().textTheme)),
+        _outlinedTextTheme(GoogleFonts.interTextTheme(ThemeData.dark().textTheme)),
     scaffoldBackgroundColor: Colors.grey[900],
   );
 
@@ -59,7 +59,7 @@ class AppTheme {
       onSecondary: matteBlack,
     ),
     scaffoldBackgroundColor: lightBackground,
-    textTheme: _outlinedTextTheme(GoogleFonts.robotoTextTheme()),
+    textTheme: _outlinedTextTheme(GoogleFonts.interTextTheme()),
     appBarTheme: const AppBarTheme(
       backgroundColor: clearSkyBlue,
       foregroundColor: Colors.white,
