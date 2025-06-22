@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../../app/app_theme.dart';
+
 import '../../core/utils/learning_preferences.dart';
 import '../../core/services/ai_feedback_service.dart';
 import 'edit_history_screen.dart';
@@ -49,10 +51,18 @@ class _LearningSettingsScreenState extends State<LearningSettingsScreen> {
   @override
   Widget build(BuildContext context) {
     if (!_loaded) {
-      return Scaffold(body: Center(child: CircularProgressIndicator()));
+      return Scaffold(
+        backgroundColor: AppTheme.clearSkyTheme.scaffoldBackgroundColor,
+        body: const Center(child: CircularProgressIndicator()),
+      );
     }
     return Scaffold(
-      appBar: AppBar(title: const Text('AI Learning')),
+      backgroundColor: AppTheme.clearSkyTheme.scaffoldBackgroundColor,
+      appBar: AppBar(
+        title: const Text('AI Learning'),
+        backgroundColor: AppTheme.clearSkyTheme.primaryColor,
+        foregroundColor: AppTheme.clearSkyTheme.colorScheme.onPrimary,
+      ),
       body: ListView(
         children: [
           SwitchListTile(

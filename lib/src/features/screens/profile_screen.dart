@@ -3,6 +3,8 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 
+import '../../app/app_theme.dart';
+
 import '../../core/models/inspector_profile.dart';
 import '../../core/utils/profile_storage.dart';
 import 'capture_signature_screen.dart';
@@ -88,11 +90,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     if (_loading) {
       return Scaffold(
-        body: Center(child: CircularProgressIndicator()),
+        backgroundColor: AppTheme.clearSkyTheme.scaffoldBackgroundColor,
+        body: const Center(child: CircularProgressIndicator()),
       );
     }
     return Scaffold(
-      appBar: AppBar(title: const Text('Inspector Profile')),
+      backgroundColor: AppTheme.clearSkyTheme.scaffoldBackgroundColor,
+      appBar: AppBar(
+        title: const Text('Inspector Profile'),
+        backgroundColor: AppTheme.clearSkyTheme.primaryColor,
+        foregroundColor: AppTheme.clearSkyTheme.colorScheme.onPrimary,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: ListView(

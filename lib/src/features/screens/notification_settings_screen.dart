@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../app/app_theme.dart';
+
 import '../../core/models/notification_preferences.dart';
 import '../../core/services/notification_service.dart';
 
@@ -49,11 +51,17 @@ class _NotificationSettingsScreenState
   Widget build(BuildContext context) {
     if (!_loaded) {
       return Scaffold(
-        body: Center(child: CircularProgressIndicator()),
+        backgroundColor: AppTheme.clearSkyTheme.scaffoldBackgroundColor,
+        body: const Center(child: CircularProgressIndicator()),
       );
     }
     return Scaffold(
-      appBar: AppBar(title: const Text('Notification Settings')),
+      backgroundColor: AppTheme.clearSkyTheme.scaffoldBackgroundColor,
+      appBar: AppBar(
+        title: const Text('Notification Settings'),
+        backgroundColor: AppTheme.clearSkyTheme.primaryColor,
+        foregroundColor: AppTheme.clearSkyTheme.colorScheme.onPrimary,
+      ),
       body: ListView(
         children: [
           SwitchListTile(
