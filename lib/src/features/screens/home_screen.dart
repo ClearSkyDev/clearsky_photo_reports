@@ -187,46 +187,57 @@ class HomeScreen extends StatelessWidget {
                     final project = projects[index];
                     final isUnscheduled = project.appointmentDate == null;
 
-                    return Card(
-                      shape: RoundedRectangleBorder(
-                        side: BorderSide(
-                          color:
-                              isUnscheduled ? Colors.blue : Colors.grey.shade300,
-                          width: 2,
-                        ),
-                        borderRadius: BorderRadius.circular(12),
+                    return GestureDetector(
+                      onTap: () => Navigator.pushNamed(
+                        context,
+                        '/projectDetails',
+                        arguments: project,
                       ),
-                      margin: const EdgeInsets.all(12),
-                      elevation: 3,
-                      child: ListTile(
-                        title: Text(
-                          project.clientName,
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Project #: ${project.projectNumber}'),
-                            Text('Claim #: ${project.claimNumber}'),
-                            Text(
-                              project.appointmentDate != null
-                                  ? 'Appointment: ${DateFormat('EEE, MMM d • h:mm a').format(project.appointmentDate!)}'
-                                  : '⚠️ No appointment scheduled',
-                              style: TextStyle(
-                                color: isUnscheduled ? Colors.orange : Colors.black,
-                                fontWeight:
-                                    isUnscheduled ? FontWeight.bold : FontWeight.normal,
-                              ),
-                            ),
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 8),
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: isUnscheduled
+                                ? const Color(0xFF007BFF)
+                                : Colors.grey.shade300,
+                            width: 2,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
+                            )
                           ],
                         ),
-                        onTap: () {
-                          Navigator.pushNamed(
-                            context,
-                            '/reportPreview',
-                            arguments: project.id,
-                          );
-                        },
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              project.clientName,
+                              style: const TextStyle(
+                                  fontSize: 18, fontWeight: FontWeight.bold),
+                            ),
+                            const SizedBox(height: 4),
+                            Text('Project #: ${project.projectNumber}'),
+                            Text('Claim #: ${project.claimNumber}'),
+                            if (project.appointmentDate != null)
+                              Text(
+                                'Appt: ${DateFormat("MMM d, yyyy h:mm a").format(project.appointmentDate!)}',
+                              ),
+                            if (project.appointmentDate == null)
+                              const Text(
+                                'No Appointment Set',
+                                style: TextStyle(
+                                    color: Color(0xFF007BFF),
+                                    fontWeight: FontWeight.bold),
+                              ),
+                          ],
+                        ),
                       ),
                     );
                   },
