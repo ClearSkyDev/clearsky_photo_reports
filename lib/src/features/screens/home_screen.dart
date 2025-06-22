@@ -125,6 +125,42 @@ class _HomeScreenState extends State<HomeScreen> {
     return projects;
   }
 
+  Map<String, List<InspectionMetadata>> _groupProjectsByDate(
+      List<InspectionMetadata> projects) {
+    final Map<String, List<InspectionMetadata>> grouped = {
+      'Today': [],
+      'Tomorrow': [],
+      'This Week': [],
+      'Later': [],
+      'Unscheduled': [],
+    };
+
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final tomorrow = today.add(const Duration(days: 1));
+    final nextWeek = today.add(const Duration(days: 7));
+
+    for (final project in projects) {
+      final appt = project.appointmentDate;
+      if (appt == null) {
+        grouped['Unscheduled']!.add(project);
+      } else {
+        final apptDate = DateTime(appt.year, appt.month, appt.day);
+        if (apptDate == today) {
+          grouped['Today']!.add(project);
+        } else if (apptDate == tomorrow) {
+          grouped['Tomorrow']!.add(project);
+        } else if (apptDate.isBefore(nextWeek)) {
+          grouped['This Week']!.add(project);
+        } else {
+          grouped['Later']!.add(project);
+        }
+      }
+    }
+
+    return grouped;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -204,66 +240,89 @@ class _HomeScreenState extends State<HomeScreen> {
                   return const Center(child: Text('No inspections found'));
                 }
 
-                return ListView.builder(
-                  itemCount: projects.length,
-                  itemBuilder: (context, index) {
-                    final project = projects[index];
-                    final isUnscheduled = project.appointmentDate == null;
+                final groupedProjects = _groupProjectsByDate(projects);
 
-                    return GestureDetector(
-                      onTap: () => Navigator.pushNamed(
-                        context,
-                        '/projectDetails',
-                        arguments: project,
-                      ),
-                      child: Container(
-                        margin: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 8),
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: isUnscheduled
-                                ? const Color(0xFF007BFF)
-                                : Colors.grey.shade300,
-                            width: 2,
+                return ListView(
+                  padding: const EdgeInsets.only(bottom: 100),
+                  children: groupedProjects.entries.expand((entry) {
+                    final sectionTitle = entry.key;
+                    final sectionProjects = entry.value;
+                    if (sectionProjects.isEmpty) return [];
+
+                    return [
+                      Padding(
+                        padding:
+                            const EdgeInsets.fromLTRB(16, 16, 16, 4),
+                        child: Text(
+                          sectionTitle,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF007BFF),
                           ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.05),
-                              blurRadius: 4,
-                              offset: const Offset(0, 2),
-                            )
-                          ],
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              project.clientName,
-                              style: const TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.bold),
-                            ),
-                            const SizedBox(height: 4),
-                            Text('Project #: ${project.projectNumber}'),
-                            Text('Claim #: ${project.claimNumber}'),
-                            if (project.appointmentDate != null)
-                              Text(
-                                'Appt: ${DateFormat("MMM d, yyyy h:mm a").format(project.appointmentDate!)}',
-                              ),
-                            if (project.appointmentDate == null)
-                              const Text(
-                                'No Appointment Set',
-                                style: TextStyle(
-                                    color: Color(0xFF007BFF),
-                                    fontWeight: FontWeight.bold),
-                              ),
-                          ],
                         ),
                       ),
-                    );
-                  },
+                      ...sectionProjects.map((project) {
+                        final isUnscheduled =
+                            project.appointmentDate == null;
+
+                        return GestureDetector(
+                          onTap: () => Navigator.pushNamed(
+                            context,
+                            '/projectDetails',
+                            arguments: project,
+                          ),
+                          child: Container(
+                            margin: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 6),
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: isUnscheduled
+                                    ? const Color(0xFF007BFF)
+                                    : Colors.grey.shade300,
+                                width: 2,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.05),
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 2),
+                                )
+                              ],
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  project.clientName,
+                                  style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                const SizedBox(height: 4),
+                                Text('Project #: ${project.projectNumber}'),
+                                Text('Claim #: ${project.claimNumber}'),
+                                if (project.appointmentDate != null)
+                                  Text(
+                                    'Appt: ${DateFormat("MMM d, yyyy h:mm a").format(project.appointmentDate!)}',
+                                  ),
+                                if (project.appointmentDate == null)
+                                  const Text(
+                                    'No Appointment Set',
+                                    style: TextStyle(
+                                        color: Color(0xFF007BFF),
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                              ],
+                            ),
+                          ),
+                        );
+                      }).toList()
+                    ];
+                  }).toList(),
                 );
               },
             ),
