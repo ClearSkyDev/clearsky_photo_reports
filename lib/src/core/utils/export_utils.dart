@@ -437,6 +437,13 @@ Future<String> _generateHtml(SavedReport report) async {
     }
     buffer.writeln('</ul>');
   }
+  if (meta.externalReportUrls.isNotEmpty) {
+    buffer.writeln('<h2>External Reports</h2><ul>');
+    for (final url in meta.externalReportUrls) {
+      buffer.writeln('<li><a href="$url">${p.basename(url)}</a></li>');
+    }
+    buffer.writeln('</ul>');
+  }
 
   if (report.structures.length > 1) {
     buffer.writeln('<h2>Table of Contents</h2><ul>');
@@ -896,6 +903,27 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
           pw.Text(
               'Inspector Role: ${meta.inspectorRoles.map((e) => e.name.replaceAll('_', ' ')).join(', ')}'),
           pw.Text('Inspector Name: ${meta.inspectorName}'),
+          if (meta.externalReportUrls.isNotEmpty) ...[
+            pw.SizedBox(height: 10),
+            pw.Text('External Reports',
+                style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+            pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: [
+                for (final url in meta.externalReportUrls)
+                  pw.UrlLink(
+                    destination: url,
+                    child: pw.Text(
+                      p.basename(url),
+                      style: pw.TextStyle(
+                        decoration: pw.TextDecoration.underline,
+                        color: PdfColors.blue,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ],
           pw.SizedBox(height: 20),
           ...widgets,
           pw.SizedBox(height: 40),
