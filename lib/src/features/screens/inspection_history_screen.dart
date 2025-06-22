@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../../../screens/inspection_report.dart';
+
 /// Lists inspections for the current user and allows resuming photo capture.
 class InspectionHistoryScreen extends StatelessWidget {
   const InspectionHistoryScreen({super.key});
@@ -50,6 +52,16 @@ class InspectionHistoryScreen extends StatelessWidget {
                 subtitle: Text(
                   [data['address'], date].where((e) => e != null && e != '').join(' • '),
                 ),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => InspectionReportScreen(
+                        inspectionId: inspections[i].id,
+                      ),
+                    ),
+                  );
+                },
                 trailing: ElevatedButton(
                   onPressed: () {
                     Navigator.pushNamed(
