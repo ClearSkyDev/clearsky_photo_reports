@@ -6,6 +6,7 @@ import '../features/screens/home_screen.dart';
 import '../features/screens/project_details_screen.dart';
 import '../features/screens/guided_capture_screen.dart';
 import '../features/screens/report_preview_screen.dart';
+import '../features/screens/settings_screen.dart';
 import '../core/models/inspection_metadata.dart';
 import '../core/models/peril_type.dart';
 import '../core/models/inspection_type.dart';
@@ -38,6 +39,7 @@ class ClearSkyApp extends StatelessWidget {
         '/home': (context) => const HomeScreen(freeReportsRemaining: 3, isSubscribed: false),
         '/projectDetails': (context) => const ProjectDetailsScreen(),
         '/reportPreview': (context) => ReportPreviewScreen(metadata: dummyMetadata),
+        '/settings': (context) => const SettingsScreen(),
         // Navigation to guided capture uses arguments
       },
       onGenerateRoute: (settings) {

@@ -109,7 +109,14 @@ class HomeScreen extends StatelessWidget {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: 0,
         onTap: (i) {
-          // TODO: implement navigation
+          switch (i) {
+            case 3:
+              Navigator.pushNamed(context, '/settings');
+              break;
+            default:
+              // TODO: implement navigation for other tabs
+              break;
+          }
         },
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
