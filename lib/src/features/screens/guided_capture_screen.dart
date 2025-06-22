@@ -5,13 +5,16 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import '../../core/services/label_suggestion_service.dart';
 
 class GuidedCaptureScreen extends StatefulWidget {
   final String inspectionId;
+  final String section;
 
   const GuidedCaptureScreen({
     super.key,
     required this.inspectionId,
+    this.section = 'General',
   });
 
   @override
@@ -45,19 +48,42 @@ class GuidedCaptureScreenState extends State<GuidedCaptureScreen> {
       'photos': FieldValue.arrayUnion([url])
     });
 
+    final suggestedLabel = await LabelSuggestionService.suggestLabel(
+      sectionPrefix: widget.section,
+      photoUri: picked.path,
+    );
+
+    final newPhoto = {
+      'localPath': picked.path,
+      'filename': filename,
+      'sectionPrefix': widget.section,
+      'userLabel': suggestedLabel,
+      'aiSuggestedLabel': suggestedLabel,
+      'approved': false,
+      'data': bytes,
+      'url': url,
+    };
+
     setState(() {
-      _capturedPhotos.add({'data': bytes, 'url': url});
+      _capturedPhotos.add(newPhoto);
     });
   }
 
-  Widget _buildPhoto(Uint8List data) {
+  Widget _buildPhoto(int index, Map<String, dynamic> photo) {
+    final controller = TextEditingController(text: photo['userLabel'] as String? ?? '');
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: Column(
         children: [
-          Image.memory(data, height: 200),
-          const TextField(
-            decoration: InputDecoration(labelText: 'Label this photo'),
+          Image.memory(photo['data'] as Uint8List, height: 200),
+          TextField(
+            controller: controller,
+            decoration: const InputDecoration(labelText: 'Label this photo'),
+            onChanged: (val) {
+              setState(() {
+                _capturedPhotos[index]['userLabel'] = val;
+              });
+            },
           ),
         ],
       ),
@@ -75,7 +101,9 @@ class GuidedCaptureScreenState extends State<GuidedCaptureScreen> {
             onPressed: _capturePhoto,
             child: const Text('Take Photo'),
           ),
-          ..._capturedPhotos.map((p) => _buildPhoto(p['data'] as Uint8List)),
+          ..._capturedPhotos.asMap().entries.map(
+            (entry) => _buildPhoto(entry.key, entry.value),
+          ),
         ],
       ),
     );
