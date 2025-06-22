@@ -244,12 +244,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
                 return ListView(
                   padding: const EdgeInsets.only(bottom: 100),
-                  children: groupedProjects.entries.expand((entry) {
+                  children: groupedProjects.entries.expand<Widget>((entry) {
                     final sectionTitle = entry.key;
                     final sectionProjects = entry.value;
-                    if (sectionProjects.isEmpty) return [];
+                    if (sectionProjects.isEmpty) return <Widget>[];
 
-                    return [
+                    return <Widget>[
                       Padding(
                         padding:
                             const EdgeInsets.fromLTRB(16, 16, 16, 4),
@@ -262,7 +262,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
                       ),
-                      ...sectionProjects.map((project) {
+                      ...sectionProjects.map<Widget>((project) {
                         final isUnscheduled =
                             project.appointmentDate == null;
 
@@ -320,7 +320,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           ),
                         );
-                      }).toList()
+                      })
                     ];
                   }).toList(),
                 );
