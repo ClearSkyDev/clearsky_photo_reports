@@ -1,6 +1,8 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+
+import '../../app/app_theme.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:file_picker/file_picker.dart';
@@ -28,11 +30,19 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
 
   DateTime? _appointmentDate;
 
-  final List<String> externalReportUrls = [];
+  String? _eagleViewUrl;
+  String? _hoverUrl;
+  String? _itelUrl;
+
+  List<String> get externalReportUrls => [
+        if (_eagleViewUrl != null) _eagleViewUrl!,
+        if (_hoverUrl != null) _hoverUrl!,
+        if (_itelUrl != null) _itelUrl!,
+      ];
 
   bool _isSubmitting = false;
 
-  Future<void> _pickAndUploadExternalReport() async {
+  Future<void> _pickAndUploadReport(String label) async {
     final result = await FilePicker.platform.pickFiles(
       allowMultiple: false,
       type: FileType.custom,
@@ -51,7 +61,17 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
         final url = await task.ref.getDownloadURL();
         if (!mounted) return;
         setState(() {
-          externalReportUrls.add(url);
+          switch (label) {
+            case 'EagleView':
+              _eagleViewUrl = url;
+              break;
+            case 'Hover':
+              _hoverUrl = url;
+              break;
+            case 'ITEL':
+              _itelUrl = url;
+              break;
+          }
         });
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -144,7 +164,12 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('New Inspection')),
+      backgroundColor: AppTheme.clearSkyTheme.scaffoldBackgroundColor,
+      appBar: AppBar(
+        title: const Text('New Inspection'),
+        backgroundColor: AppTheme.clearSkyTheme.primaryColor,
+        foregroundColor: AppTheme.clearSkyTheme.colorScheme.onPrimary,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Form(
@@ -190,23 +215,44 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
                 decoration: const InputDecoration(labelText: 'Peril Type'),
               ),
               const SizedBox(height: 12),
-              ...externalReportUrls.map(
-                (url) => ListTile(
-                  title: Text(p.basename(url)),
+              if (_eagleViewUrl != null)
+                ListTile(
+                  title: Text('EagleView: ${p.basename(_eagleViewUrl!)}'),
                   trailing: IconButton(
                     icon: const Icon(Icons.delete),
-                    onPressed: () {
-                      setState(() {
-                        externalReportUrls.remove(url);
-                      });
-                    },
+                    onPressed: () => setState(() => _eagleViewUrl = null),
                   ),
                 ),
+              if (_hoverUrl != null)
+                ListTile(
+                  title: Text('Hover: ${p.basename(_hoverUrl!)}'),
+                  trailing: IconButton(
+                    icon: const Icon(Icons.delete),
+                    onPressed: () => setState(() => _hoverUrl = null),
+                  ),
+                ),
+              if (_itelUrl != null)
+                ListTile(
+                  title: Text('ITEL: ${p.basename(_itelUrl!)}'),
+                  trailing: IconButton(
+                    icon: const Icon(Icons.delete),
+                    onPressed: () => setState(() => _itelUrl = null),
+                  ),
+                ),
+              ElevatedButton.icon(
+                onPressed: () => _pickAndUploadReport('EagleView'),
+                icon: const Icon(Icons.attach_file),
+                label: const Text('Attach EagleView Report'),
               ),
               ElevatedButton.icon(
-                onPressed: _pickAndUploadExternalReport,
+                onPressed: () => _pickAndUploadReport('Hover'),
                 icon: const Icon(Icons.attach_file),
-                label: const Text('Attach External Report'),
+                label: const Text('Attach Hover Report'),
+              ),
+              ElevatedButton.icon(
+                onPressed: () => _pickAndUploadReport('ITEL'),
+                icon: const Icon(Icons.attach_file),
+                label: const Text('Attach ITEL Report'),
               ),
               const SizedBox(height: 20),
               ElevatedButton(

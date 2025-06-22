@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../app/app_theme.dart';
 import '../../core/models/accessibility_settings.dart';
 import '../../core/services/accessibility_service.dart';
 
@@ -39,10 +40,18 @@ class _AccessibilitySettingsScreenState
   @override
   Widget build(BuildContext context) {
     if (!_loaded) {
-      return Scaffold(body: Center(child: CircularProgressIndicator()));
+      return Scaffold(
+        backgroundColor: AppTheme.clearSkyTheme.scaffoldBackgroundColor,
+        body: const Center(child: CircularProgressIndicator()),
+      );
     }
     return Scaffold(
-      appBar: AppBar(title: const Text('Accessibility Settings')),
+      backgroundColor: AppTheme.clearSkyTheme.scaffoldBackgroundColor,
+      appBar: AppBar(
+        title: const Text('Accessibility Settings'),
+        backgroundColor: AppTheme.clearSkyTheme.primaryColor,
+        foregroundColor: AppTheme.clearSkyTheme.colorScheme.onPrimary,
+      ),
       body: ListView(
         children: [
           ListTile(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../app/app_theme.dart';
 import '../../core/services/changelog_service.dart';
 
 class ChangelogScreen extends StatelessWidget {
@@ -9,7 +10,12 @@ class ChangelogScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final entries = ChangelogService.instance.entries;
     return Scaffold(
-      appBar: AppBar(title: const Text("What's New")),
+      backgroundColor: AppTheme.clearSkyTheme.scaffoldBackgroundColor,
+      appBar: AppBar(
+        title: const Text("What's New"),
+        backgroundColor: AppTheme.clearSkyTheme.primaryColor,
+        foregroundColor: AppTheme.clearSkyTheme.colorScheme.onPrimary,
+      ),
       body: ListView.builder(
         itemCount: entries.length,
         itemBuilder: (context, index) {
