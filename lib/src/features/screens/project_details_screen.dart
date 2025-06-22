@@ -88,12 +88,14 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
       firstDate: DateTime(2000),
       lastDate: DateTime(2100),
     );
+    if (!mounted) return;
     if (date != null) {
       final time = await showTimePicker(
         context: context,
         initialTime: TimeOfDay.fromDateTime(
             _appointmentDate ?? DateTime.now()),
       );
+      if (!mounted) return;
       if (time != null) {
         setState(() {
           _appointmentDate = DateTime(

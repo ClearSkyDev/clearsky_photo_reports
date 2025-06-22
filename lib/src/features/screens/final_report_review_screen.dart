@@ -71,6 +71,7 @@ class FinalReportReviewScreen extends StatelessWidget {
             label: const Text('Export as PDF'),
             onPressed: () async {
               final pro = await SubscriptionService.isPro();
+              if (!context.mounted) return;
               if (!pro) {
                 showDialog(
                   context: context,
@@ -99,6 +100,7 @@ class FinalReportReviewScreen extends StatelessWidget {
             label: const Text('Export as HTML'),
             onPressed: () async {
               final pro = await SubscriptionService.isPro();
+              if (!context.mounted) return;
               if (!pro) {
                 showDialog(
                   context: context,
