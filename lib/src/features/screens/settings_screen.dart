@@ -209,7 +209,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         ),
                       );
                     },
-                    child: const Text('Upgrade'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF007BFF),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      elevation: 2,
+                    ),
+                    child: const Text(
+                      'Upgrade',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        shadows: [Shadow(blurRadius: 2, color: Colors.black)],
+                      ),
+                    ),
                   )
                 : null,
           ),
