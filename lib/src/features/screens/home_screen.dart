@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:intl/intl.dart';
 
 import '../../app/app_theme.dart';
+import '../../../models/simple_inspection_metadata.dart';
 
 /// Landing screen with project creation and upgrade prompts.
 class HomeScreen extends StatelessWidget {
@@ -59,6 +63,30 @@ class HomeScreen extends StatelessWidget {
     } else {
       _handleCreateProject(context);
     }
+  }
+
+  Future<List<InspectionMetadata>> _loadProjects() async {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) return [];
+
+    final snapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid)
+        .collection('inspections')
+        .get();
+
+    final projects = snapshot.docs
+        .map((doc) => InspectionMetadata.fromMap(doc.id, doc.data()))
+        .toList();
+
+    projects.sort((a, b) {
+      if (a.appointmentDate == null && b.appointmentDate == null) return 0;
+      if (a.appointmentDate == null) return 1;
+      if (b.appointmentDate == null) return -1;
+      return a.appointmentDate!.compareTo(b.appointmentDate!);
+    });
+
+    return projects;
   }
 
   @override
@@ -131,6 +159,73 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
             label: const Text('Create Project'),
+          ),
+          Expanded(
+            child: FutureBuilder(
+              future: _loadProjects(),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                final projects = snapshot.data as List<InspectionMetadata>;
+
+                if (projects.isEmpty) {
+                  return const Center(child: Text('No inspections found'));
+                }
+
+                return ListView.builder(
+                  itemCount: projects.length,
+                  itemBuilder: (context, index) {
+                    final project = projects[index];
+                    final isUnscheduled = project.appointmentDate == null;
+
+                    return Card(
+                      shape: RoundedRectangleBorder(
+                        side: BorderSide(
+                          color:
+                              isUnscheduled ? Colors.blue : Colors.grey.shade300,
+                          width: 2,
+                        ),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      margin: const EdgeInsets.all(12),
+                      elevation: 3,
+                      child: ListTile(
+                        title: Text(
+                          project.clientName,
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Project #: ${project.projectNumber}'),
+                            Text('Claim #: ${project.claimNumber}'),
+                            Text(
+                              project.appointmentDate != null
+                                  ? 'Appointment: ${DateFormat('EEE, MMM d • h:mm a').format(project.appointmentDate!)}'
+                                  : '⚠️ No appointment scheduled',
+                              style: TextStyle(
+                                color: isUnscheduled ? Colors.orange : Colors.black,
+                                fontWeight:
+                                    isUnscheduled ? FontWeight.bold : FontWeight.normal,
+                              ),
+                            ),
+                          ],
+                        ),
+                        onTap: () {
+                          Navigator.pushNamed(
+                            context,
+                            '/reportPreview',
+                            arguments: project.id,
+                          );
+                        },
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
           ),
         ],
       ),
