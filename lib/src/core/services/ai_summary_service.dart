@@ -46,28 +46,35 @@ class AiSummaryService {
         .toSet();
 
     String prompt;
-    if (roles.contains(InspectorReportRole.ladderAssist) && roles.length == 1) {
-      prompt =
-          'You are a third-party roof inspector. Your job is to document findings only.\n'
-          'Do not mention recommendations, causes, or coverage.\n'
-          'Simply describe the condition and any observable damage.\n\n'
-          'Here are the findings: ${jsonEncode(sectionData)}';
-    } else if (roles.contains(InspectorReportRole.adjuster) &&
-        roles.length == 1) {
-      prompt =
-          'You are an insurance adjuster. Based on the observed damage and inspection findings, '
-          'summarize the condition and note whether the damage is consistent with covered perils (like hail/wind).\n'
-          'Lean into claim decision logic, but remain factual.\n\n'
-          'Findings: ${jsonEncode(sectionData)}';
-    } else if (roles.contains(InspectorReportRole.contractor) &&
-        roles.length == 1) {
-      prompt =
-          'You are a roofing contractor writing a report for a homeowner or claims submission.\n'
-          'Use your summary to justify why repair or replacement may be needed based on the damage observed.\n\n'
-          'Be persuasive but factual.\n\n'
-          'Inspection Results: ${jsonEncode(sectionData)}';
+
+    String ladderAssistText =
+        'You are a third-party roof inspector. Your job is to document findings only.\n'
+        'Do not mention recommendations, causes, or coverage.';
+    String adjusterText =
+        'You are an insurance adjuster. Discuss whether observed damage is consistent with covered perils and how it may impact claim decisions.';
+    String contractorText =
+        'You are a roofing contractor. Offer repair or replacement suggestions where appropriate.';
+
+    if (roles.length == 1) {
+      if (roles.contains(InspectorReportRole.ladderAssist)) {
+        prompt = '$ladderAssistText\n\nHere are the findings: ${jsonEncode(sectionData)}';
+      } else if (roles.contains(InspectorReportRole.adjuster)) {
+        prompt = '$adjusterText\n\nFindings: ${jsonEncode(sectionData)}';
+      } else {
+        prompt = '$contractorText\n\nInspection Results: ${jsonEncode(sectionData)}';
+      }
     } else {
-      prompt = 'Summarize these findings: ${jsonEncode(sectionData)}';
+      final parts = <String>[];
+      if (roles.contains(InspectorReportRole.ladderAssist)) {
+        parts.add('While this is a third-party inspection, provide objective documentation.');
+      }
+      if (roles.contains(InspectorReportRole.adjuster)) {
+        parts.add('Explain how the findings may assist in claim resolution.');
+      }
+      if (roles.contains(InspectorReportRole.contractor)) {
+        parts.add('Include practical repair or replacement suggestions.');
+      }
+      prompt = '${parts.join(' ')}\n\nFindings: ${jsonEncode(sectionData)}';
     }
 
     final messages = [
