@@ -17,7 +17,6 @@ import 'offline_draft_store.dart';
 import '../utils/sync_preferences.dart';
 import 'sync_history_service.dart';
 import '../models/sync_log_entry.dart';
-import '../models/pending_photo.dart';
 import 'pending_photo_store.dart';
 
 class OfflineSyncService {
