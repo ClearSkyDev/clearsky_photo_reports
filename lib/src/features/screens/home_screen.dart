@@ -15,14 +15,25 @@ class HomeScreen extends StatelessWidget {
   });
 
   void _handleCreateProject(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => const ProjectDetailsScreen()),
-    );
+    Navigator.pushNamed(context, '/projectDetails');
   }
 
   void _handleUpgrade(BuildContext context) {
-    // TODO: implement upgrade flow
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Upgrade Required'),
+        content: const Text(
+          'Please upgrade your account to continue using ClearSky.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
   }
 
   void _checkSubscription(BuildContext context) {
