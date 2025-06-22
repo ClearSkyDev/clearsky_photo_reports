@@ -6,6 +6,8 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../core/services/label_suggestion_service.dart';
+import '../../core/utils/crop_preferences.dart';
+import '../../core/utils/square_cropper.dart';
 
 class GuidedCaptureScreen extends StatefulWidget {
   final String inspectionId;
@@ -29,7 +31,11 @@ class GuidedCaptureScreenState extends State<GuidedCaptureScreen> {
     final picked = await _picker.pickImage(source: ImageSource.camera);
     if (picked == null) return;
 
-    final bytes = await picked.readAsBytes();
+    final enforce = await CropPreferences.isEnforced();
+    final processed =
+        enforce ? await SquareCropper.crop(picked) : picked;
+
+    final bytes = await processed.readAsBytes();
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) return;
     final filename = DateTime.now().millisecondsSinceEpoch.toString();
@@ -50,11 +56,11 @@ class GuidedCaptureScreenState extends State<GuidedCaptureScreen> {
 
     final suggestedLabel = await LabelSuggestionService.suggestLabel(
       sectionPrefix: widget.section,
-      photoUri: picked.path,
+      photoUri: processed.path,
     );
 
     final newPhoto = {
-      'localPath': picked.path,
+      'localPath': processed.path,
       'filename': filename,
       'sectionPrefix': widget.section,
       'userLabel': suggestedLabel,

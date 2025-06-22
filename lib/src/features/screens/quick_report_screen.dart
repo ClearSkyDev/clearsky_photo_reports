@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import '../../core/utils/crop_preferences.dart';
+import '../../core/utils/square_cropper.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 
@@ -45,12 +47,15 @@ class _QuickReportScreenState extends State<QuickReportScreen> {
   Future<void> _pick() async {
     final XFile? image = await _picker.pickImage(source: ImageSource.camera);
     if (!mounted || image == null) return;
+    final enforce = await CropPreferences.isEnforced();
+    final processed =
+        enforce ? await SquareCropper.crop(image) : image;
     setState(() {
       _photos[_step] = ReportPhotoEntry(
         label: _labels[_step],
         caption: '',
         confidence: 0,
-        photoUrl: image.path,
+        photoUrl: processed.path,
         timestamp: DateTime.now(),
       );
     });

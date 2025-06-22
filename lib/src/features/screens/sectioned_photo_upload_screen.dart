@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import '../../core/utils/crop_preferences.dart';
+import '../../core/utils/square_cropper.dart';
 import 'dart:io';
 import 'package:reorderables/reorderables.dart';
 
@@ -55,6 +57,15 @@ class _SectionedPhotoUploadScreenState
   Future<void> _pickImages(String section, [String? structure]) async {
     final List<XFile> selected = await _picker.pickMultiImage();
     if (selected.isNotEmpty) {
+      final enforce = await CropPreferences.isEnforced();
+      final List<XFile> processed = [];
+      if (enforce) {
+        for (final x in selected) {
+          processed.add(await SquareCropper.crop(x));
+        }
+      } else {
+        processed.addAll(selected);
+      }
       final position = await _getPosition();
       if (!mounted) return;
       setState(() {
@@ -62,7 +73,7 @@ class _SectionedPhotoUploadScreenState
             ? _sections[section]!
             : _additionalStructures[structure]![section]!;
         target.addAll(
-          selected
+          processed
               .map((xfile) => PhotoEntry(
                     url: xfile.path,
                     capturedAt: DateTime.now(),

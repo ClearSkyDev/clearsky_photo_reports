@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/utils/color_extensions.dart';
+import '../../core/utils/crop_preferences.dart';
+import '../../core/utils/square_cropper.dart';
 
 import '../../core/models/report_theme.dart';
 
@@ -63,8 +65,10 @@ class _ReportThemeScreenState extends State<ReportThemeScreen> {
   Future<void> _pickLogo() async {
     final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
     if (image != null) {
+      final enforce = await CropPreferences.isEnforced();
+      final processed = enforce ? await SquareCropper.crop(image) : image;
       setState(() {
-        _logoPath = image.path;
+        _logoPath = processed.path;
       });
     }
   }

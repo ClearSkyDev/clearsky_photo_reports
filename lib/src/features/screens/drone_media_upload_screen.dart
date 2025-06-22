@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import '../../core/utils/crop_preferences.dart';
+import '../../core/utils/square_cropper.dart';
 import 'dart:io';
 import '../../core/models/photo_entry.dart';
 
@@ -19,8 +21,17 @@ class _DroneMediaUploadScreenState extends State<DroneMediaUploadScreen> {
   Future<void> _pick() async {
     final selected = await _picker.pickMultiImage();
     if (selected.isEmpty) return;
+    final enforce = await CropPreferences.isEnforced();
+    final List<XFile> processed = [];
+    if (enforce) {
+      for (final x in selected) {
+        processed.add(await SquareCropper.crop(x));
+      }
+    } else {
+      processed.addAll(selected);
+    }
     setState(() {
-      _photos.addAll(selected.map((x) => PhotoEntry(
+      _photos.addAll(processed.map((x) => PhotoEntry(
             url: x.path,
             sourceType: _type,
             label: _section,

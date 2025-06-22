@@ -5,6 +5,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/utils/sync_preferences.dart';
 import '../../core/utils/color_extensions.dart';
+import '../../core/utils/crop_preferences.dart';
+import '../../core/utils/square_cropper.dart';
 import '../../core/models/tts_settings.dart';
 import '../../core/services/tts_service.dart';
 import 'comment_template_screen.dart';
@@ -96,6 +98,7 @@ class _ReportSettingsScreenState extends State<ReportSettingsScreen> {
   bool _autoLegalBackup = false;
   bool _cloudSyncEnabled = true;
   bool _attachPdf = true;
+  bool _enforceSquareCrop = true;
   final TextEditingController _ttsLangController = TextEditingController();
   final TextEditingController _ttsVoiceController = TextEditingController();
   final TextEditingController _brandingController = TextEditingController();
@@ -143,8 +146,10 @@ class _ReportSettingsScreenState extends State<ReportSettingsScreen> {
   Future<void> _pickLogo() async {
     final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
     if (image != null) {
+      final enforce = await CropPreferences.isEnforced();
+      final processed = enforce ? await SquareCropper.crop(image) : image;
       setState(() {
-        _logoPath = image.path;
+        _logoPath = processed.path;
       });
     }
   }
@@ -191,6 +196,7 @@ class _ReportSettingsScreenState extends State<ReportSettingsScreen> {
       });
     }
     _cloudSyncEnabled = await SyncPreferences.isCloudSyncEnabled();
+    _enforceSquareCrop = await CropPreferences.isEnforced();
   }
 
   Future<void> _saveSettings() async {
@@ -221,6 +227,7 @@ class _ReportSettingsScreenState extends State<ReportSettingsScreen> {
     await prefs.setString('tts_settings', jsonEncode(tts.toMap()));
     await TtsService.instance.saveSettings(tts);
     await SyncPreferences.setCloudSyncEnabled(_cloudSyncEnabled);
+    await CropPreferences.setEnforced(_enforceSquareCrop);
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Settings saved')),
@@ -315,6 +322,11 @@ class _ReportSettingsScreenState extends State<ReportSettingsScreen> {
                   _showGpsData = val;
                 });
               },
+            ),
+            SwitchListTile(
+              title: const Text('Enforce 1:1 Photo Crop'),
+              value: _enforceSquareCrop,
+              onChanged: (val) => setState(() => _enforceSquareCrop = val),
             ),
             SwitchListTile(
               title: const Text('Auto Backup Legal Copy'),
