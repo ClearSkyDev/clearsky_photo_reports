@@ -65,7 +65,6 @@ class _HomeScreenState extends State<HomeScreen> {
             ElevatedButton(
               onPressed: () => _handleUpgrade(context),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF007BFF),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
                 ),
@@ -172,10 +171,14 @@ class _HomeScreenState extends State<HomeScreen> {
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: isScheduled ? Colors.white : Colors.blue.shade50,
+        color: isScheduled
+            ? Colors.white
+            : Theme.of(context).colorScheme.primary.withOpacity(0.1),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: isScheduled ? Colors.grey.shade300 : const Color(0xFF007BFF),
+          color: isScheduled
+              ? Colors.grey.shade300
+              : Theme.of(context).colorScheme.primary,
           width: 2,
         ),
         boxShadow: [
@@ -199,9 +202,12 @@ class _HomeScreenState extends State<HomeScreen> {
           if (project.appointmentDate != null)
             Text('Appt: ${DateFormat("MMM d, yyyy h:mm a").format(project.appointmentDate!)}'),
           if (project.appointmentDate == null)
-            const Text(
+            Text(
               'No Appointment Set',
-              style: TextStyle(color: Color(0xFF007BFF), fontWeight: FontWeight.bold),
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.primary,
+                fontWeight: FontWeight.bold,
+              ),
             ),
         ],
       ),
@@ -315,10 +321,10 @@ class _HomeScreenState extends State<HomeScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           child: Text(
             groupName,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF007BFF),
+              color: Theme.of(context).colorScheme.primary,
             ),
           ),
         ),
@@ -461,7 +467,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     onSelected: (_) {
                       setState(() => selectedFilterIndex = index);
                     },
-                    selectedColor: const Color(0xFF007BFF),
+                    selectedColor: Theme.of(context).colorScheme.primary,
                     backgroundColor: Colors.grey.shade200,
                     labelStyle: TextStyle(
                       color: isSelected ? Colors.white : Colors.black,
@@ -503,7 +509,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _checkSubscription(context),
-        backgroundColor: const Color(0xFF007BFF),
+        backgroundColor: Theme.of(context).colorScheme.primary,
         icon: const Icon(Icons.add),
         label: const Text('New Inspection'),
       ),

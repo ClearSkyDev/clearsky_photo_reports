@@ -80,9 +80,23 @@ class AppTheme {
   );
 
   static ThemeData darkTheme = ThemeData.dark().copyWith(
-    textTheme: _outlinedTextTheme(
-        GoogleFonts.robotoTextTheme(ThemeData.dark().textTheme)),
+    colorScheme: ThemeData.dark().colorScheme.copyWith(
+      primary: clearSkyBlue,
+      secondary: sunYellow,
+    ),
+    textTheme:
+        _outlinedTextTheme(GoogleFonts.robotoTextTheme(ThemeData.dark().textTheme)),
     scaffoldBackgroundColor: Colors.grey[900],
+    appBarTheme: const AppBarTheme(
+      backgroundColor: clearSkyBlue,
+      foregroundColor: Colors.white,
+    ),
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: sunYellow,
+        foregroundColor: matteBlack,
+      ),
+    ),
   );
 
   static ThemeData clearSkyTheme = ThemeData(

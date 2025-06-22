@@ -27,7 +27,6 @@ class _ReportThemeScreenState extends State<ReportThemeScreen> {
     'Red': Colors.red,
     'Green': Colors.green,
     'Orange': Colors.orange,
-    'Purple': Colors.purple,
   };
 
   static const List<String> _fonts = [
