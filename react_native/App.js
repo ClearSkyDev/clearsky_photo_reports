@@ -15,6 +15,7 @@ import * as ImagePicker from 'expo-image-picker';
 import PhotoAnnotationScreen from './PhotoAnnotationScreen';
 import AnnotatedImage from './AnnotatedImage';
 import { appColors, appSpacing, appTypography } from './appTheme';
+import { handlePhotoUpload as uploadAndStorePhoto } from './photoUploadUtils';
 
 // Mock AI label suggestions per inspection section
 const mockAISuggestions = {
@@ -99,21 +100,16 @@ export default function ClearSkyPhotoIntakeScreen() {
     });
 
     if (!result.canceled) {
-      const newPhoto = {
-        imageUri: result.assets[0].uri,
-        originalUri: result.assets[0].uri,
-        userLabel: generateAISuggestion(section),
-        annotations: generateAIAnnotations(),
-        showAnnotated: false,
-      };
-
-      setPhotoData((prevData) => {
-        const updatedSection = prevData[section]
-          ? [...prevData[section], newPhoto]
-          : [newPhoto];
-        return { ...prevData, [section]: updatedSection };
-      });
-      console.log('Added photo to', section);
+      const photoUri = result.assets[0].uri;
+      await uploadAndStorePhoto(
+        photoUri,
+        section,
+        photoData[section] || [],
+        (updated) => setPhotoData((prev) => ({ ...prev, [section]: updated })),
+        'demo',
+        generateAISuggestion(section),
+        generateAIAnnotations()
+      );
       if (autoChecklist) {
         setChecklist((prev) => ({ ...prev, [section]: true }));
       }

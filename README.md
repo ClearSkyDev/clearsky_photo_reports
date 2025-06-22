@@ -47,6 +47,10 @@ The prototype can be run on iOS using **Expo Go**:
 
 The configuration file `react_native/app.json` defines the app name, icon and splash screen used by Expo.
 
+### Expo Limitations
+
+Expo Go does not include native PDF generation. The prototype saves the report as HTML by default. To produce a PDF you can run the app in a custom Expo Dev Client or generate the PDF using a cloud service such as a Firebase Function.
+
 ## Questionnaire Generation Demo
 
 The file `react_native/roofQuestionnaire.js` contains a utility that converts approved photo labels into a structured questionnaire object. A small demo script is available under `scripts/demo_generate_questionnaire.js`:
