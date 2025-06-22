@@ -26,7 +26,7 @@ class _LoginScreenState extends State<LoginScreen> {
         password: _passwordController.text.trim(),
       );
       if (!mounted) return;
-      Navigator.pushReplacementNamed(context, '/home');
+      Navigator.pushNamedAndRemoveUntil(context, '/home', (_) => false);
     } catch (e) {
       debugPrint('[LoginScreen] Auth error: $e');
       if (mounted) setState(() => _error = e.toString());
