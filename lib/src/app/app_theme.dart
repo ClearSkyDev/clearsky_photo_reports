@@ -54,7 +54,7 @@ class AppTheme {
     colorScheme: ColorScheme.light(
       primary: clearSkyBlue,
       secondary: sunYellow,
-      background: lightBackground,
+      surface: lightBackground,
       onPrimary: Colors.white,
       onSecondary: matteBlack,
     ),
