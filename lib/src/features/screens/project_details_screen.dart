@@ -24,7 +24,8 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
   final TextEditingController _addressController = TextEditingController();
   final TextEditingController _carrierController = TextEditingController();
   final TextEditingController _perilController = TextEditingController();
-  final TextEditingController _projectNumberController = TextEditingController();
+  final TextEditingController _projectNumberController =
+      TextEditingController();
   final TextEditingController _claimNumberController = TextEditingController();
   final TextEditingController _appointmentController = TextEditingController();
 
@@ -53,10 +54,19 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
       final path = result.files.single.path!;
       final name = p.basename(path);
       try {
-        final uid = FirebaseAuth.instance.currentUser?.uid;
-        if (uid == null) throw Exception('User not logged in');
+        final user = FirebaseAuth.instance.currentUser;
+        if (user == null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Please log in before starting an inspection.'),
+            ),
+          );
+          if (mounted) Navigator.pushNamed(context, '/login');
+          return;
+        }
+
         final ref = FirebaseStorage.instance
-            .ref('users/$uid/external_reports/$name');
+            .ref('users/${user.uid}/external_reports/$name');
         final task = await ref.putFile(File(path));
         final url = await task.ref.getDownloadURL();
         if (!mounted) return;
@@ -92,8 +102,7 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
     if (date != null) {
       final time = await showTimePicker(
         context: context,
-        initialTime: TimeOfDay.fromDateTime(
-            _appointmentDate ?? DateTime.now()),
+        initialTime: TimeOfDay.fromDateTime(_appointmentDate ?? DateTime.now()),
       );
       if (!mounted) return;
       if (time != null) {
@@ -120,12 +129,20 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
     });
 
     try {
-      final uid = FirebaseAuth.instance.currentUser?.uid;
-      if (uid == null) throw Exception('User not logged in');
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Please log in before starting an inspection.'),
+          ),
+        );
+        if (mounted) Navigator.pushNamed(context, '/login');
+        return;
+      }
 
       final collection = FirebaseFirestore.instance
           .collection('users')
-          .doc(uid)
+          .doc(user.uid)
           .collection('inspections');
 
       final snap = await collection.get();
@@ -191,7 +208,8 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
               ),
               TextFormField(
                 controller: _addressController,
-                decoration: const InputDecoration(labelText: 'Property Address'),
+                decoration:
+                    const InputDecoration(labelText: 'Property Address'),
                 validator: (v) => v == null || v.isEmpty ? 'Required' : null,
               ),
               TextFormField(
