@@ -144,6 +144,7 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
         'status': 'draft',
         'photos': [],
         'position': position,
+        'lastSynced': null,
         if (externalReportUrls.isNotEmpty)
           'externalReportUrls': externalReportUrls,
       });

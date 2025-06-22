@@ -8,6 +8,54 @@ import 'dart:io';
 import 'package:clearsky_photo_reports/src/core/models/local_inspection.dart';
 
 class OfflineSyncService {
+  static Future<void> syncInspection(String inspectionId) async {
+    final connectivity = await Connectivity().checkConnectivity();
+    if (connectivity == ConnectivityResult.none) return;
+
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) return;
+
+    final box = await Hive.openBox<LocalInspection>('inspections');
+    final inspection = box.get(inspectionId);
+    if (inspection == null || inspection.isSynced) return;
+
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid)
+        .collection('inspections')
+        .doc(inspection.inspectionId)
+        .set(inspection.metadata, SetOptions(merge: true));
+
+    for (var photo in inspection.photos) {
+      final file = File(photo['localPath']);
+      final ref = FirebaseStorage.instance.ref(
+          'users/$uid/inspections/${inspection.inspectionId}/photos/${photo['filename']}');
+      final result = await ref.putFile(file);
+      final url = await result.ref.getDownloadURL();
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(uid)
+          .collection('inspections')
+          .doc(inspection.inspectionId)
+          .collection('photos')
+          .add({
+        'url': url,
+        'label': photo['label'],
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+    }
+
+    inspection.isSynced = true;
+    inspection.save();
+
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid)
+        .collection('inspections')
+        .doc(inspection.inspectionId)
+        .update({'lastSynced': FieldValue.serverTimestamp()});
+  }
+
   static Future<void> syncAll() async {
     final connectivity = await Connectivity().checkConnectivity();
     if (connectivity == ConnectivityResult.none) return;
@@ -17,37 +65,7 @@ class OfflineSyncService {
 
     final box = await Hive.openBox<LocalInspection>('inspections');
     for (var inspection in box.values.where((i) => !i.isSynced)) {
-      // Upload metadata
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(uid)
-          .collection('inspections')
-          .doc(inspection.inspectionId)
-          .set(inspection.metadata);
-
-      // Upload photos
-      for (var photo in inspection.photos) {
-        final file = File(photo['localPath']);
-        final ref = FirebaseStorage.instance
-            .ref('users/$uid/inspections/${inspection.inspectionId}/photos/${photo['filename']}');
-        final result = await ref.putFile(file);
-        final url = await result.ref.getDownloadURL();
-        await FirebaseFirestore.instance
-            .collection('users')
-            .doc(uid)
-            .collection('inspections')
-            .doc(inspection.inspectionId)
-            .collection('photos')
-            .add({
-              'url': url,
-              'label': photo['label'],
-              'timestamp': FieldValue.serverTimestamp(),
-            });
-      }
-
-      // Mark as synced
-      inspection.isSynced = true;
-      inspection.save();
+      await syncInspection(inspection.inspectionId);
     }
   }
 
