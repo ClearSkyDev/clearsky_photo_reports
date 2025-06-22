@@ -123,11 +123,15 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
       final uid = FirebaseAuth.instance.currentUser?.uid;
       if (uid == null) throw Exception('User not logged in');
 
-      final docRef = await FirebaseFirestore.instance
+      final collection = FirebaseFirestore.instance
           .collection('users')
           .doc(uid)
-          .collection('inspections')
-          .add({
+          .collection('inspections');
+
+      final snap = await collection.get();
+      final position = snap.docs.length;
+
+      final docRef = await collection.add({
         'clientName': _clientNameController.text,
         'address': _addressController.text,
         'carrier': _carrierController.text,
@@ -139,6 +143,7 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
         'createdAt': Timestamp.now(),
         'status': 'draft',
         'photos': [],
+        'position': position,
         if (externalReportUrls.isNotEmpty)
           'externalReportUrls': externalReportUrls,
       });

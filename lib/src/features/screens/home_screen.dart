@@ -102,7 +102,10 @@ class _HomeScreenState extends State<HomeScreen> {
         .map((doc) => InspectionMetadata.fromMap(doc.id, doc.data()))
         .toList();
 
+    // Keep fallback sorting by appointment date if positions are equal
     projects.sort((a, b) {
+      final posCmp = a.position.compareTo(b.position);
+      if (posCmp != 0) return posCmp;
       if (a.appointmentDate == null && b.appointmentDate == null) return 0;
       if (a.appointmentDate == null) return 1;
       if (b.appointmentDate == null) return -1;
@@ -320,10 +323,24 @@ class _HomeScreenState extends State<HomeScreen> {
         ReorderableListView(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          onReorder: (oldIndex, newIndex) {
+          onReorder: (oldIndex, newIndex) async {
             if (newIndex > oldIndex) newIndex -= 1;
             final item = projects.removeAt(oldIndex);
             projects.insert(newIndex, item);
+
+            final uid = FirebaseAuth.instance.currentUser?.uid;
+            if (uid != null) {
+              for (int i = 0; i < projects.length; i++) {
+                projects[i].position = i;
+                await FirebaseFirestore.instance
+                    .collection('users')
+                    .doc(uid)
+                    .collection('inspections')
+                    .doc(projects[i].id)
+                    .update({'position': i});
+              }
+            }
+
             setState(() {});
           },
           children: [
