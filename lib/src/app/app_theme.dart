@@ -2,6 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
+  // Common color constants used by the Clear Sky theme.
+  static const Color clearSkyBlue = Color(0xFF005DAA);
+  static const Color sunYellow = Color(0xFFF6BE00);
+  static const Color matteBlack = Color(0xFF202020);
+  static const Color lightBackground = Color(0xFFF2F2F2);
+
   static ThemeData lightTheme = ThemeData(
     colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
     textTheme: GoogleFonts.robotoTextTheme(),
@@ -14,15 +20,23 @@ class AppTheme {
   );
 
   static ThemeData clearSkyTheme = ThemeData(
-    primaryColor: const Color(0xFF4DB8FF),
-    colorScheme: ColorScheme.fromSwatch().copyWith(
-      secondary: const Color(0xFFFFD54F),
+    colorScheme: ColorScheme.light(
+      primary: clearSkyBlue,
+      secondary: sunYellow,
+      background: lightBackground,
+      onPrimary: Colors.white,
+      onSecondary: matteBlack,
     ),
-    scaffoldBackgroundColor: const Color(0xFFF5F5F5),
+    scaffoldBackgroundColor: lightBackground,
+    textTheme: GoogleFonts.robotoTextTheme(),
+    appBarTheme: const AppBarTheme(
+      backgroundColor: clearSkyBlue,
+      foregroundColor: Colors.white,
+    ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xFFFF8A65),
-        foregroundColor: Colors.white,
+        backgroundColor: sunYellow,
+        foregroundColor: matteBlack,
       ),
     ),
   );
