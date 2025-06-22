@@ -3,6 +3,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 
 import '../../core/services/inspector_role_service.dart';
+import 'profile_screen.dart';
+import 'report_settings_screen.dart';
+import 'theme_settings_screen.dart';
+import 'accessibility_settings_screen.dart';
+import 'notification_settings_screen.dart';
+import 'learning_settings_screen.dart';
+import 'changelog_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -115,37 +122,99 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Settings")),
+      appBar: AppBar(title: const Text('Settings')),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          const Text("Subscription", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          ListTile(
+            leading: const Icon(Icons.person),
+            title: const Text('Profile'),
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const ProfileScreen()),
+            ),
+          ),
+          ListTile(
+            leading: const Icon(Icons.picture_as_pdf),
+            title: const Text('Report Settings'),
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const ReportSettingsScreen()),
+            ),
+          ),
+          ListTile(
+            leading: const Icon(Icons.color_lens),
+            title: const Text('App Theme'),
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const ThemeSettingsScreen()),
+            ),
+          ),
+          ListTile(
+            leading: const Icon(Icons.accessibility),
+            title: const Text('Accessibility'),
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const AccessibilitySettingsScreen()),
+            ),
+          ),
+          ListTile(
+            leading: const Icon(Icons.notifications),
+            title: const Text('Notifications'),
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const NotificationSettingsScreen()),
+            ),
+          ),
+          ListTile(
+            leading: const Icon(Icons.psychology),
+            title: const Text('AI Learning'),
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const LearningSettingsScreen()),
+            ),
+          ),
+          ListTile(
+            leading: const Icon(Icons.update),
+            title: const Text("What's New"),
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const ChangelogScreen()),
+            ),
+          ),
+          const Divider(),
+          const Text('Subscription', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           ListTile(
             key: _subscriptionKey,
-            title: Text(_isSubscribed ? "Pro Plan (Active)" : "Free Plan"),
-            subtitle: Text(_isSubscribed
-                ? "You have full access to all features."
-                : "Upgrade to unlock full exports, annotations, and report automation."),
+            title: Text(_isSubscribed ? 'Pro Plan (Active)' : 'Free Plan'),
+            subtitle: Text(
+              _isSubscribed
+                  ? 'You have full access to all features.'
+                  : 'Upgrade to unlock full exports, annotations, and report automation.',
+            ),
             trailing: !_isSubscribed
                 ? ElevatedButton(
                     onPressed: () {
-                      // Trigger upgrade dialog or flow
                       showDialog(
                         context: context,
                         builder: (_) => AlertDialog(
-                          title: const Text("Upgrade"),
-                          content: const Text("Upgrade to Pro in the next version!"),
-                          actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text("OK"))],
+                          title: const Text('Upgrade'),
+                          content: const Text('Upgrade to Pro in the next version!'),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: const Text('OK'),
+                            ),
+                          ],
                         ),
                       );
                     },
-                    child: const Text("Upgrade"),
+                    child: const Text('Upgrade'),
                   )
                 : null,
           ),
           const SizedBox(height: 16),
-
-          const Text("Inspector Role", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          const Text('Inspector Role', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           for (final role in InspectorRole.values)
             RadioListTile<InspectorRole>(
               key: role == InspectorRole.adjuster ? _roleKey : null,
@@ -160,22 +229,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
               },
             ),
           const SizedBox(height: 16),
-
-          const Text("Accessibility", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          const Text('Accessibility Options', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           SwitchListTile(
             key: _accessibilityKey,
-            title: const Text("High Contrast Mode"),
+            title: const Text('High Contrast Mode'),
             value: _highContrast,
             onChanged: (val) => setState(() => _highContrast = val),
           ),
           const SizedBox(height: 32),
-
           const Divider(),
-          const Text("Other", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          const Text('Other', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           ListTile(
             key: _versionKey,
-            title: const Text("App Version"),
-            subtitle: const Text("v1.0.0"),
+            title: const Text('App Version'),
+            subtitle: const Text('v1.0.0'),
           ),
         ],
       ),
