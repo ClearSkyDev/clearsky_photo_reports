@@ -52,13 +52,13 @@ class _ReportPreviewWebViewState extends State<ReportPreviewWebView> {
         'text/html',
       );
       // ignore: undefined_prefixed_name
-      ui.platformViewRegistry.registerViewFactory(
-        _viewId!,
-        (int viewId) {
-          final iframe = web_js.createIFrame(_blobUrl!);
-          return iframe;
-        },
-      );
+      // ui.platformViewRegistry.registerViewFactory(
+      //   _viewId!,
+      //   (int viewId) {
+      //     final iframe = web_js.createIFrame(_blobUrl!);
+      //     return iframe;
+      //   },
+      // );
     }
   }
 

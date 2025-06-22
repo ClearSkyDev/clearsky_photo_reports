@@ -6,6 +6,20 @@ import '../features/screens/home_screen.dart';
 import '../features/screens/project_details_screen.dart';
 import '../features/screens/guided_capture_screen.dart';
 import '../features/screens/report_preview_screen.dart';
+import '../core/models/inspection_metadata.dart';
+import '../core/models/peril_type.dart';
+import '../core/models/inspection_type.dart';
+import '../core/models/inspector_report_role.dart';
+
+final InspectionMetadata dummyMetadata = InspectionMetadata(
+  clientName: 'John Doe',
+  propertyAddress: '123 Main St',
+  inspectionDate: DateTime.now(),
+  insuranceCarrier: 'Acme Insurance',
+  perilType: PerilType.hail,
+  inspectionType: InspectionType.residentialRoof,
+  inspectorRoles: {InspectorReportRole.adjuster},
+);
 
 class ClearSkyApp extends StatelessWidget {
   const ClearSkyApp({super.key});
@@ -23,7 +37,7 @@ class ClearSkyApp extends StatelessWidget {
         '/': (context) => const SplashScreen(),
         '/home': (context) => const HomeScreen(freeReportsRemaining: 3, isSubscribed: false),
         '/projectDetails': (context) => const ProjectDetailsScreen(),
-        '/reportPreview': (context) => const ReportPreviewScreen(),
+        '/reportPreview': (context) => ReportPreviewScreen(metadata: dummyMetadata),
         // Navigation to guided capture uses arguments
       },
       onGenerateRoute: (settings) {
