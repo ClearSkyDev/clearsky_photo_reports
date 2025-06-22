@@ -43,6 +43,7 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
             .ref('users/$uid/external_reports/$name');
         final task = await ref.putFile(File(path));
         final url = await task.ref.getDownloadURL();
+        if (!mounted) return;
         setState(() {
           externalReportUrls.add(url);
         });

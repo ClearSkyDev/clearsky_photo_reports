@@ -110,11 +110,16 @@ class HomeScreen extends StatelessWidget {
         currentIndex: 0,
         onTap: (i) {
           switch (i) {
+            case 1:
+              Navigator.pushNamed(context, '/capture');
+              break;
+            case 2:
+              Navigator.pushNamed(context, '/history');
+              break;
             case 3:
               Navigator.pushNamed(context, '/settings');
               break;
             default:
-              // TODO: implement navigation for other tabs
               break;
           }
         },

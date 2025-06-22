@@ -42,6 +42,7 @@ class ClientDashboardScreen extends StatelessWidget {
                     'photos': [],
                   });
 
+                  if (!context.mounted) return;
                   Navigator.pushNamed(
                     context,
                     '/capture',

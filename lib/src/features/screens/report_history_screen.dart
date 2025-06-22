@@ -99,7 +99,7 @@ class _ReportHistoryScreenState extends State<ReportHistoryScreen> {
     Query query =
         firestore.collection('reports').orderBy('createdAt', descending: true);
     String? inspector = widget.inspectorName;
-    if (inspector.isNotEmpty) {
+    if (inspector != null && inspector.isNotEmpty) {
       query =
           query.where('inspectionMetadata.inspectorName', isEqualTo: inspector);
     }
