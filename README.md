@@ -7,6 +7,8 @@ AI powered roof inspection reporting app
 2. Run `flutter pub get` in the repository root to download all dependencies.
 3. Launch the app with `flutter run` or open it in your IDE of choice.
 
+> **Important:** This is a Flutter project. Do not run `npx expo start` or use Expo CLI. If you want to support Expo in the future, create a separate React Native app and migrate features. Do **not** mix Flutter and Expo dependencies in the same project folder.
+
 ## Dynamic Summary Assistant
 
 The new `DynamicSummaryService` keeps inspection summaries up to date.
