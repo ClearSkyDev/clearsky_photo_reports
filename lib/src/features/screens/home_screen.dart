@@ -267,7 +267,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final claimController = TextEditingController(text: project.claimNumber);
     DateTime? appt = project.appointmentDate;
     final apptController = TextEditingController(
-      text: appt != null ? DateFormat('yyyy-MM-dd h:mm a').format(appt) : '',
+      text: appt != null ? DateFormat('yyyy-MM-dd').format(appt) : '',
     );
 
     Future<void> pickDate() async {
@@ -284,7 +284,7 @@ class _HomeScreenState extends State<HomeScreen> {
         );
         if (time != null) {
           appt = DateTime(date.year, date.month, date.day, time.hour, time.minute);
-          apptController.text = DateFormat('yyyy-MM-dd h:mm a').format(appt!);
+          apptController.text = DateFormat('yyyy-MM-dd').format(appt!);
         }
       }
     }
@@ -341,7 +341,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       'claimNumber': claimController.text,
                     };
                     if (appt != null) {
-                      update['appointmentDate'] = Timestamp.fromDate(appt!);
+                      final timestamp = Timestamp.fromDate(appt!);
+                      update['appointmentDate'] = timestamp;
                     } else {
                       update['appointmentDate'] = FieldValue.delete();
                     }
