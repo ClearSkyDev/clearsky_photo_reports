@@ -22,7 +22,7 @@ dependencies:
   url_launcher: ^6.2.6
 
   # File management & sharing
-  path_provider: ^2.1.3
+  path_provider: ^2.1.2
   path: ^1.9.0
   file_picker: ^10.2.0
   share_plus: ^11.0.0
@@ -53,7 +53,8 @@ dependencies:
   ffmpeg_kit_flutter: ^6.0.3
   hive: ^2.2.3
   hive_flutter: ^1.1.0
-  connectivity_plus: ^6.1.4
+  connectivity_plus: ^5.0.2
+  uuid: ^4.2.1
   speech_to_text: ^7.0.0
   http: ^1.4.0
   image: ^4.5.4
