@@ -347,15 +347,59 @@ class _HomeScreenState extends State<HomeScreen> {
           },
           children: [
             for (int i = 0; i < projects.length; i++)
-              GestureDetector(
-                key: ValueKey('${groupName}_$i'),
-                onTap: () => Navigator.pushNamed(
-                  context,
-                  '/projectDetails',
-                  arguments: projects[i],
+              Dismissible(
+                key: ValueKey(projects[i].id),
+                direction: DismissDirection.endToStart,
+                background: Container(
+                  color: Colors.red,
+                  alignment: Alignment.centerRight,
+                  padding: const EdgeInsets.only(right: 20),
+                  child: const Icon(Icons.delete, color: Colors.white),
                 ),
-                onLongPress: () => _showEditProjectModal(context, projects[i]),
-                child: _buildProjectTile(projects[i]),
+                confirmDismiss: (_) async {
+                  return await showDialog<bool>(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: const Text('Delete Project?'),
+                      content: const Text(
+                          'Are you sure you want to delete this inspection project?'),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.of(context).pop(false),
+                          child: const Text('Cancel'),
+                        ),
+                        ElevatedButton(
+                          onPressed: () => Navigator.of(context).pop(true),
+                          child: const Text('Delete'),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+                onDismissed: (_) async {
+                  final uid = FirebaseAuth.instance.currentUser?.uid;
+                  if (uid != null) {
+                    await FirebaseFirestore.instance
+                        .collection('users')
+                        .doc(uid)
+                        .collection('inspections')
+                        .doc(projects[i].id)
+                        .delete();
+                  }
+                  projects.removeAt(i);
+                  setState(() {});
+                },
+                child: GestureDetector(
+                  key: ValueKey('${groupName}_$i'),
+                  onTap: () => Navigator.pushNamed(
+                    context,
+                    '/projectDetails',
+                    arguments: projects[i],
+                  ),
+                  onLongPress: () =>
+                      _showEditProjectModal(context, projects[i]),
+                  child: _buildProjectTile(projects[i]),
+                ),
               ),
           ],
         ),
