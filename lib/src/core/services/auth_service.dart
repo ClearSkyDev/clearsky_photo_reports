@@ -56,6 +56,11 @@ class AuthService {
     return _auth.signInWithEmailLink(email: email, emailLink: link);
   }
 
+  Future<void> sendPasswordReset(String email) {
+    debugPrint('[AuthService] sendPasswordReset to $email');
+    return _auth.sendPasswordResetEmail(email: email);
+  }
+
   Future<void> signOut() {
     debugPrint('[AuthService] signOut');
     return _auth.signOut();

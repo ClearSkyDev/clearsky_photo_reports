@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'app_theme.dart';
 import '../features/screens/splash_screen.dart';
+import '../features/screens/login_screen.dart';
+import '../features/screens/signup_screen.dart';
 import '../features/screens/home_screen.dart';
 import '../features/screens/project_details_screen.dart';
 import '../features/screens/guided_capture_screen.dart';
@@ -36,9 +38,15 @@ class ClearSkyApp extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/': (context) => const SplashScreen(),
-        '/home': (context) => const HomeScreen(freeReportsRemaining: 3, isSubscribed: false),
+        '/login': (context) => const LoginScreen(),
+        '/signup': (context) => const SignupScreen(),
+        '/home': (context) => const HomeScreen(
+              freeReportsRemaining: 3,
+              isSubscribed: false,
+            ),
         '/projectDetails': (context) => const ProjectDetailsScreen(),
-        '/reportPreview': (context) => ReportPreviewScreen(metadata: dummyMetadata),
+        '/reportPreview':
+            (context) => ReportPreviewScreen(metadata: dummyMetadata),
         '/settings': (context) => const SettingsScreen(),
         // Navigation to guided capture uses arguments
       },
