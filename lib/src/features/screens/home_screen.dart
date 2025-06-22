@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../app/app_theme.dart';
-import 'project_details_screen.dart';
 
 /// Landing screen with project creation and upgrade prompts.
 class HomeScreen extends StatelessWidget {

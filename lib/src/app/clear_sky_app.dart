@@ -6,7 +6,6 @@ import '../features/screens/home_screen.dart';
 import '../features/screens/project_details_screen.dart';
 import '../features/screens/guided_capture_screen.dart';
 import '../features/screens/report_preview_screen.dart';
-import 'main_nav_scaffold.dart';
 
 class ClearSkyApp extends StatelessWidget {
   const ClearSkyApp({super.key});
