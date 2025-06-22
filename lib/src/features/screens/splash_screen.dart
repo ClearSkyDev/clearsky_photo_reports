@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'dart:async';
 
 
@@ -13,11 +14,16 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    print("SplashScreen loaded");
+    if (kDebugMode) {
+      print('SplashScreen loaded');
+    }
+    final ctx = context;
     Future.delayed(const Duration(seconds: 2), () {
-      print("Attempting to navigate to home...");
+      if (kDebugMode) {
+        print('Attempting to navigate to home...');
+      }
       if (mounted) {
-        Navigator.pushReplacementNamed(context, '/home');
+        Navigator.pushReplacementNamed(ctx, '/home');
       }
     });
   }

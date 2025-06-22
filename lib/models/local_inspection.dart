@@ -22,4 +22,8 @@ class LocalInspection {
     required this.photos,
     this.isSynced = false,
   });
+
+  /// Persists this inspection in the Hive box.
+  void save() =>
+      Hive.box<LocalInspection>('inspections').put(inspectionId, this);
 }

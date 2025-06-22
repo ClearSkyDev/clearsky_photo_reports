@@ -35,9 +35,7 @@ class OfflineSyncService {
     await PendingPhotoStore.instance.init();
     await SyncHistoryService.instance.init();
     final initial = await Connectivity().checkConnectivity();
-    final initResult =
-        initial.isNotEmpty ? initial.first : ConnectivityResult.none;
-    online.value = initResult != ConnectivityResult.none;
+    online.value = initial != ConnectivityResult.none;
     // Perform an initial sync on startup
     if (online.value) {
       unawaited(syncDrafts());
@@ -46,8 +44,6 @@ class OfflineSyncService {
     _timer = Timer.periodic(const Duration(minutes: 5), (_) => syncDrafts());
     _connSub = Connectivity()
         .onConnectivityChanged
-        .map((results) =>
-            results.isNotEmpty ? results.first : ConnectivityResult.none)
         .listen((ConnectivityResult result) {
       final newOnline = result != ConnectivityResult.none;
       if (!online.value && newOnline) {

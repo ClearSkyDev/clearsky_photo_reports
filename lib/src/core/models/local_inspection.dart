@@ -23,6 +23,10 @@ class LocalInspection {
     this.isSynced = false,
   });
 
+  /// Persists this inspection to the local Hive box.
+  void save() =>
+      Hive.box<LocalInspection>('inspections').put(inspectionId, this);
+
   Map<String, dynamic> toMap() {
     return {
       'inspectionId': inspectionId,
