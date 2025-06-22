@@ -13,8 +13,12 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    Timer(const Duration(seconds: 2), () {
-      Navigator.pushReplacementNamed(context, '/dashboard');
+    print("SplashScreen loaded");
+    Future.delayed(const Duration(seconds: 2), () {
+      print("Attempting to navigate to home...");
+      if (mounted) {
+        Navigator.pushReplacementNamed(context, '/home');
+      }
     });
   }
 
