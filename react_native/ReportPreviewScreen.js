@@ -5,6 +5,44 @@ import generateReportHTML from './generateReportHTML';
 import { exportReportAsPDF, exportReportAsHTML } from './exportReport';
 import AnnotatedImage from './AnnotatedImage';
 
+// Inspector roles determine the tone of the auto generated summary
+export const InspectorRole = Object.freeze({
+  adjuster: 'adjuster',
+  contractor: 'contractor',
+  ladderAssist: 'ladderAssist',
+  hybrid: 'hybrid',
+});
+
+// Temporary selection until integrated with settings storage
+let selectedRole = InspectorRole.adjuster;
+
+function generateAISummary(uploadedPhotos, role) {
+  const base = 'Inspection Summary:\n\n';
+  switch (role) {
+    case InspectorRole.ladderAssist:
+      return (
+        base +
+        'This report is for documentation only. No analysis, opinions, or recommendations are included. It provides photographic evidence of the current property condition as observed.'
+      );
+    case InspectorRole.adjuster:
+      return (
+        base +
+        'Based on visible damage, this roof shows potential weather-related impacts. Observations include granule loss, edge wear, and possible hail bruising. Further review of soft metals is advised. Coverage determination may depend on carrier guidelines and date of loss relevance.'
+      );
+    case InspectorRole.contractor:
+      return (
+        base +
+        'Field inspection indicates functional and cosmetic compromise. Roof slopes show clear signs of damage, including displaced shingles and possible underlayment exposure. Contractor recommends repair or full replacement pending approval from the carrier or homeowner.'
+      );
+    case InspectorRole.hybrid:
+    default:
+      return (
+        base +
+        'This report blends documentation and practical insight. While not offering formal coverage decisions, damage patterns suggest eligibility for repair or replacement. Observed issues include edge erosion, seal tab fractures, and missing accessories.'
+      );
+  }
+}
+
 export default function ReportPreviewScreen({ uploadedPhotos, roofQuestionnaire }) {
   const [summaryText, setSummaryText] = useState('');
   const [clientName, setClientName] = useState('');
@@ -38,10 +76,11 @@ export default function ReportPreviewScreen({ uploadedPhotos, roofQuestionnaire 
   };
 
   const handleExportPDF = async () => {
+    const roleSummary = generateAISummary(uploadedPhotos, selectedRole);
     const html = generateReportHTML(
       uploadedPhotos,
       roofQuestionnaire,
-      summaryText,
+      roleSummary,
       clientName,
       clientAddress,
       insuranceCarrier,
@@ -58,10 +97,11 @@ export default function ReportPreviewScreen({ uploadedPhotos, roofQuestionnaire 
   };
 
   const handleExportHTML = async () => {
+    const roleSummary = generateAISummary(uploadedPhotos, selectedRole);
     const html = generateReportHTML(
       uploadedPhotos,
       roofQuestionnaire,
-      summaryText,
+      roleSummary,
       clientName,
       clientAddress,
       insuranceCarrier,
