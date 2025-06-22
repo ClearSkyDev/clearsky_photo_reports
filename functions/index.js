@@ -2,6 +2,7 @@ const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 const nodemailer = require("nodemailer");
 const express = require("express");
+const puppeteer = require("puppeteer");
 
 admin.initializeApp();
 
@@ -148,3 +149,31 @@ app.get("/report/:id", async (req, res) => {
 });
 
 exports.clientPortal = functions.https.onRequest(app);
+
+exports.generatePdfReport = functions
+  .runWith({ memory: "1GB", timeoutSeconds: 120 })
+  .https.onCall(async (data, context) => {
+    const html = data.html;
+    if (!html) {
+      throw new functions.https.HttpsError("invalid-argument", "Missing HTML");
+    }
+
+    const browser = await puppeteer.launch({
+      headless: "new",
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    });
+    const page = await browser.newPage();
+    await page.setContent(html, { waitUntil: "networkidle0" });
+    const pdfBuffer = await page.pdf({ format: "A4" });
+    await browser.close();
+
+    const bucket = admin.storage().bucket();
+    const fileName = `generated_reports/${Date.now()}.pdf`;
+    const file = bucket.file(fileName);
+    await file.save(pdfBuffer, { contentType: "application/pdf" });
+    const [url] = await file.getSignedUrl({
+      action: "read",
+      expires: Date.now() + 24 * 60 * 60 * 1000,
+    });
+    return { url };
+  });

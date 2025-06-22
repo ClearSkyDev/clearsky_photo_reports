@@ -1,6 +1,9 @@
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
 import * as FileSystem from 'expo-file-system';
+import * as WebBrowser from 'expo-web-browser';
+import { httpsCallable } from 'firebase/functions';
+import { functions } from './firebaseConfig';
 
 // Export report HTML content as a PDF file and prompt the user to share it
 export async function exportReportAsPDF(htmlContent, fileName = 'ClearSky_Report.pdf') {
@@ -16,6 +19,21 @@ export async function exportReportAsPDF(htmlContent, fileName = 'ClearSky_Report
     }
   } catch (error) {
     console.error('Error exporting PDF:', error);
+  }
+}
+
+// Generate PDF using the cloud function and open the returned URL
+export async function exportReportViaCloud(htmlContent, fileName = 'ClearSky_Report.pdf') {
+  try {
+    const callGenerate = httpsCallable(functions, 'generatePdfReport');
+    const res = await callGenerate({ html: htmlContent, fileName });
+    const url = res.data.url;
+    if (url) {
+      await WebBrowser.openBrowserAsync(url);
+    }
+    return url;
+  } catch (error) {
+    console.error('Error generating cloud PDF:', error);
   }
 }
 
