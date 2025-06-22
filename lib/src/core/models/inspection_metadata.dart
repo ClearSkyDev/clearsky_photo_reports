@@ -14,6 +14,7 @@ class InspectionMetadata {
   String? reportId;
   String? weatherNotes;
   String? partnerCode;
+  final List<String> externalReportUrls;
 
   InspectionMetadata({
     required this.clientName,
@@ -27,6 +28,7 @@ class InspectionMetadata {
     this.reportId,
     this.weatherNotes,
     this.partnerCode,
+    this.externalReportUrls = const [],
   });
 
   // Convert to Map (for saving to JSON, Firestore, etc.)
@@ -43,6 +45,8 @@ class InspectionMetadata {
       if (reportId != null) 'reportId': reportId,
       if (weatherNotes != null) 'weatherNotes': weatherNotes,
       if (partnerCode != null) 'partnerCode': partnerCode,
+      if (externalReportUrls.isNotEmpty)
+        'externalReportUrls': externalReportUrls,
     };
   }
 
@@ -67,6 +71,9 @@ class InspectionMetadata {
       reportId: map['reportId'],
       weatherNotes: map['weatherNotes'],
       partnerCode: map['partnerCode'],
+      externalReportUrls: map['externalReportUrls'] != null
+          ? List<String>.from(map['externalReportUrls'])
+          : const [],
     );
   }
 }
