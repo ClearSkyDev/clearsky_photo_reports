@@ -265,7 +265,7 @@ export default function ReportPreviewScreen({ uploadedPhotos, roofQuestionnaire 
       />
 
       <Button title="Export as PDF" onPress={handleExportPDF} />
-      <Button title="Export as HTML" onPress={handleExportHTML} />
+      <Button title="Download HTML Report" onPress={handleExportHTML} />
     </ScrollView>
   );
 }

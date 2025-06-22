@@ -1,4 +1,6 @@
 import * as ImageManipulator from 'expo-image-manipulator';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { storage } from './firebaseConfig';
 
 // Resize then crop a photo to ensure a 1:1 aspect ratio
 export async function compressAndSquarePhoto(uri) {
@@ -35,14 +37,39 @@ export async function compressAndSquarePhoto(uri) {
   }
 }
 
+// Upload an image to Firebase Storage and return its download URL
+export async function uploadImageToStorage(uri, projectId, filename) {
+  try {
+    const response = await fetch(uri);
+    const blob = await response.blob();
+    const storageRef = ref(storage, `inspections/${projectId}/${filename}`);
+    await uploadBytes(storageRef, blob);
+    return await getDownloadURL(storageRef);
+  } catch (err) {
+    console.error('Error uploading image:', err);
+    return null;
+  }
+}
+
 // Helper to upload a photo and append it to state
-export async function handlePhotoUpload(photoUri, sectionPrefix, uploadedPhotos, setUploadedPhotos) {
+export async function handlePhotoUpload(
+  photoUri,
+  sectionPrefix,
+  uploadedPhotos,
+  setUploadedPhotos,
+  projectId = 'demo',
+  userLabel = sectionPrefix,
+  annotations = []
+) {
   const squareUri = await compressAndSquarePhoto(photoUri);
+  const filename = `${Date.now()}.jpg`;
+  const downloadUrl = await uploadImageToStorage(squareUri, projectId, filename);
   const newPhoto = {
     id: Date.now().toString(),
-    imageUri: squareUri,
+    imageUri: downloadUrl || squareUri,
     sectionPrefix,
-    userLabel: sectionPrefix,
+    userLabel,
+    annotations,
     aiSuggestedLabel: '',
     approved: false,
   };
