@@ -19,10 +19,10 @@ class _SplashScreenState extends State<SplashScreen> {
     }
     Future.delayed(const Duration(seconds: 2), () {
       if (kDebugMode) {
-        print('Attempting to navigate to home...');
+        print('Attempting to navigate to login...');
       }
       if (mounted) {
-        Navigator.pushReplacementNamed(context, '/home');
+        Navigator.pushReplacementNamed(context, '/login');
       }
     });
   }
@@ -30,7 +30,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFF007BFF),
       body: Center(
         child: Image.asset(
           'assets/images/clearsky_logo.png',

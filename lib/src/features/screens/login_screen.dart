@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-
 import '../../core/services/auth_service.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -13,38 +12,43 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _companyController = TextEditingController();
-  bool _isLogin = true;
   String? _error;
   bool _loading = false;
 
-  Future<void> _submit() async {
-    debugPrint('[LoginScreen] Submit tapped, isLogin=$_isLogin');
+  Future<void> _login() async {
     setState(() {
       _loading = true;
       _error = null;
     });
     try {
-      if (_isLogin) {
-        await AuthService().signIn(
-          email: _emailController.text.trim(),
-          password: _passwordController.text.trim(),
-        );
-        debugPrint('[LoginScreen] Sign in successful');
-      } else {
-        await AuthService().signUp(
-          email: _emailController.text.trim(),
-          password: _passwordController.text.trim(),
-          companyId: _companyController.text.trim(),
-        );
-        debugPrint('[LoginScreen] Sign up successful');
-      }
+      await AuthService().signIn(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
+      if (!mounted) return;
+      Navigator.pushReplacementNamed(context, '/home');
     } catch (e) {
       debugPrint('[LoginScreen] Auth error: $e');
-      if (!mounted) return;
-      setState(() => _error = e.toString());
+      if (mounted) setState(() => _error = e.toString());
     } finally {
       if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  Future<void> _resetPassword() async {
+    try {
+      await AuthService().sendPasswordReset(_emailController.text.trim());
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Password reset email sent')),
+        );
+      }
+    } catch (e) {
+      debugPrint('[LoginScreen] Reset error: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Error: $e')));
+      }
     }
   }
 
@@ -52,18 +56,20 @@ class _LoginScreenState extends State<LoginScreen> {
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
-    _companyController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(_isLogin ? 'Login' : 'Sign Up')),
+      appBar: AppBar(title: const Text('Login')),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            Image.asset('assets/images/clearsky_logo.png', height: 100),
+            const SizedBox(height: 24),
             TextField(
               controller: _emailController,
               decoration: const InputDecoration(labelText: 'Email'),
@@ -73,28 +79,26 @@ class _LoginScreenState extends State<LoginScreen> {
               decoration: const InputDecoration(labelText: 'Password'),
               obscureText: true,
             ),
-            if (!_isLogin)
-              TextField(
-                controller: _companyController,
-                decoration: const InputDecoration(labelText: 'Company ID'),
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton(
+                onPressed: _loading ? null : _resetPassword,
+                child: const Text('Forgot Password?'),
               ),
+            ),
             const SizedBox(height: 12),
             if (_error != null)
-              Text(
-                _error!,
-                style: const TextStyle(color: Colors.red),
-              ),
+              Text(_error!, style: const TextStyle(color: Colors.red)),
             const SizedBox(height: 12),
             ElevatedButton(
-              onPressed: _loading ? null : _submit,
-              child: Text(_isLogin ? 'Login' : 'Create Account'),
+              onPressed: _loading ? null : _login,
+              child: const Text('Login'),
             ),
             TextButton(
-              onPressed:
-                  _loading ? null : () => setState(() => _isLogin = !_isLogin),
-              child: Text(_isLogin
-                  ? 'Need an account? Sign Up'
-                  : 'Have an account? Login'),
+              onPressed: _loading
+                  ? null
+                  : () => Navigator.pushReplacementNamed(context, '/signup'),
+              child: const Text('Need an account? Sign Up'),
             ),
           ],
         ),
