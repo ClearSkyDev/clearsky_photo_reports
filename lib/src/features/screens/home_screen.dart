@@ -7,7 +7,7 @@ import '../../app/app_theme.dart';
 import '../../../models/simple_inspection_metadata.dart';
 
 /// Landing screen with project creation and upgrade prompts.
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   final int freeReportsRemaining;
   final bool isSubscribed;
 
@@ -16,6 +16,15 @@ class HomeScreen extends StatelessWidget {
     required this.freeReportsRemaining,
     required this.isSubscribed,
   });
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  int selectedFilterIndex = 0; // 0 = All, 1 = Upcoming, 2 = Unscheduled
+
+  final List<String> filters = const ['All', 'Upcoming', 'Unscheduled'];
 
   void _handleCreateProject(BuildContext context) {
     Navigator.pushNamed(context, '/projectDetails');
@@ -40,7 +49,7 @@ class HomeScreen extends StatelessWidget {
   }
 
   void _checkSubscription(BuildContext context) {
-    if (freeReportsRemaining <= 0 && !isSubscribed) {
+    if (widget.freeReportsRemaining <= 0 && !widget.isSubscribed) {
       showDialog(
         context: context,
         builder: (_) => AlertDialog(
@@ -103,6 +112,19 @@ class HomeScreen extends StatelessWidget {
     return projects;
   }
 
+  List<InspectionMetadata> _filteredProjects(List<InspectionMetadata> projects) {
+    final now = DateTime.now();
+    if (selectedFilterIndex == 1) {
+      return projects
+          .where((p) =>
+              p.appointmentDate != null && p.appointmentDate!.isAfter(now))
+          .toList();
+    } else if (selectedFilterIndex == 2) {
+      return projects.where((p) => p.appointmentDate == null).toList();
+    }
+    return projects;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -119,13 +141,13 @@ class HomeScreen extends StatelessWidget {
       ),
       body: Column(
         children: [
-          if (!isSubscribed)
+          if (!widget.isSubscribed)
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(8),
               color: Colors.yellow.shade100,
               child: Text(
-                'Free trial: $freeReportsRemaining report${freeReportsRemaining == 1 ? '' : 's'} remaining',
+                'Free trial: ${widget.freeReportsRemaining} report${widget.freeReportsRemaining == 1 ? '' : 's'} remaining',
                 style: TextStyle(
                   color: Colors.orange.shade900,
                   fontWeight: FontWeight.bold,
@@ -139,33 +161,33 @@ class HomeScreen extends StatelessWidget {
             style: Theme.of(context).textTheme.titleLarge,
           ),
           const Text('Create professional inspection reports'),
-          const SizedBox(height: 20),
-          ElevatedButton.icon(
-            onPressed: () => _checkSubscription(context),
-            icon: const Icon(Icons.add),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppTheme.clearSkyBlue,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              padding: const EdgeInsets.symmetric(
-                horizontal: 24,
-                vertical: 12,
-              ),
-              elevation: 0,
-              textStyle: const TextStyle(
-                fontWeight: FontWeight.bold,
-                shadows: [
-                  Shadow(
-                    offset: Offset(0.5, 0.5),
-                    blurRadius: 2,
-                    color: Colors.black,
+          const SizedBox(height: 12),
+          // Filter tabs
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: List.generate(filters.length, (index) {
+                final isSelected = selectedFilterIndex == index;
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+                  child: ChoiceChip(
+                    label: Text(
+                      filters[index],
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    selected: isSelected,
+                    onSelected: (_) {
+                      setState(() => selectedFilterIndex = index);
+                    },
+                    selectedColor: const Color(0xFF007BFF),
+                    backgroundColor: Colors.grey.shade200,
+                    labelStyle: TextStyle(
+                      color: isSelected ? Colors.white : Colors.black,
+                    ),
                   ),
-                ],
-              ),
+                );
+              }),
             ),
-            label: const Text('Create Project'),
           ),
           Expanded(
             child: FutureBuilder(
@@ -175,7 +197,8 @@ class HomeScreen extends StatelessWidget {
                   return const Center(child: CircularProgressIndicator());
                 }
 
-                final projects = snapshot.data as List<InspectionMetadata>;
+                final projects = _filteredProjects(
+                    snapshot.data as List<InspectionMetadata>);
 
                 if (projects.isEmpty) {
                   return const Center(child: Text('No inspections found'));
@@ -246,6 +269,12 @@ class HomeScreen extends StatelessWidget {
             ),
           ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => _checkSubscription(context),
+        backgroundColor: const Color(0xFF007BFF),
+        icon: const Icon(Icons.add),
+        label: const Text('New Inspection'),
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: 0,
