@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { appColors, appTypography } from './appTheme';
 
 export default function SplashScreen({ navigation }) {
   useEffect(() => {
@@ -21,10 +22,10 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: appColors.surface,
   },
   title: {
+    ...appTypography.heading,
     fontSize: 24,
-    fontWeight: 'bold',
   },
 });

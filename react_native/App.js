@@ -14,6 +14,7 @@ import { Picker } from '@react-native-picker/picker';
 import * as ImagePicker from 'expo-image-picker';
 import PhotoAnnotationScreen from './PhotoAnnotationScreen';
 import AnnotatedImage from './AnnotatedImage';
+import { appColors, appSpacing, appTypography } from './appTheme';
 
 // Mock AI label suggestions per inspection section
 const mockAISuggestions = {
@@ -245,27 +246,26 @@ export default function ClearSkyPhotoIntakeScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 16,
+    padding: appSpacing.medium,
   },
   sectionContainer: {
-    marginBottom: 16,
+    marginBottom: appSpacing.medium,
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: appColors.border,
     borderRadius: 8,
   },
   sectionHeader: {
-    padding: 12,
-    backgroundColor: '#eee',
+    padding: appSpacing.small + 4,
+    backgroundColor: appColors.background,
   },
   sectionTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
+    ...appTypography.subheading,
   },
   sectionContent: {
-    padding: 12,
+    padding: appSpacing.small + 4,
   },
   photoItem: {
-    margin: 4,
+    margin: appSpacing.small / 2,
     width: 100,
   },
   thumbnail: {
@@ -275,13 +275,13 @@ const styles = StyleSheet.create({
   },
   labelInput: {
     borderBottomWidth: 1,
-    borderColor: '#aaa',
+    borderColor: appColors.border,
     paddingVertical: 4,
     marginTop: 4,
   },
   suggestText: {
     fontSize: 12,
-    color: '#666',
+    color: appColors.textSecondary,
     marginTop: 2,
   },
   actionRow: {
@@ -290,7 +290,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   actionButton: {
-    paddingHorizontal: 4,
+    paddingHorizontal: appSpacing.small / 2,
   },
   tagRow: {
     flexDirection: 'row',
@@ -298,15 +298,15 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   tagButton: {
-    backgroundColor: '#eee',
-    paddingHorizontal: 6,
+    backgroundColor: appColors.background,
+    paddingHorizontal: appSpacing.small - 2,
     paddingVertical: 2,
     borderRadius: 4,
     margin: 2,
   },
   tagText: {
     fontSize: 12,
-    color: '#333',
+    color: appColors.textPrimary,
   },
 });
 
