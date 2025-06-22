@@ -15,12 +15,6 @@ class ProjectDetailsScreen extends StatefulWidget {
   State<ProjectDetailsScreen> createState() => _ProjectDetailsScreenState();
 }
 
-class _ExternalReportEntry {
-  final String name;
-  final String url;
-  _ExternalReportEntry({required this.name, required this.url});
-}
-
 class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _clientNameController = TextEditingController();
@@ -28,7 +22,7 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
   final TextEditingController _carrierController = TextEditingController();
   final TextEditingController _perilController = TextEditingController();
 
-  final List<_ExternalReportEntry> _externalReports = [];
+  final List<String> externalReportUrls = [];
 
   bool _isSubmitting = false;
 
@@ -36,7 +30,7 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
     final result = await FilePicker.platform.pickFiles(
       allowMultiple: false,
       type: FileType.custom,
-      allowedExtensions: ['pdf', 'docx', 'csv'],
+      allowedExtensions: ['pdf', 'csv'],
     );
     if (!mounted) return;
     if (result != null && result.files.single.path != null) {
@@ -46,12 +40,11 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
         final uid = FirebaseAuth.instance.currentUser?.uid;
         if (uid == null) throw Exception('User not logged in');
         final ref = FirebaseStorage.instance
-            .ref()
-            .child('users/$uid/externalReports/$name');
-        await ref.putFile(File(path));
-        final url = await ref.getDownloadURL();
+            .ref('users/$uid/external_reports/$name');
+        final task = await ref.putFile(File(path));
+        final url = await task.ref.getDownloadURL();
         setState(() {
-          _externalReports.add(_ExternalReportEntry(name: name, url: url));
+          externalReportUrls.add(url);
         });
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -84,9 +77,8 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
         'createdAt': Timestamp.now(),
         'status': 'draft',
         'photos': [],
-        if (_externalReports.isNotEmpty)
-          'externalReportUrls':
-              _externalReports.map((e) => e.url).toList(),
+        if (externalReportUrls.isNotEmpty)
+          'externalReportUrls': externalReportUrls,
       });
 
       // Navigate to photo capture with inspection ID
@@ -139,14 +131,14 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
                 decoration: const InputDecoration(labelText: 'Peril Type'),
               ),
               const SizedBox(height: 12),
-              ..._externalReports.map(
-                (e) => ListTile(
-                  title: Text(e.name),
+              ...externalReportUrls.map(
+                (url) => ListTile(
+                  title: Text(p.basename(url)),
                   trailing: IconButton(
                     icon: const Icon(Icons.delete),
                     onPressed: () {
                       setState(() {
-                        _externalReports.remove(e);
+                        externalReportUrls.remove(url);
                       });
                     },
                   ),
