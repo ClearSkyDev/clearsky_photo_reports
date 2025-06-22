@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { ScrollView, View, Text, Image, TextInput, Button } from 'react-native';
 import Signature from 'react-native-signature-canvas';
 import generateReportHTML from './generateReportHTML';
-import { exportReportAsPDF, exportReportAsHTML } from './exportReport';
+import { exportReportViaCloud, exportReportAsHTML } from './exportReport';
 import AnnotatedImage from './AnnotatedImage';
 
 // Inspector roles determine the tone of the auto generated summary
@@ -93,7 +93,7 @@ export default function ReportPreviewScreen({ uploadedPhotos, roofQuestionnaire 
       preparedLabel,
       includeAnnotations
     );
-    await exportReportAsPDF(html);
+    await exportReportViaCloud(html);
   };
 
   const handleExportHTML = async () => {
