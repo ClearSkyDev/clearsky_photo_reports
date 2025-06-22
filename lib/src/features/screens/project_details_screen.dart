@@ -248,35 +248,26 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
                 ),
               TextButton.icon(
                 onPressed: () => _pickAndUploadReport('EagleView'),
-                icon: const Icon(Icons.attach_file, color: Color(0xFF007BFF)),
+                icon: const Icon(Icons.attach_file),
                 label: const Text(
                   'Attach EagleView Report',
-                  style: TextStyle(
-                    color: Color(0xFF007BFF),
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
               TextButton.icon(
                 onPressed: () => _pickAndUploadReport('Hover'),
-                icon: const Icon(Icons.attach_file, color: Color(0xFF007BFF)),
+                icon: const Icon(Icons.attach_file),
                 label: const Text(
                   'Attach Hover Report',
-                  style: TextStyle(
-                    color: Color(0xFF007BFF),
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
               TextButton.icon(
                 onPressed: () => _pickAndUploadReport('ITEL'),
-                icon: const Icon(Icons.attach_file, color: Color(0xFF007BFF)),
+                icon: const Icon(Icons.attach_file),
                 label: const Text(
                   'Attach ITEL Report',
-                  style: TextStyle(
-                    color: Color(0xFF007BFF),
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
               const SizedBox(height: 20),

@@ -10,7 +10,7 @@ class ThemeService extends ChangeNotifier {
 
   static const _key = 'app_theme_option';
 
-  AppThemeOption _option = AppThemeOption.light;
+  AppThemeOption _option = AppThemeOption.clearSky;
   bool _initialized = false;
 
   AppThemeOption get option => _option;

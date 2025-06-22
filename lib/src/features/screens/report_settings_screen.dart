@@ -125,7 +125,6 @@ class _ReportSettingsScreenState extends State<ReportSettingsScreen> {
     'Red': Colors.red,
     'Green': Colors.green,
     'Orange': Colors.orange,
-    'Purple': Colors.purple,
   };
   String _selectedColor = 'Blue';
   static const Map<String, String> _templates = {
