@@ -14,7 +14,7 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   InspectorRole _selectedRole = InspectorRole.adjuster;
   bool _highContrast = false;
-  bool _isSubscribed = false; // Replace with real logic later
+  final bool _isSubscribed = false; // Replace with real logic later
 
   final GlobalKey _subscriptionKey = GlobalKey();
   final GlobalKey _roleKey = GlobalKey();
@@ -100,14 +100,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
     ];
 
     TutorialCoachMark(
-      context,
       targets: targets,
       colorShadow: Colors.black,
       textSkip: 'SKIP',
       paddingFocus: 8,
       onFinish: _completeTutorial,
-      onSkip: _completeTutorial,
-    ).show();
+      onSkip: () {
+        _completeTutorial();
+        return true;
+      },
+    ).show(context: context);
   }
 
   @override

@@ -17,13 +17,12 @@ class _SplashScreenState extends State<SplashScreen> {
     if (kDebugMode) {
       print('SplashScreen loaded');
     }
-    final ctx = context;
     Future.delayed(const Duration(seconds: 2), () {
       if (kDebugMode) {
         print('Attempting to navigate to home...');
       }
       if (mounted) {
-        Navigator.pushReplacementNamed(ctx, '/home');
+        Navigator.pushReplacementNamed(context, '/home');
       }
     });
   }

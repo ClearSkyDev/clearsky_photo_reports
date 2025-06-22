@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:typed_data';
 
 /// Displays the generated report HTML across Flutter platforms.
 ///
@@ -17,7 +16,6 @@ import 'package:webview_flutter/webview_flutter.dart'
 
 // Only imported on web for HtmlElementView
 import '../../web/js_utils.dart' as web_js;
-import 'dart:ui' as ui if (dart.library.html) 'dart:ui';
 
 class ReportPreviewWebView extends StatefulWidget {
   final String html;

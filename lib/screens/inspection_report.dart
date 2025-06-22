@@ -65,12 +65,13 @@ class _InspectionReportScreenState extends State<InspectionReportScreen> {
 
   Future<void> _exportPdf() async {
     final html = _buildHtml();
-    await Printing.layoutPdf(
-      onLayout: (format) => Printing.convertHtml(
-        format: format,
-        html: html,
-      ),
-    );
+      await Printing.layoutPdf(
+        // ignore: deprecated_member_use
+        onLayout: (format) => Printing.convertHtml(
+          format: format,
+          html: html,
+        ),
+      );
   }
 
   @override
