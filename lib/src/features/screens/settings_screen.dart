@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 
-enum InspectorRole { adjuster, contractor, ladderAssist, hybrid }
+import '../../core/services/inspector_role_service.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -24,6 +24,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   void initState() {
     super.initState();
+    InspectorRoleService.loadRole().then((role) {
+      if (mounted) setState(() => _selectedRole = role);
+    });
     _checkTutorial();
   }
 
@@ -148,7 +151,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
               value: role,
               groupValue: _selectedRole,
               onChanged: (val) {
-                if (val != null) setState(() => _selectedRole = val);
+                if (val != null) {
+                  setState(() => _selectedRole = val);
+                  InspectorRoleService.saveRole(val);
+                }
               },
             ),
           const SizedBox(height: 16),
