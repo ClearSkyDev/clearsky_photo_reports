@@ -161,6 +161,189 @@ class _HomeScreenState extends State<HomeScreen> {
     return grouped;
   }
 
+  Widget _buildProjectTile(InspectionMetadata project) {
+    final isUnscheduled = project.appointmentDate == null;
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: isUnscheduled ? const Color(0xFF007BFF) : Colors.grey.shade300,
+          width: 2,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            project.clientName.isNotEmpty ? project.clientName : 'Unnamed Project',
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 4),
+          Text('Project #: ${project.projectNumber}'),
+          Text('Claim #: ${project.claimNumber}'),
+          if (project.appointmentDate != null)
+            Text('Appt: ${DateFormat("MMM d, yyyy h:mm a").format(project.appointmentDate!)}'),
+          if (project.appointmentDate == null)
+            const Text(
+              'No Appointment Set',
+              style: TextStyle(color: Color(0xFF007BFF), fontWeight: FontWeight.bold),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _showEditProjectModal(
+      BuildContext context, InspectionMetadata project) async {
+    final clientController = TextEditingController(text: project.clientName);
+    final claimController = TextEditingController(text: project.claimNumber);
+    DateTime? appt = project.appointmentDate;
+    final apptController = TextEditingController(
+      text: appt != null ? DateFormat('yyyy-MM-dd h:mm a').format(appt) : '',
+    );
+
+    Future<void> pickDate() async {
+      final date = await showDatePicker(
+        context: context,
+        initialDate: appt ?? DateTime.now(),
+        firstDate: DateTime(2000),
+        lastDate: DateTime(2100),
+      );
+      if (date != null) {
+        final time = await showTimePicker(
+          context: context,
+          initialTime: TimeOfDay.fromDateTime(appt ?? DateTime.now()),
+        );
+        if (time != null) {
+          appt = DateTime(date.year, date.month, date.day, time.hour, time.minute);
+          apptController.text = DateFormat('yyyy-MM-dd h:mm a').format(appt!);
+        }
+      }
+    }
+
+    await showDialog(
+      context: context,
+      builder: (ctx) {
+        return StatefulBuilder(builder: (ctx, setModalState) {
+          return AlertDialog(
+            title: const Text('Edit Inspection'),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: clientController,
+                    decoration: const InputDecoration(labelText: 'Client Name'),
+                  ),
+                  TextField(
+                    controller: claimController,
+                    decoration: const InputDecoration(labelText: 'Claim #'),
+                  ),
+                  GestureDetector(
+                    onTap: () async {
+                      await pickDate();
+                      setModalState(() {});
+                    },
+                    child: AbsorbPointer(
+                      child: TextField(
+                        controller: apptController,
+                        decoration: const InputDecoration(labelText: 'Appointment Date'),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text('Cancel'),
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  final uid = FirebaseAuth.instance.currentUser?.uid;
+                  if (uid != null) {
+                    final doc = FirebaseFirestore.instance
+                        .collection('users')
+                        .doc(uid)
+                        .collection('inspections')
+                        .doc(project.id);
+                    final update = {
+                      'clientName': clientController.text,
+                      'claimNumber': claimController.text,
+                    };
+                    if (appt != null) {
+                      update['appointmentDate'] = Timestamp.fromDate(appt!);
+                    } else {
+                      update['appointmentDate'] = FieldValue.delete();
+                    }
+                    await doc.update(update);
+                  }
+                  if (mounted) setState(() {});
+                  if (ctx.mounted) Navigator.pop(ctx);
+                },
+                child: const Text('Save'),
+              ),
+            ],
+          );
+        });
+      },
+    );
+  }
+
+  Widget _buildProjectGroup(
+      BuildContext context, String groupName, List<InspectionMetadata> projects) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Text(
+            groupName,
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF007BFF),
+            ),
+          ),
+        ),
+        ReorderableListView(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          onReorder: (oldIndex, newIndex) {
+            if (newIndex > oldIndex) newIndex -= 1;
+            final item = projects.removeAt(oldIndex);
+            projects.insert(newIndex, item);
+            setState(() {});
+          },
+          children: [
+            for (int i = 0; i < projects.length; i++)
+              GestureDetector(
+                key: ValueKey('${groupName}_$i'),
+                onTap: () => Navigator.pushNamed(
+                  context,
+                  '/projectDetails',
+                  arguments: projects[i],
+                ),
+                onLongPress: () => _showEditProjectModal(context, projects[i]),
+                child: _buildProjectTile(projects[i]),
+              ),
+          ],
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -244,85 +427,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
                 return ListView(
                   padding: const EdgeInsets.only(bottom: 100),
-                  children: groupedProjects.entries.expand<Widget>((entry) {
-                    final sectionTitle = entry.key;
-                    final sectionProjects = entry.value;
-                    if (sectionProjects.isEmpty) return <Widget>[];
-
-                    return <Widget>[
-                      Padding(
-                        padding:
-                            const EdgeInsets.fromLTRB(16, 16, 16, 4),
-                        child: Text(
-                          sectionTitle,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF007BFF),
-                          ),
-                        ),
-                      ),
-                      ...sectionProjects.map<Widget>((project) {
-                        final isUnscheduled =
-                            project.appointmentDate == null;
-
-                        return GestureDetector(
-                          onTap: () => Navigator.pushNamed(
-                            context,
-                            '/projectDetails',
-                            arguments: project,
-                          ),
-                          child: Container(
-                            margin: const EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 6),
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(
-                                color: isUnscheduled
-                                    ? const Color(0xFF007BFF)
-                                    : Colors.grey.shade300,
-                                width: 2,
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.05),
-                                  blurRadius: 4,
-                                  offset: const Offset(0, 2),
-                                )
-                              ],
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  project.clientName,
-                                  style: const TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                const SizedBox(height: 4),
-                                Text('Project #: ${project.projectNumber}'),
-                                Text('Claim #: ${project.claimNumber}'),
-                                if (project.appointmentDate != null)
-                                  Text(
-                                    'Appt: ${DateFormat("MMM d, yyyy h:mm a").format(project.appointmentDate!)}',
-                                  ),
-                                if (project.appointmentDate == null)
-                                  const Text(
-                                    'No Appointment Set',
-                                    style: TextStyle(
-                                        color: Color(0xFF007BFF),
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                              ],
-                            ),
-                          ),
-                        );
-                      })
-                    ];
-                  }).toList(),
+                  children: groupedProjects.entries
+                      .where((e) => e.value.isNotEmpty)
+                      .map((e) =>
+                          _buildProjectGroup(context, e.key, e.value))
+                      .toList(),
                 );
               },
             ),
