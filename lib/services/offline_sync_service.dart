@@ -50,4 +50,9 @@ class OfflineSyncService {
       await inspection.save();
     }
   }
+
+  static Future<bool> hasUnsyncedData() async {
+    final box = await Hive.openBox<LocalInspection>('inspections');
+    return box.values.any((i) => !i.isSynced);
+  }
 }
