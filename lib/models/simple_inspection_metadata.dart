@@ -6,6 +6,7 @@ class InspectionMetadata {
   final String claimNumber;
   final String projectNumber;
   final DateTime? appointmentDate;
+  int position;
 
   InspectionMetadata({
     required this.id,
@@ -13,6 +14,7 @@ class InspectionMetadata {
     required this.claimNumber,
     required this.projectNumber,
     this.appointmentDate,
+    this.position = 0,
   });
 
   factory InspectionMetadata.fromMap(String id, Map<String, dynamic> data) {
@@ -24,6 +26,7 @@ class InspectionMetadata {
       appointmentDate: data['appointmentDate'] != null
           ? (data['appointmentDate'] as Timestamp).toDate()
           : null,
+      position: data['position'] is int ? data['position'] as int : 0,
     );
   }
 }
