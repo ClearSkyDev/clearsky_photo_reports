@@ -35,6 +35,7 @@ import '../../core/services/speech_service.dart';
 import '../../core/services/tts_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../widgets/ai_disclaimer_banner.dart';
+import '../../core/services/inspector_role_service.dart';
 
 import '../../core/models/inspected_structure.dart';
 import '../../core/utils/export_log.dart';
@@ -89,10 +90,12 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
   ReportTheme _theme = ReportTheme.defaultTheme;
   bool _exporting = false;
   File? _exportedFile;
+  InspectorRole selectedRole = InspectorRole.adjuster;
 
   @override
   void initState() {
     super.initState();
+    _loadInspectorRole();
     _metadata = widget.metadata;
     _selectedRole = Set.from(_metadata.inspectorRoles);
     _summaryController = TextEditingController(text: widget.summary ?? '');
@@ -134,6 +137,14 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
         _theme = ReportTheme.fromMap(map);
       });
     }
+  }
+
+  void _loadInspectorRole() async {
+    final role = await InspectorRoleService.loadRole();
+    if (!mounted) return;
+    setState(() {
+      selectedRole = role;
+    });
   }
 
   @override
