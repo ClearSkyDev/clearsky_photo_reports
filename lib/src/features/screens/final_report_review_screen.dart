@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/utils/export_utils.dart' as export_utils;
+import '../../core/services/subscription_service.dart';
 import '../../core/models/inspection_metadata.dart';
 import '../../core/models/photo_entry.dart';
 import '../../core/services/inspector_role_service.dart';
@@ -68,18 +69,58 @@ class FinalReportReviewScreen extends StatelessWidget {
           ElevatedButton.icon(
             icon: const Icon(Icons.picture_as_pdf),
             label: const Text('Export as PDF'),
-            onPressed: () => export_utils.generateAndDownloadPdf(
-              uploadedPhotos,
-              summaryText,
-            ),
+            onPressed: () async {
+              final pro = await SubscriptionService.isPro();
+              if (!pro) {
+                showDialog(
+                  context: context,
+                  builder: (_) => AlertDialog(
+                    title: const Text('Pro Feature'),
+                    content: const Text('Upgrade to export PDF reports.'),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text('OK'),
+                      ),
+                    ],
+                  ),
+                );
+                return;
+              }
+
+              await export_utils.generateAndDownloadPdf(
+                uploadedPhotos,
+                summaryText,
+              );
+            },
           ),
           ElevatedButton.icon(
             icon: const Icon(Icons.web),
             label: const Text('Export as HTML'),
-            onPressed: () => export_utils.generateAndDownloadHtml(
-              uploadedPhotos,
-              summaryText,
-            ),
+            onPressed: () async {
+              final pro = await SubscriptionService.isPro();
+              if (!pro) {
+                showDialog(
+                  context: context,
+                  builder: (_) => AlertDialog(
+                    title: const Text('Pro Feature'),
+                    content: const Text('Upgrade to export HTML reports.'),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text('OK'),
+                      ),
+                    ],
+                  ),
+                );
+                return;
+              }
+
+              await export_utils.generateAndDownloadHtml(
+                uploadedPhotos,
+                summaryText,
+              );
+            },
           ),
         ],
       ),
