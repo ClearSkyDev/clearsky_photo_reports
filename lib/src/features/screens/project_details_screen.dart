@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:path/path.dart' as p;
+import 'package:intl/intl.dart';
 
 /// Screen for entering basic inspection details before photo capture.
 class ProjectDetailsScreen extends StatefulWidget {
@@ -21,6 +22,11 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
   final TextEditingController _addressController = TextEditingController();
   final TextEditingController _carrierController = TextEditingController();
   final TextEditingController _perilController = TextEditingController();
+  final TextEditingController _projectNumberController = TextEditingController();
+  final TextEditingController _claimNumberController = TextEditingController();
+  final TextEditingController _appointmentController = TextEditingController();
+
+  DateTime? _appointmentDate;
 
   final List<String> externalReportUrls = [];
 
@@ -55,6 +61,35 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
     }
   }
 
+  Future<void> _pickAppointmentDate() async {
+    final date = await showDatePicker(
+      context: context,
+      initialDate: _appointmentDate ?? DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+    );
+    if (date != null) {
+      final time = await showTimePicker(
+        context: context,
+        initialTime: TimeOfDay.fromDateTime(
+            _appointmentDate ?? DateTime.now()),
+      );
+      if (time != null) {
+        setState(() {
+          _appointmentDate = DateTime(
+            date.year,
+            date.month,
+            date.day,
+            time.hour,
+            time.minute,
+          );
+          _appointmentController.text =
+              DateFormat('yyyy-MM-dd h:mm a').format(_appointmentDate!);
+        });
+      }
+    }
+  }
+
   Future<void> _submitForm() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -75,6 +110,10 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
         'address': _addressController.text,
         'carrier': _carrierController.text,
         'peril': _perilController.text,
+        'projectNumber': _projectNumberController.text,
+        'claimNumber': _claimNumberController.text,
+        if (_appointmentDate != null)
+          'appointmentDate': Timestamp.fromDate(_appointmentDate!),
         'createdAt': Timestamp.now(),
         'status': 'draft',
         'photos': [],
@@ -123,6 +162,25 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
                 validator: (v) => v == null || v.isEmpty ? 'Required' : null,
               ),
               TextFormField(
+                controller: _projectNumberController,
+                decoration: const InputDecoration(labelText: 'Project Number'),
+              ),
+              TextFormField(
+                controller: _claimNumberController,
+                decoration: const InputDecoration(labelText: 'Claim Number'),
+              ),
+              GestureDetector(
+                onTap: _pickAppointmentDate,
+                child: AbsorbPointer(
+                  child: TextFormField(
+                    decoration:
+                        const InputDecoration(labelText: 'Appointment Date'),
+                    controller: _appointmentController,
+                    readOnly: true,
+                  ),
+                ),
+              ),
+              TextFormField(
                 controller: _carrierController,
                 decoration:
                     const InputDecoration(labelText: 'Insurance Carrier'),
@@ -162,5 +220,17 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _clientNameController.dispose();
+    _addressController.dispose();
+    _carrierController.dispose();
+    _perilController.dispose();
+    _projectNumberController.dispose();
+    _claimNumberController.dispose();
+    _appointmentController.dispose();
+    super.dispose();
   }
 }
