@@ -47,7 +47,7 @@ class OfflineSyncService {
 
       // Mark as synced
       inspection.isSynced = true;
-      await inspection.save();
+      inspection.save();
     }
   }
 
