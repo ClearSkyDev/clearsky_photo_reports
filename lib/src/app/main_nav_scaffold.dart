@@ -7,6 +7,7 @@ import '../features/screens/sectioned_photo_upload_screen.dart';
 import '../features/screens/report_screen.dart';
 import '../features/screens/report_settings_screen.dart';
 import '../core/services/accessibility_service.dart';
+import '../services/offline_sync_service.dart';
 
 class MainNavScaffold extends StatefulWidget {
   final InspectorUser user;
@@ -31,6 +32,12 @@ class _MainNavScaffoldState extends State<MainNavScaffold> {
       HapticFeedback.selectionClick();
     }
     setState(() => _index = i);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    OfflineSyncService.syncAll();
   }
 
   @override
