@@ -70,22 +70,30 @@ class GuidedCaptureScreenState extends State<GuidedCaptureScreen> {
   }
 
   Widget _buildPhoto(int index, Map<String, dynamic> photo) {
-    final controller = TextEditingController(text: photo['userLabel'] as String? ?? '');
+    final approved = photo['approved'] as bool? ?? false;
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      child: Column(
-        children: [
-          Image.memory(photo['data'] as Uint8List, height: 200),
-          TextField(
-            controller: controller,
-            decoration: const InputDecoration(labelText: 'Label this photo'),
-            onChanged: (val) {
-              setState(() {
-                _capturedPhotos[index]['userLabel'] = val;
-              });
-            },
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: ListTile(
+        leading: Image.file(File(photo['localPath']), width: 50),
+        title: TextFormField(
+          initialValue: photo['userLabel'] as String? ?? '',
+          onChanged: (val) =>
+              setState(() => _capturedPhotos[index]['userLabel'] = val),
+          decoration: const InputDecoration(
+            labelText: 'Suggested Label',
+            suffixIcon: Icon(Icons.lightbulb),
           ),
-        ],
+        ),
+        trailing: IconButton(
+          icon: Icon(
+            approved ? Icons.check_circle : Icons.check_circle_outline,
+            color: approved ? Colors.green : null,
+          ),
+          tooltip: 'Approve Label',
+          onPressed: () => setState(() {
+            _capturedPhotos[index]['approved'] = !approved;
+          }),
+        ),
       ),
     );
   }
