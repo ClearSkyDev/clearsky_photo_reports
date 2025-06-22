@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import '../../core/utils/crop_preferences.dart';
+import '../../core/utils/square_cropper.dart';
 import 'dart:io';
 import '../../core/models/photo_entry.dart';
 import '../../core/models/inspection_metadata.dart';
@@ -27,13 +29,22 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
     debugPrint('[PhotoUploadScreen] Picking images');
     final List<XFile> selected = await _picker.pickMultiImage();
     if (selected.isNotEmpty) {
+      final enforce = await CropPreferences.isEnforced();
+      final List<XFile> processed = [];
+      if (enforce) {
+        for (final x in selected) {
+          processed.add(await SquareCropper.crop(x));
+        }
+      } else {
+        processed.addAll(selected);
+      }
       if (!mounted) return;
       setState(() {
         _photos.addAll(
-          selected.map((xfile) => PhotoEntry(url: xfile.path)).toList(),
+          processed.map((xfile) => PhotoEntry(url: xfile.path)).toList(),
         );
       });
-      debugPrint('[PhotoUploadScreen] Added ${selected.length} photos');
+      debugPrint('[PhotoUploadScreen] Added ${processed.length} photos');
     }
   }
 
