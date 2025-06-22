@@ -12,6 +12,7 @@ class ClientDashboardScreen extends StatefulWidget {
 
 class ClientDashboardScreenState extends State<ClientDashboardScreen> {
   final List<InspectionReport> _allReports = []; // Your reports list
+  final TextEditingController _searchController = TextEditingController();
   String _filter = 'All'; // Filter: All, Synced, Unsynced
 
   void _openReport(InspectionReport report) {
@@ -45,12 +46,25 @@ class ClientDashboardScreenState extends State<ClientDashboardScreen> {
   }
 
   List<InspectionReport> get _filteredReports {
+    Iterable<InspectionReport> reports = _allReports;
     if (_filter == 'Synced') {
-      return _allReports.where((r) => r.synced).toList();
+      reports = reports.where((r) => r.synced);
     } else if (_filter == 'Unsynced') {
-      return _allReports.where((r) => !r.synced).toList();
+      reports = reports.where((r) => !r.synced);
     }
-    return _allReports;
+    final query = _searchController.text.toLowerCase().trim();
+    if (query.isNotEmpty) {
+      reports = reports.where(
+        (r) => (r.title ?? '').toLowerCase().contains(query),
+      );
+    }
+    return reports.toList();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   @override
@@ -73,33 +87,50 @@ class ClientDashboardScreenState extends State<ClientDashboardScreen> {
           )
         ],
       ),
-      body: _filteredReports.isEmpty
-          ? const Center(child: Text('No reports found.'))
-          : ListView.builder(
-              itemCount: _filteredReports.length,
-              itemBuilder: (context, index) {
-                final report = _filteredReports[index];
-                return ListTile(
-                  title: Text(report.title ?? 'Untitled Report'),
-                  subtitle: Text(report.synced ? 'Synced' : 'Unsynced'),
-                  onTap: () => _openReport(report),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (!report.synced)
-                        IconButton(
-                          icon: const Icon(Icons.cloud_upload),
-                          onPressed: () => _syncReport(report),
-                        ),
-                      IconButton(
-                        icon: const Icon(Icons.delete),
-                        onPressed: () => _deleteReport(index),
-                      ),
-                    ],
-                  ),
-                );
-              },
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              controller: _searchController,
+              decoration: const InputDecoration(
+                labelText: 'Search by title',
+                prefixIcon: Icon(Icons.search),
+              ),
+              onChanged: (_) => setState(() {}),
             ),
+          ),
+          Expanded(
+            child: _filteredReports.isEmpty
+                ? const Center(child: Text('No reports found.'))
+                : ListView.builder(
+                    itemCount: _filteredReports.length,
+                    itemBuilder: (context, index) {
+                      final report = _filteredReports[index];
+                      return ListTile(
+                        title: Text(report.title ?? 'Untitled Report'),
+                        subtitle: Text(report.synced ? 'Synced' : 'Unsynced'),
+                        onTap: () => _openReport(report),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            if (!report.synced)
+                              IconButton(
+                                icon: const Icon(Icons.cloud_upload),
+                                onPressed: () => _syncReport(report),
+                              ),
+                            IconButton(
+                              icon: const Icon(Icons.delete),
+                              onPressed: () => _deleteReport(index),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+          ),
+        ],
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: _createNewInspection,
         tooltip: 'New Inspection',
