@@ -336,7 +336,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         .doc(uid)
                         .collection('inspections')
                         .doc(project.id);
-                    final update = {
+                    final update = <String, dynamic>{
                       'clientName': clientController.text,
                       'claimNumber': claimController.text,
                     };
