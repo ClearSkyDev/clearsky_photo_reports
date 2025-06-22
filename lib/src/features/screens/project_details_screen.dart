@@ -239,20 +239,38 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
                     onPressed: () => setState(() => _itelUrl = null),
                   ),
                 ),
-              ElevatedButton.icon(
+              TextButton.icon(
                 onPressed: () => _pickAndUploadReport('EagleView'),
-                icon: const Icon(Icons.attach_file),
-                label: const Text('Attach EagleView Report'),
+                icon: const Icon(Icons.attach_file, color: Color(0xFF007BFF)),
+                label: const Text(
+                  'Attach EagleView Report',
+                  style: TextStyle(
+                    color: Color(0xFF007BFF),
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
-              ElevatedButton.icon(
+              TextButton.icon(
                 onPressed: () => _pickAndUploadReport('Hover'),
-                icon: const Icon(Icons.attach_file),
-                label: const Text('Attach Hover Report'),
+                icon: const Icon(Icons.attach_file, color: Color(0xFF007BFF)),
+                label: const Text(
+                  'Attach Hover Report',
+                  style: TextStyle(
+                    color: Color(0xFF007BFF),
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
-              ElevatedButton.icon(
+              TextButton.icon(
                 onPressed: () => _pickAndUploadReport('ITEL'),
-                icon: const Icon(Icons.attach_file),
-                label: const Text('Attach ITEL Report'),
+                icon: const Icon(Icons.attach_file, color: Color(0xFF007BFF)),
+                label: const Text(
+                  'Attach ITEL Report',
+                  style: TextStyle(
+                    color: Color(0xFF007BFF),
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
               const SizedBox(height: 20),
               ElevatedButton(

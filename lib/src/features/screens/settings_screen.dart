@@ -134,7 +134,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         padding: const EdgeInsets.all(16),
         children: [
           ListTile(
-            leading: const Icon(Icons.person),
+            leading: const Icon(Icons.person, color: Colors.black),
             title: const Text('Profile'),
             onTap: () => Navigator.push(
               context,
@@ -142,7 +142,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           ),
           ListTile(
-            leading: const Icon(Icons.picture_as_pdf),
+            leading: const Icon(Icons.picture_as_pdf, color: Colors.black),
             title: const Text('Report Settings'),
             onTap: () => Navigator.push(
               context,
@@ -150,7 +150,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           ),
           ListTile(
-            leading: const Icon(Icons.color_lens),
+            leading: const Icon(Icons.color_lens, color: Colors.black),
             title: const Text('App Theme'),
             onTap: () => Navigator.push(
               context,
@@ -158,7 +158,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           ),
           ListTile(
-            leading: const Icon(Icons.accessibility),
+            leading: const Icon(Icons.accessibility, color: Colors.black),
             title: const Text('Accessibility'),
             onTap: () => Navigator.push(
               context,
@@ -166,7 +166,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           ),
           ListTile(
-            leading: const Icon(Icons.notifications),
+            leading: const Icon(Icons.notifications, color: Colors.black),
             title: const Text('Notifications'),
             onTap: () => Navigator.push(
               context,
@@ -174,7 +174,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           ),
           ListTile(
-            leading: const Icon(Icons.psychology),
+            leading: const Icon(Icons.psychology, color: Colors.black),
             title: const Text('AI Learning'),
             onTap: () => Navigator.push(
               context,
@@ -182,7 +182,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           ),
           ListTile(
-            leading: const Icon(Icons.update),
+            leading: const Icon(Icons.update, color: Colors.black),
             title: const Text("What's New"),
             onTap: () => Navigator.push(
               context,

@@ -108,7 +108,7 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppTheme.clearSkyTheme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text('Home'),
+        title: const Text('ClearSky'),
         backgroundColor: AppTheme.clearSkyTheme.primaryColor,
         actions: [
           IconButton(
@@ -121,34 +121,16 @@ class HomeScreen extends StatelessWidget {
         children: [
           if (!isSubscribed)
             Container(
-              padding: const EdgeInsets.all(12),
-              color: AppTheme.clearSkyTheme.colorScheme.secondary,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Free trial: $freeReportsRemaining report${freeReportsRemaining == 1 ? '' : 's'} remaining',
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  ElevatedButton(
-                    onPressed: () => _handleUpgrade(context),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF007BFF),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      elevation: 2,
-                    ),
-                    child: const Text(
-                      'Upgrade',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        shadows: [Shadow(blurRadius: 2, color: Colors.black)],
-                      ),
-                    ),
-                  ),
-                ],
+              width: double.infinity,
+              padding: const EdgeInsets.all(8),
+              color: Colors.yellow.shade100,
+              child: Text(
+                'Free trial: $freeReportsRemaining report${freeReportsRemaining == 1 ? '' : 's'} remaining',
+                style: TextStyle(
+                  color: Colors.orange.shade900,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
               ),
             ),
           const SizedBox(height: 20),
