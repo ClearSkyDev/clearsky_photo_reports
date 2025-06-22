@@ -1,0 +1,16 @@
+{
+  "expo": {
+    "name": "ClearSky",
+    "slug": "clearsky-photo-reports",
+    "icon": "./assets/app_icon.png",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "platforms": ["ios", "android", "web"],
+    "orientation": "portrait",
+    "version": "1.0.0",
+    "sdkVersion": "53.0.0"
+  }
+}

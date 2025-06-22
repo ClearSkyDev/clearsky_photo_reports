@@ -4,7 +4,8 @@
   "description": "",
   "main": "MainApp.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "expo start"
   },
   "keywords": [],
   "author": "",
@@ -22,6 +23,10 @@
     "react-native": "^0.79.3",
     "react-native-signature-canvas": "^4.7.4",
     "react-native-svg": "^13.14.0",
-    "react-native-webview": "13.13.5"
+    "react-native-webview": "13.13.5",
+    "expo-camera": "^16.1.8",
+    "expo-file-system": "^18.1.10",
+    "expo-sharing": "^13.1.5",
+    "expo-font": "^13.3.1"
   }
 }
