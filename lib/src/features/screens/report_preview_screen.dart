@@ -40,6 +40,7 @@ import '../../core/services/inspector_role_service.dart';
 import '../../core/models/inspected_structure.dart';
 import '../../core/utils/export_log.dart';
 import '../../core/models/export_log_entry.dart';
+import 'final_report_review_screen.dart';
 
 class ReportPreviewScreen extends StatefulWidget {
   final List<PhotoEntry>? photos;
@@ -1211,6 +1212,26 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
     );
   }
 
+  void _openFinalReview() {
+    final photos = _gatherAllPhotos();
+    final sigData = _signature != null
+        ? 'data:image/png;base64,${base64Encode(_signature!)}'
+        : '';
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => FinalReportReviewScreen(
+          uploadedPhotos: photos,
+          metadata: _metadata,
+          role: selectedRole,
+          externalReportUrls: _metadata.externalReportUrls,
+          summaryText: _adjusterSummaryController.text,
+          signatureData: sigData,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -1625,6 +1646,13 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
               child: ElevatedButton(
                 onPressed: _previewFullReport,
                 child: const Text('Preview Full Report'),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 16),
+              child: ElevatedButton(
+                onPressed: _openFinalReview,
+                child: const Text('Final Report Review'),
               ),
             ),
             Padding(
