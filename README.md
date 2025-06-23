@@ -128,6 +128,32 @@ This project uses Firebase for data storage and optional photo uploads. Install 
 4. In the Firebase console copy the Web API Key from **Project Settings > General** and ensure it matches the `apiKey` value in `lib/src/core/firebase_options.dart`.
 5. If any placeholder like `REPLACE_WITH_API_KEY` remains in `firebase_options.dart`, the app will display a configuration error on startup.
 
+### Troubleshooting: "Firebase API Key not configured"
+
+If you encounter this error when launching the app:
+
+1. Activate the FlutterFire CLI and regenerate configuration files:
+
+   ```bash
+   dart pub global activate flutterfire_cli
+   flutterfire configure
+   ```
+
+2. Open `lib/src/core/firebase_options.dart` and replace all placeholder values
+   (`REPLACE_WITH_API_KEY`, `TODO`) with your actual Firebase project settings.
+
+3. Rebuild the project:
+
+   ```bash
+   flutter clean
+   flutter pub get
+   flutter run -d chrome
+   ```
+
+`Firebase.initializeApp()` is already wrapped in a `try/catch` block so any
+configuration issues will display a `ConfigErrorScreen` with the underlying
+error message.
+
 ## Local Storage Alternative
 
 For scenarios where Firebase is not available, reports can be stored locally using `LocalReportStore`. This implementation saves report JSON files under the application's documents directory and keeps an index of saved reports with `shared_preferences`.
