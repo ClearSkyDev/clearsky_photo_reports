@@ -69,10 +69,14 @@ class NotificationService {
 
   @pragma('vm:entry-point')
   static Future<void> _backgroundHandler(RemoteMessage message) async {
-    await Firebase.initializeApp(
-        options: DefaultFirebaseOptions.currentPlatform);
-    await NotificationService.instance._loadPrefs();
-    NotificationService.instance._showNotification(message);
+    try {
+      await Firebase.initializeApp(
+          options: DefaultFirebaseOptions.currentPlatform);
+      await NotificationService.instance._loadPrefs();
+      NotificationService.instance._showNotification(message);
+    } catch (_) {
+      // Ignore initialization errors in background isolate
+    }
   }
 
   void _handleMessage(RemoteMessage message) {
