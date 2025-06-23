@@ -7,9 +7,12 @@ import 'screens/config_error_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   try {
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
+    final options = DefaultFirebaseOptions.currentPlatform;
+    if (options.apiKey.startsWith('REPLACE_WITH')) {
+      throw Exception(
+          'Firebase API key not configured. Update lib/src/core/firebase_options.dart');
+    }
+    await Firebase.initializeApp(options: options);
     runApp(const ClearSkyApp());
   } catch (e) {
     runApp(ConfigErrorScreen(error: e.toString()));
