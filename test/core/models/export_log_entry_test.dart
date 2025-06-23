@@ -1,7 +1,11 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:clearsky_photo_reports/models/export_log_entry.dart';
+import '../../firebase_test_setup.dart';
 
 void main() {
+  setUpAll(() async {
+    await setupFirebase();
+  });
   test('export log entry map round trip', () {
     final entry = ExportLogEntry(
       reportName: 'Test',

@@ -2,8 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:clearsky_photo_reports/screens/client_dashboard_screen.dart';
 import 'package:clearsky_photo_reports/models/inspection_report.dart';
+import '../firebase_test_setup.dart';
 
 void main() {
+  setUpAll(() async {
+    await setupFirebase();
+  });
   testWidgets('Dashboard loads and new inspection triggers snackBar',
       (WidgetTester tester) async {
     // Build the widget tree
