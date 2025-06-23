@@ -1,7 +1,11 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:clearsky_photo_reports/src/core/services/label_suggestion_service.dart';
+import '../../firebase_test_setup.dart';
 
 void main() {
+  setUpAll(() async {
+    await setupFirebase();
+  });
   group('LabelSuggestionService', () {
     test('returns front elevation suggestion', () async {
       final label = await LabelSuggestionService.suggestLabel(

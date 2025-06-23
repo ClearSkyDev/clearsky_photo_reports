@@ -1,7 +1,11 @@
 import 'package:clearsky_photo_reports/models/audit_log_entry.dart';
 import 'package:flutter_test/flutter_test.dart';
+import '../../firebase_test_setup.dart';
 
 void main() {
+  setUpAll(() async {
+    await setupFirebase();
+  });
   test('audit log entry map round trip', () {
     final entry = AuditLogEntry(
       userId: 'u1',

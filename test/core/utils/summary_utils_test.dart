@@ -3,8 +3,12 @@ import 'package:clearsky_photo_reports/src/core/models/inspected_structure.dart'
 import 'package:clearsky_photo_reports/src/core/models/saved_report.dart'
     show SavedReport, ReportPhotoEntry;
 import 'package:clearsky_photo_reports/src/core/utils/summary_utils.dart';
+import '../../firebase_test_setup.dart';
 
 void main() {
+  setUpAll(() async {
+    await setupFirebase();
+  });
   test('section summaries include damage types', () {
     final report = SavedReport(
       inspectionMetadata: {

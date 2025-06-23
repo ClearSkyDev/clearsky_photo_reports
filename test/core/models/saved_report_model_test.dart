@@ -1,7 +1,11 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:clearsky_photo_reports/models/saved_report.dart';
+import '../../firebase_test_setup.dart';
 
 void main() {
+  setUpAll(() async {
+    await setupFirebase();
+  });
   test('saved report version round trip', () {
     final report = SavedReport(
       id: 'r1',
