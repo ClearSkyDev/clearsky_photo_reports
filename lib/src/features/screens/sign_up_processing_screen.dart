@@ -32,7 +32,7 @@ class _SignUpProcessingScreenState extends State<SignUpProcessingScreen> {
         companyId: '',
       );
       if (!mounted) return;
-      Navigator.pushReplacementNamed(context, '/home');
+      Navigator.pushNamedAndRemoveUntil(context, '/home', (_) => false);
     } catch (e) {
       if (mounted) {
         Navigator.pop(context);
