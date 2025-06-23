@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'sign_up_processing_screen.dart';
+import '../../core/services/auth_service.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -15,6 +15,7 @@ class _SignupScreenState extends State<SignupScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmController = TextEditingController();
   String? _error;
+  bool _loading = false;
 
   bool _validate() {
     if (_nameController.text.trim().isEmpty ||
@@ -30,18 +31,24 @@ class _SignupScreenState extends State<SignupScreen> {
     return true;
   }
 
-  void _submit() {
+  Future<void> _submit() async {
     if (!_validate()) return;
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (_) => SignUpProcessingScreen(
-          name: _nameController.text.trim(),
-          email: _emailController.text.trim(),
-          password: _passwordController.text,
-        ),
-      ),
-    );
+    setState(() => _loading = true);
+    try {
+      await AuthService().signUp(
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
+        companyId: '',
+      );
+      if (!mounted) return;
+      Navigator.pushNamedAndRemoveUntil(context, '/home', (_) => false);
+    } catch (e) {
+      if (mounted) {
+        setState(() => _error = 'Signup failed: $e');
+      }
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
   }
 
   @override
@@ -85,8 +92,14 @@ class _SignupScreenState extends State<SignupScreen> {
               Text(_error!, style: const TextStyle(color: Colors.red)),
             const SizedBox(height: 12),
             ElevatedButton(
-              onPressed: _submit,
-              child: const Text('Create Account'),
+              onPressed: _loading ? null : _submit,
+              child: _loading
+                  ? const SizedBox(
+                      height: 16,
+                      width: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Text('Create Account'),
             ),
             TextButton(
               onPressed: () =>
