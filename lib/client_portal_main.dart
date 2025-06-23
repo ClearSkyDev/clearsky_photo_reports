@@ -20,7 +20,12 @@ Future<void> main() async {
     }
     await Firebase.initializeApp(options: options);
   } catch (e) {
-    runApp(ConfigErrorScreen(error: e.toString()));
+    runApp(
+      MaterialApp(
+        home: ConfigErrorScreen(error: e.toString()),
+        debugShowCheckedModeBanner: false,
+      ),
+    );
     return;
   }
   await ThemeService.instance.init();
