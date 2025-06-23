@@ -15,7 +15,12 @@ void main() async {
     await Firebase.initializeApp(options: options);
     runApp(const ClearSkyApp());
   } catch (e) {
-    runApp(ConfigErrorScreen(error: e.toString()));
+    runApp(
+      MaterialApp(
+        home: ConfigErrorScreen(error: e.toString()),
+        debugShowCheckedModeBanner: false,
+      ),
+    );
   }
 }
 
