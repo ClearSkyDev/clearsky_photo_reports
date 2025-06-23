@@ -25,7 +25,7 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'TODO',
+    apiKey: 'REPLACE_WITH_API_KEY',
     appId: 'TODO',
     messagingSenderId: 'TODO',
     projectId: 'TODO',
@@ -34,7 +34,7 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'TODO',
+    apiKey: 'REPLACE_WITH_API_KEY',
     appId: 'TODO',
     messagingSenderId: 'TODO',
     projectId: 'TODO',
@@ -42,7 +42,7 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'TODO',
+    apiKey: 'REPLACE_WITH_API_KEY',
     appId: 'TODO',
     messagingSenderId: 'TODO',
     projectId: 'TODO',
@@ -51,7 +51,7 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'TODO',
+    apiKey: 'REPLACE_WITH_API_KEY',
     appId: 'TODO',
     messagingSenderId: 'TODO',
     projectId: 'TODO',

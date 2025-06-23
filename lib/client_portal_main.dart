@@ -8,12 +8,18 @@ import 'src/features/client_portal/client_dashboard_screen.dart';
 import 'src/core/services/auth_service.dart';
 import 'src/app/app_theme.dart';
 import 'src/core/services/theme_service.dart';
+import 'screens/config_error_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  } catch (e) {
+    runApp(ConfigErrorScreen(error: e.toString()));
+    return;
+  }
   await ThemeService.instance.init();
   runApp(const ClientPortalApp());
 }
