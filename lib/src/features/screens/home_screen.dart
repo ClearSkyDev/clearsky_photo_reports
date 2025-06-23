@@ -93,7 +93,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<bool> _hasUnsynced(String id) async {
     final box = await Hive.openBox<LocalInspection>('inspections');
-    final local = box.get(id) as LocalInspection?;
+    final local = box.get(id);
     return local != null && !local.isSynced;
   }
 
