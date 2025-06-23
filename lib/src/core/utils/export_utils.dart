@@ -37,7 +37,6 @@ Future<void> savePdfToFile(Uint8List pdfBytes, String filename) async {
   await file.writeAsBytes(pdfBytes);
 }
 
-
 Future<void> generateAndDownloadPdf(
   List<PhotoEntry> photos,
   String summary,
@@ -161,7 +160,8 @@ Future<File?> exportAsZip(SavedReport report) async {
   final zipData = ZipEncoder().encode(archive);
 
   if (kIsWeb) {
-    web_js.downloadBytes(Uint8List.fromList(zipData), fileName, 'application/zip');
+    web_js.downloadBytes(
+        Uint8List.fromList(zipData), fileName, 'application/zip');
     return null;
   }
 
@@ -743,230 +743,231 @@ Future<Uint8List> _generatePdf(SavedReport report) async {
   pdf.addPage(
     pw.MultiPage(
         footer: (context) => pw.Container(
-          color: PdfColors.grey300,
-          padding: const pw.EdgeInsets.all(6),
-          child: pw.Column(
-            mainAxisSize: pw.MainAxisSize.min,
-            children: [
-              pw.Text(_disclaimerText,
-                  style: pw.TextStyle(fontSize: 9),
-                  textAlign: pw.TextAlign.center),
-              pw.SizedBox(height: 2),
-              pw.Text(_contactInfo,
-                  style: pw.TextStyle(fontSize: 9),
-                  textAlign: pw.TextAlign.center),
-              if (report.wasOffline)
-                pw.Padding(
-                  padding: const pw.EdgeInsets.only(top: 2),
-                  child: pw.Text(
-                    '⚠️ Draft Created Offline — Please verify all data before submission',
-                    style: pw.TextStyle(
-                        fontSize: 9, color: PdfColors.orange),
-                    textAlign: pw.TextAlign.center,
-                  ),
-                ),
-            ],
-          ),
-        ),
+              color: PdfColors.grey300,
+              padding: const pw.EdgeInsets.all(6),
+              child: pw.Column(
+                mainAxisSize: pw.MainAxisSize.min,
+                children: [
+                  pw.Text(_disclaimerText,
+                      style: pw.TextStyle(fontSize: 9),
+                      textAlign: pw.TextAlign.center),
+                  pw.SizedBox(height: 2),
+                  pw.Text(_contactInfo,
+                      style: pw.TextStyle(fontSize: 9),
+                      textAlign: pw.TextAlign.center),
+                  if (report.wasOffline)
+                    pw.Padding(
+                      padding: const pw.EdgeInsets.only(top: 2),
+                      child: pw.Text(
+                        '⚠️ Draft Created Offline — Please verify all data before submission',
+                        style:
+                            pw.TextStyle(fontSize: 9, color: PdfColors.orange),
+                        textAlign: pw.TextAlign.center,
+                      ),
+                    ),
+                ],
+              ),
+            ),
         build: (context) => [
-          pw.Center(
-            child: pw.Column(
-              mainAxisAlignment: pw.MainAxisAlignment.center,
-              crossAxisAlignment: pw.CrossAxisAlignment.center,
-              children: [
-              pw.Image(pw.MemoryImage(logoBytes), width: 150),
-              pw.SizedBox(height: 20),
-              pw.Text('Roof Inspection Report',
-                  style: pw.TextStyle(
-                      fontSize: 24,
-                      fontWeight: pw.FontWeight.bold,
-                      color: PdfColor.fromInt(theme.primaryColor))),
-              pw.SizedBox(height: 10),
-              pw.Text(
-                  meta.inspectorRoles.contains(InspectorReportRole.adjuster)
-                      ? 'Prepared from Adjuster Perspective'
-                      : 'Prepared by: Third-Party Inspector',
-                  style: pw.TextStyle(
-                      fontSize: 18,
-                      color: PdfColor.fromInt(theme.primaryColor))),
-              pw.SizedBox(height: 20),
-              pw.Text('Client Name: ${meta.clientName}'),
-              pw.Text('Property Address: ${meta.propertyAddress}'),
-              pw.Text(
-                  'Inspection Date: ${meta.inspectionDate.toLocal().toString().split(' ')[0]}'),
-              pw.Text('Insurance Carrier: ${meta.insuranceCarrier}'),
-              pw.Text('Peril Type: ${meta.perilType.name}'),
-              pw.Text('Inspection Type: ${meta.inspectionType.name}'),
-              pw.Text(
-                  'Inspector Role: ${meta.inspectorRoles.map((e) => e.name.replaceAll('_', ' ')).join(', ')}'),
-              pw.Text('Inspector Name: ${meta.inspectorName}'),
-              pw.SizedBox(height: 20),
-              if ((aiStatus == 'approved' || aiStatus == 'edited') &&
-                  summaryText.isNotEmpty)
-                pw.Container(
-                  width: double.infinity,
-                  padding: const pw.EdgeInsets.all(8),
-                  decoration: pw.BoxDecoration(
-                      border: pw.Border.all(color: PdfColors.grey)),
-                  child: pw.Column(
-                    crossAxisAlignment: pw.CrossAxisAlignment.start,
-                    children: [
-                      pw.Text('Inspection Summary',
-                          style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-                      pw.SizedBox(height: 4),
-                      pw.Text(summaryText),
-                      if (report.aiSummary?.editor != null)
-                        pw.Padding(
-                          padding: const pw.EdgeInsets.only(top: 4),
-                          child: pw.Text(
-                              'Reviewed by ${report.aiSummary!.editor} on ${report.aiSummary!.editedAt?.toLocal().toString().split(' ')[0]}',
-                              style: pw.TextStyle(fontSize: 10)),
+              pw.Center(
+                child: pw.Column(
+                  mainAxisAlignment: pw.MainAxisAlignment.center,
+                  crossAxisAlignment: pw.CrossAxisAlignment.center,
+                  children: [
+                    pw.Image(pw.MemoryImage(logoBytes), width: 150),
+                    pw.SizedBox(height: 20),
+                    pw.Text('Roof Inspection Report',
+                        style: pw.TextStyle(
+                            fontSize: 24,
+                            fontWeight: pw.FontWeight.bold,
+                            color: PdfColor.fromInt(theme.primaryColor))),
+                    pw.SizedBox(height: 10),
+                    pw.Text(
+                        meta.inspectorRoles
+                                .contains(InspectorReportRole.adjuster)
+                            ? 'Prepared from Adjuster Perspective'
+                            : 'Prepared by: Third-Party Inspector',
+                        style: pw.TextStyle(
+                            fontSize: 18,
+                            color: PdfColor.fromInt(theme.primaryColor))),
+                    pw.SizedBox(height: 20),
+                    pw.Text('Client Name: ${meta.clientName}'),
+                    pw.Text('Property Address: ${meta.propertyAddress}'),
+                    pw.Text(
+                        'Inspection Date: ${meta.inspectionDate.toLocal().toString().split(' ')[0]}'),
+                    pw.Text('Insurance Carrier: ${meta.insuranceCarrier}'),
+                    pw.Text('Peril Type: ${meta.perilType.name}'),
+                    pw.Text('Inspection Type: ${meta.inspectionType.name}'),
+                    pw.Text(
+                        'Inspector Role: ${meta.inspectorRoles.map((e) => e.name.replaceAll('_', ' ')).join(', ')}'),
+                    pw.Text('Inspector Name: ${meta.inspectorName}'),
+                    pw.SizedBox(height: 20),
+                    if ((aiStatus == 'approved' || aiStatus == 'edited') &&
+                        summaryText.isNotEmpty)
+                      pw.Container(
+                        width: double.infinity,
+                        padding: const pw.EdgeInsets.all(8),
+                        decoration: pw.BoxDecoration(
+                            border: pw.Border.all(color: PdfColors.grey)),
+                        child: pw.Column(
+                          crossAxisAlignment: pw.CrossAxisAlignment.start,
+                          children: [
+                            pw.Text('Inspection Summary',
+                                style: pw.TextStyle(
+                                    fontWeight: pw.FontWeight.bold)),
+                            pw.SizedBox(height: 4),
+                            pw.Text(summaryText),
+                            if (report.aiSummary?.editor != null)
+                              pw.Padding(
+                                padding: const pw.EdgeInsets.only(top: 4),
+                                child: pw.Text(
+                                    'Reviewed by ${report.aiSummary!.editor} on ${report.aiSummary!.editedAt?.toLocal().toString().split(' ')[0]}',
+                                    style: pw.TextStyle(fontSize: 10)),
+                              ),
+                          ],
                         ),
-                    ],
-                  ),
+                      ),
+                    if (summary.isNotEmpty)
+                      pw.Container(
+                        width: double.infinity,
+                        padding: const pw.EdgeInsets.all(8),
+                        decoration: pw.BoxDecoration(
+                            border: pw.Border.all(color: PdfColors.grey)),
+                        child: pw.Column(
+                          crossAxisAlignment: pw.CrossAxisAlignment.start,
+                          children: [
+                            pw.Text('Inspector Notes / Summary',
+                                style: pw.TextStyle(
+                                    fontWeight: pw.FontWeight.bold)),
+                            pw.SizedBox(height: 4),
+                            pw.Text(summary),
+                          ],
+                        ),
+                      ),
+                    pw.SizedBox(height: 20),
+                    pw.Text(_coverDisclaimer,
+                        style: pw.TextStyle(fontSize: 12),
+                        textAlign: pw.TextAlign.center),
+                  ],
                 ),
-              if (summary.isNotEmpty)
-                pw.Container(
-                  width: double.infinity,
-                  padding: const pw.EdgeInsets.all(8),
-                  decoration: pw.BoxDecoration(
-                      border: pw.Border.all(color: PdfColors.grey)),
-                  child: pw.Column(
-                    crossAxisAlignment: pw.CrossAxisAlignment.start,
-                    children: [
-                      pw.Text('Inspector Notes / Summary',
-                          style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-                      pw.SizedBox(height: 4),
-                      pw.Text(summary),
-                    ],
-                  ),
-                ),
-              pw.SizedBox(height: 20),
-              pw.Text(_coverDisclaimer,
-                  style: pw.TextStyle(fontSize: 12),
-                  textAlign: pw.TextAlign.center),
-            ],
-          ),
-        ),
-      ]
-      ),
+              ),
+            ]),
   );
   pdf.addPage(
     pw.MultiPage(
-        footer: (context) => pw.Container(
-          color: PdfColors.grey300,
-          padding: const pw.EdgeInsets.all(6),
-          child: pw.Column(
-            mainAxisSize: pw.MainAxisSize.min,
+      footer: (context) => pw.Container(
+        color: PdfColors.grey300,
+        padding: const pw.EdgeInsets.all(6),
+        child: pw.Column(
+          mainAxisSize: pw.MainAxisSize.min,
+          children: [
+            pw.Text(_disclaimerText,
+                style: pw.TextStyle(fontSize: 9),
+                textAlign: pw.TextAlign.center),
+            pw.SizedBox(height: 2),
+            pw.Text(_contactInfo,
+                style: pw.TextStyle(fontSize: 9),
+                textAlign: pw.TextAlign.center),
+            if (report.wasOffline)
+              pw.Padding(
+                padding: const pw.EdgeInsets.only(top: 2),
+                child: pw.Text(
+                  '⚠️ Draft Created Offline — Please verify all data before submission',
+                  style: pw.TextStyle(fontSize: 9, color: PdfColors.orange),
+                  textAlign: pw.TextAlign.center,
+                ),
+              ),
+          ],
+        ),
+      ),
+      build: (context) => [
+        pw.Header(level: 0, text: 'ClearSky Photo Report'),
+        pw.Text('Client Name: ${meta.clientName}'),
+        pw.Text('Property Address: ${meta.propertyAddress}'),
+        if (report.structures.length > 1) ...[
+          pw.SizedBox(height: 10),
+          pw.Header(level: 1, text: 'Table of Contents'),
+          pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
-              pw.Text(_disclaimerText,
-                  style: pw.TextStyle(fontSize: 9),
-                  textAlign: pw.TextAlign.center),
-              pw.SizedBox(height: 2),
-              pw.Text(_contactInfo,
-                  style: pw.TextStyle(fontSize: 9),
-                  textAlign: pw.TextAlign.center),
-              if (report.wasOffline)
-                pw.Padding(
-                  padding: const pw.EdgeInsets.only(top: 2),
+              for (int i = 0; i < report.structures.length; i++)
+                pw.Text('${i + 1}. ${report.structures[i].name}'),
+            ],
+          ),
+          pw.SizedBox(height: 20),
+        ],
+        pw.Text(
+            'Inspection Date: ${meta.inspectionDate.toLocal().toString().split(' ')[0]}'),
+        pw.Text('Insurance Carrier: ${meta.insuranceCarrier}'),
+        pw.Text('Peril Type: ${meta.perilType.name}'),
+        pw.Text('Inspection Type: ${meta.inspectionType.name}'),
+        pw.Text(
+            'Inspector Role: ${meta.inspectorRoles.map((e) => e.name.replaceAll('_', ' ')).join(', ')}'),
+        pw.Text('Inspector Name: ${meta.inspectorName}'),
+        if (meta.externalReportUrls.isNotEmpty) ...[
+          pw.SizedBox(height: 10),
+          pw.Text('External Reports',
+              style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+          pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: [
+              for (final url in meta.externalReportUrls)
+                pw.UrlLink(
+                  destination: url,
                   child: pw.Text(
-                    '⚠️ Draft Created Offline — Please verify all data before submission',
+                    p.basename(url),
                     style: pw.TextStyle(
-                        fontSize: 9, color: PdfColors.orange),
-                    textAlign: pw.TextAlign.center,
+                      decoration: pw.TextDecoration.underline,
+                      color: PdfColors.blue,
+                    ),
                   ),
                 ),
             ],
           ),
+        ],
+        pw.SizedBox(height: 20),
+        ...widgets,
+        pw.SizedBox(height: 40),
+        pw.Column(
+          crossAxisAlignment: pw.CrossAxisAlignment.start,
+          children: [
+            pw.Container(
+                height: 1, width: double.infinity, color: PdfColors.black),
+            pw.SizedBox(height: 8),
+            pw.Text('Inspector Signature'),
+            pw.Text('${meta.inspectorName} – $dateStr'),
+          ],
         ),
-        build: (context) => [
-          pw.Header(level: 0, text: 'ClearSky Photo Report'),
-          pw.Text('Client Name: ${meta.clientName}'),
-          pw.Text('Property Address: ${meta.propertyAddress}'),
-          if (report.structures.length > 1) ...[
-            pw.SizedBox(height: 10),
-            pw.Header(level: 1, text: 'Table of Contents'),
-            pw.Column(
-              crossAxisAlignment: pw.CrossAxisAlignment.start,
-              children: [
-                for (int i = 0; i < report.structures.length; i++)
-                  pw.Text('${i + 1}. ${report.structures[i].name}'),
-              ],
-            ),
-            pw.SizedBox(height: 20),
-          ],
-          pw.Text(
-              'Inspection Date: ${meta.inspectionDate.toLocal().toString().split(' ')[0]}'),
-          pw.Text('Insurance Carrier: ${meta.insuranceCarrier}'),
-          pw.Text('Peril Type: ${meta.perilType.name}'),
-          pw.Text('Inspection Type: ${meta.inspectionType.name}'),
-          pw.Text(
-              'Inspector Role: ${meta.inspectorRoles.map((e) => e.name.replaceAll('_', ' ')).join(', ')}'),
-          pw.Text('Inspector Name: ${meta.inspectorName}'),
-          if (meta.externalReportUrls.isNotEmpty) ...[
-            pw.SizedBox(height: 10),
-            pw.Text('External Reports',
-                style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-            pw.Column(
-              crossAxisAlignment: pw.CrossAxisAlignment.start,
-              children: [
-                for (final url in meta.externalReportUrls)
-                  pw.UrlLink(
-                    destination: url,
-                    child: pw.Text(
-                      p.basename(url),
-                      style: pw.TextStyle(
-                        decoration: pw.TextDecoration.underline,
-                        color: PdfColors.blue,
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-          ],
+        if (report.homeownerSignature != null &&
+            !report.homeownerSignature!.declined) ...[
           pw.SizedBox(height: 20),
-          ...widgets,
-          pw.SizedBox(height: 40),
           pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
               pw.Container(
                   height: 1, width: double.infinity, color: PdfColors.black),
               pw.SizedBox(height: 8),
-              pw.Text('Inspector Signature'),
-              pw.Text('${meta.inspectorName} – $dateStr'),
+              pw.Text('Homeowner Signature'),
+              pw.SizedBox(height: 4),
+              pw.Image(
+                  pw.MemoryImage(
+                      base64Decode(report.homeownerSignature!.image)),
+                  height: 80),
+              pw.Text(
+                  'Signed by ${report.homeownerSignature!.name} – ${report.homeownerSignature!.timestamp.toLocal().toString().split(' ')[0]}'),
             ],
           ),
-          if (report.homeownerSignature != null &&
-              !report.homeownerSignature!.declined) ...[
-            pw.SizedBox(height: 20),
-            pw.Column(
-              crossAxisAlignment: pw.CrossAxisAlignment.start,
-              children: [
-                pw.Container(
-                    height: 1, width: double.infinity, color: PdfColors.black),
-                pw.SizedBox(height: 8),
-                pw.Text('Homeowner Signature'),
-                pw.SizedBox(height: 4),
-                pw.Image(
-                    pw.MemoryImage(
-                        base64Decode(report.homeownerSignature!.image)),
-                    height: 80),
-                pw.Text(
-                    'Signed by ${report.homeownerSignature!.name} – ${report.homeownerSignature!.timestamp.toLocal().toString().split(' ')[0]}'),
-              ],
-            ),
-          ],
-          if (report.homeownerSignature != null &&
-              report.homeownerSignature!.declined)
-            pw.Padding(
-              padding: const pw.EdgeInsets.only(top: 20),
-              child: pw.Text(
-                  'Client declined to sign: ${report.homeownerSignature!.declineReason ?? ''}'),
-            ),
         ],
-      ),
-    );
+        if (report.homeownerSignature != null &&
+            report.homeownerSignature!.declined)
+          pw.Padding(
+            padding: const pw.EdgeInsets.only(top: 20),
+            child: pw.Text(
+                'Client declined to sign: ${report.homeownerSignature!.declineReason ?? ''}'),
+          ),
+      ],
+    ),
+  );
 
   return pdf.save();
 }
