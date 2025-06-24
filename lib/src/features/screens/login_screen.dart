@@ -15,11 +15,12 @@ class _LoginScreenState extends State<LoginScreen> {
   String? _error;
   bool _loading = false;
 
-  Future<void> _login() async {
-    setState(() {
-      _loading = true;
-      _error = null;
-    });
+    Future<void> _login() async {
+      setState(() {
+        _loading = true;
+        _error = null;
+      });
+      debugPrint('[LoginScreen] Starting login for ${_emailController.text}');
     try {
       await AuthService().signIn(
         email: _emailController.text.trim(),
@@ -30,9 +31,10 @@ class _LoginScreenState extends State<LoginScreen> {
     } catch (e) {
       debugPrint('[LoginScreen] Auth error: $e');
       if (mounted) setState(() => _error = e.toString());
-    } finally {
-      if (mounted) setState(() => _loading = false);
-    }
+      } finally {
+        if (mounted) setState(() => _loading = false);
+        debugPrint('[LoginScreen] Login complete');
+      }
   }
 
   Future<void> _resetPassword() async {
@@ -86,14 +88,17 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: const Text('Forgot Password?'),
               ),
             ),
-            const SizedBox(height: 12),
-            if (_error != null)
-              Text(_error!, style: const TextStyle(color: Colors.red)),
-            const SizedBox(height: 12),
-            ElevatedButton(
-              onPressed: _loading ? null : _login,
-              child: const Text('Login'),
-            ),
+              const SizedBox(height: 12),
+              if (_error != null)
+                Text(_error!, style: const TextStyle(color: Colors.red)),
+              const SizedBox(height: 12),
+              if (_loading)
+                const CircularProgressIndicator()
+              else
+                ElevatedButton(
+                  onPressed: _login,
+                  child: const Text('Login'),
+                ),
             TextButton(
               onPressed: _loading
                   ? null

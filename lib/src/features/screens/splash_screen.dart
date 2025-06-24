@@ -33,7 +33,7 @@ class _SplashScreenState extends State<SplashScreen> {
       backgroundColor: const Color(0xFF007BFF),
       body: Center(
         child: Image.asset(
-          'assets/images/clearsky_logo.png',
+          'assets/splash.png',
           width: 200,
         ),
       ),

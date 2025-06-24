@@ -39,7 +39,7 @@ class AppTheme {
   }
 
   static ThemeData lightTheme = ThemeData(
-    fontFamily: 'Roboto',
+    fontFamily: 'Quicksand',
     primaryColor: clearSkyBlue,
     scaffoldBackgroundColor: Colors.white,
     appBarTheme: const AppBarTheme(
@@ -85,7 +85,7 @@ class AppTheme {
       secondary: sunYellow,
     ),
     textTheme:
-        _outlinedTextTheme(GoogleFonts.robotoTextTheme(ThemeData.dark().textTheme)),
+        _outlinedTextTheme(GoogleFonts.quicksandTextTheme(ThemeData.dark().textTheme)),
     scaffoldBackgroundColor: Colors.grey[900],
     appBarTheme: const AppBarTheme(
       backgroundColor: clearSkyBlue,
@@ -108,7 +108,7 @@ class AppTheme {
       onSecondary: matteBlack,
     ),
     scaffoldBackgroundColor: lightBackground,
-    textTheme: _outlinedTextTheme(GoogleFonts.robotoTextTheme()),
+    textTheme: _outlinedTextTheme(GoogleFonts.quicksandTextTheme()),
     appBarTheme: const AppBarTheme(
       backgroundColor: clearSkyBlue,
       foregroundColor: Colors.white,
@@ -126,7 +126,7 @@ class AppTheme {
   static ThemeData highContrastTheme = ThemeData.from(
     colorScheme: const ColorScheme.highContrastLight(),
   ).copyWith(
-    textTheme: _outlinedTextTheme(GoogleFonts.robotoMonoTextTheme()),
+    textTheme: _outlinedTextTheme(GoogleFonts.quicksandTextTheme()),
     primaryColor: Colors.blue,
     scaffoldBackgroundColor: Colors.white,
     appBarTheme: const AppBarTheme(
