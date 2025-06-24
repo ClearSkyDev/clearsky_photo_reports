@@ -1,5 +1,3 @@
-y
-
 android {
     defaultConfig {
         applicationId "com.example.clearsky_photo_reports"
