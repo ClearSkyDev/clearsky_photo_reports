@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../core/services/auth_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -17,6 +17,30 @@ class _SignupScreenState extends State<SignupScreen> {
   String? _error;
   bool _loading = false;
 
+  Future<void> _createAccount() async {
+    if (!_validate()) return;
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+
+    setState(() => _loading = true);
+    try {
+      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      if (!mounted) return;
+      Navigator.pushReplacementNamed(context, '/home');
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Account creation failed: $e')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
   bool _validate() {
     if (_nameController.text.trim().isEmpty ||
         _emailController.text.trim().isEmpty ||
@@ -31,25 +55,6 @@ class _SignupScreenState extends State<SignupScreen> {
     return true;
   }
 
-  Future<void> _submit() async {
-    if (!_validate()) return;
-    setState(() => _loading = true);
-    try {
-      await AuthService().signUp(
-        email: _emailController.text.trim(),
-        password: _passwordController.text,
-        companyId: '',
-      );
-      if (!mounted) return;
-      Navigator.pushNamedAndRemoveUntil(context, '/home', (_) => false);
-    } catch (e) {
-      if (mounted) {
-        setState(() => _error = 'Signup failed: $e');
-      }
-    } finally {
-      if (mounted) setState(() => _loading = false);
-    }
-  }
 
   @override
   void dispose() {
@@ -92,7 +97,7 @@ class _SignupScreenState extends State<SignupScreen> {
               Text(_error!, style: const TextStyle(color: Colors.red)),
             const SizedBox(height: 12),
             ElevatedButton(
-              onPressed: _loading ? null : _submit,
+              onPressed: _loading ? null : _createAccount,
               child: _loading
                   ? const SizedBox(
                       height: 16,
