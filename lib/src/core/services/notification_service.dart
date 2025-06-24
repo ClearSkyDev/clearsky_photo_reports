@@ -6,7 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../firebase_options.dart';
+import 'package:clearsky_photo_reports/firebase_options.dart';
 import '../models/notification_preferences.dart';
 
 /// Handles Firebase Messaging setup and displaying local notifications.

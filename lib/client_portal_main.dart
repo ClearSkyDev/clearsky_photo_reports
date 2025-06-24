@@ -2,7 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-import 'src/core/firebase_options.dart';
+import 'package:clearsky_photo_reports/firebase_options.dart';
 import 'src/features/client_portal/client_login_screen.dart';
 import 'src/features/client_portal/client_dashboard_screen.dart';
 import 'src/core/services/auth_service.dart';
@@ -16,7 +16,7 @@ Future<void> main() async {
     final options = DefaultFirebaseOptions.currentPlatform;
     if (options.apiKey.startsWith('REPLACE_WITH')) {
       throw Exception(
-          'Firebase API key not configured. Update lib/src/core/firebase_options.dart');
+          'Firebase API key not configured. Update lib/firebase_options.dart');
     }
     await Firebase.initializeApp(options: options);
   } catch (e) {
