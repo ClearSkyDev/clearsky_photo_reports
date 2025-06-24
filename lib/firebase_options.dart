@@ -20,13 +20,13 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyExampleWebKey123456',
-    appId: '1:1234567890:web:abcdef123456',
-    messagingSenderId: '1234567890',
-    projectId: 'clearsky-photo-reports',
-    authDomain: 'clearsky-photo-reports.firebaseapp.com',
-    storageBucket: 'clearsky-photo-reports.appspot.com',
-    measurementId: 'G-ABCDE12345',
+  apiKey: "AIzaSyDncntPjpq-awo_TrQhCpIGrd8Bhw4zeLs",
+  authDomain: "clearsky-photoreports.firebaseapp.com",
+  projectId: "clearsky-photoreports",
+  storageBucket: "clearsky-photoreports.firebasestorage.app",
+  messagingSenderId: "1027653730880",
+  appId: "1:1027653730880:web:bb7e290e2a5bb3745dd5a5",
+  measurementId: "G-1C6LJYYJF4"
   );
 
   static const FirebaseOptions android = FirebaseOptions(
