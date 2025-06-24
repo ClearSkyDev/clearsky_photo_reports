@@ -51,8 +51,14 @@ class ClearSkyApp extends StatelessWidget {
         // Navigation to guided capture uses arguments
       },
       onGenerateRoute: (settings) {
-        if (settings.name == '/guidedCapture') {
-          final inspectionId = settings.arguments as String;
+        if (settings.name == '/guidedCapture' || settings.name == '/capture') {
+          final args = settings.arguments;
+          String inspectionId = '';
+          if (args is String) {
+            inspectionId = args;
+          } else if (args is Map<String, dynamic>) {
+            inspectionId = args['inspectionId'] as String? ?? '';
+          }
           return MaterialPageRoute(
             builder: (context) => GuidedCaptureScreen(inspectionId: inspectionId),
           );
