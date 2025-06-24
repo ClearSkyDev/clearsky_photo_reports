@@ -1,19 +1,20 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <!--
-    If you are serving your web app in a path other than the root, change the
-    href value below to reflect the base path you are serving from.
+ <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js"></script>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyXXXXXX",
+    authDomain: "clearsky-photoreports.firebaseapp.com",
+    projectId: "clearsky-photoreports",
+    storageBucket: "clearsky-photoreports.appspot.com",
+    messagingSenderId: "1234567890",
+    appId: "1:1234567890:web:abcdefg12345"
+  };
+  firebase.initializeApp(firebaseConfig);
+</script>
 
-    The path provided below has to start and end with a slash "/" in order for
-    it to work correctly.
-
-    For more details:
-    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
-
-    This is a placeholder for base href that will be replaced by the value of
-    the `--base-href` argument provided to `flutter build`.
-  -->
   <base href="$FLUTTER_BASE_HREF">
 
   <meta charset="UTF-8">
