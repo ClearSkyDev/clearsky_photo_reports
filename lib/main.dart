@@ -10,7 +10,7 @@ void main() async {
     final options = DefaultFirebaseOptions.currentPlatform;
     if (options.apiKey.startsWith('REPLACE_WITH')) {
       throw Exception(
-          'Firebase API key not configured. Update lib/src/core/firebase_options.dart');
+          'Firebase API key not configured. Update lib/firebase_options.dart');
     }
     await Firebase.initializeApp(options: options);
     runApp(const ClearSkyApp());
