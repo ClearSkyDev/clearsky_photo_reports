@@ -5,6 +5,7 @@ import '../../app/app_theme.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 
 import '../../core/services/inspector_role_service.dart';
+import '../../core/services/accessibility_service.dart';
 import 'profile_screen.dart';
 import 'report_settings_screen.dart';
 import 'theme_settings_screen.dart';
@@ -36,6 +37,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     InspectorRoleService.loadRole().then((role) {
       if (mounted) setState(() => _selectedRole = role);
     });
+    _highContrast = AccessibilityService.instance.settings.highContrast;
     _checkTutorial();
   }
 
@@ -254,7 +256,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
             key: _accessibilityKey,
             title: const Text('High Contrast Mode'),
             value: _highContrast,
-            onChanged: (val) => setState(() => _highContrast = val),
+            onChanged: (val) {
+              setState(() => _highContrast = val);
+              final settings = AccessibilityService.instance.settings
+                  .copyWith(highContrast: val);
+              AccessibilityService.instance.saveSettings(settings);
+            },
           ),
           const SizedBox(height: 32),
           const Divider(),
