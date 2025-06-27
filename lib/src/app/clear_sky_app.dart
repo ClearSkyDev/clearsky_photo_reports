@@ -9,6 +9,8 @@ import '../features/screens/project_details_screen.dart';
 import '../features/screens/guided_capture_screen.dart';
 import '../features/screens/report_preview_screen.dart';
 import '../features/screens/settings_screen.dart';
+import '../core/services/theme_service.dart';
+import '../core/services/accessibility_service.dart';
 import '../core/models/inspection_metadata.dart';
 import '../core/models/peril_type.dart';
 import '../core/models/inspection_type.dart';
@@ -29,41 +31,65 @@ class ClearSkyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'ClearSky Photo Reports',
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
-      themeMode: ThemeMode.system,
-      debugShowCheckedModeBanner: false,
-      initialRoute: '/',
-      routes: {
-        '/': (context) => const SplashScreen(),
-        '/login': (context) => const LoginScreen(),
-        '/signup': (context) => const SignupScreen(),
-        '/home': (context) => const HomeScreen(
-              freeReportsRemaining: 3,
-              isSubscribed: false,
-            ),
-        '/projectDetails': (context) => const ProjectDetailsScreen(),
-        '/reportPreview':
-            (context) => ReportPreviewScreen(metadata: dummyMetadata),
-        '/settings': (context) => const SettingsScreen(),
-        // Navigation to guided capture uses arguments
-      },
-      onGenerateRoute: (settings) {
-        if (settings.name == '/guidedCapture' || settings.name == '/capture') {
-          final args = settings.arguments;
-          String inspectionId = '';
-          if (args is String) {
-            inspectionId = args;
-          } else if (args is Map<String, dynamic>) {
-            inspectionId = args['inspectionId'] as String? ?? '';
-          }
-          return MaterialPageRoute(
-            builder: (context) => GuidedCaptureScreen(inspectionId: inspectionId),
-          );
-        }
-        return null;
+    final themeService = ThemeService.instance;
+    final accessService = AccessibilityService.instance;
+    return AnimatedBuilder(
+      animation: Listenable.merge([themeService, accessService]),
+      builder: (context, _) {
+        final settings = accessService.settings;
+        final lightTheme = settings.highContrast
+            ? AppTheme.highContrastTheme
+            : themeService.lightTheme;
+        return MaterialApp(
+          title: 'ClearSky Photo Reports',
+          theme: lightTheme,
+          darkTheme: AppTheme.darkTheme,
+          themeMode:
+              settings.highContrast ? ThemeMode.light : themeService.themeMode,
+          debugShowCheckedModeBanner: false,
+          builder: (context, child) {
+            return MediaQuery(
+              data: MediaQuery.of(context).copyWith(
+                textScaleFactor: settings.textScale,
+                accessibleNavigation: settings.screenReader,
+                disableAnimations: settings.reducedMotion,
+              ),
+              child: child!,
+            );
+          },
+          initialRoute: '/',
+          routes: {
+            '/': (context) => const SplashScreen(),
+            '/login': (context) => const LoginScreen(),
+            '/signup': (context) => const SignupScreen(),
+            '/home': (context) => const HomeScreen(
+                  freeReportsRemaining: 3,
+                  isSubscribed: false,
+                ),
+            '/projectDetails': (context) => const ProjectDetailsScreen(),
+            '/reportPreview':
+                (context) => ReportPreviewScreen(metadata: dummyMetadata),
+            '/settings': (context) => const SettingsScreen(),
+            // Navigation to guided capture uses arguments
+          },
+          onGenerateRoute: (settings) {
+            if (settings.name == '/guidedCapture' ||
+                settings.name == '/capture') {
+              final args = settings.arguments;
+              String inspectionId = '';
+              if (args is String) {
+                inspectionId = args;
+              } else if (args is Map<String, dynamic>) {
+                inspectionId = args['inspectionId'] as String? ?? '';
+              }
+              return MaterialPageRoute(
+                builder: (context) =>
+                    GuidedCaptureScreen(inspectionId: inspectionId),
+              );
+            }
+            return null;
+          },
+        );
       },
     );
   }
