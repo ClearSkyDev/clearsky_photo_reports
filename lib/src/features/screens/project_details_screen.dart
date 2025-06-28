@@ -168,7 +168,7 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
 
       // Navigate to photo capture with inspection ID
       if (!mounted) return;
-      Navigator.pushReplacementNamed(
+      Navigator.pushNamed(
         context,
         '/capture',
         arguments: {'inspectionId': docRef.id},
