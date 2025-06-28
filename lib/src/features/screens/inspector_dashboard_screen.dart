@@ -39,7 +39,7 @@ class _InspectorDashboardScreenState extends State<InspectorDashboardScreen> {
     Query query =
         firestore.collection('reports').orderBy('createdAt', descending: true);
     final profile = await ProfileStorage.load();
-    if (profile != null && profile.role != InspectorRole.admin) {
+    if (profile != null) {
       query = query.where('inspectionMetadata.inspectorName',
           isEqualTo: profile.name);
     }

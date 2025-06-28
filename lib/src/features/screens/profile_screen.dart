@@ -21,7 +21,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _companyController = TextEditingController();
-  InspectorRole _role = InspectorRole.inspector;
+  InspectorRole _role = InspectorRole.contractor;
   Uint8List? _signature;
   bool _loading = true;
 
