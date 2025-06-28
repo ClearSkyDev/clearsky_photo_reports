@@ -822,11 +822,6 @@ class _SendReportScreenState extends State<SendReportScreen> {
     if (_savedReport == null || _exporting) return;
     await _maybeRunQualityCheck();
     if (!mounted) return;
-    if (_profile?.role != InspectorRole.admin) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Admin only')));
-      return;
-    }
     setState(() => _exporting = true);
     showDialog(
       context: context,
@@ -1507,16 +1502,15 @@ class _SendReportScreenState extends State<SendReportScreen> {
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
                         : const Text('Download ZIP')),
-                if (_profile?.role == InspectorRole.admin)
-                  ElevatedButton(
-                      onPressed: _exporting ? null : _exportLegal,
-                      child: _exporting
-                          ? const SizedBox(
-                              width: 16,
-                              height: 16,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
-                          : const Text('Export Legal Copy')),
+                ElevatedButton(
+                    onPressed: _exporting ? null : _exportLegal,
+                    child: _exporting
+                        ? const SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Text('Export Legal Copy')),
                 if (_exportedFile != null)
                   ElevatedButton(
                       onPressed: _shareReport,

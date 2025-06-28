@@ -1,4 +1,9 @@
-enum InspectorRole { admin, inspector }
+/// Available user roles when creating or sending a report.
+enum InspectorRole {
+  contractor,
+  adjuster,
+  ladderAssist,
+}
 
 class InspectorProfile {
   final String id;
@@ -16,7 +21,7 @@ class InspectorProfile {
     this.phone,
     this.company,
     this.signature,
-    this.role = InspectorRole.inspector,
+    this.role = InspectorRole.contractor,
   });
 
   Map<String, dynamic> toMap() {
@@ -36,7 +41,7 @@ class InspectorProfile {
       for (final r in InspectorRole.values) {
         if (r.name == value) return r;
       }
-      return InspectorRole.inspector;
+      return InspectorRole.contractor;
     }
 
     return InspectorProfile(
