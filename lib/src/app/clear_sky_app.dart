@@ -50,9 +50,8 @@ class ClearSkyApp extends StatelessWidget {
           builder: (context, child) {
             return MediaQuery(
               data: MediaQuery.of(context).copyWith(
-                textScaleFactor: settings.textScale,
                 accessibleNavigation: settings.screenReader,
-                disableAnimations: settings.reducedMotion,
+                disableAnimations: settings.reducedMotion, textScaler: TextScaler.linear(settings.textScale),
               ),
               child: child!,
             );

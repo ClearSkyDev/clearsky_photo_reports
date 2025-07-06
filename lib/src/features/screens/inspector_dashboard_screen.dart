@@ -9,7 +9,6 @@ import '../../core/models/inspector_report_role.dart';
 import '../../core/services/offline_draft_store.dart';
 import '../../core/services/offline_sync_service.dart';
 import '../../core/utils/profile_storage.dart';
-import '../../core/models/inspector_profile.dart';
 import 'report_preview_screen.dart';
 import 'send_report_screen.dart';
 
