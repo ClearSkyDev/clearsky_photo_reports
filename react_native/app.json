@@ -11,6 +11,12 @@
     "platforms": ["ios", "android", "web"],
     "orientation": "portrait",
     "version": "1.0.0",
-    "sdkVersion": "53.0.0"
+    "sdkVersion": "53.0.0",
+    "ios": {
+      "bundleIdentifier": "com.example.clearskyPhotoReports"
+    },
+    "android": {
+      "package": "com.example.clearskyPhotoReports"
+    }
   }
 }
