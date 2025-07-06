@@ -4,14 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../app/app_theme.dart';
+import '../../core/models/inspection_photo.dart';
 
-/// Model representing a labeled image returned from the screen.
-class LabeledImage {
-  final XFile image;
-  final String label;
-
-  LabeledImage(this.image, this.label);
-}
 
 /// Screen for previewing a photo and building a label using QuickTags.
 class PhotoLabelScreen extends StatefulWidget {
@@ -83,11 +77,23 @@ class _PhotoLabelScreenState extends State<PhotoLabelScreen> {
   }
 
   void _save() {
-    final result = <LabeledImage>[];
+    final photos = <InspectionPhoto>[];
     for (var i = 0; i < _images.length; i++) {
-      result.add(LabeledImage(_images[i], _controllers[i].text.trim()));
+      final tags = _controllers[i]
+          .text
+          .split(' – ')
+          .where((e) => e.trim().isNotEmpty)
+          .toList();
+      final photo = InspectionPhoto(
+        imagePath: _images[i].path,
+        section: widget.sectionContext,
+        tags: tags,
+        timestamp: DateTime.now(),
+      );
+      inspectionPhotos.add(photo);
+      photos.add(photo);
     }
-    Navigator.pop(context, result);
+    Navigator.pop(context, photos);
   }
 
   Future<void> _addPhotos() async {

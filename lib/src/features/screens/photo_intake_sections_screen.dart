@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import '../../core/models/inspection_photo.dart';
 import '../widgets/expandable_tile.dart';
 import 'photo_label_screen.dart';
 
@@ -25,15 +26,15 @@ class PhotoIntakeSectionsScreen extends StatefulWidget {
 class _PhotoIntakeSectionsScreenState extends State<PhotoIntakeSectionsScreen> {
   final ImagePicker _picker = ImagePicker();
 
-  // Store captured images for each section.
-  late final Map<String, List<XFile>> _photos = {
+  // Store captured photos for each section with metadata.
+  late final Map<String, List<InspectionPhoto>> _photos = {
     for (final s in intakeSections) s: [],
   };
 
   Future<void> _openCamera(String section) async {
     final XFile? image = await _picker.pickImage(source: ImageSource.camera);
     if (!mounted || image == null) return;
-    final List<LabeledImage>? labeled = await Navigator.push(
+    final List<InspectionPhoto>? labeled = await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (_) => PhotoLabelScreen(
@@ -43,14 +44,14 @@ class _PhotoIntakeSectionsScreenState extends State<PhotoIntakeSectionsScreen> {
       ),
     );
     if (labeled != null && labeled.isNotEmpty) {
-      setState(() => _photos[section]!.addAll(labeled.map((e) => e.image)));
+      setState(() => _photos[section]!.addAll(labeled));
     }
   }
 
   Future<void> _openGallery(String section) async {
     final List<XFile> images = await _picker.pickMultiImage();
     if (!mounted || images.isEmpty) return;
-    final List<LabeledImage>? labeled = await Navigator.push(
+    final List<InspectionPhoto>? labeled = await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (_) => PhotoLabelScreen(
@@ -60,7 +61,7 @@ class _PhotoIntakeSectionsScreenState extends State<PhotoIntakeSectionsScreen> {
       ),
     );
     if (labeled != null && labeled.isNotEmpty) {
-      setState(() => _photos[section]!.addAll(labeled.map((e) => e.image)));
+      setState(() => _photos[section]!.addAll(labeled));
     }
   }
 
