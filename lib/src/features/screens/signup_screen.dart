@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -28,6 +29,28 @@ class _SignupScreenState extends State<SignupScreen> {
         email: email,
         password: password,
       );
+
+      final uid = FirebaseAuth.instance.currentUser?.uid;
+      if (uid != null) {
+        final inspections = FirebaseFirestore.instance
+            .collection('users')
+            .doc(uid)
+            .collection('inspections');
+        await inspections.add({
+          'clientName': 'John Doe',
+          'address': '123 Main St',
+          'carrier': 'Acme Insurance',
+          'peril': 'Hail',
+          'projectNumber': 'TEST-001',
+          'claimNumber': 'TEST-CLAIM',
+          'createdAt': FieldValue.serverTimestamp(),
+          'status': 'draft',
+          'photos': [],
+          'position': 0,
+          'lastSynced': null,
+        });
+      }
+
       if (!mounted) return;
       Navigator.pushReplacementNamed(context, '/home');
     } catch (e) {
