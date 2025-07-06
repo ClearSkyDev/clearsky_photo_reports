@@ -5,15 +5,12 @@ import 'package:image_picker/image_picker.dart';
 
 import '../../app/app_theme.dart';
 
-/// Model representing an image and its associated label tags.
+/// Model representing a labeled image returned from the screen.
 class LabeledImage {
   final XFile image;
-  final Set<String> tags;
+  final String label;
 
-  LabeledImage(this.image, [Set<String>? tags]) : tags = tags ?? {};
-
-  /// Returns tags joined with an en dash.
-  String get label => tags.join(' – ');
+  LabeledImage(this.image, this.label);
 }
 
 /// Screen for previewing a photo and building a label using QuickTags.
@@ -34,7 +31,9 @@ class PhotoLabelScreen extends StatefulWidget {
 class _PhotoLabelScreenState extends State<PhotoLabelScreen> {
   final ImagePicker _picker = ImagePicker();
 
-  late List<LabeledImage> _images;
+  late List<XFile> _images;
+  late List<Set<String>> _tags;
+  late List<TextEditingController> _controllers;
   late final List<String> _itemTags;
   final List<String> _directionTags = const ['Front', 'Right', 'Back', 'Left'];
 
@@ -43,8 +42,18 @@ class _PhotoLabelScreenState extends State<PhotoLabelScreen> {
   @override
   void initState() {
     super.initState();
-    _images = [for (final img in widget.images) LabeledImage(img)];
+    _images = [...widget.images];
+    _tags = [for (final _ in _images) <String>{}];
+    _controllers = [for (final _ in _images) TextEditingController()];
     _itemTags = _suggestItemTags(widget.sectionContext);
+  }
+
+  @override
+  void dispose() {
+    for (final c in _controllers) {
+      c.dispose();
+    }
+    super.dispose();
   }
 
   List<String> _suggestItemTags(String section) {
@@ -63,17 +72,22 @@ class _PhotoLabelScreenState extends State<PhotoLabelScreen> {
 
   void _toggle(String tag, bool selected) {
     setState(() {
-      final tags = _images[_currentIndex].tags;
+      final tags = _tags[_currentIndex];
       if (selected) {
         tags.add(tag);
       } else {
         tags.remove(tag);
       }
+      _controllers[_currentIndex].text = tags.join(' – ');
     });
   }
 
   void _save() {
-    Navigator.pop(context, _images);
+    final result = <LabeledImage>[];
+    for (var i = 0; i < _images.length; i++) {
+      result.add(LabeledImage(_images[i], _controllers[i].text.trim()));
+    }
+    Navigator.pop(context, result);
   }
 
   Future<void> _addPhotos() async {
@@ -98,12 +112,15 @@ class _PhotoLabelScreenState extends State<PhotoLabelScreen> {
     );
     if (source == null) return;
 
-    final baseTags = {..._images[_currentIndex].tags};
+    final baseTags = {..._tags[_currentIndex]};
+    final baseLabel = _controllers[_currentIndex].text;
     if (source == ImageSource.camera) {
       final XFile? img = await _picker.pickImage(source: ImageSource.camera);
       if (img == null) return;
       setState(() {
-        _images.add(LabeledImage(img, baseTags));
+        _images.add(img);
+        _tags.add({...baseTags});
+        _controllers.add(TextEditingController(text: baseLabel));
         _currentIndex = _images.length - 1;
       });
     } else {
@@ -111,7 +128,9 @@ class _PhotoLabelScreenState extends State<PhotoLabelScreen> {
       if (imgs.isEmpty) return;
       setState(() {
         for (final x in imgs) {
-          _images.add(LabeledImage(x, {...baseTags}));
+          _images.add(x);
+          _tags.add({...baseTags});
+          _controllers.add(TextEditingController(text: baseLabel));
         }
         _currentIndex = _images.length - 1;
       });
@@ -131,11 +150,13 @@ class _PhotoLabelScreenState extends State<PhotoLabelScreen> {
                 itemCount: _images.length,
                 onPageChanged: (i) => setState(() => _currentIndex = i),
                 itemBuilder: (context, index) {
-                  final labeled = _images[index];
+                  final file = _images[index];
+                  final tags = _tags[index];
+                  final controller = _controllers[index];
                   return SingleChildScrollView(
                     child: Column(
                       children: [
-                        Image.file(File(labeled.image.path), height: 250),
+                        Image.file(File(file.path), height: 250),
                         const SizedBox(height: 12),
                         Wrap(
                           spacing: 6,
@@ -143,7 +164,7 @@ class _PhotoLabelScreenState extends State<PhotoLabelScreen> {
                             for (final tag in [..._directionTags, ..._itemTags])
                               FilterChip(
                                 label: Text(tag),
-                                selected: labeled.tags.contains(tag),
+                                selected: tags.contains(tag),
                                 onSelected: (val) {
                                   _currentIndex = index;
                                   _toggle(tag, val);
@@ -152,6 +173,13 @@ class _PhotoLabelScreenState extends State<PhotoLabelScreen> {
                                     AppTheme.clearSkyBlue.withOpacity(0.2),
                               ),
                           ],
+                        ),
+                        const SizedBox(height: 8),
+                        TextField(
+                          controller: controller,
+                          decoration: const InputDecoration(
+                            labelText: 'Label',
+                          ),
                         ),
                         IconButton(
                           icon: const Icon(Icons.add),
