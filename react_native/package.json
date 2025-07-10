@@ -1,7 +1,7 @@
 {
-  "name": "react_native",
+  "name": "clearsky_photo_reports",
   "version": "1.0.0",
-  "description": "",
+  "description": "AI powered roof inspection reporting app",
   "main": "MainApp.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -10,6 +10,14 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ClearSkyDev/clearsky_photo_reports.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ClearSkyDev/clearsky_photo_reports/issues"
+  },
+  "homepage": "https://github.com/ClearSkyDev/clearsky_photo_reports#readme",
   "type": "commonjs",
   "dependencies": {
     "@react-native-picker/picker": "^2.4.10",
