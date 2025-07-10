@@ -3,11 +3,24 @@ AI powered roof inspection reporting app
 
 ## Getting Started
 
+This repository contains the main **Flutter** application and an optional
+**React Native/Expo** prototype located under `react_native/`.
+
+### Flutter app
+
 1. Install [Flutter](https://docs.flutter.dev/get-started/install) on your machine.
 2. Run `flutter pub get` in the repository root to download all dependencies.
 3. Launch the app with `flutter run` or open it in your IDE of choice.
 
-> **Important:** This is a Flutter project. Do not run `npx expo start` or use Expo CLI. If you want to support Expo in the future, create a separate React Native app and migrate features. Do **not** mix Flutter and Expo dependencies in the same project folder.
+### React Native prototype
+
+1. `cd react_native`
+2. Install packages with `npm install`.
+3. Start the development server with `npx expo start`.
+
+> Use Flutter commands in the repo root and Expo commands inside `react_native`.
+> The `.easignore` file ensures Flutter's native folders are skipped when running
+> EAS builds.
 
 ## Dynamic Summary Assistant
 
@@ -48,6 +61,17 @@ The prototype can be run on iOS using **Expo Go**:
 3. Scan the QR code with the Expo Go app from the App Store to preview the app live on your iPhone.
 
 The configuration file `react_native/app.json` defines the app name, icon and splash screen used by Expo.
+
+### Preparing an EAS build
+
+Running EAS Build from the `react_native` folder requires removing the Flutter
+`ios/` directory so Expo treats the project as a managed app. A helper script is
+provided:
+
+```bash
+python ../scripts/prepare_eas_build.py
+eas build -p ios --profile production
+```
 
 ### Expo Limitations
 

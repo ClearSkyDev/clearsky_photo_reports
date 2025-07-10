@@ -1,22 +1,33 @@
 {
   "expo": {
-    "name": "ClearSky",
-    "slug": "clearsky-photo-reports",
-    "icon": "./assets/app_icon.png",
+    "name": "ClearSky Photo Reports",
+    "slug": "clearsky_photo_reports",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "platforms": ["ios", "android", "web"],
+    "icon": "./assets/icon.png",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "platforms": ["ios", "android", "web"],
-    "orientation": "portrait",
-    "version": "1.0.0",
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "assetBundlePatterns": ["**/*"],
     "sdkVersion": "53.0.0",
     "ios": {
-      "bundleIdentifier": "com.example.clearskyPhotoReports"
+      "bundleIdentifier": "com.clearsky.photo",
+      "buildNumber": "1.0.0"
     },
     "android": {
-      "package": "com.example.clearskyPhotoReports"
+      "package": "com.clearsky.photo",
+      "versionCode": 1
+    },
+    "extra": {
+      "eas": {
+        "projectId": "3722841f-e742-4d43-859c-b6c5b0e8d784"
+      }
     }
   }
 }
