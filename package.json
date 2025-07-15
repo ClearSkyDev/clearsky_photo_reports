@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "description": "AI powered roof inspection reporting app",
   "main": "index.js",
+  "private": true,
+  "workspaces": [
+    "react_native"
+  ],
   "directories": {
     "lib": "lib",
     "test": "test"
@@ -23,6 +27,8 @@
   "homepage": "https://github.com/ClearSkyDev/clearsky_photo_reports#readme",
   "dependencies": {
     "expo": "^53.0.19",
+    "expo-print": "~14.1.4",
+    "expo-web-browser": "~14.2.0",
     "react": "^19.1.0",
     "react-native": "^0.80.1"
   }
