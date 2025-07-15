@@ -1,2 +1,3 @@
 # This Flutter project is not configured for Expo.
-# Do not run 'npx expo start' or use Expo CLI.
+# Do not run 'npx expo start' or use Expo CLI here.
+# Run all Expo and EAS commands from the `react_native` folder instead.
