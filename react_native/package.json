@@ -5,7 +5,8 @@
   "main": "MainApp.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "expo start"
+    "start": "expo start",
+    "prebuild:ios": "npm install && npx -y expo prebuild --platform ios"
   },
   "keywords": [],
   "author": "",
