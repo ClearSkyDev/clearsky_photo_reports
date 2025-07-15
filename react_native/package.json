@@ -2,7 +2,7 @@
   "name": "clearsky_photo_reports",
   "version": "1.0.0",
   "description": "AI powered roof inspection reporting app",
-  "main": "MainApp.js",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "expo start",
@@ -36,6 +36,11 @@
     "expo-camera": "^16.1.8",
     "expo-file-system": "^18.1.10",
     "expo-sharing": "^13.1.5",
-    "expo-font": "^13.3.1"
+    "expo-font": "^13.3.1",
+    "@react-navigation/stack": "^6.4.1",
+    "react-native-screens": "^4.11.1",
+    "react-native-safe-area-context": "^5.5.2",
+    "react-native-gesture-handler": "^2.27.1",
+    "react-native-reanimated": "^3.18.0"
   }
 }
