@@ -6,13 +6,28 @@
   "build": {
     "development": {
       "developmentClient": true,
-      "distribution": "internal"
+      "distribution": "internal",
+      "ios": {
+        "env": {
+          "NO_FLIPPER": "1"
+        }
+      }
     },
     "preview": {
-      "distribution": "internal"
+      "distribution": "internal",
+      "ios": {
+        "env": {
+          "NO_FLIPPER": "1"
+        }
+      }
     },
     "production": {
-      "autoIncrement": true
+      "autoIncrement": true,
+      "ios": {
+        "env": {
+          "NO_FLIPPER": "1"
+        }
+      }
     }
   },
   "submit": {
