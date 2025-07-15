@@ -2,7 +2,7 @@
   "name": "clearsky_photo_reports",
   "version": "1.0.0",
   "description": "AI powered roof inspection reporting app",
-  "main": "App.js",
+  "main": "index.js",
   "directories": {
     "lib": "lib",
     "test": "test"
