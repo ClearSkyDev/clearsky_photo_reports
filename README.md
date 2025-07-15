@@ -17,6 +17,7 @@ This repository contains the main **Flutter** application and an optional
 1. `cd react_native`
 2. Install packages with `npm install`.
 3. Start the development server with `npx expo start`.
+4. Run additional Expo or EAS commands, like `npx expo export:embed`, from this directory.
 
 > Use Flutter commands in the repo root and Expo commands inside `react_native`.
 > The `.easignore` file ensures Flutter's native folders are skipped when running
