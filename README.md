@@ -73,6 +73,19 @@ python ../scripts/prepare_eas_build.py
 eas build -p ios --profile production
 ```
 
+### Local prebuild for iOS
+
+If you need to generate the native `ios` directory locally, install the
+dependencies first and then run Expo's prebuild command:
+
+```bash
+cd react_native
+npm install
+npx expo prebuild --platform ios
+```
+
+Avoid using `--no-install` unless `node_modules` already exist.
+
 ### Expo Limitations
 
 Expo Go does not include native PDF generation. The prototype saves the report as HTML by default. To produce a PDF you can run the app in a custom Expo Dev Client or generate the PDF using a cloud service such as a Firebase Function.
