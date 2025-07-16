@@ -42,7 +42,7 @@ class DefaultFirebaseOptions {
     appId: '1:1234567890:ios:abcdef123456',
     messagingSenderId: '1234567890',
     projectId: 'clearsky-photo-reports',
-    iosBundleId: 'com.example.clearskyPhotoReports',
+    iosBundleId: 'com.clearsky.photo',
     storageBucket: 'clearsky-photo-reports.appspot.com',
   );
 
@@ -51,7 +51,7 @@ class DefaultFirebaseOptions {
     appId: '1:1234567890:macos:abcdef123456',
     messagingSenderId: '1234567890',
     projectId: 'clearsky-photo-reports',
-    iosBundleId: 'com.example.clearskyPhotoReports',
+    iosBundleId: 'com.clearsky.photo',
     storageBucket: 'clearsky-photo-reports.appspot.com',
   );
 }
