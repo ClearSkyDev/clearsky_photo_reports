@@ -10,9 +10,9 @@ else:
 
     new_lines = []
     for line in lines:
-        if "FlipperConfiguration.enabled" in line or "FlipperConfiguration" in line:
-            new_lines.append("  flipper_config = FlipperConfiguration.disabled\n")
-        elif "use_flipper!" in line:
+        # Comment out any Flipper-related lines entirely to avoid referencing
+        # the FlipperConfiguration constant which may not be defined.
+        if "FlipperConfiguration" in line or "use_flipper!" in line:
             new_lines.append("# " + line)
         else:
             new_lines.append(line)
