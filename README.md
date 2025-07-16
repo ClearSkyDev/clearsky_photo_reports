@@ -85,6 +85,13 @@ npm install
 npx expo prebuild --platform ios
 ```
 
+After prebuild completes, run the helper script to disable Flipper in the
+generated `ios/Podfile`:
+
+```bash
+python scripts/disable_flipper.py
+```
+
 Avoid using `--no-install` unless `node_modules` already exist.
 
 ### Expo Limitations
