@@ -86,10 +86,13 @@ npx expo prebuild --platform ios
 ```
 
 After prebuild completes, run the helper script to disable Flipper in the
-generated `ios/Podfile`:
+generated `ios/Podfile`. The script works when called from either the repository
+root or the `react_native` directory:
 
 ```bash
-python scripts/disable_flipper.py
+python scripts/disable_flipper.py    # from repo root
+# or
+python ../scripts/disable_flipper.py # if still inside react_native/
 ```
 
 Avoid using `--no-install` unless `node_modules` already exist.
