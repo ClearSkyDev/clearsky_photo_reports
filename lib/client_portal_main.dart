@@ -14,7 +14,8 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   try {
     final options = DefaultFirebaseOptions.currentPlatform;
-    if (options.apiKey.startsWith('REPLACE_WITH')) {
+    if (options.apiKey.startsWith('REPLACE_WITH') ||
+        options.apiKey.contains('Example')) {
       throw Exception(
           'Firebase API key not configured. Update lib/firebase_options.dart');
     }
