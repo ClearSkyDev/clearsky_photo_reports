@@ -27,8 +27,8 @@
       "bundleIdentifier": "com.clearsky.photo",
       "buildNumber": "1.0.0",
       "infoPlist": {
-        "NSCameraUsageDescription": "Allow ClearSky Photo Reports to use the camera for capturing roof inspection photos.",
-        "NSPhotoLibraryUsageDescription": "Allow ClearSky Photo Reports to access your photo library for uploading inspection photos.",
+        "NSCameraUsageDescription": "ClearSky needs access to your camera to document inspection photos.",
+        "NSPhotoLibraryUsageDescription": "ClearSky uses your library to attach photos to reports.",
         "ITSAppUsesNonExemptEncryption": false
       }
     },
