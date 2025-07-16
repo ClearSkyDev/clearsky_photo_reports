@@ -23,6 +23,7 @@
     },
     "production": {
       "autoIncrement": true,
+      "channel": "production",
       "ios": {
         "env": {
           "NO_FLIPPER": "1"

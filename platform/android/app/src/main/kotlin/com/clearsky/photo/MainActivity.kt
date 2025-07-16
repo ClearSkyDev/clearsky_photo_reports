@@ -1,4 +1,4 @@
-package com.example.clearsky_photo_reports
+package com.clearsky.photo
 
 import io.flutter.embedding.android.FlutterActivity
 
