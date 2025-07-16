@@ -4,7 +4,11 @@
     "slug": "clearsky_photo_reports",
     "version": "1.0.0",
     "orientation": "portrait",
-    "platforms": ["ios", "android", "web"],
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
     "icon": "./assets/icon.png",
     "splash": {
       "image": "./assets/splash.png",
@@ -14,11 +18,18 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "sdkVersion": "53.0.0",
     "ios": {
       "bundleIdentifier": "com.clearsky.photo",
-      "buildNumber": "1.0.0"
+      "buildNumber": "1.0.0",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Allow ClearSky Photo Reports to use the camera for capturing roof inspection photos.",
+        "NSPhotoLibraryUsageDescription": "Allow ClearSky Photo Reports to access your photo library for uploading inspection photos.",
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "package": "com.clearsky.photo",
