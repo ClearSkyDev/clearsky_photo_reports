@@ -1,6 +1,6 @@
 android {
     defaultConfig {
-        applicationId "com.example.clearsky_photo_reports"
+        applicationId "com.clearsky.photo"
         minSdkVersion 21
         targetSdkVersion 33
         versionCode 1

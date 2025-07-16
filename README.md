@@ -188,7 +188,7 @@ If you encounter this error when launching the app:
    ```
 
 2. Open `lib/src/core/firebase_options.dart` and replace all placeholder values
-   (`REPLACE_WITH_API_KEY`, `TODO`) with your actual Firebase project settings.
+   such as `REPLACE_WITH_API_KEY` with your actual Firebase project settings.
 
 3. Rebuild the project:
 
@@ -268,6 +268,14 @@ Reports can include additional PDF, DOCX or CSV files. Use the **Attach 3rd-Part
 ## Multi-Property Report Builder
 
 Inspectors can now add multiple properties within a single inspection. Each property has its own optional address and full photo section workflow. Tabs keep the capture process organized and exports combine all properties into one report. When more than one property is present a table of contents is generated.
+
+## App Store Submission
+
+The production build uses bundle identifier `com.clearsky.photo` and version `1.0.0`.
+Ensure screenshots and descriptions are uploaded to the App Store and Google Play
+Consoles. The `infoPlist` now includes camera, photo library and microphone usage
+descriptions and the Android manifest defines required permissions. Over&#8209;the&#8209;air
+updates are enabled via Expo.
 
 
 
