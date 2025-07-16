@@ -279,3 +279,14 @@ updates are enabled via Expo.
 
 
 
+
+## Accessibility Features
+- Font scaling (respects OS text size)
+- High contrast toggle
+- Haptic feedback toggle
+- AI label explanation toggle
+
+## Launch Checklist
+- PDF export tested on custom EAS build
+- Firebase env variables set in EAS project
+- iOS camera permissions display customized
