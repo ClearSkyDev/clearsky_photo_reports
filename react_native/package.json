@@ -1,47 +1,25 @@
 {
   "name": "clearsky_photo_reports",
   "version": "1.0.0",
-  "description": "AI powered roof inspection reporting app",
+  "private": true,
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "expo start",
-    "prebuild:ios": "npm install && npx -y expo prebuild --platform ios"
+    "android": "expo run:android",
+    "ios": "expo run:ios",
+    "web": "expo start --web"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/ClearSkyDev/clearsky_photo_reports.git"
-  },
-  "bugs": {
-    "url": "https://github.com/ClearSkyDev/clearsky_photo_reports/issues"
-  },
-  "homepage": "https://github.com/ClearSkyDev/clearsky_photo_reports#readme",
-  "type": "commonjs",
   "dependencies": {
-    "@react-native-picker/picker": "^2.4.10",
-    "@react-navigation/bottom-tabs": "^6.5.21",
-    "@react-navigation/native": "^6.1.6",
-    "expo": "^53.0.11",
-    "expo-image-manipulator": "^13.1.7",
-    "expo-image-picker": "^16.1.4",
-    "firebase": "^11.9.1",
-    "react": "^19.1.0",
-    "react-native": "^0.79.3",
-    "react-native-signature-canvas": "^4.7.4",
-    "react-native-svg": "^13.14.0",
-    "react-native-webview": "13.13.5",
+    "expo": "^53.0.20",
+    "expo-media-library": "~17.1.7",
+    "expo-image-picker": "~16.1.4",
     "expo-camera": "~16.1.11",
     "expo-file-system": "~18.1.11",
-    "expo-sharing": "^13.1.5",
-    "expo-font": "^13.3.1",
-    "@react-navigation/stack": "^6.4.1",
-    "react-native-screens": "^4.11.1",
-    "react-native-safe-area-context": "^5.5.2",
-    "react-native-gesture-handler": "^2.27.1",
-    "react-native-reanimated": "^3.18.0",
-    "expo-media-library": "~17.1.7"
+    "expo-constants": "~17.1.7",
+    "expo-status-bar": "^2.2.3",
+    "react": "19.0.0",
+    "react-native": "0.79.5",
+    "react-native-svg": "^13.14.0",
+    "@react-native-picker/picker": "^2.4.10"
   }
 }
