@@ -4,7 +4,6 @@
     "slug": "clearsky",
     "version": "1.0.0",
     "orientation": "portrait",
-    "scheme": "clearsky",
     "icon": "./assets/icon.png",
     "splash": {
       "image": "./assets/splash.png",
@@ -15,37 +14,29 @@
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "bundleIdentifier": "com.clearsky.photo",
-      "buildNumber": "1.0.0",
+      "buildNumber": "1.0.1",
       "supportsTablet": false,
       "infoPlist": {
-        "NSCameraUsageDescription": "This app uses the camera to take inspection photos.",
-        "NSPhotoLibraryUsageDescription": "This app needs access to your photo library for uploading inspection images.",
+        "NSCameraUsageDescription": "This app uses the camera to capture inspection photos.",
+        "NSPhotoLibraryUsageDescription": "This app needs access to your photo library to upload inspection images.",
+        "NSMicrophoneUsageDescription": "This app uses the microphone when capturing video during inspections.",
         "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
       "package": "com.clearsky.photo",
-      "versionCode": 1,
+      "versionCode": 2,
       "permissions": ["CAMERA", "READ_EXTERNAL_STORAGE", "WRITE_EXTERNAL_STORAGE"]
     },
     "extra": {
       "eas": {
-        "projectId": "YOUR_PROJECT_ID"
-      },
-      "firebaseConfig": {
-        "apiKey": "YOUR_FIREBASE_API_KEY",
-        "authDomain": "your-project.firebaseapp.com",
-        "projectId": "your-project-id",
-        "storageBucket": "your-project.appspot.com",
-        "messagingSenderId": "your-messaging-sender-id",
-        "appId": "your-app-id",
-        "measurementId": "your-measurement-id"
+        "projectId": "3722841f-e742-4d43-859c-b6c5b0e8d784"
       }
     },
     "plugins": [
-      "expo-image-picker",
       "expo-media-library",
       "expo-camera",
+      "expo-image-picker",
       "expo-file-system"
     ],
     "updates": {
