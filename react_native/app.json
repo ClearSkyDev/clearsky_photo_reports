@@ -25,11 +25,12 @@
     "sdkVersion": "53.0.0",
     "ios": {
       "bundleIdentifier": "com.clearsky.photo",
-      "buildNumber": "1.0.0",
+      "buildNumber": "1.0.1",
       "infoPlist": {
         "NSCameraUsageDescription": "ClearSky needs access to your camera to document inspection photos.",
         "NSPhotoLibraryUsageDescription": "ClearSky uses your library to attach photos to reports.",
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSMicrophoneUsageDescription": "This app uses the microphone to record videos during inspections."
       }
     },
     "android": {
