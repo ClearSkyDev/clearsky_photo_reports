@@ -1,46 +1,49 @@
 {
   "expo": {
     "name": "ClearSky Photo Reports",
-    "slug": "clearsky_photo_reports",
+    "slug": "clearsky",
     "version": "1.0.0",
     "orientation": "portrait",
-    "platforms": [
-      "ios",
-      "android",
-      "web"
-    ],
     "icon": "./assets/icon.png",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "updates": {
-      "fallbackToCacheTimeout": 0,
-      "url": "https://u.expo.dev/3722841f-e742-4d43-859c-b6c5b0e8d784"
-    },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
-    "sdkVersion": "53.0.0",
+    "userInterfaceStyle": "light",
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "bundleIdentifier": "com.clearsky.photo",
-      "buildNumber": "1.0.0",
+      "buildNumber": "1.0.1",
+      "supportsTablet": false,
       "infoPlist": {
-        "NSCameraUsageDescription": "ClearSky needs access to your camera to document inspection photos.",
-        "NSPhotoLibraryUsageDescription": "ClearSky uses your library to attach photos to reports.",
-        "ITSAppUsesNonExemptEncryption": false,
-        "NSMicrophoneUsageDescription": "This app uses the microphone to record videos during inspections."
+        "NSCameraUsageDescription": "This app uses the camera to capture inspection photos.",
+        "NSPhotoLibraryUsageDescription": "This app needs access to your photo library to upload inspection images.",
+        "NSMicrophoneUsageDescription": "This app uses the microphone when capturing video during inspections.",
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
       "package": "com.clearsky.photo",
-      "versionCode": 1
+      "versionCode": 2,
+      "permissions": ["CAMERA", "READ_EXTERNAL_STORAGE", "WRITE_EXTERNAL_STORAGE"]
     },
     "extra": {
       "eas": {
         "projectId": "3722841f-e742-4d43-859c-b6c5b0e8d784"
       }
+    },
+    "plugins": [
+      "expo-media-library",
+      "expo-camera",
+      "expo-image-picker",
+      "expo-file-system"
+    ],
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "runtimeVersion": {
+      "policy": "sdkVersion"
     }
   }
 }
