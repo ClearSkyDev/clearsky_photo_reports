@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ScrollView, View, Text, Image, TextInput, Button } from 'react-native';
+import { SafeAreaView, ScrollView, View, Text, Image, TextInput, Button } from 'react-native';
 import Signature from 'react-native-signature-canvas';
 import generateReportHTML from './generateReportHTML';
 import { exportReportViaCloud, exportReportAsHTML } from './exportReport';
@@ -43,7 +43,8 @@ function generateAISummary(uploadedPhotos, role) {
   }
 }
 
-export default function ReportPreviewScreen({ uploadedPhotos, roofQuestionnaire }) {
+export default function ReportPreviewScreen({ route }) {
+  const { uploadedPhotos, roofQuestionnaire } = route.params;
   const [summaryText, setSummaryText] = useState('');
   const [clientName, setClientName] = useState('');
   const [clientAddress, setClientAddress] = useState('');
@@ -118,6 +119,7 @@ export default function ReportPreviewScreen({ uploadedPhotos, roofQuestionnaire 
   };
 
   return (
+    <SafeAreaView style={{ flex: 1 }}>
     <ScrollView style={{ padding: 16 }}>
       <Text style={{ fontSize: 20, fontWeight: 'bold' }}>Inspection Report</Text>
       <Text>Date: {new Date().toLocaleDateString()}</Text>
@@ -267,5 +269,6 @@ export default function ReportPreviewScreen({ uploadedPhotos, roofQuestionnaire 
       <Button title="Export as PDF" onPress={handleExportPDF} />
       <Button title="Download HTML Report" onPress={handleExportHTML} />
     </ScrollView>
+    </SafeAreaView>
   );
 }

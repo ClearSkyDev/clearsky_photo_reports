@@ -20,10 +20,12 @@ export default function MainApp() {
         <Stack.Screen
           name="ClearSkyPhotoIntakeScreen"
           component={ClearSkyPhotoIntakeScreen}
+          options={{ title: 'Photo Intake' }}
         />
         <Stack.Screen
           name="ReportPreviewScreen"
           component={ReportPreviewScreen}
+          options={{ title: 'Report Preview' }}
         />
       </Stack.Navigator>
     </NavigationContainer>

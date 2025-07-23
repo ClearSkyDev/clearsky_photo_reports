@@ -1,9 +1,15 @@
 import React, { useEffect } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Alert } from 'react-native';
 import { appColors, appTypography } from './appTheme';
 
 export default function SplashScreen({ navigation }) {
   useEffect(() => {
+    if (!process.env.EXPO_PUBLIC_FIREBASE_API_KEY) {
+      Alert.alert(
+        'Configuration Error',
+        'Firebase API key is missing. Please configure the app.'
+      );
+    }
     const timer = setTimeout(() => {
       navigation.replace('ClearSkyPhotoIntakeScreen');
     }, 1500);
