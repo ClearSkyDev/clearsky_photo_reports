@@ -1,3 +1,4 @@
+# Ignore Flutter native project folders during EAS build
 ios/
 android/
 macos/
