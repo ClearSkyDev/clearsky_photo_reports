@@ -74,4 +74,5 @@ export async function handlePhotoUpload(
     approved: false,
   };
   setUploadedPhotos([...uploadedPhotos, newPhoto]);
+  return downloadUrl;
 }

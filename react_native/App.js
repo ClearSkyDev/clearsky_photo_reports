@@ -9,6 +9,9 @@ import {
   Button,
   TouchableOpacity,
   Modal,
+  ActivityIndicator,
+  Alert,
+  SafeAreaView,
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import * as ImagePicker from 'expo-image-picker';
@@ -16,6 +19,7 @@ import PhotoAnnotationScreen from './PhotoAnnotationScreen';
 import AnnotatedImage from './AnnotatedImage';
 import { appColors, appSpacing, appTypography } from './appTheme';
 import { handlePhotoUpload as uploadAndStorePhoto } from './photoUploadUtils';
+import { buildRoofQuestionnaire } from './roofQuestionnaire';
 
 // Mock AI label suggestions per inspection section
 const mockAISuggestions = {
@@ -81,7 +85,7 @@ const inspectionSections = [
 ];
 
 
-export default function ClearSkyPhotoIntakeScreen() {
+export default function ClearSkyPhotoIntakeScreen({ navigation }) {
   // Store photos keyed by section name
   const [photoData, setPhotoData] = useState({});
   const [selectedSection, setSelectedSection] = useState(inspectionSections[0]);
@@ -90,34 +94,44 @@ export default function ClearSkyPhotoIntakeScreen() {
   );
   const [autoChecklist, setAutoChecklist] = useState(true);
   const [editingPhoto, setEditingPhoto] = useState(null);
+  const [uploading, setUploading] = useState(false);
 
   const handlePhotoUpload = async (section) => {
-    console.log('Upload photo for', section);
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: false,
-      quality: 1,
-    });
+    setUploading(true);
+    try {
+      let result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: false,
+        quality: 1,
+      });
 
-    if (!result.canceled) {
-      const photoUri = result.assets[0].uri;
-      await uploadAndStorePhoto(
-        photoUri,
-        section,
-        photoData[section] || [],
-        (updated) => setPhotoData((prev) => ({ ...prev, [section]: updated })),
-        'demo',
-        generateAISuggestion(section),
-        generateAIAnnotations()
-      );
-      if (autoChecklist) {
-        setChecklist((prev) => ({ ...prev, [section]: true }));
+      if (!result.canceled) {
+        const photoUri = result.assets[0].uri;
+        const downloadUrl = await uploadAndStorePhoto(
+          photoUri,
+          section,
+          photoData[section] || [],
+          (updated) => setPhotoData((prev) => ({ ...prev, [section]: updated })),
+          'demo',
+          generateAISuggestion(section),
+          generateAIAnnotations()
+        );
+        if (!downloadUrl) {
+          Alert.alert(
+            'Upload Error',
+            'Photo upload failed. Please check your connection and try again.'
+          );
+        }
+        if (autoChecklist) {
+          setChecklist((prev) => ({ ...prev, [section]: true }));
+        }
       }
+    } finally {
+      setUploading(false);
     }
   };
 
   const handleLabelChange = (section, index, newLabel) => {
-    console.log('Label change', section, index, newLabel);
     setPhotoData((prevData) => {
       const updatedSection = [...prevData[section]];
       updatedSection[index].userLabel = newLabel;
@@ -126,7 +140,6 @@ export default function ClearSkyPhotoIntakeScreen() {
   };
 
   const handleSaveAnnotations = (section, index, annotations) => {
-    console.log('Save annotations', section, index);
     setPhotoData((prevData) => {
       const updatedSection = [...prevData[section]];
       updatedSection[index].annotations = annotations;
@@ -139,7 +152,7 @@ export default function ClearSkyPhotoIntakeScreen() {
   const progress = Object.values(checklist).filter(Boolean).length;
 
   return (
-    <View style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1 }}>
       <Modal visible={!!editingPhoto} animationType="slide">
         {editingPhoto && (
           <PhotoAnnotationScreen
@@ -163,7 +176,9 @@ export default function ClearSkyPhotoIntakeScreen() {
         <Button
           title={`Upload Photo for ${selectedSection}`}
           onPress={() => handlePhotoUpload(selectedSection)}
+          disabled={uploading}
         />
+        {uploading && <ActivityIndicator style={{ marginTop: 10 }} />}
 
         {photoData[selectedSection]?.map((item, index) => (
           <View key={index} style={{ marginTop: 10 }}>
@@ -235,8 +250,20 @@ export default function ClearSkyPhotoIntakeScreen() {
           />
         </View>
       </View>
+      <Button
+        title="Preview Report"
+        onPress={() => {
+          const allPhotos = [].concat(...Object.values(photoData));
+          const generatedQuestionnaire = buildRoofQuestionnaire(allPhotos);
+          navigation.navigate('ReportPreviewScreen', {
+            uploadedPhotos: allPhotos,
+            roofQuestionnaire: generatedQuestionnaire,
+          });
+        }}
+        style={{ marginTop: 20 }}
+      />
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
 
