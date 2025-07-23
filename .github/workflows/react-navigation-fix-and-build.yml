@@ -1,0 +1,42 @@
+name: Fix Navigation + Build iOS for TestFlight
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  fix-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install global Expo and EAS CLI
+        run: npm install -g expo-cli eas-cli
+
+      - name: Install project dependencies
+        run: |
+          cd react_native
+          yarn install
+
+      - name: Install missing React Navigation dependencies
+        run: |
+          cd react_native
+          yarn add @react-navigation/native
+          yarn add @react-navigation/stack
+          expo install react-native-screens react-native-safe-area-context react-native-gesture-handler react-native-reanimated
+
+      - name: Expo login with token
+        run: eas login --token ${{ secrets.EXPO_TOKEN }}
+
+      - name: Run EAS iOS build and submit to TestFlight
+        run: |
+          cd react_native
+          npx eas build -p ios --profile preview --auto-submit --non-interactive
