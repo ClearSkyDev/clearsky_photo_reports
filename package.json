@@ -33,6 +33,7 @@
     "expo-file-system": "~18.1.11",
     "expo-image-picker": "~16.1.4",
     "expo-print": "~14.1.4",
+    "expo-updates": "~0.28.17",
     "expo-web-browser": "~14.2.0",
     "firebase": "^12.0.0",
     "react": "19.0.0",
