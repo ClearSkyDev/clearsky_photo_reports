@@ -71,6 +71,7 @@ provided:
 
 ```bash
 python ../scripts/prepare_eas_build.py
+python ../scripts/bump_ios_version.py
 eas build -p ios --profile production
 ```
 
