@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "ClearSky Photo Reports",
-    "slug": "clearsky-photo-reports",
+    "slug": "clearsky_photo_reports",
     "owner": "clearsky",
     "version": "1.0.2",
     "orientation": "portrait",
