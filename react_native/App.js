@@ -180,50 +180,60 @@ export default function ClearSkyPhotoIntakeScreen({ navigation }) {
         />
         {uploading && <ActivityIndicator style={{ marginTop: 10 }} />}
 
-        {photoData[selectedSection]?.map((item, index) => (
-          <View key={index} style={{ marginTop: 10 }}>
-            {item.showAnnotated && item.annotations.length ? (
-              <AnnotatedImage
-                photo={item}
-                style={{ width: 200, height: 200, borderRadius: 6 }}
-              />
-            ) : (
-              <Image
-                source={{ uri: item.imageUri }}
-                style={{ width: 200, height: 200, borderRadius: 6 }}
-                resizeMode="cover"
-              />
-            )}
+        {photoData[selectedSection] &&
+        photoData[selectedSection].length > 0 ? (
+          photoData[selectedSection].map((item, index) => (
+            <View key={index} style={{ marginTop: 10 }}>
+              {item.showAnnotated && item.annotations.length ? (
+                <AnnotatedImage
+                  photo={item}
+                  style={{ width: 200, height: 200, borderRadius: 6 }}
+                />
+              ) : (
+                <Image
+                  source={{ uri: item.imageUri }}
+                  style={{ width: 200, height: 200, borderRadius: 6 }}
+                  resizeMode="cover"
+                />
+              )}
 
-            <TextInput
-              value={item.userLabel}
-              onChangeText={(text) => handleLabelChange(selectedSection, index, text)}
-              placeholder="Enter photo label"
-              style={{
-                borderWidth: 1,
-                borderColor: '#ccc',
-                padding: 8,
-                marginTop: 5,
-                borderRadius: 4,
-              }}
-            />
+              <TextInput
+                value={item.userLabel}
+                onChangeText={(text) =>
+                  handleLabelChange(selectedSection, index, text)
+                }
+                placeholder="Enter photo label"
+                style={{
+                  borderWidth: 1,
+                  borderColor: '#ccc',
+                  padding: 8,
+                  marginTop: 5,
+                  borderRadius: 4,
+                }}
+              />
 
-            <View style={styles.tagRow}>
-              {tagSuggestions[selectedSection]?.map((tag) => (
-                <TouchableOpacity
-                  key={tag}
-                  style={styles.tagButton}
-                  onPress={() => handleLabelChange(selectedSection, index, `${item.userLabel} ${tag}`)}
-                >
-                  <Text style={styles.tagText}>{tag}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-            <View style={{ flexDirection: 'row', marginTop: 4 }}>
-              <Button title="Annotate" onPress={() => setEditingPhoto({ section: selectedSection, index })} />
-              {item.annotations.length > 0 && (
-                <Button
-                  title={item.showAnnotated ? 'Original' : 'Marked Up'}
+              <View style={styles.tagRow}>
+                {tagSuggestions[selectedSection]?.map((tag) => (
+                  <TouchableOpacity
+                    key={tag}
+                    style={styles.tagButton}
+                    onPress={() =>
+                      handleLabelChange(
+                        selectedSection,
+                        index,
+                        `${item.userLabel} ${tag}`
+                      )
+                    }
+                  >
+                    <Text style={styles.tagText}>{tag}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+              <View style={{ flexDirection: 'row', marginTop: 4 }}>
+                <Button title="Annotate" onPress={() => setEditingPhoto({ section: selectedSection, index })} />
+                {item.annotations.length > 0 && (
+                  <Button
+                    title={item.showAnnotated ? 'Original' : 'Marked Up'}
                   onPress={() => {
                     setPhotoData((prev) => {
                       const updated = [...prev[selectedSection]];
@@ -235,7 +245,12 @@ export default function ClearSkyPhotoIntakeScreen({ navigation }) {
               )}
             </View>
           </View>
-        ))}
+        ))
+        ) : (
+          <Text style={{ marginTop: 10, fontStyle: 'italic', color: '#555' }}>
+            No photos uploaded for this section yet.
+          </Text>
+        )}
       </View>
 
       <View style={{ marginTop: 20 }}>
