@@ -3,6 +3,8 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../utils/dev_delay.dart';
+
 import '../models/chat_message.dart';
 
 /// Simple OpenAI chat client for on-site assistant.
@@ -30,16 +32,23 @@ class AiChatService {
       {'role': 'user', 'content': message},
     ];
 
-    final res = await http.post(Uri.parse(apiUrl),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $apiKey',
-        },
-        body: jsonEncode({
-          'model': 'gpt-3.5-turbo',
-          'messages': messages,
-          'max_tokens': 200,
-        }));
+    await devDelay();
+    http.Response res;
+    try {
+      res = await http.post(Uri.parse(apiUrl),
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $apiKey',
+          },
+          body: jsonEncode({
+            'model': 'gpt-3.5-turbo',
+            'messages': messages,
+            'max_tokens': 200,
+          }));
+    } catch (e) {
+      debugPrint('[AiChatService] http error: $e');
+      rethrow;
+    }
 
     if (res.statusCode != 200) {
       throw Exception('Failed to chat (${res.statusCode})');
@@ -63,27 +72,38 @@ class AiChatService {
 
   Future<void> _storeMessage(String reportId, ChatMessage msg) async {
     debugPrint('[AiChatService] storeMessage $reportId role=${msg.role}');
-    await FirebaseFirestore.instance
-        .collection('reports')
-        .doc(reportId)
-        .collection('chats')
-        .add({
-      'role': msg.role,
-      'text': msg.text,
-      'createdAt': FieldValue.serverTimestamp(),
-    });
+    await devDelay();
+    try {
+      await FirebaseFirestore.instance
+          .collection('reports')
+          .doc(reportId)
+          .collection('chats')
+          .add({
+        'role': msg.role,
+        'text': msg.text,
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+    } catch (e) {
+      debugPrint('[AiChatService] storeMessage error: $e');
+    }
   }
 
   Future<List<ChatMessage>> loadMessages(String reportId) async {
     debugPrint('[AiChatService] loadMessages $reportId');
-    final snap = await FirebaseFirestore.instance
-        .collection('reports')
-        .doc(reportId)
-        .collection('chats')
-        .orderBy('createdAt')
-        .get();
-    return snap.docs
-        .map<ChatMessage>((d) => ChatMessage.fromMap(d.data(), d.id))
-        .toList();
+    await devDelay();
+    try {
+      final snap = await FirebaseFirestore.instance
+          .collection('reports')
+          .doc(reportId)
+          .collection('chats')
+          .orderBy('createdAt')
+          .get();
+      return snap.docs
+          .map<ChatMessage>((d) => ChatMessage.fromMap(d.data(), d.id))
+          .toList();
+    } catch (e) {
+      debugPrint('[AiChatService] loadMessages error: $e');
+      return [];
+    }
   }
 }
