@@ -1,33 +1,35 @@
 import React from 'react';
+import { StyleSheet } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
-import SplashScreen from './SplashScreen';
-import ClearSkyPhotoIntakeScreen from './App';
-import ReportPreviewScreen from './ReportPreviewScreen';
+// Screens
+import SplashScreen from './screens/SplashScreen';
+import PhotoIntakeScreen from './screens/PhotoIntakeScreen';
+import ReportPreviewScreen from './screens/ReportPreviewScreen';
 
 const Stack = createStackNavigator();
 
 export default function MainApp() {
   return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName="Splash">
-        <Stack.Screen
-          name="Splash"
-          component={SplashScreen}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="ClearSkyPhotoIntakeScreen"
-          component={ClearSkyPhotoIntakeScreen}
-          options={{ title: 'Photo Intake' }}
-        />
-        <Stack.Screen
-          name="ReportPreviewScreen"
-          component={ReportPreviewScreen}
-          options={{ title: 'Report Preview' }}
-        />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <GestureHandlerRootView style={styles.container}>
+      <NavigationContainer>
+        <Stack.Navigator
+          initialRouteName="Splash"
+          screenOptions={{ headerShown: false }}
+        >
+          <Stack.Screen name="Splash" component={SplashScreen} />
+          <Stack.Screen name="PhotoIntake" component={PhotoIntakeScreen} />
+          <Stack.Screen name="ReportPreview" component={ReportPreviewScreen} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </GestureHandlerRootView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1
+  }
+});
