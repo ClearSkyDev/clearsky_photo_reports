@@ -26,6 +26,8 @@
   },
   "homepage": "https://github.com/ClearSkyDev/clearsky_photo_reports#readme",
   "dependencies": {
+    "@react-navigation/native": "^7.1.14",
+    "@react-navigation/stack": "^7.4.2",
     "expo": "^53.0.20",
     "expo-camera": "~16.1.11",
     "expo-file-system": "~18.1.11",
@@ -33,6 +35,10 @@
     "expo-print": "~14.1.4",
     "expo-web-browser": "~14.2.0",
     "react": "^19.1.0",
-    "react-native": "^0.80.1"
+    "react-native": "^0.80.1",
+    "react-native-gesture-handler": "^2.27.2",
+    "react-native-reanimated": "^4.0.0",
+    "react-native-safe-area-context": "^5.5.2",
+    "react-native-screens": "^4.13.1"
   }
 }
