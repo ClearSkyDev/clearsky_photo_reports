@@ -1,8 +1,9 @@
 {
   "expo": {
     "name": "ClearSky Photo Reports",
-    "slug": "clearsky_photo_reports",
-    "version": "1.0.0",
+    "slug": "clearsky-photo-reports",
+    "owner": "clearsky",
+    "version": "1.0.2",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "splash": {
@@ -14,18 +15,17 @@
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "bundleIdentifier": "com.clearsky.photo",
-      "buildNumber": "1.0.1",
+      "buildNumber": "1.0.2",
       "supportsTablet": false,
       "infoPlist": {
-        "NSCameraUsageDescription": "This app uses the camera to capture inspection photos.",
-        "NSPhotoLibraryUsageDescription": "This app needs access to your photo library to upload inspection images.",
-        "NSMicrophoneUsageDescription": "This app uses the microphone when capturing video during inspections.",
+        "NSCameraUsageDescription": "Used to take roof inspection photos",
+        "NSPhotoLibraryUsageDescription": "Used to upload images from gallery",
         "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
       "package": "com.clearsky.photo",
-      "versionCode": 2,
+      "versionCode": 3,
       "permissions": ["CAMERA", "READ_EXTERNAL_STORAGE", "WRITE_EXTERNAL_STORAGE"]
     },
     "extra": {
@@ -34,10 +34,10 @@
       }
     },
     "plugins": [
-      "expo-media-library",
       "expo-camera",
-      "expo-image-picker",
-      "expo-file-system"
+      "expo-file-system",
+      "expo-media-library",
+      "expo-image-picker"
     ],
     "updates": {
       "fallbackToCacheTimeout": 0
