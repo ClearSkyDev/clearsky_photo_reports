@@ -1,14 +1,11 @@
-import React, { useEffect } from 'react';
-import { View, Text } from 'react-native';
+import React from 'react';
+import { SafeAreaView, Text } from 'react-native';
 
 export default function PhotoIntakeScreen() {
-  useEffect(() => {
-    console.log('PhotoIntakeScreen mounted');
-  }, []);
-
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text>Photo Intake Screen</Text>
-    </View>
+    <SafeAreaView style={{ flex: 1 }}>
+      <Text style={{ fontSize: 20, textAlign: 'center' }}>Photo Intake Screen</Text>
+      {/* Add temporary dummy photo tiles here */}
+    </SafeAreaView>
   );
 }
