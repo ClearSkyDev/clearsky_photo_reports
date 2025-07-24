@@ -10,8 +10,9 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   try {
     final options = DefaultFirebaseOptions.currentPlatform;
-    if (options.apiKey.startsWith('REPLACE_WITH') ||
-        options.apiKey.contains('Example')) {
+    if (options.apiKey.contains('Example')) {
+      print('⚠️ Warning: Running in demo mode without Firebase.');
+    } else if (options.apiKey.startsWith('REPLACE_WITH')) {
       throw Exception(
           'Firebase API key not configured. Update lib/firebase_options.dart');
     }
