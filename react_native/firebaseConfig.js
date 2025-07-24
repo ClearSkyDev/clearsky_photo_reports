@@ -13,28 +13,44 @@ const firebaseConfig = {
   appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID || '',
 };
 
-if (!process.env.EXPO_PUBLIC_FIREBASE_API_KEY) {
-  console.warn('Missing Firebase env var: EXPO_PUBLIC_FIREBASE_API_KEY');
-}
-if (!process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN) {
-  console.warn('Missing Firebase env var: EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN');
-}
-if (!process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID) {
-  console.warn('Missing Firebase env var: EXPO_PUBLIC_FIREBASE_PROJECT_ID');
-}
-if (!process.env.EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET) {
-  console.warn('Missing Firebase env var: EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET');
-}
-if (!process.env.EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID) {
-  console.warn('Missing Firebase env var: EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID');
-}
-if (!process.env.EXPO_PUBLIC_FIREBASE_APP_ID) {
-  console.warn('Missing Firebase env var: EXPO_PUBLIC_FIREBASE_APP_ID');
+export let offlineMode = false;
+
+const missingVars = [
+  'EXPO_PUBLIC_FIREBASE_API_KEY',
+  'EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN',
+  'EXPO_PUBLIC_FIREBASE_PROJECT_ID',
+  'EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET',
+  'EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID',
+  'EXPO_PUBLIC_FIREBASE_APP_ID',
+].filter((name) => !process.env[name]);
+
+if (missingVars.length > 0) {
+  offlineMode = true;
+  console.warn(
+    `Missing Firebase env vars: ${missingVars.join(', ')}. Running in demo mode.`
+  );
 }
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
-export const db = getFirestore(app);
-export const storage = getStorage(app);
-export const functions = getFunctions(app);
+let app;
+let auth;
+let db;
+let storage;
+let functions;
+
+if (!offlineMode) {
+  try {
+    app = initializeApp(firebaseConfig);
+    auth = getAuth(app);
+    db = getFirestore(app);
+    storage = getStorage(app);
+    functions = getFunctions(app);
+    console.log('Firebase initialized successfully');
+  } catch (err) {
+    console.warn('Failed to initialize Firebase', err);
+    offlineMode = true;
+  }
+} else {
+  console.log('Firebase not configured; using demo mode');
+}
+
+export { app, auth, db, storage, functions, offlineMode };

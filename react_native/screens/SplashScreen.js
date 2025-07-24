@@ -1,9 +1,10 @@
 import React, { useEffect } from 'react';
 import { View, Text } from 'react-native';
+import { offlineMode } from '../firebaseConfig';
 
 export default function SplashScreen({ navigation }) {
   useEffect(() => {
-    console.log('SplashScreen mounted');
+    console.log('SplashScreen mounted - offlineMode:', offlineMode);
     const timer = setTimeout(() => {
       try {
         console.log('Navigating to PhotoIntake');

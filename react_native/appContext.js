@@ -2,7 +2,7 @@ import React, { createContext, useState, useContext, useEffect } from 'react';
 import { Text } from 'react-native';
 import { signInAnonymously, onAuthStateChanged } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { auth, db } from './firebaseConfig';
+import { auth, db, offlineMode } from './firebaseConfig';
 
 const AppContext = createContext();
 
@@ -16,6 +16,12 @@ export function AppProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (offlineMode) {
+      console.log('Skipping Firebase auth - offline mode');
+      setLoading(false);
+      return;
+    }
+
     const unsub = onAuthStateChanged(auth, async (user) => {
       if (user) {
         setUserId(user.uid);
@@ -46,7 +52,14 @@ export function AppProvider({ children }) {
 
   return (
     <AppContext.Provider
-      value={{ userId, role, setRole, subscription, setSubscription }}
+      value={{
+        userId,
+        role,
+        setRole,
+        subscription,
+        setSubscription,
+        offlineMode,
+      }}
     >
       {children}
     </AppContext.Provider>
