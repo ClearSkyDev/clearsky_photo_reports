@@ -9,6 +9,7 @@ import '../features/screens/project_details_screen.dart';
 import '../features/screens/guided_capture_screen.dart';
 import '../features/screens/report_preview_screen.dart';
 import '../features/screens/settings_screen.dart';
+import '../features/screens/test_photo_upload_screen.dart';
 import '../core/services/theme_service.dart';
 import '../core/services/accessibility_service.dart';
 import '../core/services/demo_mode_service.dart';
@@ -98,9 +99,10 @@ class ClearSkyApp extends StatelessWidget {
                   isSubscribed: false,
                 ),
             '/projectDetails': (context) => const ProjectDetailsScreen(),
-            '/reportPreview':
-                (context) => ReportPreviewScreen(metadata: dummyMetadata),
+            '/reportPreview': (context) =>
+                ReportPreviewScreen(metadata: dummyMetadata),
             '/settings': (context) => const SettingsScreen(),
+            '/testUpload': (context) => const TestPhotoUploadScreen(),
             // Navigation to guided capture uses arguments
           },
           onGenerateRoute: (settings) {
