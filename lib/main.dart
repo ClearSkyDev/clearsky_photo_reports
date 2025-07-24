@@ -4,6 +4,7 @@ import 'firebase_options.dart';
 import 'clear_sky_app.dart';
 import 'src/core/services/theme_service.dart';
 import 'src/core/services/accessibility_service.dart';
+import 'src/core/services/demo_mode_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,6 +17,7 @@ void main() async {
       throw Exception('Firebase API key not configured');
     }
   } catch (e) {
+    DemoModeService.instance.enable();
     print('⚠️ Running in demo mode: Firebase not initialized.');
   }
   await ThemeService.instance.init();

@@ -11,6 +11,7 @@ import '../features/screens/report_preview_screen.dart';
 import '../features/screens/settings_screen.dart';
 import '../core/services/theme_service.dart';
 import '../core/services/accessibility_service.dart';
+import '../core/services/demo_mode_service.dart';
 import '../core/models/inspection_metadata.dart';
 import '../core/models/peril_type.dart';
 import '../core/models/inspection_type.dart';
@@ -48,12 +49,43 @@ class ClearSkyApp extends StatelessWidget {
               settings.highContrast ? ThemeMode.light : themeService.themeMode,
           debugShowCheckedModeBanner: false,
           builder: (context, child) {
-            return MediaQuery(
+            final content = MediaQuery(
               data: MediaQuery.of(context).copyWith(
                 accessibleNavigation: settings.screenReader,
-                disableAnimations: settings.reducedMotion, textScaler: TextScaler.linear(settings.textScale),
+                disableAnimations: settings.reducedMotion,
+                textScaler: TextScaler.linear(settings.textScale),
               ),
               child: child!,
+            );
+            return Stack(
+              children: [
+                content,
+                AnimatedBuilder(
+                  animation: DemoModeService.instance,
+                  builder: (context, _) {
+                    return DemoModeService.instance.isEnabled
+                        ? Positioned(
+                            bottom: 0,
+                            left: 0,
+                            right: 0,
+                            child: Material(
+                              color: Colors.orange,
+                              child: SafeArea(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(
+                                    'Demo mode: Firebase features disabled.',
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(color: Colors.white),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          )
+                        : const SizedBox.shrink();
+                  },
+                ),
+              ],
             );
           },
           initialRoute: '/',
