@@ -29,9 +29,13 @@ class _AiChatDrawerState extends State<AiChatDrawer> {
   }
 
   Future<void> _loadHistory() async {
-    final history = await _service.loadMessages(widget.reportId);
-    if (!mounted) return;
-    setState(() => _messages.addAll(history));
+    try {
+      final history = await _service.loadMessages(widget.reportId);
+      if (!mounted) return;
+      setState(() => _messages.addAll(history));
+    } catch (e) {
+      debugPrint('[AiChatDrawer] loadHistory error: $e');
+    }
   }
 
   Future<void> _send() async {
@@ -43,13 +47,18 @@ class _AiChatDrawerState extends State<AiChatDrawer> {
       _loading = true;
     });
     _controller.clear();
-    final reply = await _service.sendMessage(
-        reportId: widget.reportId, message: text, context: widget.context);
-    if (!mounted) return;
-    setState(() {
-      _messages.add(reply);
-      _loading = false;
-    });
+    try {
+      final reply = await _service.sendMessage(
+          reportId: widget.reportId, message: text, context: widget.context);
+      if (!mounted) return;
+      setState(() {
+        _messages.add(reply);
+        _loading = false;
+      });
+    } catch (e) {
+      debugPrint('[AiChatDrawer] send error: $e');
+      if (mounted) setState(() => _loading = false);
+    }
   }
 
   @override

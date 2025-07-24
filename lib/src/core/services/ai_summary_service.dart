@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
+import '../utils/dev_delay.dart';
+
 import '../models/saved_report.dart';
 import '../models/inspector_report_role.dart';
 
@@ -82,16 +84,23 @@ class AiSummaryService {
       {'role': 'user', 'content': prompt}
     ];
 
-    final res = await http.post(Uri.parse(apiUrl),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $apiKey',
-        },
-        body: jsonEncode({
-          'model': 'gpt-3.5-turbo',
-          'messages': messages,
-          'max_tokens': 300,
-        }));
+    await devDelay();
+    http.Response res;
+    try {
+      res = await http.post(Uri.parse(apiUrl),
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $apiKey',
+          },
+          body: jsonEncode({
+            'model': 'gpt-3.5-turbo',
+            'messages': messages,
+            'max_tokens': 300,
+          }));
+    } catch (e) {
+      debugPrint('[AiSummaryService] http error: $e');
+      rethrow;
+    }
 
     if (res.statusCode != 200) {
       throw Exception('Failed to generate summary (${res.statusCode})');

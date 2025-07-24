@@ -9,6 +9,7 @@ import '../../core/models/inspector_report_role.dart';
 import '../../core/services/offline_draft_store.dart';
 import '../../core/services/offline_sync_service.dart';
 import '../../core/utils/profile_storage.dart';
+import '../../core/utils/dev_delay.dart';
 import 'report_preview_screen.dart';
 import 'send_report_screen.dart';
 
@@ -34,20 +35,27 @@ class _InspectorDashboardScreenState extends State<InspectorDashboardScreen> {
   }
 
   Future<List<SavedReport>> _loadReports() async {
-    final firestore = FirebaseFirestore.instance;
-    Query query =
-        firestore.collection('reports').orderBy('createdAt', descending: true);
-    final profile = await ProfileStorage.load();
-    if (profile != null) {
-      query = query.where('inspectionMetadata.inspectorName',
-          isEqualTo: profile.name);
+    await devDelay();
+    try {
+      final firestore = FirebaseFirestore.instance;
+      Query query =
+          firestore.collection('reports').orderBy('createdAt', descending: true);
+      final profile = await ProfileStorage.load();
+      if (profile != null) {
+        query = query.where('inspectionMetadata.inspectorName',
+            isEqualTo: profile.name);
+      }
+      final snap = await query.get();
+      final remote = snap.docs
+          .map((d) =>
+              SavedReport.fromMap(d.data() as Map<String, dynamic>, d.id))
+          .toList();
+      final local = OfflineDraftStore.instance.loadReports();
+      return [...local, ...remote];
+    } catch (e) {
+      debugPrint('[InspectorDashboard] loadReports error: $e');
+      return OfflineDraftStore.instance.loadReports();
     }
-    final snap = await query.get();
-    final remote = snap.docs
-        .map((d) => SavedReport.fromMap(d.data() as Map<String, dynamic>, d.id))
-        .toList();
-    final local = OfflineDraftStore.instance.loadReports();
-    return [...local, ...remote];
   }
 
   void _pickDateRange() async {
