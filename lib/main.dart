@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'clear_sky_app.dart';
 import 'src/core/services/theme_service.dart';
 import 'src/core/services/accessibility_service.dart';
+import 'src/core/utils/debug_init.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,5 +23,6 @@ void main() async {
   await ThemeService.instance.init();
   await AccessibilityService.instance.init();
   runApp(const ClearSkyApp());
+  unawaited(debugInitCheck(routes: appRoutes));
 }
 

@@ -15,6 +15,7 @@ import '../core/models/inspection_metadata.dart';
 import '../core/models/peril_type.dart';
 import '../core/models/inspection_type.dart';
 import '../core/models/inspector_report_role.dart';
+import '../core/utils/debug_init.dart';
 
 final InspectionMetadata dummyMetadata = InspectionMetadata(
   clientName: 'John Doe',
@@ -25,6 +26,21 @@ final InspectionMetadata dummyMetadata = InspectionMetadata(
   inspectionType: InspectionType.residentialRoof,
   inspectorRoles: {InspectorReportRole.adjuster},
 );
+
+/// All routes registered with the application.
+final Map<String, WidgetBuilder> appRoutes = {
+  '/': (context) => const SplashScreen(),
+  '/login': (context) => const LoginScreen(),
+  '/signup': (context) => const SignupScreen(),
+  '/home': (context) => const HomeScreen(
+        freeReportsRemaining: 3,
+        isSubscribed: false,
+      ),
+  '/projectDetails': (context) => const ProjectDetailsScreen(),
+  '/reportPreview': (context) => ReportPreviewScreen(metadata: dummyMetadata),
+  '/settings': (context) => const SettingsScreen(),
+  // Navigation to guided capture uses arguments
+};
 
 class ClearSkyApp extends StatelessWidget {
   const ClearSkyApp({super.key});
@@ -41,6 +57,8 @@ class ClearSkyApp extends StatelessWidget {
             ? AppTheme.highContrastTheme
             : themeService.lightTheme;
         return MaterialApp(
+          navigatorKey: rootNavigatorKey,
+          navigatorObservers: [LoggingNavigatorObserver()],
           title: 'ClearSky Photo Reports',
           theme: lightTheme,
           darkTheme: AppTheme.darkTheme,
@@ -57,20 +75,7 @@ class ClearSkyApp extends StatelessWidget {
             );
           },
           initialRoute: '/',
-          routes: {
-            '/': (context) => const SplashScreen(),
-            '/login': (context) => const LoginScreen(),
-            '/signup': (context) => const SignupScreen(),
-            '/home': (context) => const HomeScreen(
-                  freeReportsRemaining: 3,
-                  isSubscribed: false,
-                ),
-            '/projectDetails': (context) => const ProjectDetailsScreen(),
-            '/reportPreview':
-                (context) => ReportPreviewScreen(metadata: dummyMetadata),
-            '/settings': (context) => const SettingsScreen(),
-            // Navigation to guided capture uses arguments
-          },
+          routes: appRoutes,
           onGenerateRoute: (settings) {
             if (settings.name == '/guidedCapture' ||
                 settings.name == '/capture') {
