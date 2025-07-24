@@ -2,9 +2,9 @@ import React, { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { View, Text } from 'react-native';
 import ErrorBoundary from './ErrorBoundary';
 import { offlineMode } from './firebaseConfig';
+import DemoBanner from './components/DemoBanner';
 
 // Screens
 import SplashScreen from './screens/SplashScreen';
@@ -20,15 +20,7 @@ export default function MainApp() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      {offlineMode && (
-        <View
-          style={{ backgroundColor: 'orange', padding: 8 }}
-        >
-          <Text style={{ color: 'white', textAlign: 'center' }}>
-            ⚠️ Running in demo mode. Firebase not connected.
-          </Text>
-        </View>
-      )}
+      <DemoBanner subtext="Some features may be limited." />
       <ErrorBoundary>
         <NavigationContainer>
           <Stack.Navigator initialRouteName="Splash">
