@@ -173,9 +173,13 @@ This project uses Firebase for data storage and optional photo uploads. Install 
 
 1. Create a Firebase project in the [Firebase console](https://console.firebase.google.com).
 2. Download **google-services.json** for Android and **GoogleService-Info.plist** for iOS and place them in the respective platform directories.
-3. Run `flutterfire configure` to generate `lib/src/core/firebase_options.dart` which provides the `DefaultFirebaseOptions` used during `Firebase.initializeApp`.
-4. In the Firebase console copy the Web API Key from **Project Settings > General** and ensure it matches the `apiKey` value in `lib/src/core/firebase_options.dart`.
-5. If any placeholder like `REPLACE_WITH_API_KEY` remains in `firebase_options.dart`, the app will display a configuration error on startup.
+3. Run `flutterfire configure` to generate `lib/firebase_options.dart` which
+   provides the `DefaultFirebaseOptions` used during `Firebase.initializeApp`.
+4. In the Firebase console copy the Web API Key from **Project Settings > General** and ensure it matches the `apiKey` value in `lib/firebase_options.dart`.
+5. If any placeholder like `REPLACE_WITH_API_KEY` remains in `firebase_options.dart`,
+   the app will display a configuration error on startup. This repository
+   contains **dummy credentials** so the application can run in offline/demo mode.
+   Replace them with your real project values for full Firebase functionality.
 
 ### Troubleshooting: "Firebase API Key not configured"
 
@@ -188,8 +192,9 @@ If you encounter this error when launching the app:
    flutterfire configure
    ```
 
-2. Open `lib/src/core/firebase_options.dart` and replace all placeholder values
-   such as `REPLACE_WITH_API_KEY` with your actual Firebase project settings.
+2. Open `lib/firebase_options.dart` and replace all placeholder values
+   such as `REPLACE_WITH_API_KEY` with your actual Firebase project settings. The
+   committed file contains dummy credentials for demo purposes.
 
 3. Rebuild the project:
 
