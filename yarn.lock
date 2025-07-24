@@ -2605,9 +2605,9 @@ expo-web-browser@~14.2.0:
   resolved "https://registry.yarnpkg.com/expo-web-browser/-/expo-web-browser-14.2.0.tgz#d8fb521ae349aebbf5c0ca32448877480124c06c"
   integrity sha512-6S51d8pVlDRDsgGAp8BPpwnxtyKiMWEFdezNz+5jVIyT+ctReW42uxnjRgtsdn5sXaqzhaX+Tzk/CWaKCyC0hw==
 
-expo@^53.0.19, expo@^53.0.20:
+expo@^53.0.20:
   version "53.0.20"
-  resolved "https://registry.npmjs.org/expo/-/expo-53.0.20.tgz"
+  resolved "https://registry.yarnpkg.com/expo/-/expo-53.0.20.tgz#e11b553322de313d47c407367d8d48d3a073e3cc"
   integrity sha512-Nh+HIywVy9KxT/LtH08QcXqrxtUOA9BZhsXn3KCsAYA+kNb80M8VKN8/jfQF+I6CgeKyFKJoPNsWgI0y0VBGrA==
   dependencies:
     "@babel/runtime" "^7.20.0"
