@@ -11,8 +11,8 @@ export default function SplashScreen({ navigation }) {
       );
     }
     const timer = setTimeout(() => {
-      navigation.replace('ClearSkyPhotoIntakeScreen');
-    }, 1500);
+      navigation.replace('PhotoIntake');
+    }, 2000);
     return () => clearTimeout(timer);
   }, [navigation]);
 
