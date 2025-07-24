@@ -16,10 +16,10 @@ export default function MainApp() {
     <GestureHandlerRootView style={styles.container}>
       <NavigationContainer>
         <Stack.Navigator
-          initialRouteName="Splash"
+          initialRouteName="SplashScreen"
           screenOptions={{ headerShown: false }}
         >
-          <Stack.Screen name="Splash" component={SplashScreen} />
+          <Stack.Screen name="SplashScreen" component={SplashScreen} />
           <Stack.Screen name="PhotoIntake" component={PhotoIntakeScreen} />
           <Stack.Screen name="ReportPreview" component={ReportPreviewScreen} />
         </Stack.Navigator>
