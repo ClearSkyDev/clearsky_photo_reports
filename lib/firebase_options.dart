@@ -26,7 +26,7 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-      apiKey: 'FAKE_WEB_KEY_1234567890',
+      apiKey: 'REPLACE_WITH_API_KEY',
       authDomain: 'demo-clearsky.firebaseapp.com',
       projectId: 'demo-clearsky',
       storageBucket: 'demo-clearsky.appspot.com',
@@ -35,7 +35,7 @@ class DefaultFirebaseOptions {
       measurementId: 'G-DEMO12345');
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'FAKE_ANDROID_KEY_0987654321',
+    apiKey: 'REPLACE_WITH_API_KEY',
     appId: '1:123456789012:android:abcdef1234567890',
     messagingSenderId: '123456789012',
     projectId: 'demo-clearsky',
@@ -43,7 +43,7 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'FAKE_IOS_KEY_1234567890',
+    apiKey: 'REPLACE_WITH_API_KEY',
     appId: '1:123456789012:ios:abcdef1234567890',
     messagingSenderId: '123456789012',
     projectId: 'demo-clearsky',
@@ -52,7 +52,7 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'FAKE_MACOS_KEY_1234567890',
+    apiKey: 'REPLACE_WITH_API_KEY',
     appId: '1:123456789012:macos:abcdef1234567890',
     messagingSenderId: '123456789012',
     projectId: 'demo-clearsky',
