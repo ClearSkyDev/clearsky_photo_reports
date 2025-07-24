@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, useNavigationContainerRef } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
 // Screens
@@ -11,9 +11,21 @@ import ReportPreviewScreen from './screens/ReportPreviewScreen';
 const Stack = createStackNavigator();
 
 export default function MainApp() {
+  const navigationRef = useNavigationContainerRef();
+  useEffect(() => {
+    console.log('[MainApp] mounted');
+  }, []);
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <NavigationContainer>
+      <NavigationContainer
+        ref={navigationRef}
+        onReady={() => {
+          console.log(`[MainApp] Initial screen: ${navigationRef.getCurrentRoute()?.name}`);
+        }}
+        onStateChange={() => {
+          console.log(`[Navigation] Navigated to ${navigationRef.getCurrentRoute()?.name}`);
+        }}
+      >
         <Stack.Navigator initialRouteName="Splash">
           <Stack.Screen
             name="Splash"

@@ -15,6 +15,14 @@ import '../core/models/inspection_metadata.dart';
 import '../core/models/peril_type.dart';
 import '../core/models/inspection_type.dart';
 import '../core/models/inspector_report_role.dart';
+class LoggingNavigatorObserver extends NavigatorObserver {
+  @override
+  void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    super.didPush(route, previousRoute);
+    debugPrint('[Navigation] pushed ${route.settings.name}');
+  }
+}
+
 
 final InspectionMetadata dummyMetadata = InspectionMetadata(
   clientName: 'John Doe',
@@ -47,6 +55,7 @@ class ClearSkyApp extends StatelessWidget {
           themeMode:
               settings.highContrast ? ThemeMode.light : themeService.themeMode,
           debugShowCheckedModeBanner: false,
+          navigatorObservers: [LoggingNavigatorObserver()],
           builder: (context, child) {
             return MediaQuery(
               data: MediaQuery.of(context).copyWith(
@@ -58,20 +67,41 @@ class ClearSkyApp extends StatelessWidget {
           },
           initialRoute: '/',
           routes: {
-            '/': (context) => const SplashScreen(),
-            '/login': (context) => const LoginScreen(),
-            '/signup': (context) => const SignupScreen(),
-            '/home': (context) => const HomeScreen(
-                  freeReportsRemaining: 3,
-                  isSubscribed: false,
-                ),
-            '/projectDetails': (context) => const ProjectDetailsScreen(),
-            '/reportPreview':
-                (context) => ReportPreviewScreen(metadata: dummyMetadata),
-            '/settings': (context) => const SettingsScreen(),
+            '/': (context) {
+              debugPrint('[Route] SplashScreen');
+              return const SplashScreen();
+            },
+            '/login': (context) {
+              debugPrint('[Route] LoginScreen');
+              return const LoginScreen();
+            },
+            '/signup': (context) {
+              debugPrint('[Route] SignupScreen');
+              return const SignupScreen();
+            },
+            '/home': (context) {
+              debugPrint('[Route] HomeScreen');
+              return const HomeScreen(
+                freeReportsRemaining: 3,
+                isSubscribed: false,
+              );
+            },
+            '/projectDetails': (context) {
+              debugPrint('[Route] ProjectDetailsScreen');
+              return const ProjectDetailsScreen();
+            },
+            '/reportPreview': (context) {
+              debugPrint('[Route] ReportPreviewScreen');
+              return ReportPreviewScreen(metadata: dummyMetadata);
+            },
+            '/settings': (context) {
+              debugPrint('[Route] SettingsScreen');
+              return const SettingsScreen();
+            },
             // Navigation to guided capture uses arguments
           },
           onGenerateRoute: (settings) {
+            debugPrint('[Route] ${settings.name}');
             if (settings.name == '/guidedCapture' ||
                 settings.name == '/capture') {
               final args = settings.arguments;
