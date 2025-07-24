@@ -1,6 +1,7 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import SplashScreen from './SplashScreen';
 import ClearSkyPhotoIntakeScreen from './App';
@@ -10,8 +11,9 @@ const Stack = createStackNavigator();
 
 export default function MainApp() {
   return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName="Splash">
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <NavigationContainer>
+        <Stack.Navigator initialRouteName="Splash">
         <Stack.Screen
           name="Splash"
           component={SplashScreen}
@@ -27,7 +29,8 @@ export default function MainApp() {
           component={ReportPreviewScreen}
           options={{ title: 'Report Preview' }}
         />
-      </Stack.Navigator>
-    </NavigationContainer>
+        </Stack.Navigator>
+      </NavigationContainer>
+    </GestureHandlerRootView>
   );
 }
