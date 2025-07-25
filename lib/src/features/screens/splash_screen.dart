@@ -18,7 +18,7 @@ class _SplashScreenState extends State<SplashScreen> {
     if (kDebugMode) {
       print('SplashScreen loaded');
     }
-    Future.delayed(const Duration(seconds: 2), () {
+    Future.delayed(const Duration(seconds: 3), () {
       if (kDebugMode) {
         print('Attempting to determine start screen...');
       }

@@ -17,7 +17,7 @@ void main() {
     expect(find.byType(SplashScreen), findsOneWidget);
 
     // Wait for the delayed navigation in SplashScreen.initState
-    await tester.pump(const Duration(seconds: 3));
+    await tester.pump(const Duration(seconds: 4));
     await tester.pumpAndSettle();
 
     final loginFinder = find.byType(LoginScreen);
