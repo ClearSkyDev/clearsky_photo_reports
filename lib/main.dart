@@ -22,6 +22,32 @@ void main() async {
   }
   await ThemeService.instance.init();
   await AccessibilityService.instance.init();
-  runApp(const ClearSkyApp());
+  if (DemoModeService.instance.isEnabled) {
+    runApp(MaterialApp(
+      home: Scaffold(
+        body: Stack(
+          children: [
+            const ClearSkyApp(),
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: Container(
+                color: Colors.orange,
+                padding: const EdgeInsets.all(8),
+                child: const Text(
+                  '⚠️ Running in Demo Mode — Firebase disabled',
+                  style: TextStyle(color: Colors.white),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    ));
+  } else {
+    runApp(const ClearSkyApp());
+  }
 }
 
