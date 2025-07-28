@@ -2,6 +2,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:hive/hive.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../src/core/utils/logging.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:io';
 
@@ -59,7 +60,7 @@ class OfflineSyncService {
         .doc(inspection.inspectionId)
         .update({'lastSynced': FieldValue.serverTimestamp()});
     } catch (e) {
-      debugPrint('[OfflineSyncService] syncInspection error: $e');
+      logger().d('[OfflineSyncService] syncInspection error: $e');
     }
   }
 
@@ -77,7 +78,7 @@ class OfflineSyncService {
         await syncInspection(inspection.inspectionId);
       }
     } catch (e) {
-      debugPrint('[OfflineSyncService] syncAll error: $e');
+      logger().d('[OfflineSyncService] syncAll error: $e');
     }
   }
 

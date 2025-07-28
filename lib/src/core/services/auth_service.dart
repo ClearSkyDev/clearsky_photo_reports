@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 
 import '../models/inspector_user.dart';
+import '../utils/logging.dart';
 import 'audit_log_service.dart';
 
 class AuthService {
@@ -18,7 +19,7 @@ class AuthService {
     required String companyId,
     UserRole role = UserRole.inspector,
   }) async {
-    debugPrint('[AuthService] signUp email=$email, company=$companyId');
+    logger().d('[AuthService] signUp email=$email, company=$companyId');
     final cred = await _auth.createUserWithEmailAndPassword(
       email: email,
       password: password,
@@ -32,13 +33,13 @@ class AuthService {
   }
 
   Future<void> signIn({required String email, required String password}) async {
-    debugPrint('[AuthService] signIn email=$email');
+    logger().d('[AuthService] signIn email=$email');
     await _auth.signInWithEmailAndPassword(email: email, password: password);
     await AuditLogService().logAction('login');
   }
 
   Future<void> sendSignInLink(String email, String url) {
-    debugPrint('[AuthService] sendSignInLink to $email');
+    logger().d('[AuthService] sendSignInLink to $email');
     final settings = ActionCodeSettings(
       url: url,
       handleCodeInApp: true,
@@ -52,22 +53,22 @@ class AuthService {
   }
 
   Future<void> signInWithLink(String email, String link) {
-    debugPrint('[AuthService] signInWithLink for $email');
+    logger().d('[AuthService] signInWithLink for $email');
     return _auth.signInWithEmailLink(email: email, emailLink: link);
   }
 
   Future<void> sendPasswordReset(String email) {
-    debugPrint('[AuthService] sendPasswordReset to $email');
+    logger().d('[AuthService] sendPasswordReset to $email');
     return _auth.sendPasswordResetEmail(email: email);
   }
 
   Future<void> signOut() {
-    debugPrint('[AuthService] signOut');
+    logger().d('[AuthService] signOut');
     return _auth.signOut();
   }
 
   Future<InspectorUser?> fetchUser(String uid) async {
-    debugPrint('[AuthService] fetchUser $uid');
+    logger().d('[AuthService] fetchUser $uid');
     final snap = await _usersCollection.doc(uid).get();
     if (!snap.exists) return null;
     return InspectorUser.fromMap(uid, snap.data()!);

@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 
 import '../utils/dev_delay.dart';
 
+import '../utils/logging.dart';
 import '../models/saved_report.dart';
 import '../models/inspector_report_role.dart';
 
@@ -98,7 +99,7 @@ class AiSummaryService {
             'max_tokens': 300,
           }));
     } catch (e) {
-      debugPrint('[AiSummaryService] http error: $e');
+      logger().d('[AiSummaryService] http error: $e');
       rethrow;
     }
 

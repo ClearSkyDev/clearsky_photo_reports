@@ -53,5 +53,9 @@
 <string>Allow ClearSky Photo Reports to save inspection photos.</string>
 <key>NSMicrophoneUsageDescription</key>
 <string>Allow ClearSky Photo Reports to record audio for video reports.</string>
+    <key>UIBackgroundModes</key>
+    <array>
+        <string>remote-notification</string>
+    </array>
 </dict>
 </plist>

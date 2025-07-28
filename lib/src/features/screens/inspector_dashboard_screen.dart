@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import '../../core/models/saved_report.dart';
+import '../../core/utils/logging.dart';
 import '../../core/models/inspection_metadata.dart';
 import '../../core/models/inspected_structure.dart';
 import '../../core/models/photo_entry.dart';
@@ -53,7 +54,7 @@ class _InspectorDashboardScreenState extends State<InspectorDashboardScreen> {
       final local = OfflineDraftStore.instance.loadReports();
       return [...local, ...remote];
     } catch (e) {
-      debugPrint('[InspectorDashboard] loadReports error: $e');
+      logger().d('[InspectorDashboard] loadReports error: $e');
       return OfflineDraftStore.instance.loadReports();
     }
   }

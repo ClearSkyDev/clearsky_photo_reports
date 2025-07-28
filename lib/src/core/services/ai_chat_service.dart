@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../utils/logging.dart';
 import '../utils/dev_delay.dart';
 
 import '../models/chat_message.dart';
@@ -20,7 +21,7 @@ class AiChatService {
       {required String reportId,
       required String message,
       Map<String, dynamic>? context}) async {
-    debugPrint('[AiChatService] sendMessage to $reportId');
+    logger().d('[AiChatService] sendMessage to $reportId');
     final history = await loadMessages(reportId);
     final messages = <Map<String, String>>[
       {
@@ -46,7 +47,7 @@ class AiChatService {
             'max_tokens': 200,
           }));
     } catch (e) {
-      debugPrint('[AiChatService] http error: $e');
+      logger().d('[AiChatService] http error: $e');
       rethrow;
     }
 
@@ -66,12 +67,12 @@ class AiChatService {
         ChatMessage(
             id: '', role: 'user', text: message, createdAt: DateTime.now()));
     await _storeMessage(reportId, reply);
-    debugPrint('[AiChatService] reply length ${reply.text.length}');
+    logger().d('[AiChatService] reply length ${reply.text.length}');
     return reply;
   }
 
   Future<void> _storeMessage(String reportId, ChatMessage msg) async {
-    debugPrint('[AiChatService] storeMessage $reportId role=${msg.role}');
+    logger().d('[AiChatService] storeMessage $reportId role=${msg.role}');
     await devDelay();
     try {
       await FirebaseFirestore.instance
@@ -84,12 +85,12 @@ class AiChatService {
         'createdAt': FieldValue.serverTimestamp(),
       });
     } catch (e) {
-      debugPrint('[AiChatService] storeMessage error: $e');
+      logger().d('[AiChatService] storeMessage error: $e');
     }
   }
 
   Future<List<ChatMessage>> loadMessages(String reportId) async {
-    debugPrint('[AiChatService] loadMessages $reportId');
+    logger().d('[AiChatService] loadMessages $reportId');
     await devDelay();
     try {
       final snap = await FirebaseFirestore.instance
@@ -102,7 +103,7 @@ class AiChatService {
           .map<ChatMessage>((d) => ChatMessage.fromMap(d.data(), d.id))
           .toList();
     } catch (e) {
-      debugPrint('[AiChatService] loadMessages error: $e');
+      logger().d('[AiChatService] loadMessages error: $e');
       return [];
     }
   }

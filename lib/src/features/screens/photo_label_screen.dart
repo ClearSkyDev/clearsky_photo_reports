@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import '../../core/utils/color_extensions.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../app/app_theme.dart';
@@ -176,7 +177,7 @@ class _PhotoLabelScreenState extends State<PhotoLabelScreen> {
                                   _toggle(tag, val);
                                 },
                                 selectedColor:
-                                    AppTheme.clearSkyBlue.withOpacity(0.2),
+                                    AppTheme.clearSkyBlue.withValues(alpha: (0.2 * 255).round()),
                               ),
                           ],
                         ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
+import '../../core/utils/logging.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:async';
 
@@ -16,22 +17,22 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     if (kDebugMode) {
-      print('SplashScreen loaded');
+      logger().d('SplashScreen loaded');
     }
     Future.delayed(const Duration(seconds: 3), () {
       if (kDebugMode) {
-        print('Attempting to determine start screen...');
+        logger().d('Attempting to determine start screen...');
       }
       if (!mounted) return;
       final user = FirebaseAuth.instance.currentUser;
       if (user != null) {
         if (kDebugMode) {
-          print('User already logged in: ${user.uid}');
+          logger().d('User already logged in: ${user.uid}');
         }
         Navigator.pushReplacementNamed(context, '/home');
       } else {
         if (kDebugMode) {
-          print('No authenticated user, showing login.');
+          logger().d('No authenticated user, showing login.');
         }
         Navigator.pushReplacementNamed(context, '/login');
       }

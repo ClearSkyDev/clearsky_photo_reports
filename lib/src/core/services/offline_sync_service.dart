@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import '../utils/logging.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as p;
@@ -29,7 +30,7 @@ class OfflineSyncService {
   Timer? _timer;
 
   Future<void> init() async {
-    debugPrint('[OfflineSyncService] init');
+    logger().d('[OfflineSyncService] init');
     await Hive.initFlutter();
     await OfflineDraftStore.instance.init();
     await PendingPhotoStore.instance.init();
@@ -54,20 +55,20 @@ class OfflineSyncService {
   }
 
   Future<void> dispose() async {
-    debugPrint('[OfflineSyncService] dispose');
+    logger().d('[OfflineSyncService] dispose');
     await _connSub?.cancel();
     _timer?.cancel();
   }
 
   Future<void> saveDraft(SavedReport report) {
-    debugPrint('[OfflineSyncService] saveDraft ${report.id}');
+    logger().d('[OfflineSyncService] saveDraft ${report.id}');
     return OfflineDraftStore.instance.saveReport(report);
   }
 
   int get pendingCount => OfflineDraftStore.instance.count;
 
   Future<void> syncDrafts() async {
-    debugPrint('[OfflineSyncService] syncDrafts start');
+    logger().d('[OfflineSyncService] syncDrafts start');
     if (!online.value) return;
     if (!await SyncPreferences.isCloudSyncEnabled()) return;
     final drafts = OfflineDraftStore.instance.loadReports();
@@ -92,11 +93,11 @@ class OfflineSyncService {
       }
       progress.value = (i + 1) / drafts.length;
     }
-    debugPrint('[OfflineSyncService] syncDrafts complete');
+    logger().d('[OfflineSyncService] syncDrafts complete');
   }
 
   Future<void> syncPendingPhotos(String inspectionId) async {
-    debugPrint('[OfflineSyncService] syncPendingPhotos $inspectionId');
+    logger().d('[OfflineSyncService] syncPendingPhotos $inspectionId');
     if (!online.value) return;
     if (!await SyncPreferences.isCloudSyncEnabled()) return;
 
@@ -133,7 +134,7 @@ class OfflineSyncService {
   }
 
   Future<void> _uploadDraft(SavedReport draft) async {
-    debugPrint('[OfflineSyncService] uploading draft ${draft.id}');
+    logger().d('[OfflineSyncService] uploading draft ${draft.id}');
     final firestore = FirebaseFirestore.instance;
     final storage = FirebaseStorage.instance;
 
