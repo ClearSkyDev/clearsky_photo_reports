@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'clear_sky_app.dart';
+import 'src/core/utils/logging.dart';
 import 'src/core/services/theme_service.dart';
 import 'src/core/services/accessibility_service.dart';
 
@@ -15,7 +16,7 @@ void main() async {
     await AccessibilityService.instance.init();
     runApp(const ClearSkyApp());
   } catch (e, stack) {
-    debugPrint('Firebase initialization failed: $e\n$stack');
+    logger().d('Firebase initialization failed: $e\n$stack');
     runApp(
       MaterialApp(
         home: Scaffold(

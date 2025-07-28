@@ -4,6 +4,7 @@ import 'dart:io';
 
 import '../../core/models/inspector_user.dart';
 import '../../core/services/auth_service.dart';
+import '../../core/utils/logging.dart';
 import '../../core/services/offline_sync_service.dart';
 import '../widgets/ai_chat_button.dart';
 import '../widgets/ai_chat_drawer.dart';
@@ -20,7 +21,7 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
-    debugPrint('[DashboardScreen] build');
+    logger().d('[DashboardScreen] build');
     final key = const String.fromEnvironment('OPENAI_API_KEY', defaultValue: '')
             .isNotEmpty
         ? const String.fromEnvironment('OPENAI_API_KEY')

@@ -5,6 +5,7 @@ import '../../core/utils/square_cropper.dart';
 import 'dart:io';
 import '../../core/models/photo_entry.dart';
 import '../../core/models/inspection_metadata.dart';
+import '../../core/utils/logging.dart';
 import '../../core/models/report_template.dart';
 import 'report_preview_screen.dart';
 
@@ -26,7 +27,7 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
   final List<PhotoEntry> _photos = [];
 
   Future<void> _pickImages() async {
-    debugPrint('[PhotoUploadScreen] Picking images');
+    logger().d('[PhotoUploadScreen] Picking images');
     final List<XFile> selected = await _picker.pickMultiImage();
     if (selected.isNotEmpty) {
       final enforce = await CropPreferences.isEnforced();
@@ -44,12 +45,12 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
           processed.map((xfile) => PhotoEntry(url: xfile.path)).toList(),
         );
       });
-      debugPrint('[PhotoUploadScreen] Added ${processed.length} photos');
+      logger().d('[PhotoUploadScreen] Added ${processed.length} photos');
     }
   }
 
   void _removePhoto(int index) {
-    debugPrint('[PhotoUploadScreen] Removing photo $index');
+    logger().d('[PhotoUploadScreen] Removing photo $index');
     setState(() {
       _photos.removeAt(index);
     });
@@ -57,7 +58,7 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint('[PhotoUploadScreen] build');
+    logger().d('[PhotoUploadScreen] build');
     return Scaffold(
       appBar: AppBar(title: const Text('Photo Upload')),
       body: Column(
@@ -125,7 +126,7 @@ class _PhotoUploadScreenState extends State<PhotoUploadScreen> {
             child: ElevatedButton(
               onPressed: () {
                 if (_photos.isNotEmpty) {
-                  debugPrint('[PhotoUploadScreen] Navigating to preview');
+                  logger().d('[PhotoUploadScreen] Navigating to preview');
                   Navigator.push(
                     context,
                     MaterialPageRoute(

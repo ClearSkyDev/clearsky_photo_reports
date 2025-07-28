@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../core/services/auth_service.dart';
+import '../../core/utils/logging.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -20,7 +21,7 @@ class _LoginScreenState extends State<LoginScreen> {
         _loading = true;
         _error = null;
       });
-      debugPrint('[LoginScreen] Starting login for ${_emailController.text}');
+      logger().d('[LoginScreen] Starting login for ${_emailController.text}');
     try {
       await AuthService().signIn(
         email: _emailController.text.trim(),
@@ -29,11 +30,11 @@ class _LoginScreenState extends State<LoginScreen> {
       if (!mounted) return;
       Navigator.pushNamedAndRemoveUntil(context, '/home', (_) => false);
     } catch (e) {
-      debugPrint('[LoginScreen] Auth error: $e');
+      logger().d('[LoginScreen] Auth error: $e');
       if (mounted) setState(() => _error = e.toString());
       } finally {
         if (mounted) setState(() => _loading = false);
-        debugPrint('[LoginScreen] Login complete');
+        logger().d('[LoginScreen] Login complete');
       }
   }
 
@@ -46,7 +47,7 @@ class _LoginScreenState extends State<LoginScreen> {
         );
       }
     } catch (e) {
-      debugPrint('[LoginScreen] Reset error: $e');
+      logger().d('[LoginScreen] Reset error: $e');
       if (mounted) {
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text('Error: $e')));

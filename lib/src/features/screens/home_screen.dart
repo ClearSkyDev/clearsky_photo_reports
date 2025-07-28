@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
 import 'package:hive/hive.dart';
+import '../../core/utils/color_extensions.dart';
 
 import '../../app/app_theme.dart';
 import '../../../models/simple_inspection_metadata.dart';
@@ -190,7 +191,7 @@ class _HomeScreenState extends State<HomeScreen> {
       decoration: BoxDecoration(
         color: isScheduled
             ? Colors.white
-            : Theme.of(context).colorScheme.primary.withOpacity(0.1),
+            : Theme.of(context).colorScheme.primary.withValues(alpha: (0.1 * 255).round()),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: isScheduled
@@ -200,7 +201,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: (0.05 * 255).round()),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),

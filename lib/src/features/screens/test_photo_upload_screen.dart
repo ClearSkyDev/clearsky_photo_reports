@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import '../../core/utils/logging.dart';
 
 /// Simple screen for testing photo capture and upload.
 class TestPhotoUploadScreen extends StatefulWidget {
@@ -44,7 +45,7 @@ class _TestPhotoUploadScreenState extends State<TestPhotoUploadScreen> {
         setState(() => _image = picked);
       }
     } catch (e) {
-      debugPrint('Error picking image: $e');
+      logger().d('Error picking image: $e');
       if (mounted) {
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text('Error: $e')));
@@ -60,13 +61,13 @@ class _TestPhotoUploadScreenState extends State<TestPhotoUploadScreen> {
       final ref = FirebaseStorage.instance.ref('test_uploads/$name.jpg');
       await ref.putFile(file);
       final url = await ref.getDownloadURL();
-      debugPrint('Uploaded to $url');
+      logger().d('Uploaded to $url');
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Upload successful')),
       );
     } catch (e) {
-      debugPrint('Upload failed: $e');
+      logger().d('Upload failed: $e');
       if (mounted) {
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text('Upload failed: $e')));

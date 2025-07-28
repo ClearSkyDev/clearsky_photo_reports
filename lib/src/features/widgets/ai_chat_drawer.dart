@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/models/chat_message.dart';
 import '../../core/services/ai_chat_service.dart';
+import '../../core/utils/logging.dart';
 
 /// Sliding drawer for the on-site AI assistant.
 class AiChatDrawer extends StatefulWidget {
@@ -34,7 +35,7 @@ class _AiChatDrawerState extends State<AiChatDrawer> {
       if (!mounted) return;
       setState(() => _messages.addAll(history));
     } catch (e) {
-      debugPrint('[AiChatDrawer] loadHistory error: $e');
+      logger().d('[AiChatDrawer] loadHistory error: $e');
     }
   }
 
@@ -56,7 +57,7 @@ class _AiChatDrawerState extends State<AiChatDrawer> {
         _loading = false;
       });
     } catch (e) {
-      debugPrint('[AiChatDrawer] send error: $e');
+      logger().d('[AiChatDrawer] send error: $e');
       if (mounted) setState(() => _loading = false);
     }
   }
