@@ -3,7 +3,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
 import 'package:hive/hive.dart';
-import '../../core/utils/color_extensions.dart';
 
 import '../../app/app_theme.dart';
 import '../../../models/simple_inspection_metadata.dart';
