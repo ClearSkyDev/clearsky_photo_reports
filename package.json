@@ -12,7 +12,14 @@
     "test": "test"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "expo start",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
+    "web": "expo start --web",
+    "build": "eas build --platform all",
+    "submit": "eas submit --platform all",
+    "lint": "eslint .",
+    "test": "jest",
     "bump-ios-version": "python scripts/bump_ios_version.py"
   },
   "repository": {
