@@ -13,7 +13,7 @@ const firebaseConfig = {
   appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID || '',
 };
 
-export let offlineMode = false;
+let offlineMode = false;
 
 const missingVars = [
   'EXPO_PUBLIC_FIREBASE_API_KEY',
@@ -51,6 +51,19 @@ if (!offlineMode) {
   }
 } else {
   console.log('Firebase not configured; using demo mode');
+  app = {};
+  auth = { currentUser: null };
+  db = { collection: () => ({ doc: () => ({}) }) };
+  storage = { ref: () => ({}) };
+  functions = {};
+}
+
+export function logFirebaseStatus() {
+  if (offlineMode) {
+    console.log('[Firebase] Running in OFFLINE mode. No real backend connection.');
+  } else {
+    console.log('[Firebase] Connected to live Firebase project:', firebaseConfig.projectId);
+  }
 }
 
 export { app, auth, db, storage, functions, offlineMode };
