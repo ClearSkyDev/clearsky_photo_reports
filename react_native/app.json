@@ -1,43 +1,58 @@
 {
   "expo": {
-    "name": "ClearSky Photo Reports",
+    "name": "ClearSky",
     "slug": "clearsky-photo-reports",
-    "owner": "clearsky",
     "version": "1.0.2",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#0E5CC8"
     },
-    "userInterfaceStyle": "light",
-    "assetBundlePatterns": ["**/*"],
     "ios": {
+      "supportsTablet": true,
       "bundleIdentifier": "com.clearsky.photo",
       "buildNumber": "1.0.2",
-      "supportsTablet": false,
       "infoPlist": {
-        "NSCameraUsageDescription": "Used to take roof inspection photos",
-        "NSPhotoLibraryUsageDescription": "Used to upload images from gallery",
+        "NSCameraUsageDescription": "ClearSky needs access to your camera to capture roof and property photos.",
+        "NSPhotoLibraryUsageDescription": "ClearSky needs access to your photo library to select and attach existing images.",
         "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
       "package": "com.clearsky.photo",
       "versionCode": 3,
-      "permissions": ["CAMERA", "READ_EXTERNAL_STORAGE", "WRITE_EXTERNAL_STORAGE"]
-    },
-    "extra": {
-      "eas": {
-        "projectId": "3722841f-e742-4d43-859c-b6c5b0e8d784"
+      "permissions": [
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE"
+      ],
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icon.png",
+        "backgroundColor": "#0E5CC8"
       }
     },
+    "web": {
+      "favicon": "./assets/icon.png"
+    },
     "plugins": [
-      "expo-camera",
-      "expo-file-system",
-      "expo-media-library",
-      "expo-image-picker"
+      [
+        "expo-camera",
+        {}
+      ],
+      [
+        "expo-image-picker",
+        {}
+      ],
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "useFrameworks": "static"
+          }
+        }
+      ]
     ],
     "updates": {
       "fallbackToCacheTimeout": 0
@@ -45,8 +60,5 @@
     "runtimeVersion": {
       "policy": "sdkVersion"
     }
-  },
-  "cli": {
-    "appVersionSource": "auto"
   }
 }
