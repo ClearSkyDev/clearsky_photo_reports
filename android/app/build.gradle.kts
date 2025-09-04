@@ -11,7 +11,7 @@ plugins {
 
 android {
     namespace = "com.clearsky.photo"
-    compileSdk = flutter.compileSdkVersion
+    compileSdk = 34
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
@@ -25,12 +25,10 @@ android {
 
     defaultConfig {
         applicationId = "com.clearsky.photo"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
-        versionCode = flutter.versionCode
-        versionName = flutter.versionName
+        minSdk = 23
+        targetSdk = 34
+        versionCode = 10001
+        versionName = "0.9.0-beta1"
     }
 
     buildTypes {
