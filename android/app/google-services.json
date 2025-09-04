@@ -1,0 +1,27 @@
+{
+  "project_info": {
+    "project_number": "123456789012",
+    "project_id": "demo-clearsky",
+    "storage_bucket": "demo-clearsky.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:123456789012:android:abcdef1234567890",
+        "android_client_info": {
+          "package_name": "com.clearsky.photo"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {"current_key": "REPLACE_WITH_API_KEY"}
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

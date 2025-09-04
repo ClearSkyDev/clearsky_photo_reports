@@ -120,7 +120,5 @@ app.*.symbols
 
 node_modules/
 # Firebase configuration
-**/google-services.json
-**/GoogleService-Info.plist
 flutter/
 .expo/
