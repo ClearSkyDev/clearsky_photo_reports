@@ -46,11 +46,11 @@
 <key>UIApplicationSupportsIndirectInputEvents</key>
 <true/>
 <key>NSCameraUsageDescription</key>
-<string>Allow ClearSky Photo Reports to capture roof inspection images.</string>
+<string>ClearSky Photo Reports uses the camera to capture inspection photos.</string>
 <key>NSPhotoLibraryUsageDescription</key>
-<string>Allow ClearSky Photo Reports to access your photo library.</string>
+<string>ClearSky Photo Reports needs access to select inspection photos from your library.</string>
 <key>NSPhotoLibraryAddUsageDescription</key>
-<string>Allow ClearSky Photo Reports to save inspection photos.</string>
+<string>ClearSky Photo Reports saves inspection photos to your photo library.</string>
 <key>NSMicrophoneUsageDescription</key>
 <string>Allow ClearSky Photo Reports to record audio for video reports.</string>
     <key>UIBackgroundModes</key>
