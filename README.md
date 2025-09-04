@@ -181,6 +181,17 @@ This project uses Firebase for data storage and optional photo uploads. Install 
    contains **dummy credentials** so the application can run in offline/demo mode.
    Replace them with your real project values for full Firebase functionality.
 
+### Firebase Setup (Windows)
+
+Run the FlutterFire CLI without modifying your PATH:
+
+```powershell
+ dart pub global run flutterfire_cli configure --platforms=ios,android
+```
+
+This command creates `lib/firebase_options.dart`, `android/app/google-services.json`, and `ios/Runner/GoogleService-Info.plist`.
+
+
 ### Troubleshooting: "Firebase API Key not configured"
 
 If you encounter this error when launching the app:
