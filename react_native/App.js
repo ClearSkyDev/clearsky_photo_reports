@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+import { logFirebaseStatus } from "./firebaseConfig";
 import React, { useState } from 'react';
 import {
   View,
