@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import '../../core/utils/logging.dart';
@@ -47,8 +48,9 @@ class _TestPhotoUploadScreenState extends State<TestPhotoUploadScreen> {
     } catch (e) {
       logger().d('Error picking image: $e');
       if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Error: $e')));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: $e')));
       }
     }
   }
@@ -63,14 +65,15 @@ class _TestPhotoUploadScreenState extends State<TestPhotoUploadScreen> {
       final url = await ref.getDownloadURL();
       logger().d('Uploaded to $url');
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Upload successful')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Upload successful')));
     } catch (e) {
       logger().d('Upload failed: $e');
       if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Upload failed: $e')));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Upload failed: $e')));
       }
     }
   }
@@ -95,6 +98,12 @@ class _TestPhotoUploadScreenState extends State<TestPhotoUploadScreen> {
               onPressed: _image == null ? null : _uploadImage,
               child: const Text('Upload'),
             ),
+            if (kDebugMode) const SizedBox(height: 16),
+            if (kDebugMode)
+              ElevatedButton(
+                onPressed: () => throw Exception('Test Crash'),
+                child: const Text('Crash App'),
+              ),
           ],
         ),
       ),
